@@ -14,7 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      reservas: {
+        Row: {
+          area: Database["public"]["Enums"]["reserva_area"] | null
+          comandas: boolean | null
+          created_at: string
+          data: string | null
+          horario: string | null
+          id: string
+          leva_bolo: boolean | null
+          nome: string
+          observacoes: string | null
+          quantidade: number | null
+          status: Database["public"]["Enums"]["reserva_status"]
+          telefone: string
+          tipo: Database["public"]["Enums"]["reserva_tipo"]
+          tipo_evento: string | null
+          updated_at: string
+        }
+        Insert: {
+          area?: Database["public"]["Enums"]["reserva_area"] | null
+          comandas?: boolean | null
+          created_at?: string
+          data?: string | null
+          horario?: string | null
+          id?: string
+          leva_bolo?: boolean | null
+          nome: string
+          observacoes?: string | null
+          quantidade?: number | null
+          status?: Database["public"]["Enums"]["reserva_status"]
+          telefone: string
+          tipo: Database["public"]["Enums"]["reserva_tipo"]
+          tipo_evento?: string | null
+          updated_at?: string
+        }
+        Update: {
+          area?: Database["public"]["Enums"]["reserva_area"] | null
+          comandas?: boolean | null
+          created_at?: string
+          data?: string | null
+          horario?: string | null
+          id?: string
+          leva_bolo?: boolean | null
+          nome?: string
+          observacoes?: string | null
+          quantidade?: number | null
+          status?: Database["public"]["Enums"]["reserva_status"]
+          telefone?: string
+          tipo?: Database["public"]["Enums"]["reserva_tipo"]
+          tipo_evento?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +76,9 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      reserva_area: "interna" | "externa" | "sem_preferencia"
+      reserva_status: "pendente" | "confirmada" | "cancelada" | "finalizada"
+      reserva_tipo: "mesa" | "aniversario" | "evento" | "casamento"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +205,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      reserva_area: ["interna", "externa", "sem_preferencia"],
+      reserva_status: ["pendente", "confirmada", "cancelada", "finalizada"],
+      reserva_tipo: ["mesa", "aniversario", "evento", "casamento"],
+    },
   },
 } as const
