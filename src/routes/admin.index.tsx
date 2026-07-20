@@ -1,0 +1,518 @@
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  Bell, BellOff, Calendar, CalendarDays, Download, LogOut, PartyPopper, Search,
+  Sparkles, User, Loader2, Check, X, CheckCircle2, Phone, Utensils, Heart, Cake,
+} from "lucide-react";
+import { toast } from "sonner";
+
+import { supabase } from "@/integrations/supabase/client";
+import {
+  AREA_LABEL, STATUS_LABEL, TIPO_LABEL, TIPO_SHORT,
+  formatData, formatHorario,
+  type Reserva, type ReservaStatus, type ReservaTipo,
+} from "@/lib/reservations";
+import {
+  canNotify, initInstallPrompt, isStandalone, notificationPermission,
+  registerServiceWorker, requestNotificationPermission, showNotification,
+  triggerInstallPrompt,
+} from "@/lib/pwa";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
+
+export const Route = createFileRoute("/admin/")({
+  head: () => ({
+    meta: [
+      { title: "Painel — Iracema" },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
+  ssr: false,
+  component: AdminDashboard,
+});
+
+type Filtro = "hoje" | "amanha" | "semana" | "mes" | "todos";
+const FILTROS: Array<{ id: Filtro; label: string }> = [
+  { id: "hoje", label: "Hoje" },
+  { id: "amanha", label: "Amanhã" },
+  { id: "semana", label: "Semana" },
+  { id: "mes", label: "Mês" },
+  { id: "todos", label: "Todos" },
+];
+
+const TIPO_ICON = {
+  mesa: Utensils, aniversario: Cake, evento: Sparkles, casamento: Heart,
+} as const;
+
+function todayISO() { return new Date().toISOString().slice(0, 10); }
+function tomorrowISO() {
+  const d = new Date(); d.setDate(d.getDate() + 1);
+  return d.toISOString().slice(0, 10);
+}
+function endOfWeekISO() {
+  const d = new Date(); d.setDate(d.getDate() + 7);
+  return d.toISOString().slice(0, 10);
+}
+function endOfMonthISO() {
+  const d = new Date(); d.setDate(d.getDate() + 30);
+  return d.toISOString().slice(0, 10);
+}
+
+function AdminDashboard() {
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+
+  const [ready, setReady] = useState(false);
+  const [filtro, setFiltro] = useState<Filtro>("hoje");
+  const [busca, setBusca] = useState("");
+  const [selected, setSelected] = useState<Reserva | null>(null);
+  const [notifPerm, setNotifPerm] = useState<string>("default");
+  const [installReady, setInstallReady] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Auth gate
+  useEffect(() => {
+    let mounted = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (!mounted) return;
+      if (!data.session) navigate({ to: "/admin/login" });
+      else setReady(true);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_OUT") navigate({ to: "/admin/login" });
+    });
+    return () => { mounted = false; sub.subscription.unsubscribe(); };
+  }, [navigate]);
+
+  // PWA + notifications setup
+  useEffect(() => {
+    registerServiceWorker();
+    initInstallPrompt(() => setInstallReady(true));
+    if (canNotify()) setNotifPerm(notificationPermission());
+  }, []);
+
+  // Realtime → toast + notification
+  useEffect(() => {
+    if (!ready) return;
+    const channel = supabase
+      .channel("reservas-admin")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "reservas" },
+        (payload) => {
+          const r = payload.new as Reserva;
+          qc.invalidateQueries({ queryKey: ["reservas"] });
+          qc.invalidateQueries({ queryKey: ["reservas-stats"] });
+          const line = `${TIPO_SHORT[r.tipo]} • ${r.quantidade ?? "?"} pessoas • ${formatData(r.data)}${r.horario ? ` às ${formatHorario(r.horario)}` : ""}`;
+          toast.success(`Nova reserva — ${r.nome}`, { description: line });
+          showNotification(`Nova reserva — ${r.nome}`, line);
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "reservas" },
+        () => {
+          qc.invalidateQueries({ queryKey: ["reservas"] });
+          qc.invalidateQueries({ queryKey: ["reservas-stats"] });
+        },
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [ready, qc]);
+
+  // Stats query
+  const stats = useQuery({
+    enabled: ready,
+    queryKey: ["reservas-stats"],
+    queryFn: async () => {
+      const [hoje, pendentes, semana, eventos] = await Promise.all([
+        supabase.from("reservas").select("id", { count: "exact", head: true }).eq("data", todayISO()),
+        supabase.from("reservas").select("id", { count: "exact", head: true }).eq("status", "pendente"),
+        supabase.from("reservas").select("id", { count: "exact", head: true }).gte("data", todayISO()).lte("data", endOfWeekISO()),
+        supabase.from("reservas").select("id", { count: "exact", head: true }).in("tipo", ["evento", "casamento", "aniversario"]).gte("data", todayISO()),
+      ]);
+      return {
+        hoje: hoje.count ?? 0,
+        pendentes: pendentes.count ?? 0,
+        semana: semana.count ?? 0,
+        eventos: eventos.count ?? 0,
+      };
+    },
+  });
+
+  // List query
+  const listaQ = useQuery({
+    enabled: ready,
+    queryKey: ["reservas", filtro, busca],
+    queryFn: async () => {
+      let q = supabase.from("reservas").select("*").order("data", { ascending: true, nullsFirst: false }).order("horario", { ascending: true }).order("created_at", { ascending: false });
+
+      if (filtro === "hoje") q = q.eq("data", todayISO());
+      else if (filtro === "amanha") q = q.eq("data", tomorrowISO());
+      else if (filtro === "semana") q = q.gte("data", todayISO()).lte("data", endOfWeekISO());
+      else if (filtro === "mes") q = q.gte("data", todayISO()).lte("data", endOfMonthISO());
+
+      const term = busca.trim();
+      if (term) q = q.or(`nome.ilike.%${term}%,telefone.ilike.%${term}%`);
+
+      const { data, error } = await q.limit(200);
+      if (error) throw error;
+      return data as Reserva[];
+    },
+  });
+
+  const updateStatus = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: ReservaStatus }) => {
+      const { error } = await supabase.from("reservas").update({ status }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: (_data, vars) => {
+      toast.success(`Reserva ${STATUS_LABEL[vars.status].toLowerCase()}.`);
+      qc.invalidateQueries({ queryKey: ["reservas"] });
+      qc.invalidateQueries({ queryKey: ["reservas-stats"] });
+      setSelected((s) => (s && s.id === vars.id ? { ...s, status: vars.status } : s));
+    },
+    onError: () => toast.error("Não foi possível atualizar."),
+  });
+
+  async function handleNotifRequest() {
+    const p = await requestNotificationPermission();
+    setNotifPerm(p);
+    if (p === "granted") toast.success("Notificações ativadas.");
+    else if (p === "denied") toast.error("Permissão negada nas configurações do navegador.");
+  }
+
+  async function handleInstall() {
+    const r = await triggerInstallPrompt();
+    if (r === "accepted") {
+      toast.success("Aplicativo instalado.");
+      setInstallReady(false);
+    }
+  }
+
+  async function signOut() {
+    await supabase.auth.signOut();
+    navigate({ to: "/admin/login" });
+  }
+
+  if (!ready) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  const showInstall = installReady && !isStandalone();
+  const showNotifCTA = canNotify() && notifPerm !== "granted" && notifPerm !== "unsupported";
+
+  return (
+    <main className="min-h-screen bg-background pb-16 safe-top safe-bottom">
+      {/* Header */}
+      <header className="sticky top-0 z-20 border-b border-border/70 bg-background/85 backdrop-blur-md">
+        <div className="mx-auto flex max-w-4xl items-center gap-3 px-5 py-4">
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-terracotta">
+              Iracema
+            </p>
+            <h1 className="truncate text-lg font-medium">Painel de reservas</h1>
+          </div>
+          <button
+            onClick={signOut}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            aria-label="Sair"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
+        </div>
+      </header>
+
+      <div className="mx-auto max-w-4xl px-5 pt-6">
+        {/* CTAs PWA / Notif */}
+        {(showInstall || showNotifCTA) && (
+          <div className="mb-5 flex flex-wrap gap-2 animate-fade">
+            {showNotifCTA && (
+              <button
+                onClick={handleNotifRequest}
+                className="inline-flex items-center gap-2 rounded-full border border-terracotta/30 bg-terracotta/5 px-3.5 py-1.5 text-xs font-medium text-terracotta transition-colors hover:bg-terracotta/10"
+              >
+                <Bell className="h-3.5 w-3.5" />
+                Ativar notificações
+              </button>
+            )}
+            {showInstall && (
+              <button
+                onClick={handleInstall}
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-accent"
+              >
+                <Download className="h-3.5 w-3.5" />
+                Instalar aplicativo
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Stats */}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <StatCard icon={CalendarDays} label="Hoje"       value={stats.data?.hoje}       loading={stats.isLoading} />
+          <StatCard icon={Bell}         label="Pendentes"  value={stats.data?.pendentes}  loading={stats.isLoading} accent />
+          <StatCard icon={Calendar}     label="Próx. 7 dias" value={stats.data?.semana}   loading={stats.isLoading} />
+          <StatCard icon={PartyPopper}  label="Eventos"    value={stats.data?.eventos}    loading={stats.isLoading} />
+        </div>
+
+        {/* Search */}
+        <div className="mt-6 relative">
+          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            placeholder="Buscar por nome ou telefone…"
+            className="h-11 rounded-xl pl-10"
+          />
+        </div>
+
+        {/* Filtros */}
+        <div className="mt-4 -mx-5 overflow-x-auto px-5 pb-1 scrollbar-none">
+          <div className="flex gap-1.5">
+            {FILTROS.map((f) => (
+              <button
+                key={f.id}
+                onClick={() => setFiltro(f.id)}
+                className={`h-9 shrink-0 rounded-full px-4 text-xs font-medium transition-all ${
+                  filtro === f.id
+                    ? "bg-primary text-primary-foreground shadow-[var(--shadow-sm)]"
+                    : "bg-muted text-muted-foreground hover:bg-accent hover:text-foreground"
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Lista */}
+        <div className="mt-5 space-y-2.5">
+          {listaQ.isLoading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-[88px] w-full rounded-2xl" />
+            ))
+          ) : listaQ.data && listaQ.data.length > 0 ? (
+            listaQ.data.map((r, i) => (
+              <ReservaCard
+                key={r.id}
+                r={r}
+                onClick={() => setSelected(r)}
+                delay={i * 30}
+              />
+            ))
+          ) : (
+            <EmptyState />
+          )}
+        </div>
+      </div>
+
+      {/* Detalhes */}
+      <ReservaDialog
+        reserva={selected}
+        onClose={() => setSelected(null)}
+        onStatus={(status) => selected && updateStatus.mutate({ id: selected.id, status })}
+        pending={updateStatus.isPending}
+      />
+    </main>
+  );
+}
+
+function StatCard({
+  icon: Icon, label, value, loading, accent,
+}: { icon: React.ComponentType<{ className?: string }>; label: string; value?: number; loading?: boolean; accent?: boolean }) {
+  return (
+    <div className={`rounded-2xl border border-border bg-card p-4 transition-colors ${accent ? "bg-cream" : ""}`}>
+      <div className="flex items-center gap-2">
+        <Icon className={`h-3.5 w-3.5 ${accent ? "text-terracotta" : "text-muted-foreground"}`} />
+        <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
+      </div>
+      <p className="mt-2.5 font-serif text-3xl tabular-nums text-foreground">
+        {loading ? <span className="inline-block h-7 w-8 rounded shimmer" /> : (value ?? 0)}
+      </p>
+    </div>
+  );
+}
+
+function StatusPill({ status }: { status: ReservaStatus }) {
+  const styles: Record<ReservaStatus, string> = {
+    pendente:   "bg-warning/15 text-[oklch(0.45_0.11_65)]",
+    confirmada: "bg-success/15 text-[oklch(0.4_0.12_150)]",
+    cancelada:  "bg-destructive/12 text-destructive",
+    finalizada: "bg-muted text-muted-foreground",
+  };
+  return (
+    <span className={`inline-flex h-6 items-center rounded-full px-2.5 text-[11px] font-medium ${styles[status]}`}>
+      {STATUS_LABEL[status]}
+    </span>
+  );
+}
+
+function ReservaCard({
+  r, onClick, delay,
+}: { r: Reserva; onClick: () => void; delay: number }) {
+  const Icon = TIPO_ICON[r.tipo as ReservaTipo] ?? Utensils;
+  return (
+    <button
+      onClick={onClick}
+      style={{ animationDelay: `${delay}ms` }}
+      className="w-full rounded-2xl border border-border bg-card p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-terracotta/40 hover:shadow-[var(--shadow-md)] active:scale-[0.995] animate-in-up"
+    >
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+        <div className="flex min-w-0 items-start gap-3">
+          <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cream text-terracotta">
+            <Icon className="h-4 w-4" />
+          </div>
+          <div className="min-w-0">
+            <p className="truncate font-medium text-foreground">{r.nome}</p>
+            <p className="mt-0.5 truncate text-[13px] text-muted-foreground">
+              {TIPO_SHORT[r.tipo as ReservaTipo]}
+              {r.quantidade ? ` • ${r.quantidade} pessoas` : ""}
+              {r.data ? ` • ${formatData(r.data)}` : ""}
+              {r.horario ? ` às ${formatHorario(r.horario)}` : ""}
+            </p>
+          </div>
+        </div>
+        <StatusPill status={r.status} />
+      </div>
+    </button>
+  );
+}
+
+function ReservaDialog({
+  reserva, onClose, onStatus, pending,
+}: { reserva: Reserva | null; onClose: () => void; onStatus: (s: ReservaStatus) => void; pending: boolean }) {
+  const r = reserva;
+  return (
+    <Dialog open={!!r} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-md rounded-2xl p-0 overflow-hidden">
+        {r && (
+          <>
+            <DialogHeader className="border-b border-border/70 p-5 text-left">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <DialogTitle className="truncate font-serif text-2xl font-normal tracking-tight">
+                    {r.nome}
+                  </DialogTitle>
+                  <DialogDescription className="mt-1 text-[13px] text-muted-foreground">
+                    {TIPO_LABEL[r.tipo as ReservaTipo]}
+                  </DialogDescription>
+                </div>
+                <StatusPill status={r.status} />
+              </div>
+            </DialogHeader>
+
+            <div className="max-h-[55vh] overflow-y-auto p-5">
+              <div className="space-y-3.5 text-sm">
+                <DetailRow icon={Phone} label="Telefone" value={r.telefone} link={`tel:${r.telefone.replace(/\D/g, "")}`} />
+                {r.quantidade != null && <DetailRow icon={User} label="Pessoas" value={String(r.quantidade)} />}
+                {r.data && <DetailRow icon={CalendarDays} label="Data" value={formatData(r.data)} />}
+                {r.horario && <DetailRow icon={Calendar} label="Horário" value={formatHorario(r.horario)} />}
+                {r.area && <DetailRow icon={Utensils} label="Área" value={AREA_LABEL[r.area]} />}
+                {r.tipo_evento && <DetailRow icon={Sparkles} label="Tipo do evento" value={r.tipo_evento} />}
+                {r.leva_bolo !== null && r.tipo === "aniversario" && (
+                  <DetailRow icon={Cake} label="Leva bolo" value={r.leva_bolo ? "Sim" : "Não"} />
+                )}
+                {r.comandas !== null && r.tipo === "aniversario" && (
+                  <DetailRow icon={Check} label="Comandas individuais" value={r.comandas ? "Sim" : "Não"} />
+                )}
+                {r.observacoes && (
+                  <div className="rounded-xl bg-muted p-3.5">
+                    <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                      Observações
+                    </p>
+                    <p className="leading-relaxed text-foreground">{r.observacoes}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="border-t border-border/70 bg-muted/40 p-4">
+              <div className="grid grid-cols-3 gap-2">
+                <ActionBtn
+                  disabled={pending || r.status === "confirmada"}
+                  onClick={() => onStatus("confirmada")}
+                  variant="primary"
+                  icon={CheckCircle2}
+                >
+                  Confirmar
+                </ActionBtn>
+                <ActionBtn
+                  disabled={pending || r.status === "finalizada"}
+                  onClick={() => onStatus("finalizada")}
+                  icon={Check}
+                >
+                  Finalizar
+                </ActionBtn>
+                <ActionBtn
+                  disabled={pending || r.status === "cancelada"}
+                  onClick={() => onStatus("cancelada")}
+                  variant="danger"
+                  icon={X}
+                >
+                  Cancelar
+                </ActionBtn>
+              </div>
+            </div>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function DetailRow({
+  icon: Icon, label, value, link,
+}: { icon: React.ComponentType<{ className?: string }>; label: string; value: string; link?: string }) {
+  const content = <span className="font-medium text-foreground">{value}</span>;
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center gap-2 text-muted-foreground">
+        <Icon className="h-3.5 w-3.5" />
+        <span className="text-[13px]">{label}</span>
+      </div>
+      {link ? <a href={link} className="text-right underline-offset-2 hover:underline">{content}</a> : content}
+    </div>
+  );
+}
+
+function ActionBtn({
+  children, onClick, disabled, variant, icon: Icon,
+}: {
+  children: React.ReactNode; onClick: () => void; disabled?: boolean;
+  variant?: "primary" | "danger"; icon: React.ComponentType<{ className?: string }>;
+}) {
+  const base = "flex h-11 items-center justify-center gap-1.5 rounded-xl text-xs font-medium transition-all active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none";
+  const styles = variant === "primary"
+    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+    : variant === "danger"
+    ? "bg-background text-destructive border border-border hover:bg-destructive/5"
+    : "bg-background text-foreground border border-border hover:bg-accent";
+  return (
+    <button onClick={onClick} disabled={disabled} className={`${base} ${styles}`}>
+      <Icon className="h-3.5 w-3.5" />
+      {children}
+    </button>
+  );
+}
+
+function EmptyState() {
+  return (
+    <div className="rounded-2xl border border-dashed border-border bg-card/50 py-14 text-center animate-fade">
+      <p className="font-serif text-2xl text-foreground">Nenhuma reserva</p>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Nada por aqui neste filtro.
+      </p>
+    </div>
+  );
+}
