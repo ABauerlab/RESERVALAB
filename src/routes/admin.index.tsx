@@ -367,7 +367,7 @@ function AdminDashboard() {
         onClose={() => setSelected(null)}
         onConfirm={() => selected && handleConfirm(selected)}
         onSetStatus={(status) => selected && updateReserva.mutate({ id: selected.id, patch: { status } })}
-        onSave={(patch) => selected && updateReserva.mutateAsync({ id: selected.id, patch })}
+        onSave={(patch) => selected ? updateReserva.mutateAsync({ id: selected.id, patch }) : Promise.resolve()}
         onDelete={() => selected && deleteReserva.mutate(selected.id)}
         pending={updateReserva.isPending || deleteReserva.isPending}
       />
