@@ -2,6 +2,7 @@ import type { Database } from "@/integrations/supabase/types";
 
 export type Reserva = Database["public"]["Tables"]["reservas"]["Row"];
 export type ReservaInsert = Database["public"]["Tables"]["reservas"]["Insert"];
+export type ReservaUpdate = Database["public"]["Tables"]["reservas"]["Update"];
 export type ReservaTipo = Database["public"]["Enums"]["reserva_tipo"];
 export type ReservaStatus = Database["public"]["Enums"]["reserva_status"];
 export type ReservaArea = Database["public"]["Enums"]["reserva_area"];
@@ -27,6 +28,8 @@ export const STATUS_LABEL: Record<ReservaStatus, string> = {
   finalizada: "Finalizada",
 };
 
+export const STATUS_LIST: ReservaStatus[] = ["pendente", "confirmada", "cancelada", "finalizada"];
+
 export const AREA_LABEL: Record<ReservaArea, string> = {
   interna: "Interna",
   externa: "Externa",
@@ -41,15 +44,41 @@ export const TIPO_CARDS: Array<{
   { tipo: "mesa",         titulo: "Reservar mesa",       descricao: "Almoço, jantar ou um brinde com amigos." },
   { tipo: "aniversario",  titulo: "Aniversário",         descricao: "Celebre com bolo, comandas e a nossa equipe." },
   { tipo: "evento",       titulo: "Evento particular",   descricao: "Confraternização, encontro corporativo, comemoração." },
-  { tipo: "casamento",    titulo: "Casamento",           descricao: "Cerimônia e recepção sob medida no Iracema." },
+  { tipo: "casamento",    titulo: "Casamento",           descricao: "Cerimônia e recepção sob medida." },
 ];
 
+/**
+ * Formata telefone de forma flexível:
+ * - Se começa com "+", mantém DDI livre e formata o restante em grupos.
+ * - Caso contrário, aplica máscara BR (10 ou 11 dígitos).
+ */
 export function formatTelefone(v: string): string {
-  const d = v.replace(/\D/g, "").slice(0, 11);
+  const trimmed = v.trim();
+  if (trimmed.startsWith("+")) {
+    // Mantém apenas + e dígitos, agrupa: +DD (XXX) XXXXX-XXXX (flexível)
+    const digits = trimmed.slice(1).replace(/\D/g, "").slice(0, 15);
+    if (digits.length === 0) return "+";
+    if (digits.length <= 2) return `+${digits}`;
+    if (digits.length <= 4) return `+${digits.slice(0, 2)} ${digits.slice(2)}`;
+    if (digits.length <= 8) return `+${digits.slice(0, 2)} ${digits.slice(2, 4)} ${digits.slice(4)}`;
+    // Ex: +55 11 91234-5678
+    return `+${digits.slice(0, 2)} ${digits.slice(2, 4)} ${digits.slice(4, 9)}-${digits.slice(9)}`;
+  }
+  const d = trimmed.replace(/\D/g, "").slice(0, 11);
   if (d.length <= 2) return d;
   if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
   if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
   return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+}
+
+/** Retorna telefone somente-dígitos incluindo DDI (default 55 se não informado). */
+export function telefoneToWhatsApp(v: string): string {
+  const trimmed = v.trim();
+  if (trimmed.startsWith("+")) return trimmed.slice(1).replace(/\D/g, "");
+  const d = trimmed.replace(/\D/g, "");
+  if (d.length === 0) return "";
+  // Assume BR se sem DDI
+  return d.startsWith("55") ? d : `55${d}`;
 }
 
 export function formatData(iso?: string | null): string {

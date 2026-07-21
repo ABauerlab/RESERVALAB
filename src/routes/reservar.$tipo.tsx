@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate, useParams, notFound } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft, Loader2, Minus, Plus } from "lucide-react";
 import { toast } from "sonner";
 
@@ -11,6 +12,7 @@ import {
   type ReservaInsert,
   type ReservaTipo,
 } from "@/lib/reservations";
+import { getDefaultTenant } from "@/lib/tenant";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,7 +26,7 @@ const TIPOS_VALIDOS: ReservaTipo[] = ["mesa", "aniversario", "evento", "casament
 export const Route = createFileRoute("/reservar/$tipo")({
   head: ({ params }) => ({
     meta: [
-      { title: `${TIPO_LABEL[params.tipo as ReservaTipo] ?? "Reserva"} — Iracema` },
+      { title: `${TIPO_LABEL[params.tipo as ReservaTipo] ?? "Reserva"} — ReservaLab` },
       { name: "description", content: "Envie sua solicitação de reserva em poucos toques." },
       { name: "robots", content: "noindex" },
     ],
@@ -38,10 +40,11 @@ export const Route = createFileRoute("/reservar/$tipo")({
 function ReservarPage() {
   const { tipo } = useParams({ from: "/reservar/$tipo" }) as { tipo: ReservaTipo };
   const navigate = useNavigate();
+  const tenantQ = useQuery({ queryKey: ["default-tenant"], queryFn: getDefaultTenant, staleTime: 5 * 60_000 });
 
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
-  const [quantidade, setQuantidade] = useState(2);
+  const [quantidade, setQuantidade] = useState<number>(2);
   const [data, setData] = useState("");
   const [horario, setHorario] = useState("");
   const [observacoes, setObservacoes] = useState("");
@@ -63,19 +66,27 @@ function ReservarPage() {
   const hoje = useMemo(() => new Date().toISOString().slice(0, 10), []);
 
   const podeEnviar =
+    !!tenantQ.data &&
     nome.trim().length >= 2 &&
     telefone.replace(/\D/g, "").length >= 10 &&
     quantidade > 0 &&
-    data &&
-    (!precisaHorario || horario) &&
+    !!data &&
+    (!precisaHorario || !!horario) &&
     (!isEvento || tipoEvento.trim().length > 0);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!podeEnviar || enviando) return;
+    const tenant = tenantQ.data;
+    if (!tenant) {
+      toast.error("Empresa indisponível no momento.");
+      return;
+    }
 
     setEnviando(true);
     const payload: ReservaInsert = {
+      tenant_id: tenant.id,
+      codigo_acompanhamento: "", // trigger no banco gera automaticamente
       tipo,
       nome: nome.trim(),
       telefone: telefone.trim(),
@@ -93,12 +104,22 @@ function ReservarPage() {
       status: "pendente",
     };
 
-    const { error } = await supabase.from("reservas").insert(payload);
+    const { data: inserted, error } = await supabase
+      .from("reservas")
+      .insert(payload)
+      .select("codigo_acompanhamento")
+      .single();
     setEnviando(false);
 
-    if (error) {
+    if (error || !inserted) {
       toast.error("Não foi possível enviar sua reserva. Tente novamente.");
       return;
+    }
+    // Salva o código para exibição na tela de obrigado
+    try {
+      sessionStorage.setItem("ultima-reserva-codigo", inserted.codigo_acompanhamento);
+    } catch {
+      /* noop */
     }
     navigate({ to: "/obrigado" });
   }
@@ -115,7 +136,7 @@ function ReservarPage() {
 
         <header className="mt-6 animate-fade">
           <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-terracotta">
-            Iracema
+            {tenantQ.data?.nome ?? "Reserva"}
           </p>
           <h1 className="mt-3 font-serif text-4xl leading-tight tracking-tight sm:text-5xl">
             {TIPO_LABEL[tipo]}
@@ -137,11 +158,11 @@ function ReservarPage() {
             />
           </Field>
 
-          <Field label="Telefone / WhatsApp">
+          <Field label="Telefone / WhatsApp" hint="Se for do exterior, comece com + e o código do país">
             <Input
               value={telefone}
               onChange={(e) => setTelefone(formatTelefone(e.target.value))}
-              placeholder="(11) 91234-5678"
+              placeholder="(11) 91234-5678 ou +1 555 1234"
               inputMode="tel"
               autoComplete="tel"
               className="h-12 rounded-xl"
@@ -150,7 +171,7 @@ function ReservarPage() {
           </Field>
 
           <Field label={isEvento || isCasa ? "Quantidade prevista" : "Quantidade de pessoas"}>
-            <Stepper value={quantidade} onChange={setQuantidade} min={1} max={500} />
+            <QuantityInput value={quantidade} onChange={setQuantidade} min={1} max={5000} />
           </Field>
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
@@ -268,31 +289,58 @@ function ReservarPage() {
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, children, hint }: { label: string; children: React.ReactNode; hint?: string }) {
   return (
     <div className="space-y-2">
       <Label className="text-[13px] font-medium text-foreground">{label}</Label>
       {children}
+      {hint && <p className="text-[11px] text-muted-foreground">{hint}</p>}
     </div>
   );
 }
 
-function Stepper({ value, onChange, min, max }: { value: number; onChange: (v: number) => void; min: number; max: number }) {
+function QuantityInput({
+  value, onChange, min, max,
+}: { value: number; onChange: (v: number) => void; min: number; max: number }) {
+  const [text, setText] = useState<string>(String(value));
+
+  function commit(next: number) {
+    const clamped = Math.max(min, Math.min(max, Number.isFinite(next) ? next : min));
+    onChange(clamped);
+    setText(String(clamped));
+  }
+
   return (
     <div className="flex h-12 items-center justify-between rounded-xl border border-input bg-background px-2">
       <button
         type="button"
-        onClick={() => onChange(Math.max(min, value - 1))}
+        onClick={() => commit(value - 1)}
         className="flex h-10 w-10 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-accent active:scale-95 disabled:opacity-40"
         disabled={value <= min}
         aria-label="Diminuir"
       >
         <Minus className="h-4 w-4" />
       </button>
-      <span className="text-lg font-medium tabular-nums">{value}</span>
+      <input
+        type="text"
+        inputMode="numeric"
+        pattern="[0-9]*"
+        value={text}
+        onChange={(e) => {
+          const v = e.target.value.replace(/\D/g, "").slice(0, 4);
+          setText(v);
+          if (v !== "") onChange(Math.max(min, Math.min(max, parseInt(v, 10))));
+        }}
+        onBlur={() => {
+          if (text === "") commit(min);
+          else commit(parseInt(text, 10));
+        }}
+        className="w-16 bg-transparent text-center text-lg font-medium tabular-nums outline-none"
+        aria-label="Quantidade"
+      />
       <button
         type="button"
-        onClick={() => onChange(Math.min(max, value + 1))}
+        onClick={() => commit(value + 1)}
         className="flex h-10 w-10 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-accent active:scale-95 disabled:opacity-40"
         disabled={value >= max}
         aria-label="Aumentar"

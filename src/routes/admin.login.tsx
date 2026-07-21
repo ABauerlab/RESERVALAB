@@ -12,7 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 export const Route = createFileRoute("/admin/login")({
   head: () => ({
     meta: [
-      { title: "Admin — Iracema" },
+      { title: "Admin — ReservaLab" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -46,9 +46,7 @@ function AdminLogin() {
         toast.error("E-mail ou senha inválidos.");
         return;
       }
-      if (!manter) {
-        // Mesmo assim a sessão permanece, mas limpar no fechar seria ideal; simplificação
-      }
+      void manter;
       navigate({ to: "/admin" });
     } else {
       const { error } = await supabase.auth.signUp({
@@ -71,7 +69,7 @@ function AdminLogin() {
       <div className="w-full max-w-sm animate-in-up">
         <Link to="/" className="mb-10 block text-center">
           <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-terracotta">
-            Iracema
+            ReservaLab
           </p>
           <p className="mt-1 text-xs text-muted-foreground">Painel administrativo</p>
         </Link>
@@ -91,7 +89,7 @@ function AdminLogin() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@iracema.com"
+                placeholder="voce@empresa.com"
                 autoComplete="email"
                 required
                 className="h-12 rounded-xl"
