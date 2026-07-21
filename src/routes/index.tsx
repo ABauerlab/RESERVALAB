@@ -1,12 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, UtensilsCrossed, Cake, Sparkles, Heart } from "lucide-react";
-import { TIPO_CARDS } from "@/lib/reservations";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowRight, UtensilsCrossed, Cake, Sparkles, Heart, Search } from "lucide-react";
+import { TIPO_CARDS, type ReservaTipo } from "@/lib/reservations";
+import { getDefaultTenant } from "@/lib/tenant";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Iracema — Reservas" },
-      { name: "description", content: "Reserve sua mesa, aniversário ou evento no Iracema em poucos toques." },
+      { name: "description", content: "Reserve sua mesa, aniversário ou evento em poucos toques." },
     ],
   }),
   component: Home,
@@ -20,13 +22,22 @@ const ICONS = {
 } as const;
 
 function Home() {
+  const tenantQ = useQuery({
+    queryKey: ["default-tenant"],
+    queryFn: getDefaultTenant,
+    staleTime: 5 * 60_000,
+  });
+  const tenant = tenantQ.data;
+  const nomeEmpresa = tenant?.nome ?? "";
+  const tiposAceitos = tenant?.tipos_aceitos ?? ["mesa", "aniversario", "evento", "casamento"];
+  const cards = TIPO_CARDS.filter((c) => tiposAceitos.includes(c.tipo as ReservaTipo));
+
   return (
     <main className="relative min-h-screen bg-background">
       <div className="mx-auto flex min-h-screen max-w-2xl flex-col px-5 pt-14 pb-10 safe-top safe-bottom sm:pt-20">
-        {/* Marca */}
         <header className="animate-fade">
           <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-terracotta">
-            Iracema
+            {nomeEmpresa || "Reservas"}
           </p>
           <h1 className="mt-6 font-serif text-[44px] leading-[1.05] tracking-tight text-foreground sm:text-6xl">
             Como podemos te receber?
@@ -36,9 +47,8 @@ function Home() {
           </p>
         </header>
 
-        {/* Cards */}
         <div className="mt-10 grid gap-3 sm:mt-12">
-          {TIPO_CARDS.map((card, i) => {
+          {cards.map((card, i) => {
             const Icon = ICONS[card.tipo];
             return (
               <Link
@@ -61,9 +71,22 @@ function Home() {
           })}
         </div>
 
+        <div className="mt-8 flex justify-center">
+          <Link
+            to="/acompanhar"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          >
+            <Search className="h-3.5 w-3.5" />
+            Acompanhar reserva pelo código
+          </Link>
+        </div>
+
         <div className="mt-auto pt-16 text-center">
           <p className="text-xs text-muted-foreground">
             Sem cadastro. Sem esperas.
+          </p>
+          <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground/60">
+            ReservaLab
           </p>
         </div>
       </div>

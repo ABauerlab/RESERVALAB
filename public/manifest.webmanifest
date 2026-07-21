@@ -1,7 +1,7 @@
 {
-  "name": "Iracema — Reservas",
-  "short_name": "Iracema",
-  "description": "Painel de reservas do restaurante Iracema.",
+  "name": "ReservaLab",
+  "short_name": "ReservaLab",
+  "description": "Sistema de reservas ReservaLab.",
   "start_url": "/admin",
   "scope": "/",
   "display": "standalone",
@@ -9,7 +9,8 @@
   "background_color": "#f6f1e6",
   "theme_color": "#f6f1e6",
   "icons": [
-    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }

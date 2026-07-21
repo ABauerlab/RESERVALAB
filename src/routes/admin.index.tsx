@@ -1,18 +1,20 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  Bell, BellOff, Calendar, CalendarDays, Download, LogOut, PartyPopper, Search,
+  Bell, Calendar, CalendarDays, Download, LogOut, PartyPopper, Search,
   Sparkles, User, Loader2, Check, X, CheckCircle2, Phone, Utensils, Heart, Cake,
+  MessageCircle, Pencil, Trash2, Save,
 } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import {
-  AREA_LABEL, STATUS_LABEL, TIPO_LABEL, TIPO_SHORT,
-  formatData, formatHorario,
-  type Reserva, type ReservaStatus, type ReservaTipo,
+  AREA_LABEL, STATUS_LABEL, STATUS_LIST, TIPO_LABEL, TIPO_SHORT,
+  formatData, formatHorario, telefoneToWhatsApp,
+  type Reserva, type ReservaArea, type ReservaStatus, type ReservaTipo, type ReservaUpdate,
 } from "@/lib/reservations";
+import { getDefaultTenant } from "@/lib/tenant";
 import {
   canNotify, initInstallPrompt, isStandalone, notificationPermission,
   registerServiceWorker, requestNotificationPermission, showNotification,
@@ -21,15 +23,20 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
+  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 
 export const Route = createFileRoute("/admin/")({
   head: () => ({
     meta: [
-      { title: "Painel — Iracema" },
+      { title: "Painel — ReservaLab" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -37,13 +44,19 @@ export const Route = createFileRoute("/admin/")({
   component: AdminDashboard,
 });
 
-type Filtro = "hoje" | "amanha" | "semana" | "mes" | "todos";
-const FILTROS: Array<{ id: Filtro; label: string }> = [
+type FiltroData = "hoje" | "amanha" | "semana" | "mes" | "todos";
+const FILTROS_DATA: Array<{ id: FiltroData; label: string }> = [
   { id: "hoje", label: "Hoje" },
   { id: "amanha", label: "Amanhã" },
   { id: "semana", label: "Semana" },
   { id: "mes", label: "Mês" },
   { id: "todos", label: "Todos" },
+];
+
+type FiltroStatus = "todos" | ReservaStatus;
+const FILTROS_STATUS: Array<{ id: FiltroStatus; label: string }> = [
+  { id: "todos", label: "Todos" },
+  ...STATUS_LIST.map((s) => ({ id: s as FiltroStatus, label: STATUS_LABEL[s] })),
 ];
 
 const TIPO_ICON = {
@@ -69,14 +82,14 @@ function AdminDashboard() {
   const qc = useQueryClient();
 
   const [ready, setReady] = useState(false);
-  const [filtro, setFiltro] = useState<Filtro>("hoje");
+  const [filtroData, setFiltroData] = useState<FiltroData>("hoje");
+  const [filtroStatus, setFiltroStatus] = useState<FiltroStatus>("todos");
   const [busca, setBusca] = useState("");
   const [selected, setSelected] = useState<Reserva | null>(null);
   const [notifPerm, setNotifPerm] = useState<string>("default");
   const [installReady, setInstallReady] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Auth gate
   useEffect(() => {
     let mounted = true;
     supabase.auth.getSession().then(({ data }) => {
@@ -90,14 +103,12 @@ function AdminDashboard() {
     return () => { mounted = false; sub.subscription.unsubscribe(); };
   }, [navigate]);
 
-  // PWA + notifications setup
   useEffect(() => {
     registerServiceWorker();
     initInstallPrompt(() => setInstallReady(true));
     if (canNotify()) setNotifPerm(notificationPermission());
   }, []);
 
-  // Realtime → toast + notification
   useEffect(() => {
     if (!ready) return;
     const channel = supabase
@@ -126,7 +137,6 @@ function AdminDashboard() {
     return () => { supabase.removeChannel(channel); };
   }, [ready, qc]);
 
-  // Stats query
   const stats = useQuery({
     enabled: ready,
     queryKey: ["reservas-stats"],
@@ -146,20 +156,24 @@ function AdminDashboard() {
     },
   });
 
-  // List query
   const listaQ = useQuery({
     enabled: ready,
-    queryKey: ["reservas", filtro, busca],
+    queryKey: ["reservas", filtroData, filtroStatus, busca],
     queryFn: async () => {
-      let q = supabase.from("reservas").select("*").order("data", { ascending: true, nullsFirst: false }).order("horario", { ascending: true }).order("created_at", { ascending: false });
+      let q = supabase.from("reservas").select("*")
+        .order("data", { ascending: true, nullsFirst: false })
+        .order("horario", { ascending: true })
+        .order("created_at", { ascending: false });
 
-      if (filtro === "hoje") q = q.eq("data", todayISO());
-      else if (filtro === "amanha") q = q.eq("data", tomorrowISO());
-      else if (filtro === "semana") q = q.gte("data", todayISO()).lte("data", endOfWeekISO());
-      else if (filtro === "mes") q = q.gte("data", todayISO()).lte("data", endOfMonthISO());
+      if (filtroData === "hoje") q = q.eq("data", todayISO());
+      else if (filtroData === "amanha") q = q.eq("data", tomorrowISO());
+      else if (filtroData === "semana") q = q.gte("data", todayISO()).lte("data", endOfWeekISO());
+      else if (filtroData === "mes") q = q.gte("data", todayISO()).lte("data", endOfMonthISO());
+
+      if (filtroStatus !== "todos") q = q.eq("status", filtroStatus);
 
       const term = busca.trim();
-      if (term) q = q.or(`nome.ilike.%${term}%,telefone.ilike.%${term}%`);
+      if (term) q = q.or(`nome.ilike.%${term}%,telefone.ilike.%${term}%,codigo_acompanhamento.ilike.%${term.toUpperCase()}%`);
 
       const { data, error } = await q.limit(200);
       if (error) throw error;
@@ -167,19 +181,54 @@ function AdminDashboard() {
     },
   });
 
-  const updateStatus = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: ReservaStatus }) => {
-      const { error } = await supabase.from("reservas").update({ status }).eq("id", id);
+  const updateReserva = useMutation({
+    mutationFn: async ({ id, patch }: { id: string; patch: ReservaUpdate }) => {
+      const { error } = await supabase.from("reservas").update(patch).eq("id", id);
       if (error) throw error;
     },
     onSuccess: (_data, vars) => {
-      toast.success(`Reserva ${STATUS_LABEL[vars.status].toLowerCase()}.`);
       qc.invalidateQueries({ queryKey: ["reservas"] });
       qc.invalidateQueries({ queryKey: ["reservas-stats"] });
-      setSelected((s) => (s && s.id === vars.id ? { ...s, status: vars.status } : s));
+      setSelected((s) => (s && s.id === vars.id ? { ...s, ...vars.patch } as Reserva : s));
     },
     onError: () => toast.error("Não foi possível atualizar."),
   });
+
+  const deleteReserva = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("reservas").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Reserva excluída.");
+      qc.invalidateQueries({ queryKey: ["reservas"] });
+      qc.invalidateQueries({ queryKey: ["reservas-stats"] });
+      setSelected(null);
+    },
+    onError: () => toast.error("Não foi possível excluir."),
+  });
+
+  async function handleConfirm(r: Reserva) {
+    await updateReserva.mutateAsync({ id: r.id, patch: { status: "confirmada" } });
+    toast.success("Reserva confirmada.");
+    // Abre WhatsApp com mensagem personalizada
+    const tenant = await getDefaultTenant();
+    const numero = telefoneToWhatsApp(r.telefone);
+    if (!numero) return;
+    const template = tenant?.mensagem_confirmacao ??
+      "Ola {nome}, sua reserva no {empresa} para {data} as {horario} foi confirmada. Endereco: {endereco}. Para acompanhar ou alterar acesse: {link_acompanhar}";
+    const link = `${window.location.origin}/acompanhar/${r.codigo_acompanhamento}`;
+    const msg = template
+      .replaceAll("{nome}", r.nome)
+      .replaceAll("{empresa}", tenant?.nome ?? "")
+      .replaceAll("{data}", formatData(r.data))
+      .replaceAll("{horario}", formatHorario(r.horario))
+      .replaceAll("{endereco}", tenant?.endereco ?? "")
+      .replaceAll("{link_acompanhar}", link)
+      .replaceAll("{codigo}", r.codigo_acompanhamento);
+    const url = `https://wa.me/${numero}?text=${encodeURIComponent(msg)}`;
+    window.open(url, "_blank", "noopener");
+  }
 
   async function handleNotifRequest() {
     const p = await requestNotificationPermission();
@@ -214,12 +263,11 @@ function AdminDashboard() {
 
   return (
     <main className="min-h-screen bg-background pb-16 safe-top safe-bottom">
-      {/* Header */}
       <header className="sticky top-0 z-20 border-b border-border/70 bg-background/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-4xl items-center gap-3 px-5 py-4">
           <div className="min-w-0 flex-1">
             <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-terracotta">
-              Iracema
+              ReservaLab
             </p>
             <h1 className="truncate text-lg font-medium">Painel de reservas</h1>
           </div>
@@ -234,7 +282,6 @@ function AdminDashboard() {
       </header>
 
       <div className="mx-auto max-w-4xl px-5 pt-6">
-        {/* CTAs PWA / Notif */}
         {(showInstall || showNotifCTA) && (
           <div className="mb-5 flex flex-wrap gap-2 animate-fade">
             {showNotifCTA && (
@@ -258,45 +305,43 @@ function AdminDashboard() {
           </div>
         )}
 
-        {/* Stats */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <StatCard icon={CalendarDays} label="Hoje"       value={stats.data?.hoje}       loading={stats.isLoading} />
-          <StatCard icon={Bell}         label="Pendentes"  value={stats.data?.pendentes}  loading={stats.isLoading} accent />
-          <StatCard icon={Calendar}     label="Próx. 7 dias" value={stats.data?.semana}   loading={stats.isLoading} />
-          <StatCard icon={PartyPopper}  label="Eventos"    value={stats.data?.eventos}    loading={stats.isLoading} />
+          <StatCard icon={CalendarDays} label="Hoje"          value={stats.data?.hoje}      loading={stats.isLoading} />
+          <StatCard icon={Bell}         label="Pendentes"     value={stats.data?.pendentes} loading={stats.isLoading} accent />
+          <StatCard icon={Calendar}     label="Próx. 7 dias"  value={stats.data?.semana}    loading={stats.isLoading} />
+          <StatCard icon={PartyPopper}  label="Eventos"       value={stats.data?.eventos}   loading={stats.isLoading} />
         </div>
 
-        {/* Search */}
         <div className="mt-6 relative">
           <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
-            placeholder="Buscar por nome ou telefone…"
+            placeholder="Nome, telefone ou código…"
             className="h-11 rounded-xl pl-10"
           />
         </div>
 
-        {/* Filtros */}
         <div className="mt-4 -mx-5 overflow-x-auto px-5 pb-1 scrollbar-none">
           <div className="flex gap-1.5">
-            {FILTROS.map((f) => (
-              <button
-                key={f.id}
-                onClick={() => setFiltro(f.id)}
-                className={`h-9 shrink-0 rounded-full px-4 text-xs font-medium transition-all ${
-                  filtro === f.id
-                    ? "bg-primary text-primary-foreground shadow-[var(--shadow-sm)]"
-                    : "bg-muted text-muted-foreground hover:bg-accent hover:text-foreground"
-                }`}
-              >
+            {FILTROS_DATA.map((f) => (
+              <FilterChip key={f.id} active={filtroData === f.id} onClick={() => setFiltroData(f.id)}>
                 {f.label}
-              </button>
+              </FilterChip>
             ))}
           </div>
         </div>
 
-        {/* Lista */}
+        <div className="mt-2 -mx-5 overflow-x-auto px-5 pb-1 scrollbar-none">
+          <div className="flex gap-1.5">
+            {FILTROS_STATUS.map((f) => (
+              <FilterChip key={f.id} active={filtroStatus === f.id} onClick={() => setFiltroStatus(f.id)} variant="status">
+                {f.label}
+              </FilterChip>
+            ))}
+          </div>
+        </div>
+
         <div className="mt-5 space-y-2.5">
           {listaQ.isLoading ? (
             Array.from({ length: 4 }).map((_, i) => (
@@ -317,14 +362,36 @@ function AdminDashboard() {
         </div>
       </div>
 
-      {/* Detalhes */}
       <ReservaDialog
         reserva={selected}
         onClose={() => setSelected(null)}
-        onStatus={(status) => selected && updateStatus.mutate({ id: selected.id, status })}
-        pending={updateStatus.isPending}
+        onConfirm={() => selected && handleConfirm(selected)}
+        onSetStatus={(status) => selected && updateReserva.mutate({ id: selected.id, patch: { status } })}
+        onSave={(patch) => selected && updateReserva.mutateAsync({ id: selected.id, patch })}
+        onDelete={() => selected && deleteReserva.mutate(selected.id)}
+        pending={updateReserva.isPending || deleteReserva.isPending}
       />
+
+      <audio ref={audioRef} preload="auto" />
     </main>
+  );
+}
+
+function FilterChip({
+  active, onClick, children, variant,
+}: { active: boolean; onClick: () => void; children: React.ReactNode; variant?: "status" }) {
+  const activeCls = variant === "status"
+    ? "bg-terracotta/15 text-terracotta shadow-[var(--shadow-sm)]"
+    : "bg-primary text-primary-foreground shadow-[var(--shadow-sm)]";
+  return (
+    <button
+      onClick={onClick}
+      className={`h-9 shrink-0 rounded-full px-4 text-xs font-medium transition-all ${
+        active ? activeCls : "bg-muted text-muted-foreground hover:bg-accent hover:text-foreground"
+      }`}
+    >
+      {children}
+    </button>
   );
 }
 
@@ -381,6 +448,9 @@ function ReservaCard({
               {r.data ? ` • ${formatData(r.data)}` : ""}
               {r.horario ? ` às ${formatHorario(r.horario)}` : ""}
             </p>
+            <p className="mt-0.5 truncate text-[11px] font-mono text-muted-foreground/70">
+              {r.codigo_acompanhamento}
+            </p>
           </div>
         </div>
         <StatusPill status={r.status} />
@@ -390,9 +460,59 @@ function ReservaCard({
 }
 
 function ReservaDialog({
-  reserva, onClose, onStatus, pending,
-}: { reserva: Reserva | null; onClose: () => void; onStatus: (s: ReservaStatus) => void; pending: boolean }) {
+  reserva, onClose, onConfirm, onSetStatus, onSave, onDelete, pending,
+}: {
+  reserva: Reserva | null;
+  onClose: () => void;
+  onConfirm: () => void;
+  onSetStatus: (s: ReservaStatus) => void;
+  onSave: (patch: ReservaUpdate) => Promise<void>;
+  onDelete: () => void;
+  pending: boolean;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [form, setForm] = useState<ReservaUpdate>({});
+
+  useEffect(() => {
+    setEditing(false);
+    setForm({});
+  }, [reserva?.id]);
+
   const r = reserva;
+
+  function startEdit() {
+    if (!r) return;
+    setForm({
+      nome: r.nome,
+      telefone: r.telefone,
+      quantidade: r.quantidade,
+      data: r.data,
+      horario: r.horario,
+      area: r.area,
+      tipo: r.tipo,
+      tipo_evento: r.tipo_evento,
+      observacoes: r.observacoes,
+      leva_bolo: r.leva_bolo,
+      comandas: r.comandas,
+      status: r.status,
+    });
+    setEditing(true);
+  }
+
+  async function saveEdit() {
+    if (!r) return;
+    await onSave(form);
+    toast.success("Reserva atualizada.");
+    setEditing(false);
+  }
+
+  function confirmDelete() {
+    if (!r) return;
+    if (window.confirm(`Excluir a reserva de ${r.nome}? Esta ação não pode ser desfeita.`)) {
+      onDelete();
+    }
+  }
+
   return (
     <Dialog open={!!r} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-md rounded-2xl p-0 overflow-hidden">
@@ -405,7 +525,7 @@ function ReservaDialog({
                     {r.nome}
                   </DialogTitle>
                   <DialogDescription className="mt-1 text-[13px] text-muted-foreground">
-                    {TIPO_LABEL[r.tipo as ReservaTipo]}
+                    {TIPO_LABEL[r.tipo as ReservaTipo]} · <span className="font-mono">{r.codigo_acompanhamento}</span>
                   </DialogDescription>
                 </div>
                 <StatusPill status={r.status} />
@@ -413,61 +533,168 @@ function ReservaDialog({
             </DialogHeader>
 
             <div className="max-h-[55vh] overflow-y-auto p-5">
-              <div className="space-y-3.5 text-sm">
-                <DetailRow icon={Phone} label="Telefone" value={r.telefone} link={`tel:${r.telefone.replace(/\D/g, "")}`} />
-                {r.quantidade != null && <DetailRow icon={User} label="Pessoas" value={String(r.quantidade)} />}
-                {r.data && <DetailRow icon={CalendarDays} label="Data" value={formatData(r.data)} />}
-                {r.horario && <DetailRow icon={Calendar} label="Horário" value={formatHorario(r.horario)} />}
-                {r.area && <DetailRow icon={Utensils} label="Área" value={AREA_LABEL[r.area]} />}
-                {r.tipo_evento && <DetailRow icon={Sparkles} label="Tipo do evento" value={r.tipo_evento} />}
-                {r.leva_bolo !== null && r.tipo === "aniversario" && (
-                  <DetailRow icon={Cake} label="Leva bolo" value={r.leva_bolo ? "Sim" : "Não"} />
-                )}
-                {r.comandas !== null && r.tipo === "aniversario" && (
-                  <DetailRow icon={Check} label="Comandas individuais" value={r.comandas ? "Sim" : "Não"} />
-                )}
-                {r.observacoes && (
-                  <div className="rounded-xl bg-muted p-3.5">
-                    <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                      Observações
-                    </p>
-                    <p className="leading-relaxed text-foreground">{r.observacoes}</p>
-                  </div>
-                )}
-              </div>
+              {editing ? (
+                <EditFields r={r} form={form} setForm={setForm} />
+              ) : (
+                <div className="space-y-3.5 text-sm">
+                  <DetailRow icon={Phone} label="Telefone" value={r.telefone} link={`tel:${telefoneToWhatsApp(r.telefone)}`} />
+                  {r.quantidade != null && <DetailRow icon={User} label="Pessoas" value={String(r.quantidade)} />}
+                  {r.data && <DetailRow icon={CalendarDays} label="Data" value={formatData(r.data)} />}
+                  {r.horario && <DetailRow icon={Calendar} label="Horário" value={formatHorario(r.horario)} />}
+                  {r.area && <DetailRow icon={Utensils} label="Área" value={AREA_LABEL[r.area]} />}
+                  {r.tipo_evento && <DetailRow icon={Sparkles} label="Tipo do evento" value={r.tipo_evento} />}
+                  {r.leva_bolo !== null && r.tipo === "aniversario" && (
+                    <DetailRow icon={Cake} label="Leva bolo" value={r.leva_bolo ? "Sim" : "Não"} />
+                  )}
+                  {r.comandas !== null && r.tipo === "aniversario" && (
+                    <DetailRow icon={Check} label="Comandas individuais" value={r.comandas ? "Sim" : "Não"} />
+                  )}
+                  {r.observacoes && (
+                    <div className="rounded-xl bg-muted p-3.5">
+                      <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                        Observações
+                      </p>
+                      <p className="leading-relaxed text-foreground">{r.observacoes}</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
-            <div className="border-t border-border/70 bg-muted/40 p-4">
-              <div className="grid grid-cols-3 gap-2">
-                <ActionBtn
-                  disabled={pending || r.status === "confirmada"}
-                  onClick={() => onStatus("confirmada")}
-                  variant="primary"
-                  icon={CheckCircle2}
-                >
-                  Confirmar
-                </ActionBtn>
-                <ActionBtn
-                  disabled={pending || r.status === "finalizada"}
-                  onClick={() => onStatus("finalizada")}
-                  icon={Check}
-                >
-                  Finalizar
-                </ActionBtn>
-                <ActionBtn
-                  disabled={pending || r.status === "cancelada"}
-                  onClick={() => onStatus("cancelada")}
-                  variant="danger"
-                  icon={X}
-                >
-                  Cancelar
-                </ActionBtn>
-              </div>
-            </div>
+            <DialogFooter className="border-t border-border/70 bg-muted/40 p-4 flex-col gap-2 sm:flex-col sm:space-x-0">
+              {editing ? (
+                <div className="grid w-full grid-cols-2 gap-2">
+                  <ActionBtn onClick={() => setEditing(false)} icon={X}>Cancelar</ActionBtn>
+                  <ActionBtn onClick={saveEdit} disabled={pending} variant="primary" icon={Save}>
+                    Salvar
+                  </ActionBtn>
+                </div>
+              ) : (
+                <>
+                  <div className="grid w-full grid-cols-2 gap-2">
+                    <ActionBtn
+                      disabled={pending || r.status === "confirmada"}
+                      onClick={onConfirm}
+                      variant="primary"
+                      icon={MessageCircle}
+                    >
+                      Confirmar + WhatsApp
+                    </ActionBtn>
+                    <ActionBtn onClick={startEdit} icon={Pencil}>
+                      Editar
+                    </ActionBtn>
+                  </div>
+                  <div className="grid w-full grid-cols-3 gap-2">
+                    <ActionBtn
+                      disabled={pending || r.status === "finalizada"}
+                      onClick={() => onSetStatus("finalizada")}
+                      icon={CheckCircle2}
+                    >
+                      Finalizar
+                    </ActionBtn>
+                    <ActionBtn
+                      disabled={pending || r.status === "cancelada"}
+                      onClick={() => onSetStatus("cancelada")}
+                      variant="danger"
+                      icon={X}
+                    >
+                      Cancelar
+                    </ActionBtn>
+                    <ActionBtn
+                      disabled={pending}
+                      onClick={confirmDelete}
+                      variant="danger"
+                      icon={Trash2}
+                    >
+                      Excluir
+                    </ActionBtn>
+                  </div>
+                </>
+              )}
+            </DialogFooter>
           </>
         )}
       </DialogContent>
     </Dialog>
+  );
+}
+
+function EditFields({
+  r, form, setForm,
+}: { r: Reserva; form: ReservaUpdate; setForm: (f: ReservaUpdate) => void }) {
+  function set<K extends keyof ReservaUpdate>(key: K, value: ReservaUpdate[K]) {
+    setForm({ ...form, [key]: value });
+  }
+  return (
+    <div className="space-y-4 text-sm">
+      <FieldRow label="Nome">
+        <Input value={form.nome ?? ""} onChange={(e) => set("nome", e.target.value)} className="h-10 rounded-lg" />
+      </FieldRow>
+      <FieldRow label="Telefone">
+        <Input value={form.telefone ?? ""} onChange={(e) => set("telefone", e.target.value)} className="h-10 rounded-lg" />
+      </FieldRow>
+      <div className="grid grid-cols-2 gap-3">
+        <FieldRow label="Data">
+          <Input type="date" value={form.data ?? ""} onChange={(e) => set("data", e.target.value || null)} className="h-10 rounded-lg" />
+        </FieldRow>
+        <FieldRow label="Horário">
+          <Input type="time" value={form.horario ?? ""} onChange={(e) => set("horario", e.target.value || null)} className="h-10 rounded-lg" />
+        </FieldRow>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <FieldRow label="Quantidade">
+          <Input type="number" min={1} value={form.quantidade ?? ""} onChange={(e) => set("quantidade", e.target.value ? parseInt(e.target.value, 10) : null)} className="h-10 rounded-lg" />
+        </FieldRow>
+        <FieldRow label="Status">
+          <Select value={form.status ?? r.status} onValueChange={(v) => set("status", v as ReservaStatus)}>
+            <SelectTrigger className="h-10 rounded-lg"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {STATUS_LIST.map((s) => <SelectItem key={s} value={s}>{STATUS_LABEL[s]}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </FieldRow>
+      </div>
+      <FieldRow label="Tipo">
+        <Select value={form.tipo ?? r.tipo} onValueChange={(v) => set("tipo", v as ReservaTipo)}>
+          <SelectTrigger className="h-10 rounded-lg"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="mesa">Mesa</SelectItem>
+            <SelectItem value="aniversario">Aniversário</SelectItem>
+            <SelectItem value="evento">Evento</SelectItem>
+            <SelectItem value="casamento">Casamento</SelectItem>
+          </SelectContent>
+        </Select>
+      </FieldRow>
+      {(form.tipo ?? r.tipo) === "mesa" && (
+        <FieldRow label="Área">
+          <Select value={form.area ?? "sem_preferencia"} onValueChange={(v) => set("area", v as ReservaArea)}>
+            <SelectTrigger className="h-10 rounded-lg"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="interna">Interna</SelectItem>
+              <SelectItem value="externa">Externa</SelectItem>
+              <SelectItem value="sem_preferencia">Sem preferência</SelectItem>
+            </SelectContent>
+          </Select>
+        </FieldRow>
+      )}
+      {(form.tipo ?? r.tipo) === "evento" && (
+        <FieldRow label="Tipo do evento">
+          <Input value={form.tipo_evento ?? ""} onChange={(e) => set("tipo_evento", e.target.value)} className="h-10 rounded-lg" />
+        </FieldRow>
+      )}
+      <FieldRow label="Observações">
+        <Textarea value={form.observacoes ?? ""} onChange={(e) => set("observacoes", e.target.value)} className="min-h-20 rounded-lg" />
+      </FieldRow>
+    </div>
+  );
+}
+
+function FieldRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1.5">
+      <Label className="text-[12px] text-muted-foreground">{label}</Label>
+      {children}
+    </div>
   );
 }
 
