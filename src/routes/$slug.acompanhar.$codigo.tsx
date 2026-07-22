@@ -18,7 +18,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 
-export const Route = createFileRoute("/acompanhar/$codigo")({
+export const Route = createFileRoute("/$slug/acompanhar/$codigo")({
   head: () => ({
     meta: [
       { title: "Sua reserva — ReservaLab" },
@@ -30,14 +30,13 @@ export const Route = createFileRoute("/acompanhar/$codigo")({
 });
 
 function AcompanharDetalhes() {
-  const { codigo } = useParams({ from: "/acompanhar/$codigo" });
+  const { slug, codigo } = useParams({ from: "/$slug/acompanhar/$codigo" });
   const qc = useQueryClient();
 
   const reservaQ = useQuery({
     queryKey: ["reserva-por-codigo", codigo],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .rpc("get_reserva_by_codigo", { _codigo: codigo });
+      const { data, error } = await supabase.rpc("get_reserva_by_codigo", { _codigo: codigo });
       if (error) throw error;
       const first = Array.isArray(data) ? data[0] : null;
       return (first ?? null) as Reserva | null;
@@ -47,38 +46,24 @@ function AcompanharDetalhes() {
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto max-w-md px-5 pt-6 pb-24 safe-top safe-bottom">
-        <Link
-          to="/acompanhar"
-          className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
-        >
+        <Link to="/$slug/acompanhar" params={{ slug }} className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground">
           <ChevronLeft className="h-4 w-4" /> Outra consulta
         </Link>
 
         <header className="mt-6 animate-fade">
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-terracotta">
-            Acompanhar
-          </p>
-          <h1 className="mt-3 font-serif text-4xl leading-tight tracking-tight">
-            Reserva {codigo}
-          </h1>
+          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-terracotta">Acompanhar</p>
+          <h1 className="mt-3 font-serif text-4xl leading-tight tracking-tight">Reserva {codigo}</h1>
         </header>
 
         {reservaQ.isLoading ? (
-          <div className="mt-10 flex justify-center">
-            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-          </div>
+          <div className="mt-10 flex justify-center"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
         ) : !reservaQ.data ? (
           <div className="mt-8 rounded-2xl border border-dashed border-border bg-card/50 py-14 text-center">
             <p className="font-serif text-2xl text-foreground">Não encontramos</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Confira o código digitado.
-            </p>
+            <p className="mt-1 text-sm text-muted-foreground">Confira o código digitado.</p>
           </div>
         ) : (
-          <ReservaEdit
-            reserva={reservaQ.data}
-            onUpdated={(r) => qc.setQueryData(["reserva-por-codigo", codigo], r)}
-          />
+          <ReservaEdit reserva={reservaQ.data} onUpdated={(r) => qc.setQueryData(["reserva-por-codigo", codigo], r)} />
         )}
       </div>
     </main>
@@ -111,7 +96,6 @@ function ReservaEdit({ reserva, onUpdated }: { reserva: Reserva; onUpdated: (r: 
         _area: area || null,
         _observacoes: observacoes || null,
       };
-      // O RPC aceita NULL (COALESCE), mas os tipos gerados marcam os parâmetros como obrigatórios.
       const { data: updated, error } = await (supabase.rpc as unknown as (
         fn: "update_reserva_by_codigo",
         params: typeof args,
@@ -119,10 +103,7 @@ function ReservaEdit({ reserva, onUpdated }: { reserva: Reserva; onUpdated: (r: 
       if (error) throw error;
       return updated;
     },
-    onSuccess: (r) => {
-      toast.success("Reserva atualizada.");
-      if (r) onUpdated(r);
-    },
+    onSuccess: (r) => { toast.success("Reserva atualizada."); if (r) onUpdated(r); },
     onError: () => toast.error("Não foi possível atualizar."),
   });
 
@@ -131,9 +112,7 @@ function ReservaEdit({ reserva, onUpdated }: { reserva: Reserva; onUpdated: (r: 
       <div className="rounded-2xl border border-border bg-card p-5">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-              {TIPO_LABEL[reserva.tipo]}
-            </p>
+            <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{TIPO_LABEL[reserva.tipo]}</p>
             <p className="mt-1 font-serif text-2xl text-foreground">{reserva.nome}</p>
           </div>
           <StatusPill status={reserva.status} />
@@ -148,8 +127,7 @@ function ReservaEdit({ reserva, onUpdated }: { reserva: Reserva; onUpdated: (r: 
 
       {bloqueada ? (
         <p className="rounded-xl border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
-          Esta reserva está {STATUS_LABEL[reserva.status].toLowerCase()} e não pode mais ser alterada.
-          Para uma nova solicitação, faça uma reserva.
+          Esta reserva está {STATUS_LABEL[reserva.status].toLowerCase()} e não pode mais ser alterada. Para uma nova solicitação, faça uma reserva.
         </p>
       ) : (
         <>
@@ -190,11 +168,7 @@ function ReservaEdit({ reserva, onUpdated }: { reserva: Reserva; onUpdated: (r: 
             </div>
           </div>
 
-          <Button
-            onClick={() => salvar.mutate()}
-            disabled={salvar.isPending}
-            className="h-12 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
-          >
+          <Button onClick={() => salvar.mutate()} disabled={salvar.isPending} className="h-12 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90">
             {salvar.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             Salvar alterações
           </Button>

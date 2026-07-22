@@ -1,9 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { Check, Copy, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/obrigado")({
+export const Route = createFileRoute("/$slug/obrigado")({
   head: () => ({
     meta: [
       { title: "Reserva enviada — ReservaLab" },
@@ -15,14 +15,11 @@ export const Route = createFileRoute("/obrigado")({
 });
 
 function Obrigado() {
+  const { slug } = useParams({ from: "/$slug/obrigado" });
   const [codigo, setCodigo] = useState<string>("");
 
   useEffect(() => {
-    try {
-      setCodigo(sessionStorage.getItem("ultima-reserva-codigo") ?? "");
-    } catch {
-      /* noop */
-    }
+    try { setCodigo(sessionStorage.getItem("ultima-reserva-codigo") ?? ""); } catch { /* noop */ }
   }, []);
 
   function copiar() {
@@ -54,10 +51,7 @@ function Obrigado() {
             </p>
             <div className="mt-2 flex items-center justify-between gap-3">
               <p className="font-serif text-2xl tracking-wider text-foreground">{codigo}</p>
-              <button
-                onClick={copiar}
-                className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-background px-3 text-xs font-medium transition-colors hover:bg-accent"
-              >
+              <button onClick={copiar} className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-background px-3 text-xs font-medium transition-colors hover:bg-accent">
                 <Copy className="h-3.5 w-3.5" />
                 Copiar
               </button>
@@ -69,17 +63,11 @@ function Obrigado() {
         )}
 
         <div className="mt-6 flex flex-wrap justify-center gap-2">
-          <Link
-            to="/acompanhar"
-            className="inline-flex h-11 items-center justify-center gap-1.5 rounded-xl bg-primary px-5 text-sm font-medium text-primary-foreground transition hover:opacity-90"
-          >
+          <Link to="/$slug/acompanhar" params={{ slug }} className="inline-flex h-11 items-center justify-center gap-1.5 rounded-xl bg-primary px-5 text-sm font-medium text-primary-foreground transition hover:opacity-90">
             <Search className="h-3.5 w-3.5" />
             Acompanhar reserva
           </Link>
-          <Link
-            to="/"
-            className="inline-flex h-11 items-center justify-center rounded-xl border border-border bg-background px-5 text-sm font-medium transition hover:bg-accent"
-          >
+          <Link to="/$slug" params={{ slug }} className="inline-flex h-11 items-center justify-center rounded-xl border border-border bg-background px-5 text-sm font-medium transition hover:bg-accent">
             Voltar ao início
           </Link>
         </div>

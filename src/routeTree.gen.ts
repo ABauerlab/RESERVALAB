@@ -10,27 +10,20 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as ObrigadoRouteImport } from './routes/obrigado'
-import { Route as AcompanharRouteImport } from './routes/acompanhar'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as ReservarTipoRouteImport } from './routes/reservar.$tipo'
-import { Route as AdminLoginRouteImport } from './routes/admin.login'
-import { Route as AcompanharCodigoRouteImport } from './routes/acompanhar.$codigo'
+import { Route as MasterIndexRouteImport } from './routes/master.index'
+import { Route as SlugIndexRouteImport } from './routes/$slug.index'
+import { Route as MasterLoginRouteImport } from './routes/master.login'
+import { Route as SlugObrigadoRouteImport } from './routes/$slug.obrigado'
+import { Route as SlugAcompanharRouteImport } from './routes/$slug.acompanhar'
+import { Route as SlugAdminIndexRouteImport } from './routes/$slug.admin.index'
+import { Route as SlugReservarTipoRouteImport } from './routes/$slug.reservar.$tipo'
+import { Route as SlugAdminLoginRouteImport } from './routes/$slug.admin.login'
+import { Route as SlugAcompanharCodigoRouteImport } from './routes/$slug.acompanhar.$codigo'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ObrigadoRoute = ObrigadoRouteImport.update({
-  id: '/obrigado',
-  path: '/obrigado',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AcompanharRoute = AcompanharRouteImport.update({
-  id: '/acompanhar',
-  path: '/acompanhar',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -38,99 +31,145 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/admin/',
-  path: '/admin/',
+const MasterIndexRoute = MasterIndexRouteImport.update({
+  id: '/master/',
+  path: '/master/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ReservarTipoRoute = ReservarTipoRouteImport.update({
-  id: '/reservar/$tipo',
-  path: '/reservar/$tipo',
+const SlugIndexRoute = SlugIndexRouteImport.update({
+  id: '/$slug/',
+  path: '/$slug/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminLoginRoute = AdminLoginRouteImport.update({
-  id: '/admin/login',
-  path: '/admin/login',
+const MasterLoginRoute = MasterLoginRouteImport.update({
+  id: '/master/login',
+  path: '/master/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AcompanharCodigoRoute = AcompanharCodigoRouteImport.update({
+const SlugObrigadoRoute = SlugObrigadoRouteImport.update({
+  id: '/$slug/obrigado',
+  path: '/$slug/obrigado',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SlugAcompanharRoute = SlugAcompanharRouteImport.update({
+  id: '/$slug/acompanhar',
+  path: '/$slug/acompanhar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SlugAdminIndexRoute = SlugAdminIndexRouteImport.update({
+  id: '/$slug/admin/',
+  path: '/$slug/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SlugReservarTipoRoute = SlugReservarTipoRouteImport.update({
+  id: '/$slug/reservar/$tipo',
+  path: '/$slug/reservar/$tipo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SlugAdminLoginRoute = SlugAdminLoginRouteImport.update({
+  id: '/$slug/admin/login',
+  path: '/$slug/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SlugAcompanharCodigoRoute = SlugAcompanharCodigoRouteImport.update({
   id: '/$codigo',
   path: '/$codigo',
-  getParentRoute: () => AcompanharRoute,
+  getParentRoute: () => SlugAcompanharRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/acompanhar': typeof AcompanharRouteWithChildren
-  '/obrigado': typeof ObrigadoRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/acompanhar/$codigo': typeof AcompanharCodigoRoute
-  '/admin/login': typeof AdminLoginRoute
-  '/reservar/$tipo': typeof ReservarTipoRoute
-  '/admin/': typeof AdminIndexRoute
+  '/$slug/acompanhar': typeof SlugAcompanharRouteWithChildren
+  '/$slug/obrigado': typeof SlugObrigadoRoute
+  '/master/login': typeof MasterLoginRoute
+  '/$slug/': typeof SlugIndexRoute
+  '/master/': typeof MasterIndexRoute
+  '/$slug/acompanhar/$codigo': typeof SlugAcompanharCodigoRoute
+  '/$slug/admin/login': typeof SlugAdminLoginRoute
+  '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
+  '/$slug/admin/': typeof SlugAdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/acompanhar': typeof AcompanharRouteWithChildren
-  '/obrigado': typeof ObrigadoRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/acompanhar/$codigo': typeof AcompanharCodigoRoute
-  '/admin/login': typeof AdminLoginRoute
-  '/reservar/$tipo': typeof ReservarTipoRoute
-  '/admin': typeof AdminIndexRoute
+  '/$slug/acompanhar': typeof SlugAcompanharRouteWithChildren
+  '/$slug/obrigado': typeof SlugObrigadoRoute
+  '/master/login': typeof MasterLoginRoute
+  '/$slug': typeof SlugIndexRoute
+  '/master': typeof MasterIndexRoute
+  '/$slug/acompanhar/$codigo': typeof SlugAcompanharCodigoRoute
+  '/$slug/admin/login': typeof SlugAdminLoginRoute
+  '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
+  '/$slug/admin': typeof SlugAdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/acompanhar': typeof AcompanharRouteWithChildren
-  '/obrigado': typeof ObrigadoRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/acompanhar/$codigo': typeof AcompanharCodigoRoute
-  '/admin/login': typeof AdminLoginRoute
-  '/reservar/$tipo': typeof ReservarTipoRoute
-  '/admin/': typeof AdminIndexRoute
+  '/$slug/acompanhar': typeof SlugAcompanharRouteWithChildren
+  '/$slug/obrigado': typeof SlugObrigadoRoute
+  '/master/login': typeof MasterLoginRoute
+  '/$slug/': typeof SlugIndexRoute
+  '/master/': typeof MasterIndexRoute
+  '/$slug/acompanhar/$codigo': typeof SlugAcompanharCodigoRoute
+  '/$slug/admin/login': typeof SlugAdminLoginRoute
+  '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
+  '/$slug/admin/': typeof SlugAdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/acompanhar'
-    | '/obrigado'
     | '/sitemap.xml'
-    | '/acompanhar/$codigo'
-    | '/admin/login'
-    | '/reservar/$tipo'
-    | '/admin/'
+    | '/$slug/acompanhar'
+    | '/$slug/obrigado'
+    | '/master/login'
+    | '/$slug/'
+    | '/master/'
+    | '/$slug/acompanhar/$codigo'
+    | '/$slug/admin/login'
+    | '/$slug/reservar/$tipo'
+    | '/$slug/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/acompanhar'
-    | '/obrigado'
     | '/sitemap.xml'
-    | '/acompanhar/$codigo'
-    | '/admin/login'
-    | '/reservar/$tipo'
-    | '/admin'
+    | '/$slug/acompanhar'
+    | '/$slug/obrigado'
+    | '/master/login'
+    | '/$slug'
+    | '/master'
+    | '/$slug/acompanhar/$codigo'
+    | '/$slug/admin/login'
+    | '/$slug/reservar/$tipo'
+    | '/$slug/admin'
   id:
     | '__root__'
     | '/'
-    | '/acompanhar'
-    | '/obrigado'
     | '/sitemap.xml'
-    | '/acompanhar/$codigo'
-    | '/admin/login'
-    | '/reservar/$tipo'
-    | '/admin/'
+    | '/$slug/acompanhar'
+    | '/$slug/obrigado'
+    | '/master/login'
+    | '/$slug/'
+    | '/master/'
+    | '/$slug/acompanhar/$codigo'
+    | '/$slug/admin/login'
+    | '/$slug/reservar/$tipo'
+    | '/$slug/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AcompanharRoute: typeof AcompanharRouteWithChildren
-  ObrigadoRoute: typeof ObrigadoRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  AdminLoginRoute: typeof AdminLoginRoute
-  ReservarTipoRoute: typeof ReservarTipoRoute
-  AdminIndexRoute: typeof AdminIndexRoute
+  SlugAcompanharRoute: typeof SlugAcompanharRouteWithChildren
+  SlugObrigadoRoute: typeof SlugObrigadoRoute
+  MasterLoginRoute: typeof MasterLoginRoute
+  SlugIndexRoute: typeof SlugIndexRoute
+  MasterIndexRoute: typeof MasterIndexRoute
+  SlugAdminLoginRoute: typeof SlugAdminLoginRoute
+  SlugReservarTipoRoute: typeof SlugReservarTipoRoute
+  SlugAdminIndexRoute: typeof SlugAdminIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -142,20 +181,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/obrigado': {
-      id: '/obrigado'
-      path: '/obrigado'
-      fullPath: '/obrigado'
-      preLoaderRoute: typeof ObrigadoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/acompanhar': {
-      id: '/acompanhar'
-      path: '/acompanhar'
-      fullPath: '/acompanhar'
-      preLoaderRoute: typeof AcompanharRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -163,57 +188,95 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/': {
-      id: '/admin/'
-      path: '/admin'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AdminIndexRouteImport
+    '/master/': {
+      id: '/master/'
+      path: '/master'
+      fullPath: '/master/'
+      preLoaderRoute: typeof MasterIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/reservar/$tipo': {
-      id: '/reservar/$tipo'
-      path: '/reservar/$tipo'
-      fullPath: '/reservar/$tipo'
-      preLoaderRoute: typeof ReservarTipoRouteImport
+    '/$slug/': {
+      id: '/$slug/'
+      path: '/$slug'
+      fullPath: '/$slug/'
+      preLoaderRoute: typeof SlugIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/login': {
-      id: '/admin/login'
-      path: '/admin/login'
-      fullPath: '/admin/login'
-      preLoaderRoute: typeof AdminLoginRouteImport
+    '/master/login': {
+      id: '/master/login'
+      path: '/master/login'
+      fullPath: '/master/login'
+      preLoaderRoute: typeof MasterLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/acompanhar/$codigo': {
-      id: '/acompanhar/$codigo'
+    '/$slug/obrigado': {
+      id: '/$slug/obrigado'
+      path: '/$slug/obrigado'
+      fullPath: '/$slug/obrigado'
+      preLoaderRoute: typeof SlugObrigadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$slug/acompanhar': {
+      id: '/$slug/acompanhar'
+      path: '/$slug/acompanhar'
+      fullPath: '/$slug/acompanhar'
+      preLoaderRoute: typeof SlugAcompanharRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$slug/admin/': {
+      id: '/$slug/admin/'
+      path: '/$slug/admin'
+      fullPath: '/$slug/admin/'
+      preLoaderRoute: typeof SlugAdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$slug/reservar/$tipo': {
+      id: '/$slug/reservar/$tipo'
+      path: '/$slug/reservar/$tipo'
+      fullPath: '/$slug/reservar/$tipo'
+      preLoaderRoute: typeof SlugReservarTipoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$slug/admin/login': {
+      id: '/$slug/admin/login'
+      path: '/$slug/admin/login'
+      fullPath: '/$slug/admin/login'
+      preLoaderRoute: typeof SlugAdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$slug/acompanhar/$codigo': {
+      id: '/$slug/acompanhar/$codigo'
       path: '/$codigo'
-      fullPath: '/acompanhar/$codigo'
-      preLoaderRoute: typeof AcompanharCodigoRouteImport
-      parentRoute: typeof AcompanharRoute
+      fullPath: '/$slug/acompanhar/$codigo'
+      preLoaderRoute: typeof SlugAcompanharCodigoRouteImport
+      parentRoute: typeof SlugAcompanharRoute
     }
   }
 }
 
-interface AcompanharRouteChildren {
-  AcompanharCodigoRoute: typeof AcompanharCodigoRoute
+interface SlugAcompanharRouteChildren {
+  SlugAcompanharCodigoRoute: typeof SlugAcompanharCodigoRoute
 }
 
-const AcompanharRouteChildren: AcompanharRouteChildren = {
-  AcompanharCodigoRoute: AcompanharCodigoRoute,
+const SlugAcompanharRouteChildren: SlugAcompanharRouteChildren = {
+  SlugAcompanharCodigoRoute: SlugAcompanharCodigoRoute,
 }
 
-const AcompanharRouteWithChildren = AcompanharRoute._addFileChildren(
-  AcompanharRouteChildren,
+const SlugAcompanharRouteWithChildren = SlugAcompanharRoute._addFileChildren(
+  SlugAcompanharRouteChildren,
 )
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AcompanharRoute: AcompanharRouteWithChildren,
-  ObrigadoRoute: ObrigadoRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  AdminLoginRoute: AdminLoginRoute,
-  ReservarTipoRoute: ReservarTipoRoute,
-  AdminIndexRoute: AdminIndexRoute,
+  SlugAcompanharRoute: SlugAcompanharRouteWithChildren,
+  SlugObrigadoRoute: SlugObrigadoRoute,
+  MasterLoginRoute: MasterLoginRoute,
+  SlugIndexRoute: SlugIndexRoute,
+  MasterIndexRoute: MasterIndexRoute,
+  SlugAdminLoginRoute: SlugAdminLoginRoute,
+  SlugReservarTipoRoute: SlugReservarTipoRoute,
+  SlugAdminIndexRoute: SlugAdminIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
