@@ -3,23 +3,22 @@ import type { Database } from "@/integrations/supabase/types";
 
 export type Tenant = Database["public"]["Tables"]["tenants"]["Row"];
 
-// Fase 1: tenant único hardcoded (Iracema). Rotas /$slug entram em fase 2.
-export const DEFAULT_TENANT_SLUG = "iracema";
+const _cache = new Map<string, Tenant | null>();
 
-let _cache: Tenant | null = null;
-
-export async function getDefaultTenant(): Promise<Tenant | null> {
-  if (_cache) return _cache;
+export async function getTenantBySlug(slug: string): Promise<Tenant | null> {
+  const key = slug.toLowerCase();
+  if (_cache.has(key)) return _cache.get(key) ?? null;
   const { data } = await supabase
     .from("tenants")
     .select("*")
-    .eq("slug", DEFAULT_TENANT_SLUG)
+    .eq("slug", key)
     .eq("ativo", true)
     .maybeSingle();
-  _cache = data ?? null;
-  return _cache;
+  _cache.set(key, data ?? null);
+  return data ?? null;
 }
 
-export function clearTenantCache() {
-  _cache = null;
+export function clearTenantCache(slug?: string) {
+  if (slug) _cache.delete(slug.toLowerCase());
+  else _cache.clear();
 }

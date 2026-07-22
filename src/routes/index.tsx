@@ -1,94 +1,78 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, UtensilsCrossed, Cake, Sparkles, Heart, Search } from "lucide-react";
-import { TIPO_CARDS, type ReservaTipo } from "@/lib/reservations";
-import { getDefaultTenant } from "@/lib/tenant";
+import { ArrowRight, CalendarCheck, Bell, Sparkles, Users } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Iracema — Reservas" },
-      { name: "description", content: "Reserve sua mesa, aniversário ou evento em poucos toques." },
+      { title: "ReservaLab — Sistema de reservas para restaurantes e eventos" },
+      { name: "description", content: "SaaS multi-tenant de reservas: formulário público, painel admin em tempo real e notificações push. Cada empresa no seu próprio /nome." },
+      { property: "og:title", content: "ReservaLab — Reservas simples para o seu estabelecimento" },
+      { property: "og:description", content: "Substitua o WhatsApp por um sistema completo de reservas. Rápido, moderno e sem esperas." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: Home,
+  component: Landing,
 });
 
-const ICONS = {
-  mesa: UtensilsCrossed,
-  aniversario: Cake,
-  evento: Sparkles,
-  casamento: Heart,
-} as const;
-
-function Home() {
-  const tenantQ = useQuery({
-    queryKey: ["default-tenant"],
-    queryFn: getDefaultTenant,
-    staleTime: 5 * 60_000,
-  });
-  const tenant = tenantQ.data;
-  const nomeEmpresa = tenant?.nome ?? "";
-  const tiposAceitos = tenant?.tipos_aceitos ?? ["mesa", "aniversario", "evento", "casamento"];
-  const cards = TIPO_CARDS.filter((c) => tiposAceitos.includes(c.tipo as ReservaTipo));
-
+function Landing() {
   return (
-    <main className="relative min-h-screen bg-background">
-      <div className="mx-auto flex min-h-screen max-w-2xl flex-col px-5 pt-14 pb-10 safe-top safe-bottom sm:pt-20">
+    <main className="min-h-screen bg-background">
+      <div className="mx-auto max-w-4xl px-6 pt-16 pb-24 safe-top safe-bottom sm:pt-24">
         <header className="animate-fade">
           <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-terracotta">
-            {nomeEmpresa || "Reservas"}
-          </p>
-          <h1 className="mt-6 font-serif text-[44px] leading-[1.05] tracking-tight text-foreground sm:text-6xl">
-            Como podemos te receber?
-          </h1>
-          <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-muted-foreground sm:text-base">
-            Escolha o tipo de reserva. Levamos poucos segundos, e nossa equipe confirma com você em seguida.
-          </p>
-        </header>
-
-        <div className="mt-10 grid gap-3 sm:mt-12">
-          {cards.map((card, i) => {
-            const Icon = ICONS[card.tipo];
-            return (
-              <Link
-                key={card.tipo}
-                to="/reservar/$tipo"
-                params={{ tipo: card.tipo }}
-                className="group relative flex items-center gap-4 rounded-2xl border border-border bg-card px-5 py-4 shadow-[var(--shadow-sm)] transition-all duration-200 hover:-translate-y-0.5 hover:border-terracotta/40 hover:shadow-[var(--shadow-md)] active:scale-[0.99] animate-in-up"
-                style={{ animationDelay: `${60 + i * 50}ms` }}
-              >
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-cream text-terracotta transition-colors group-hover:bg-terracotta group-hover:text-terracotta-foreground">
-                  <Icon className="h-5 w-5" strokeWidth={1.75} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="font-medium text-foreground">{card.titulo}</p>
-                  <p className="mt-0.5 line-clamp-1 text-sm text-muted-foreground">{card.descricao}</p>
-                </div>
-                <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-terracotta" />
-              </Link>
-            );
-          })}
-        </div>
-
-        <div className="mt-8 flex justify-center">
-          <Link
-            to="/acompanhar"
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-          >
-            <Search className="h-3.5 w-3.5" />
-            Acompanhar reserva pelo código
-          </Link>
-        </div>
-
-        <div className="mt-auto pt-16 text-center">
-          <p className="text-xs text-muted-foreground">
-            Sem cadastro. Sem esperas.
-          </p>
-          <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground/60">
             ReservaLab
           </p>
-        </div>
+          <h1 className="mt-6 font-serif text-5xl leading-[1.02] tracking-tight text-foreground sm:text-7xl">
+            Reservas simples,<br />gestão sem WhatsApp.
+          </h1>
+          <p className="mt-6 max-w-2xl text-[15px] leading-relaxed text-muted-foreground sm:text-lg">
+            Plataforma multi-empresa para restaurantes, eventos e casamentos. Cada estabelecimento no seu próprio endereço, com formulário público, painel em tempo real e notificações push.
+          </p>
+
+          <div className="mt-10 flex flex-wrap gap-3">
+            <a
+              href="mailto:contato.bauerlab@gmail.com?subject=Quero%20o%20ReservaLab"
+              className="inline-flex h-12 items-center gap-2 rounded-xl bg-terracotta px-6 text-sm font-medium text-terracotta-foreground transition hover:bg-terracotta/90"
+            >
+              Solicitar acesso
+              <ArrowRight className="h-4 w-4" />
+            </a>
+            <Link
+              to="/master/login"
+              className="inline-flex h-12 items-center rounded-xl border border-border bg-card px-6 text-sm font-medium text-foreground transition hover:bg-accent"
+            >
+              Sou admin
+            </Link>
+          </div>
+        </header>
+
+        <section className="mt-20 grid gap-3 sm:grid-cols-2">
+          {[
+            { icon: CalendarCheck, titulo: "Formulário público", desc: "Sua empresa em reserva.bauerlab.com.br/nomedaempresa" },
+            { icon: Bell,          titulo: "Push em tempo real", desc: "Notificação instantânea a cada nova reserva" },
+            { icon: Sparkles,      titulo: "Multi-tipo",         desc: "Mesa, aniversário, evento, casamento — você escolhe" },
+            { icon: Users,         titulo: "WhatsApp integrado", desc: "Confirmação com mensagem personalizada em 1 clique" },
+          ].map((f, i) => (
+            <div
+              key={f.titulo}
+              className="rounded-2xl border border-border bg-card p-5 animate-in-up"
+              style={{ animationDelay: `${80 + i * 50}ms` }}
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cream text-terracotta">
+                <f.icon className="h-4 w-4" />
+              </div>
+              <p className="mt-4 font-medium">{f.titulo}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{f.desc}</p>
+            </div>
+          ))}
+        </section>
+
+        <footer className="mt-24 text-center">
+          <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground/60">
+            ReservaLab · bauerlab
+          </p>
+        </footer>
       </div>
     </main>
   );

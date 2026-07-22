@@ -10,27 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as ObrigadoRouteImport } from './routes/obrigado'
-import { Route as AcompanharRouteImport } from './routes/acompanhar'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as ReservarTipoRouteImport } from './routes/reservar.$tipo'
-import { Route as AdminLoginRouteImport } from './routes/admin.login'
-import { Route as AcompanharCodigoRouteImport } from './routes/acompanhar.$codigo'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ObrigadoRoute = ObrigadoRouteImport.update({
-  id: '/obrigado',
-  path: '/obrigado',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AcompanharRoute = AcompanharRouteImport.update({
-  id: '/acompanhar',
-  path: '/acompanhar',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -38,99 +22,31 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/admin/',
-  path: '/admin/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ReservarTipoRoute = ReservarTipoRouteImport.update({
-  id: '/reservar/$tipo',
-  path: '/reservar/$tipo',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminLoginRoute = AdminLoginRouteImport.update({
-  id: '/admin/login',
-  path: '/admin/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AcompanharCodigoRoute = AcompanharCodigoRouteImport.update({
-  id: '/$codigo',
-  path: '/$codigo',
-  getParentRoute: () => AcompanharRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/acompanhar': typeof AcompanharRouteWithChildren
-  '/obrigado': typeof ObrigadoRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/acompanhar/$codigo': typeof AcompanharCodigoRoute
-  '/admin/login': typeof AdminLoginRoute
-  '/reservar/$tipo': typeof ReservarTipoRoute
-  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/acompanhar': typeof AcompanharRouteWithChildren
-  '/obrigado': typeof ObrigadoRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/acompanhar/$codigo': typeof AcompanharCodigoRoute
-  '/admin/login': typeof AdminLoginRoute
-  '/reservar/$tipo': typeof ReservarTipoRoute
-  '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/acompanhar': typeof AcompanharRouteWithChildren
-  '/obrigado': typeof ObrigadoRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/acompanhar/$codigo': typeof AcompanharCodigoRoute
-  '/admin/login': typeof AdminLoginRoute
-  '/reservar/$tipo': typeof ReservarTipoRoute
-  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/acompanhar'
-    | '/obrigado'
-    | '/sitemap.xml'
-    | '/acompanhar/$codigo'
-    | '/admin/login'
-    | '/reservar/$tipo'
-    | '/admin/'
+  fullPaths: '/' | '/sitemap.xml'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/acompanhar'
-    | '/obrigado'
-    | '/sitemap.xml'
-    | '/acompanhar/$codigo'
-    | '/admin/login'
-    | '/reservar/$tipo'
-    | '/admin'
-  id:
-    | '__root__'
-    | '/'
-    | '/acompanhar'
-    | '/obrigado'
-    | '/sitemap.xml'
-    | '/acompanhar/$codigo'
-    | '/admin/login'
-    | '/reservar/$tipo'
-    | '/admin/'
+  to: '/' | '/sitemap.xml'
+  id: '__root__' | '/' | '/sitemap.xml'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AcompanharRoute: typeof AcompanharRouteWithChildren
-  ObrigadoRoute: typeof ObrigadoRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  AdminLoginRoute: typeof AdminLoginRoute
-  ReservarTipoRoute: typeof ReservarTipoRoute
-  AdminIndexRoute: typeof AdminIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -142,20 +58,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/obrigado': {
-      id: '/obrigado'
-      path: '/obrigado'
-      fullPath: '/obrigado'
-      preLoaderRoute: typeof ObrigadoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/acompanhar': {
-      id: '/acompanhar'
-      path: '/acompanhar'
-      fullPath: '/acompanhar'
-      preLoaderRoute: typeof AcompanharRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -163,68 +65,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/': {
-      id: '/admin/'
-      path: '/admin'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reservar/$tipo': {
-      id: '/reservar/$tipo'
-      path: '/reservar/$tipo'
-      fullPath: '/reservar/$tipo'
-      preLoaderRoute: typeof ReservarTipoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/login': {
-      id: '/admin/login'
-      path: '/admin/login'
-      fullPath: '/admin/login'
-      preLoaderRoute: typeof AdminLoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/acompanhar/$codigo': {
-      id: '/acompanhar/$codigo'
-      path: '/$codigo'
-      fullPath: '/acompanhar/$codigo'
-      preLoaderRoute: typeof AcompanharCodigoRouteImport
-      parentRoute: typeof AcompanharRoute
-    }
   }
 }
 
-interface AcompanharRouteChildren {
-  AcompanharCodigoRoute: typeof AcompanharCodigoRoute
-}
-
-const AcompanharRouteChildren: AcompanharRouteChildren = {
-  AcompanharCodigoRoute: AcompanharCodigoRoute,
-}
-
-const AcompanharRouteWithChildren = AcompanharRoute._addFileChildren(
-  AcompanharRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AcompanharRoute: AcompanharRouteWithChildren,
-  ObrigadoRoute: ObrigadoRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  AdminLoginRoute: AdminLoginRoute,
-  ReservarTipoRoute: ReservarTipoRoute,
-  AdminIndexRoute: AdminIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
