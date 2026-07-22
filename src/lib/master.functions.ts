@@ -1,0 +1,142 @@
+import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+
+const SUPER_ADMIN_EMAIL = "contato.bauerlab@gmail.com";
+const SUPER_ADMIN_PASSWORD = "21254775";
+
+// Idempotente: cria user + role super_admin se ainda não existir NENHUM super_admin no sistema.
+// Chamado pela tela /master/login para bootstrap na primeira visita.
+export const bootstrapSuperAdmin = createServerFn({ method: "POST" }).handler(async () => {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+  // Já existe super_admin?
+  const { data: existing, error: rolesErr } = await supabaseAdmin
+    .from("user_roles").select("id").eq("role", "super_admin").limit(1);
+  if (rolesErr) throw new Error(rolesErr.message);
+  if (existing && existing.length > 0) return { created: false };
+
+  // Procura pelo user (pode existir sem role)
+  let userId: string | null = null;
+  const list = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
+  const found = list.data?.users?.find((u) => u.email?.toLowerCase() === SUPER_ADMIN_EMAIL);
+  if (found) userId = found.id;
+
+  if (!userId) {
+    const { data: created, error: cErr } = await supabaseAdmin.auth.admin.createUser({
+      email: SUPER_ADMIN_EMAIL,
+      password: SUPER_ADMIN_PASSWORD,
+      email_confirm: true,
+    });
+    if (cErr || !created.user) throw new Error(cErr?.message ?? "createUser falhou");
+    userId = created.user.id;
+  }
+
+  const { error: rErr } = await supabaseAdmin
+    .from("user_roles")
+    .insert({ user_id: userId, role: "super_admin", tenant_id: null });
+  if (rErr) throw new Error(rErr.message);
+
+  return { created: true };
+});
+
+export type CriarTenantInput = {
+  slug: string;
+  nome: string;
+  email_admin: string;
+  senha_admin: string;
+  endereco?: string;
+  telefone_contato?: string;
+  whatsapp?: string;
+  tipos_aceitos?: Array<"mesa" | "aniversario" | "evento" | "casamento">;
+};
+
+export const criarTenant = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: CriarTenantInput) => {
+    if (!input || typeof input !== "object") throw new Error("Payload inválido");
+    const slug = String(input.slug ?? "").toLowerCase().trim().replace(/[^a-z0-9-]/g, "-");
+    if (!/^[a-z0-9][a-z0-9-]{1,40}$/.test(slug)) throw new Error("Slug inválido");
+    if (!input.nome || input.nome.trim().length < 2) throw new Error("Nome inválido");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email_admin ?? "")) throw new Error("E-mail inválido");
+    if (!input.senha_admin || input.senha_admin.length < 6) throw new Error("Senha muito curta");
+    const tipos = input.tipos_aceitos && input.tipos_aceitos.length
+      ? input.tipos_aceitos
+      : ["mesa", "aniversario", "evento", "casamento"] as const;
+    return { ...input, slug, tipos_aceitos: tipos as CriarTenantInput["tipos_aceitos"] };
+  })
+  .handler(async ({ data, context }) => {
+    // Verifica super_admin
+    const { data: isSuper, error: roleErr } = await context.supabase
+      .rpc("has_role", { _user_id: context.userId, _role: "super_admin" });
+    if (roleErr) throw new Error(roleErr.message);
+    if (!isSuper) throw new Error("Acesso negado");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Cria tenant
+    const { data: tenant, error: tErr } = await supabaseAdmin
+      .from("tenants")
+      .insert({
+        slug: data.slug,
+        nome: data.nome.trim(),
+        endereco: data.endereco?.trim() || null,
+        telefone_contato: data.telefone_contato?.trim() || null,
+        whatsapp: data.whatsapp?.trim() || null,
+        email_contato: data.email_admin,
+        tipos_aceitos: data.tipos_aceitos ?? ["mesa", "aniversario", "evento", "casamento"],
+        ativo: true,
+      })
+      .select("*")
+      .single();
+    if (tErr || !tenant) throw new Error(tErr?.message ?? "Falha ao criar empresa");
+
+    // Cria user admin do tenant (ou reusa)
+    let adminUserId: string | null = null;
+    const list = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
+    const existing = list.data?.users?.find((u) => u.email?.toLowerCase() === data.email_admin.toLowerCase());
+    if (existing) {
+      adminUserId = existing.id;
+    } else {
+      const { data: created, error: cErr } = await supabaseAdmin.auth.admin.createUser({
+        email: data.email_admin,
+        password: data.senha_admin,
+        email_confirm: true,
+      });
+      if (cErr || !created.user) throw new Error(cErr?.message ?? "Falha ao criar usuário");
+      adminUserId = created.user.id;
+    }
+
+    // Grant tenant_admin
+    const { error: grErr } = await supabaseAdmin
+      .from("user_roles")
+      .insert({ user_id: adminUserId, role: "tenant_admin", tenant_id: tenant.id });
+    if (grErr && !grErr.message.includes("duplicate")) throw new Error(grErr.message);
+
+    return { tenant };
+  });
+
+export const listarTenants = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: isSuper } = await context.supabase
+      .rpc("has_role", { _user_id: context.userId, _role: "super_admin" });
+    if (!isSuper) throw new Error("Acesso negado");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("tenants").select("*").order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return { tenants: data ?? [] };
+  });
+
+export const toggleTenantAtivo = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { id: string; ativo: boolean }) => input)
+  .handler(async ({ data, context }) => {
+    const { data: isSuper } = await context.supabase
+      .rpc("has_role", { _user_id: context.userId, _role: "super_admin" });
+    if (!isSuper) throw new Error("Acesso negado");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("tenants").update({ ativo: data.ativo }).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
