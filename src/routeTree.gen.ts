@@ -11,7 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MasterIndexRouteImport } from './routes/master.index'
 import { Route as SlugIndexRouteImport } from './routes/$slug.index'
+import { Route as MasterLoginRouteImport } from './routes/master.login'
 import { Route as SlugObrigadoRouteImport } from './routes/$slug.obrigado'
 import { Route as SlugAcompanharRouteImport } from './routes/$slug.acompanhar'
 import { Route as SlugAdminIndexRouteImport } from './routes/$slug.admin.index'
@@ -29,9 +31,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MasterIndexRoute = MasterIndexRouteImport.update({
+  id: '/master/',
+  path: '/master/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SlugIndexRoute = SlugIndexRouteImport.update({
   id: '/$slug/',
   path: '/$slug/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MasterLoginRoute = MasterLoginRouteImport.update({
+  id: '/master/login',
+  path: '/master/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SlugObrigadoRoute = SlugObrigadoRouteImport.update({
@@ -70,7 +82,9 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$slug/acompanhar': typeof SlugAcompanharRouteWithChildren
   '/$slug/obrigado': typeof SlugObrigadoRoute
+  '/master/login': typeof MasterLoginRoute
   '/$slug/': typeof SlugIndexRoute
+  '/master/': typeof MasterIndexRoute
   '/$slug/acompanhar/$codigo': typeof SlugAcompanharCodigoRoute
   '/$slug/admin/login': typeof SlugAdminLoginRoute
   '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
@@ -81,7 +95,9 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$slug/acompanhar': typeof SlugAcompanharRouteWithChildren
   '/$slug/obrigado': typeof SlugObrigadoRoute
+  '/master/login': typeof MasterLoginRoute
   '/$slug': typeof SlugIndexRoute
+  '/master': typeof MasterIndexRoute
   '/$slug/acompanhar/$codigo': typeof SlugAcompanharCodigoRoute
   '/$slug/admin/login': typeof SlugAdminLoginRoute
   '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
@@ -93,7 +109,9 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$slug/acompanhar': typeof SlugAcompanharRouteWithChildren
   '/$slug/obrigado': typeof SlugObrigadoRoute
+  '/master/login': typeof MasterLoginRoute
   '/$slug/': typeof SlugIndexRoute
+  '/master/': typeof MasterIndexRoute
   '/$slug/acompanhar/$codigo': typeof SlugAcompanharCodigoRoute
   '/$slug/admin/login': typeof SlugAdminLoginRoute
   '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
@@ -106,7 +124,9 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/$slug/acompanhar'
     | '/$slug/obrigado'
+    | '/master/login'
     | '/$slug/'
+    | '/master/'
     | '/$slug/acompanhar/$codigo'
     | '/$slug/admin/login'
     | '/$slug/reservar/$tipo'
@@ -117,7 +137,9 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/$slug/acompanhar'
     | '/$slug/obrigado'
+    | '/master/login'
     | '/$slug'
+    | '/master'
     | '/$slug/acompanhar/$codigo'
     | '/$slug/admin/login'
     | '/$slug/reservar/$tipo'
@@ -128,7 +150,9 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/$slug/acompanhar'
     | '/$slug/obrigado'
+    | '/master/login'
     | '/$slug/'
+    | '/master/'
     | '/$slug/acompanhar/$codigo'
     | '/$slug/admin/login'
     | '/$slug/reservar/$tipo'
@@ -140,7 +164,9 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SlugAcompanharRoute: typeof SlugAcompanharRouteWithChildren
   SlugObrigadoRoute: typeof SlugObrigadoRoute
+  MasterLoginRoute: typeof MasterLoginRoute
   SlugIndexRoute: typeof SlugIndexRoute
+  MasterIndexRoute: typeof MasterIndexRoute
   SlugAdminLoginRoute: typeof SlugAdminLoginRoute
   SlugReservarTipoRoute: typeof SlugReservarTipoRoute
   SlugAdminIndexRoute: typeof SlugAdminIndexRoute
@@ -162,11 +188,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/master/': {
+      id: '/master/'
+      path: '/master'
+      fullPath: '/master/'
+      preLoaderRoute: typeof MasterIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$slug/': {
       id: '/$slug/'
       path: '/$slug'
       fullPath: '/$slug/'
       preLoaderRoute: typeof SlugIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/master/login': {
+      id: '/master/login'
+      path: '/master/login'
+      fullPath: '/master/login'
+      preLoaderRoute: typeof MasterLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$slug/obrigado': {
@@ -231,7 +271,9 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SlugAcompanharRoute: SlugAcompanharRouteWithChildren,
   SlugObrigadoRoute: SlugObrigadoRoute,
+  MasterLoginRoute: MasterLoginRoute,
   SlugIndexRoute: SlugIndexRoute,
+  MasterIndexRoute: MasterIndexRoute,
   SlugAdminLoginRoute: SlugAdminLoginRoute,
   SlugReservarTipoRoute: SlugReservarTipoRoute,
   SlugAdminIndexRoute: SlugAdminIndexRoute,
