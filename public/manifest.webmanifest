@@ -2,7 +2,7 @@
   "name": "ReservaLab",
   "short_name": "ReservaLab",
   "description": "Sistema de reservas ReservaLab.",
-  "start_url": "/admin",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",

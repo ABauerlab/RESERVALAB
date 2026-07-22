@@ -50,7 +50,7 @@ function MasterPanel() {
   const tenantsQ = useQuery({
     enabled: ready,
     queryKey: ["master-tenants"],
-    queryFn: async () => (await listar({})).tenants,
+    queryFn: async () => (await listar()).tenants,
   });
 
   const criarM = useMutation({

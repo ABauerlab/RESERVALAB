@@ -32,7 +32,7 @@ function MasterLogin() {
   useEffect(() => {
     (async () => {
       try {
-        await bootstrap({});
+        await bootstrap();
       } catch {
         // Ignora: idempotente. Se falhar, o login abaixo dará erro claro.
       } finally {
