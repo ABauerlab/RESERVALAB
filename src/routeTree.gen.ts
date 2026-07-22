@@ -11,6 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SlugIndexRouteImport } from './routes/$slug.index'
+import { Route as SlugObrigadoRouteImport } from './routes/$slug.obrigado'
+import { Route as SlugAcompanharRouteImport } from './routes/$slug.acompanhar'
+import { Route as SlugReservarTipoRouteImport } from './routes/$slug.reservar.$tipo'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -22,31 +26,86 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SlugIndexRoute = SlugIndexRouteImport.update({
+  id: '/$slug/',
+  path: '/$slug/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SlugObrigadoRoute = SlugObrigadoRouteImport.update({
+  id: '/$slug/obrigado',
+  path: '/$slug/obrigado',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SlugAcompanharRoute = SlugAcompanharRouteImport.update({
+  id: '/$slug/acompanhar',
+  path: '/$slug/acompanhar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SlugReservarTipoRoute = SlugReservarTipoRouteImport.update({
+  id: '/$slug/reservar/$tipo',
+  path: '/$slug/reservar/$tipo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/$slug/acompanhar': typeof SlugAcompanharRoute
+  '/$slug/obrigado': typeof SlugObrigadoRoute
+  '/$slug/': typeof SlugIndexRoute
+  '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/$slug/acompanhar': typeof SlugAcompanharRoute
+  '/$slug/obrigado': typeof SlugObrigadoRoute
+  '/$slug': typeof SlugIndexRoute
+  '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/$slug/acompanhar': typeof SlugAcompanharRoute
+  '/$slug/obrigado': typeof SlugObrigadoRoute
+  '/$slug/': typeof SlugIndexRoute
+  '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/sitemap.xml'
+  fullPaths:
+    | '/'
+    | '/sitemap.xml'
+    | '/$slug/acompanhar'
+    | '/$slug/obrigado'
+    | '/$slug/'
+    | '/$slug/reservar/$tipo'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/sitemap.xml'
-  id: '__root__' | '/' | '/sitemap.xml'
+  to:
+    | '/'
+    | '/sitemap.xml'
+    | '/$slug/acompanhar'
+    | '/$slug/obrigado'
+    | '/$slug'
+    | '/$slug/reservar/$tipo'
+  id:
+    | '__root__'
+    | '/'
+    | '/sitemap.xml'
+    | '/$slug/acompanhar'
+    | '/$slug/obrigado'
+    | '/$slug/'
+    | '/$slug/reservar/$tipo'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  SlugAcompanharRoute: typeof SlugAcompanharRoute
+  SlugObrigadoRoute: typeof SlugObrigadoRoute
+  SlugIndexRoute: typeof SlugIndexRoute
+  SlugReservarTipoRoute: typeof SlugReservarTipoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +124,44 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$slug/': {
+      id: '/$slug/'
+      path: '/$slug'
+      fullPath: '/$slug/'
+      preLoaderRoute: typeof SlugIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$slug/obrigado': {
+      id: '/$slug/obrigado'
+      path: '/$slug/obrigado'
+      fullPath: '/$slug/obrigado'
+      preLoaderRoute: typeof SlugObrigadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$slug/acompanhar': {
+      id: '/$slug/acompanhar'
+      path: '/$slug/acompanhar'
+      fullPath: '/$slug/acompanhar'
+      preLoaderRoute: typeof SlugAcompanharRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$slug/reservar/$tipo': {
+      id: '/$slug/reservar/$tipo'
+      path: '/$slug/reservar/$tipo'
+      fullPath: '/$slug/reservar/$tipo'
+      preLoaderRoute: typeof SlugReservarTipoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  SlugAcompanharRoute: SlugAcompanharRoute,
+  SlugObrigadoRoute: SlugObrigadoRoute,
+  SlugIndexRoute: SlugIndexRoute,
+  SlugReservarTipoRoute: SlugReservarTipoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
