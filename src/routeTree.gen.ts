@@ -14,6 +14,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SlugIndexRouteImport } from './routes/$slug.index'
 import { Route as SlugObrigadoRouteImport } from './routes/$slug.obrigado'
 import { Route as SlugAcompanharRouteImport } from './routes/$slug.acompanhar'
+import { Route as SlugAdminIndexRouteImport } from './routes/$slug.admin.index'
 import { Route as SlugReservarTipoRouteImport } from './routes/$slug.reservar.$tipo'
 import { Route as SlugAdminLoginRouteImport } from './routes/$slug.admin.login'
 import { Route as SlugAcompanharCodigoRouteImport } from './routes/$slug.acompanhar.$codigo'
@@ -43,6 +44,11 @@ const SlugAcompanharRoute = SlugAcompanharRouteImport.update({
   path: '/$slug/acompanhar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SlugAdminIndexRoute = SlugAdminIndexRouteImport.update({
+  id: '/$slug/admin/',
+  path: '/$slug/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SlugReservarTipoRoute = SlugReservarTipoRouteImport.update({
   id: '/$slug/reservar/$tipo',
   path: '/$slug/reservar/$tipo',
@@ -68,6 +74,7 @@ export interface FileRoutesByFullPath {
   '/$slug/acompanhar/$codigo': typeof SlugAcompanharCodigoRoute
   '/$slug/admin/login': typeof SlugAdminLoginRoute
   '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
+  '/$slug/admin/': typeof SlugAdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByTo {
   '/$slug/acompanhar/$codigo': typeof SlugAcompanharCodigoRoute
   '/$slug/admin/login': typeof SlugAdminLoginRoute
   '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
+  '/$slug/admin': typeof SlugAdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -89,6 +97,7 @@ export interface FileRoutesById {
   '/$slug/acompanhar/$codigo': typeof SlugAcompanharCodigoRoute
   '/$slug/admin/login': typeof SlugAdminLoginRoute
   '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
+  '/$slug/admin/': typeof SlugAdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -101,6 +110,7 @@ export interface FileRouteTypes {
     | '/$slug/acompanhar/$codigo'
     | '/$slug/admin/login'
     | '/$slug/reservar/$tipo'
+    | '/$slug/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -111,6 +121,7 @@ export interface FileRouteTypes {
     | '/$slug/acompanhar/$codigo'
     | '/$slug/admin/login'
     | '/$slug/reservar/$tipo'
+    | '/$slug/admin'
   id:
     | '__root__'
     | '/'
@@ -121,6 +132,7 @@ export interface FileRouteTypes {
     | '/$slug/acompanhar/$codigo'
     | '/$slug/admin/login'
     | '/$slug/reservar/$tipo'
+    | '/$slug/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -131,6 +143,7 @@ export interface RootRouteChildren {
   SlugIndexRoute: typeof SlugIndexRoute
   SlugAdminLoginRoute: typeof SlugAdminLoginRoute
   SlugReservarTipoRoute: typeof SlugReservarTipoRoute
+  SlugAdminIndexRoute: typeof SlugAdminIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -168,6 +181,13 @@ declare module '@tanstack/react-router' {
       path: '/$slug/acompanhar'
       fullPath: '/$slug/acompanhar'
       preLoaderRoute: typeof SlugAcompanharRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$slug/admin/': {
+      id: '/$slug/admin/'
+      path: '/$slug/admin'
+      fullPath: '/$slug/admin/'
+      preLoaderRoute: typeof SlugAdminIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$slug/reservar/$tipo': {
@@ -214,6 +234,7 @@ const rootRouteChildren: RootRouteChildren = {
   SlugIndexRoute: SlugIndexRoute,
   SlugAdminLoginRoute: SlugAdminLoginRoute,
   SlugReservarTipoRoute: SlugReservarTipoRoute,
+  SlugAdminIndexRoute: SlugAdminIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
