@@ -119,6 +119,7 @@ function AdminDashboard() {
     registerServiceWorker();
     initInstallPrompt(() => setInstallReady(true));
     if (canNotify()) setNotifPerm(notificationPermission());
+    currentPushEndpoint().then((ep) => setPushEndpoint(ep));
   }, []);
 
   useEffect(() => {
