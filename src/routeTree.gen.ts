@@ -17,9 +17,11 @@ import { Route as MasterLoginRouteImport } from './routes/master.login'
 import { Route as SlugObrigadoRouteImport } from './routes/$slug.obrigado'
 import { Route as SlugAcompanharRouteImport } from './routes/$slug.acompanhar'
 import { Route as SlugAdminIndexRouteImport } from './routes/$slug.admin.index'
+import { Route as ApiPublicVapidPublicKeyRouteImport } from './routes/api/public/vapid-public-key'
 import { Route as SlugReservarTipoRouteImport } from './routes/$slug.reservar.$tipo'
 import { Route as SlugAdminLoginRouteImport } from './routes/$slug.admin.login'
 import { Route as SlugAcompanharCodigoRouteImport } from './routes/$slug.acompanhar.$codigo'
+import { Route as ApiPublicHooksSendPushRouteImport } from './routes/api/public/hooks.send-push'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -61,6 +63,11 @@ const SlugAdminIndexRoute = SlugAdminIndexRouteImport.update({
   path: '/$slug/admin/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicVapidPublicKeyRoute = ApiPublicVapidPublicKeyRouteImport.update({
+  id: '/api/public/vapid-public-key',
+  path: '/api/public/vapid-public-key',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SlugReservarTipoRoute = SlugReservarTipoRouteImport.update({
   id: '/$slug/reservar/$tipo',
   path: '/$slug/reservar/$tipo',
@@ -76,6 +83,11 @@ const SlugAcompanharCodigoRoute = SlugAcompanharCodigoRouteImport.update({
   path: '/$codigo',
   getParentRoute: () => SlugAcompanharRoute,
 } as any)
+const ApiPublicHooksSendPushRoute = ApiPublicHooksSendPushRouteImport.update({
+  id: '/api/public/hooks/send-push',
+  path: '/api/public/hooks/send-push',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -88,7 +100,9 @@ export interface FileRoutesByFullPath {
   '/$slug/acompanhar/$codigo': typeof SlugAcompanharCodigoRoute
   '/$slug/admin/login': typeof SlugAdminLoginRoute
   '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
+  '/api/public/vapid-public-key': typeof ApiPublicVapidPublicKeyRoute
   '/$slug/admin/': typeof SlugAdminIndexRoute
+  '/api/public/hooks/send-push': typeof ApiPublicHooksSendPushRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -101,7 +115,9 @@ export interface FileRoutesByTo {
   '/$slug/acompanhar/$codigo': typeof SlugAcompanharCodigoRoute
   '/$slug/admin/login': typeof SlugAdminLoginRoute
   '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
+  '/api/public/vapid-public-key': typeof ApiPublicVapidPublicKeyRoute
   '/$slug/admin': typeof SlugAdminIndexRoute
+  '/api/public/hooks/send-push': typeof ApiPublicHooksSendPushRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -115,7 +131,9 @@ export interface FileRoutesById {
   '/$slug/acompanhar/$codigo': typeof SlugAcompanharCodigoRoute
   '/$slug/admin/login': typeof SlugAdminLoginRoute
   '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
+  '/api/public/vapid-public-key': typeof ApiPublicVapidPublicKeyRoute
   '/$slug/admin/': typeof SlugAdminIndexRoute
+  '/api/public/hooks/send-push': typeof ApiPublicHooksSendPushRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -130,7 +148,9 @@ export interface FileRouteTypes {
     | '/$slug/acompanhar/$codigo'
     | '/$slug/admin/login'
     | '/$slug/reservar/$tipo'
+    | '/api/public/vapid-public-key'
     | '/$slug/admin/'
+    | '/api/public/hooks/send-push'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -143,7 +163,9 @@ export interface FileRouteTypes {
     | '/$slug/acompanhar/$codigo'
     | '/$slug/admin/login'
     | '/$slug/reservar/$tipo'
+    | '/api/public/vapid-public-key'
     | '/$slug/admin'
+    | '/api/public/hooks/send-push'
   id:
     | '__root__'
     | '/'
@@ -156,7 +178,9 @@ export interface FileRouteTypes {
     | '/$slug/acompanhar/$codigo'
     | '/$slug/admin/login'
     | '/$slug/reservar/$tipo'
+    | '/api/public/vapid-public-key'
     | '/$slug/admin/'
+    | '/api/public/hooks/send-push'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -169,7 +193,9 @@ export interface RootRouteChildren {
   MasterIndexRoute: typeof MasterIndexRoute
   SlugAdminLoginRoute: typeof SlugAdminLoginRoute
   SlugReservarTipoRoute: typeof SlugReservarTipoRoute
+  ApiPublicVapidPublicKeyRoute: typeof ApiPublicVapidPublicKeyRoute
   SlugAdminIndexRoute: typeof SlugAdminIndexRoute
+  ApiPublicHooksSendPushRoute: typeof ApiPublicHooksSendPushRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -230,6 +256,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlugAdminIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/vapid-public-key': {
+      id: '/api/public/vapid-public-key'
+      path: '/api/public/vapid-public-key'
+      fullPath: '/api/public/vapid-public-key'
+      preLoaderRoute: typeof ApiPublicVapidPublicKeyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$slug/reservar/$tipo': {
       id: '/$slug/reservar/$tipo'
       path: '/$slug/reservar/$tipo'
@@ -250,6 +283,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/$slug/acompanhar/$codigo'
       preLoaderRoute: typeof SlugAcompanharCodigoRouteImport
       parentRoute: typeof SlugAcompanharRoute
+    }
+    '/api/public/hooks/send-push': {
+      id: '/api/public/hooks/send-push'
+      path: '/api/public/hooks/send-push'
+      fullPath: '/api/public/hooks/send-push'
+      preLoaderRoute: typeof ApiPublicHooksSendPushRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -276,7 +316,9 @@ const rootRouteChildren: RootRouteChildren = {
   MasterIndexRoute: MasterIndexRoute,
   SlugAdminLoginRoute: SlugAdminLoginRoute,
   SlugReservarTipoRoute: SlugReservarTipoRoute,
+  ApiPublicVapidPublicKeyRoute: ApiPublicVapidPublicKeyRoute,
   SlugAdminIndexRoute: SlugAdminIndexRoute,
+  ApiPublicHooksSendPushRoute: ApiPublicHooksSendPushRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
