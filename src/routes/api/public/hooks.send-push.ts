@@ -69,7 +69,7 @@ export const Route = createFileRoute("/api/public/hooks/send-push")({
               const res = await fetch(s.endpoint, {
                 method: req.method,
                 headers: req.headers,
-                body: req.body,
+                body: req.body as BodyInit,
               });
               if (res.status === 404 || res.status === 410) {
                 toRemove.push(s.id);
