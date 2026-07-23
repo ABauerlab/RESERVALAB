@@ -18,7 +18,8 @@ import { getTenantBySlug } from "@/lib/tenant";
 import {
   canNotify, initInstallPrompt, isStandalone, notificationPermission,
   registerServiceWorker, requestNotificationPermission, showNotification,
-  triggerInstallPrompt,
+  triggerInstallPrompt, pushSupported, subscribeToPush, unsubscribeFromPush,
+  currentPushEndpoint,
 } from "@/lib/pwa";
 
 import { Button } from "@/components/ui/button";
@@ -80,6 +81,8 @@ function AdminDashboard() {
   const [selected, setSelected] = useState<Reserva | null>(null);
   const [notifPerm, setNotifPerm] = useState<string>("default");
   const [installReady, setInstallReady] = useState(false);
+  const [pushEndpoint, setPushEndpoint] = useState<string | null>(null);
+  const [pushBusy, setPushBusy] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -233,11 +236,42 @@ function AdminDashboard() {
     window.open(url, "_blank", "noopener");
   }
 
-  async function handleNotifRequest() {
-    const p = await requestNotificationPermission();
-    setNotifPerm(p);
-    if (p === "granted") toast.success("Notificações ativadas.");
-    else if (p === "denied") toast.error("Permissão negada nas configurações do navegador.");
+  async function handleEnablePush() {
+    if (!tenantId) return;
+    setPushBusy(true);
+    try {
+      const p = await requestNotificationPermission();
+      setNotifPerm(p);
+      if (p !== "granted") {
+        if (p === "denied") toast.error("Permissão negada nas configurações do navegador.");
+        return;
+      }
+      const sub = await subscribeToPush();
+      if (!sub) { toast.error("Não foi possível ativar push neste dispositivo."); return; }
+      const { data: sess } = await supabase.auth.getSession();
+      const { error } = await supabase
+        .from("push_subscriptions")
+        .upsert(
+          { tenant_id: tenantId, user_id: sess.session?.user.id ?? null,
+            endpoint: sub.endpoint, p256dh: sub.p256dh, auth: sub.auth },
+          { onConflict: "endpoint" },
+        );
+      if (error) { toast.error("Falha ao registrar dispositivo: " + error.message); return; }
+      setPushEndpoint(sub.endpoint);
+      toast.success("Notificações push ativadas.");
+    } finally { setPushBusy(false); }
+  }
+
+  async function handleDisablePush() {
+    setPushBusy(true);
+    try {
+      const endpoint = pushEndpoint ?? (await currentPushEndpoint());
+      const removed = await unsubscribeFromPush();
+      const ep = endpoint ?? removed;
+      if (ep) await supabase.from("push_subscriptions").delete().eq("endpoint", ep);
+      setPushEndpoint(null);
+      toast.success("Notificações push desativadas.");
+    } finally { setPushBusy(false); }
   }
 
   async function handleInstall() {
