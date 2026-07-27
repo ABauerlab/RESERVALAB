@@ -58,7 +58,12 @@ function MasterPanel() {
     enabled: ready,
     queryKey: ["master-tenants"],
     queryFn: async () => (await listar()).tenants,
+    retry: 1,
+    refetchOnWindowFocus: true,
+    refetchOnMount: "always",
+    staleTime: 0,
   });
+
 
   const criarM = useMutation({
     mutationFn: async (input: Parameters<typeof criar>[0]) => criar(input),
