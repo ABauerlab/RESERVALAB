@@ -15,6 +15,8 @@ import {
   type Reserva, type ReservaArea, type ReservaStatus, type ReservaTipo, type ReservaUpdate,
 } from "@/lib/reservations";
 import { getTenantBySlug } from "@/lib/tenant";
+import { buildMensagemConfirmacao, whatsappUrl } from "@/lib/confirmacao";
+
 import {
   canNotify, initInstallPrompt, isStandalone, notificationPermission,
   registerServiceWorker, requestNotificationPermission, showNotification,
