@@ -222,20 +222,16 @@ function AdminDashboard() {
     const tenant = await getTenantBySlug(slug);
     const numero = telefoneToWhatsApp(r.telefone);
     if (!numero) return;
-    const template = tenant?.mensagem_confirmacao ??
-      "Ola {nome}, sua reserva no {empresa} para {data} as {horario} foi confirmada. Endereco: {endereco}. Para acompanhar ou alterar acesse: {link_acompanhar}";
-    const link = `${window.location.origin}/${slug}/acompanhar/${r.codigo_acompanhamento}`;
-    const msg = template
-      .replaceAll("{nome}", r.nome)
-      .replaceAll("{empresa}", tenant?.nome ?? "")
-      .replaceAll("{data}", formatData(r.data))
-      .replaceAll("{horario}", formatHorario(r.horario))
-      .replaceAll("{endereco}", tenant?.endereco ?? "")
-      .replaceAll("{link_acompanhar}", link)
-      .replaceAll("{codigo}", r.codigo_acompanhamento);
-    const url = `https://wa.me/${numero}?text=${encodeURIComponent(msg)}`;
-    window.open(url, "_blank", "noopener");
+    const msg = buildMensagemConfirmacao(tenant?.mensagem_confirmacao, {
+      reserva: r,
+      empresaNome: tenant?.nome ?? "",
+      endereco: tenant?.endereco,
+      telefoneEmpresa: tenant?.telefone_contato,
+      linkAcompanhar: `${window.location.origin}/${slug}/acompanhar/${r.codigo_acompanhamento}`,
+    });
+    window.open(whatsappUrl(numero, msg), "_blank", "noopener");
   }
+
 
   async function handleEnablePush() {
     if (!tenantId) return;
