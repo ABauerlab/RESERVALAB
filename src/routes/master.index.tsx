@@ -2,17 +2,21 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ExternalLink, Loader2, LogOut, Plus, Power } from "lucide-react";
+import { ExternalLink, Loader2, LogOut, Plus, Power, KeyRound, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
-import { criarTenant, listarTenants, toggleTenantAtivo } from "@/lib/master.functions";
+import {
+  criarTenant, listarTenants, toggleTenantAtivo,
+  listarAcessos, criarAcesso, redefinirSenhaAcesso, removerAcesso,
+} from "@/lib/master.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
+
 
 export const Route = createFileRoute("/master/")({
   head: () => ({
@@ -30,6 +34,7 @@ function MasterPanel() {
   const [ready, setReady] = useState(false);
   const [openNew, setOpenNew] = useState(false);
   const [aba, setAba] = useState<"empresas" | "sugestoes">("empresas");
+  const [acessosDe, setAcessosDe] = useState<{ id: string; nome: string } | null>(null);
 
 
   const listar = useServerFn(listarTenants);
@@ -153,6 +158,12 @@ function MasterPanel() {
                       <ExternalLink className="h-3.5 w-3.5" /> Abrir
                     </Link>
                     <button
+                      onClick={() => setAcessosDe({ id: t.id, nome: t.nome })}
+                      className="inline-flex h-9 items-center gap-1 rounded-lg border border-border bg-background px-3 text-xs font-medium hover:bg-accent"
+                    >
+                      <KeyRound className="h-3.5 w-3.5" /> Logins
+                    </button>
+                    <button
                       onClick={() => toggleM.mutate({ id: t.id, ativo: !t.ativo })}
                       className="inline-flex h-9 items-center gap-1 rounded-lg border border-border bg-background px-3 text-xs font-medium hover:bg-accent"
                     >
@@ -168,6 +179,8 @@ function MasterPanel() {
         )}
       </div>
 
+
+      <AcessosDialog tenant={acessosDe} onClose={() => setAcessosDe(null)} />
 
       <NovoTenantDialog
         open={openNew}
@@ -344,5 +357,112 @@ function MasterFeedbacks() {
         </ul>
       )}
     </section>
+  );
+}
+
+/** Gestão de logins (acessos) de uma empresa. */
+function AcessosDialog({ tenant, onClose }: { tenant: { id: string; nome: string } | null; onClose: () => void }) {
+  const listar = useServerFn(listarAcessos);
+  const criar = useServerFn(criarAcesso);
+  const redefinir = useServerFn(redefinirSenhaAcesso);
+  const remover = useServerFn(removerAcesso);
+  const qc = useQueryClient();
+
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+
+  useEffect(() => { if (!tenant) { setEmail(""); setSenha(""); } }, [tenant]);
+
+  const acessosQ = useQuery({
+    enabled: !!tenant,
+    queryKey: ["master-acessos", tenant?.id],
+    queryFn: async () => (await listar({ data: { tenant_id: tenant!.id } })).acessos,
+  });
+
+  const invalidate = () => qc.invalidateQueries({ queryKey: ["master-acessos", tenant?.id] });
+  const onErr = (e: unknown) => toast.error(e instanceof Error ? e.message : "Falha na operação.");
+
+  const criarM = useMutation({
+    mutationFn: async () => criar({ data: { tenant_id: tenant!.id, email, senha } }),
+    onSuccess: () => { toast.success("Login criado."); setEmail(""); setSenha(""); invalidate(); },
+    onError: onErr,
+  });
+
+  const redefinirM = useMutation({
+    mutationFn: async (v: { user_id: string; senha: string }) => redefinir({ data: v }),
+    onSuccess: () => { toast.success("Senha redefinida."); invalidate(); },
+    onError: onErr,
+  });
+
+  const removerM = useMutation({
+    mutationFn: async (role_id: string) => remover({ data: { role_id } }),
+    onSuccess: () => { toast.success("Acesso removido."); invalidate(); },
+    onError: onErr,
+  });
+
+  return (
+    <Dialog open={!!tenant} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-lg rounded-2xl">
+        <DialogHeader>
+          <DialogTitle className="font-serif text-2xl font-normal">Logins — {tenant?.nome}</DialogTitle>
+        </DialogHeader>
+
+        {acessosQ.isLoading ? (
+          <div className="flex justify-center py-8"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
+        ) : (acessosQ.data ?? []).length === 0 ? (
+          <p className="rounded-xl border border-dashed border-border bg-card/50 p-4 text-center text-sm text-muted-foreground">
+            Nenhum login cadastrado.
+          </p>
+        ) : (
+          <ul className="space-y-2">
+            {(acessosQ.data ?? []).map((a) => (
+              <li key={a.role_id} className="rounded-xl border border-border bg-card p-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">{a.email}</p>
+                    <p className="mt-0.5 text-[11px] text-muted-foreground">
+                      {a.must_change_password ? "Senha provisória" : "Senha definida"} ·{" "}
+                      {a.last_sign_in_at ? `último acesso ${new Date(a.last_sign_in_at).toLocaleDateString("pt-BR")}` : "nunca acessou"}
+                    </p>
+                  </div>
+                  <div className="flex gap-1.5">
+                    <button
+                      onClick={() => {
+                        const nova = window.prompt(`Nova senha para ${a.email} (mín. 6 caracteres)`);
+                        if (nova && nova.length >= 6) redefinirM.mutate({ user_id: a.user_id, senha: nova });
+                        else if (nova) toast.error("Senha muito curta.");
+                      }}
+                      className="inline-flex h-8 items-center gap-1 rounded-lg border border-border bg-background px-2.5 text-[11px] font-medium hover:bg-accent"
+                    >
+                      <KeyRound className="h-3.5 w-3.5" /> Senha
+                    </button>
+                    <button
+                      onClick={() => { if (window.confirm(`Remover o acesso de ${a.email}?`)) removerM.mutate(a.role_id); }}
+                      className="inline-flex h-8 items-center gap-1 rounded-lg border border-border bg-background px-2.5 text-[11px] font-medium text-destructive hover:bg-destructive/10"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" /> Remover
+                    </button>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <form
+          onSubmit={(e) => { e.preventDefault(); criarM.mutate(); }}
+          className="mt-2 space-y-3 border-t border-border pt-4"
+        >
+          <p className="text-[12px] font-medium text-muted-foreground">Adicionar login</p>
+          <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@empresa.com" required className="h-11 rounded-xl" />
+          <Input type="text" value={senha} onChange={(e) => setSenha(e.target.value)} placeholder="Senha inicial (mín. 6)" required minLength={6} className="h-11 rounded-xl" />
+          <DialogFooter>
+            <Button type="submit" disabled={criarM.isPending} className="bg-terracotta text-terracotta-foreground hover:bg-terracotta/90">
+              {criarM.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Adicionar"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

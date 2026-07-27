@@ -140,3 +140,114 @@ export const toggleTenantAtivo = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+// ---- Gestão de logins (acessos) de cada empresa ----
+
+export const listarAcessos = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { tenant_id: string }) => {
+    if (!input?.tenant_id) throw new Error("Empresa inválida");
+    return input;
+  })
+  .handler(async ({ data, context }) => {
+    const { data: isSuper } = await context.supabase
+      .rpc("has_role", { _user_id: context.userId, _role: "super_admin" });
+    if (!isSuper) throw new Error("Acesso negado");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: roles, error } = await supabaseAdmin
+      .from("user_roles").select("id, user_id, created_at")
+      .eq("tenant_id", data.tenant_id).eq("role", "tenant_admin");
+    if (error) throw new Error(error.message);
+    const list = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
+    const users = list.data?.users ?? [];
+    return {
+      acessos: (roles ?? []).map((r) => {
+        const u = users.find((x) => x.id === r.user_id);
+        return {
+          role_id: r.id,
+          user_id: r.user_id,
+          email: u?.email ?? "(usuário removido)",
+          must_change_password: u?.user_metadata?.must_change_password === true,
+          last_sign_in_at: u?.last_sign_in_at ?? null,
+        };
+      }),
+    };
+  });
+
+export const criarAcesso = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { tenant_id: string; email: string; senha: string }) => {
+    if (!input?.tenant_id) throw new Error("Empresa inválida");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email ?? "")) throw new Error("E-mail inválido");
+    if (!input.senha || input.senha.length < 6) throw new Error("Senha muito curta");
+    return { ...input, email: input.email.toLowerCase().trim() };
+  })
+  .handler(async ({ data, context }) => {
+    const { data: isSuper } = await context.supabase
+      .rpc("has_role", { _user_id: context.userId, _role: "super_admin" });
+    if (!isSuper) throw new Error("Acesso negado");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const list = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
+    const found = list.data?.users?.find((u) => u.email?.toLowerCase() === data.email);
+    let userId = found?.id ?? null;
+
+    if (!userId) {
+      const { data: created, error: cErr } = await supabaseAdmin.auth.admin.createUser({
+        email: data.email,
+        password: data.senha,
+        email_confirm: true,
+        user_metadata: { must_change_password: true },
+      });
+      if (cErr || !created.user) throw new Error(cErr?.message ?? "Falha ao criar usuário");
+      userId = created.user.id;
+    } else {
+      await supabaseAdmin.auth.admin.updateUserById(userId, {
+        password: data.senha,
+        user_metadata: { ...(found?.user_metadata ?? {}), must_change_password: true },
+      });
+    }
+
+    const { error: rErr } = await supabaseAdmin
+      .from("user_roles")
+      .insert({ user_id: userId, role: "tenant_admin", tenant_id: data.tenant_id });
+    if (rErr && !/duplicate|unique/i.test(rErr.message)) throw new Error(rErr.message);
+
+    return { ok: true };
+  });
+
+export const redefinirSenhaAcesso = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { user_id: string; senha: string }) => {
+    if (!input?.user_id) throw new Error("Usuário inválido");
+    if (!input.senha || input.senha.length < 6) throw new Error("Senha muito curta");
+    return input;
+  })
+  .handler(async ({ data, context }) => {
+    const { data: isSuper } = await context.supabase
+      .rpc("has_role", { _user_id: context.userId, _role: "super_admin" });
+    if (!isSuper) throw new Error("Acesso negado");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(data.user_id, {
+      password: data.senha,
+      user_metadata: { must_change_password: true },
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const removerAcesso = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { role_id: string }) => {
+    if (!input?.role_id) throw new Error("Acesso inválido");
+    return input;
+  })
+  .handler(async ({ data, context }) => {
+    const { data: isSuper } = await context.supabase
+      .rpc("has_role", { _user_id: context.userId, _role: "super_admin" });
+    if (!isSuper) throw new Error("Acesso negado");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("user_roles").delete().eq("id", data.role_id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
