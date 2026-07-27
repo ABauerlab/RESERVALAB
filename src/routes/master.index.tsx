@@ -162,7 +162,10 @@ function MasterPanel() {
             ))
           )}
         </div>
+        </>
+        )}
       </div>
+
 
       <NovoTenantDialog
         open={openNew}
