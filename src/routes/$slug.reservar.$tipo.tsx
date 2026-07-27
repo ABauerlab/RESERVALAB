@@ -42,6 +42,16 @@ function ReservarPage() {
   const navigate = useNavigate();
   const tenantQ = useQuery({ queryKey: ["tenant", slug], queryFn: () => getTenantBySlug(slug), staleTime: 5 * 60_000 });
 
+  const bloqueiosQ = useQuery({
+    queryKey: ["bloqueios", slug],
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("bloqueios_do_tenant", { _slug: slug });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [quantidade, setQuantidade] = useState<number>(2);
@@ -65,8 +75,25 @@ function ReservarPage() {
 
   const hoje = useMemo(() => new Date().toISOString().slice(0, 10), []);
 
+  // Bloqueio de agenda aplicável à data/horário escolhidos
+  const bloqueio = useMemo(() => {
+    if (!data) return null;
+    const doDia = (bloqueiosQ.data ?? []).filter((b) => b.data === data);
+    if (doDia.length === 0) return null;
+    const diaTodo = doDia.find((b) => !b.hora_inicio && !b.hora_fim);
+    if (diaTodo) return { motivo: diaTodo.motivo, diaTodo: true as const };
+    if (!horario) return null;
+    const faixa = doDia.find((b) => {
+      const ini = b.hora_inicio ?? "00:00:00";
+      const fim = b.hora_fim ?? "23:59:59";
+      return horario >= ini.slice(0, 5) && horario <= fim.slice(0, 5);
+    });
+    return faixa ? { motivo: faixa.motivo, diaTodo: false as const } : null;
+  }, [bloqueiosQ.data, data, horario]);
+
   const podeEnviar =
     !!tenantQ.data &&
+    !bloqueio &&
     nome.trim().length >= 2 &&
     telefone.replace(/\D/g, "").length >= 10 &&
     quantidade > 0 &&
@@ -81,37 +108,36 @@ function ReservarPage() {
     if (!tenant) { toast.error("Empresa indisponível no momento."); return; }
 
     setEnviando(true);
-    const payload: ReservaInsert = {
-      tenant_id: tenant.id,
-      codigo_acompanhamento: "",
-      tipo,
-      nome: nome.trim(),
-      telefone: telefone.trim(),
-      quantidade,
-      data,
-      horario: precisaHorario && horario ? horario : null,
-      area: isMesa ? area : null,
-      leva_bolo: isAniv ? levaBolo === "sim" : null,
-      comandas: isAniv ? comandas === "sim" : null,
-      tipo_evento: isEvento ? tipoEvento.trim() : null,
-      observacoes: (isEvento || isCasa) ? (mensagem.trim() || null) : (observacoes.trim() || null),
-      status: "pendente",
-    };
-
-    const { data: inserted, error } = await supabase
-      .from("reservas")
-      .insert(payload)
-      .select("codigo_acompanhamento")
-      .single();
+    // Criação via função segura no servidor: valida empresa, tipos aceitos e
+    // bloqueios de agenda, e devolve o código sem expor a lista de reservas.
+    const { data: codigo, error } = await supabase.rpc("criar_reserva", {
+      _slug: slug,
+      _tipo: tipo,
+      _nome: nome.trim(),
+      _telefone: telefone.trim(),
+      _quantidade: quantidade,
+      _data: data,
+      _horario: precisaHorario && horario ? horario : null,
+      _area: isMesa ? area : null,
+      _leva_bolo: isAniv ? levaBolo === "sim" : null,
+      _comandas: isAniv ? comandas === "sim" : null,
+      _tipo_evento: isEvento ? tipoEvento.trim() : null,
+      _observacoes: (isEvento || isCasa) ? (mensagem.trim() || null) : (observacoes.trim() || null),
+    });
     setEnviando(false);
 
-    if (error || !inserted) {
-      toast.error("Não foi possível enviar sua reserva. Tente novamente.");
+    if (error || !codigo) {
+      const msg = error?.message ?? "";
+      if (msg.includes("indisponivel")) toast.error("Essa data ou horário não está disponível. Escolha outro.");
+      else if (msg.includes("Telefone")) toast.error("Confira o telefone informado.");
+      else if (msg.includes("nao esta disponivel")) toast.error("Este tipo de reserva não está disponível.");
+      else toast.error("Não foi possível enviar sua reserva. Tente novamente.");
       return;
     }
-    try { sessionStorage.setItem("ultima-reserva-codigo", inserted.codigo_acompanhamento); } catch { /* noop */ }
+    try { sessionStorage.setItem("ultima-reserva-codigo", codigo); } catch { /* noop */ }
     navigate({ to: "/$slug/obrigado", params: { slug } });
   }
+
 
   return (
     <main className="min-h-screen bg-background">
