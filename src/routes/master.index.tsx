@@ -29,6 +29,8 @@ function MasterPanel() {
   const navigate = useNavigate();
   const [ready, setReady] = useState(false);
   const [openNew, setOpenNew] = useState(false);
+  const [aba, setAba] = useState<"empresas" | "sugestoes">("empresas");
+
 
   const listar = useServerFn(listarTenants);
   const criar = useServerFn(criarTenant);
