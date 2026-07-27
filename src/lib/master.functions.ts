@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireRuntimeSupabaseAuth } from "@/integrations/supabase/auth-middleware-runtime";
 
 const SUPER_ADMIN_EMAIL = "contato.bauerlab@gmail.com";
 const SUPER_ADMIN_PASSWORD = "21254775";
@@ -51,7 +51,7 @@ export type CriarTenantInput = {
 };
 
 export const criarTenant = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireRuntimeSupabaseAuth])
   .inputValidator((input: CriarTenantInput) => {
     if (!input || typeof input !== "object") throw new Error("Payload inválido");
     const slug = String(input.slug ?? "").toLowerCase().trim().replace(/[^a-z0-9-]/g, "-");
@@ -116,7 +116,7 @@ export const criarTenant = createServerFn({ method: "POST" })
   });
 
 export const listarTenants = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireRuntimeSupabaseAuth])
   .handler(async ({ context }) => {
     const { data: isSuper } = await context.supabase
       .rpc("has_role", { _user_id: context.userId, _role: "super_admin" });
@@ -129,7 +129,7 @@ export const listarTenants = createServerFn({ method: "GET" })
   });
 
 export const toggleTenantAtivo = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireRuntimeSupabaseAuth])
   .inputValidator((input: { id: string; ativo: boolean }) => input)
   .handler(async ({ data, context }) => {
     const { data: isSuper } = await context.supabase
@@ -144,7 +144,7 @@ export const toggleTenantAtivo = createServerFn({ method: "POST" })
 // ---- Gestão de logins (acessos) de cada empresa ----
 
 export const listarAcessos = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireRuntimeSupabaseAuth])
   .inputValidator((input: { tenant_id: string }) => {
     if (!input?.tenant_id) throw new Error("Empresa inválida");
     return input;
@@ -175,7 +175,7 @@ export const listarAcessos = createServerFn({ method: "POST" })
   });
 
 export const criarAcesso = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireRuntimeSupabaseAuth])
   .inputValidator((input: { tenant_id: string; email: string; senha: string }) => {
     if (!input?.tenant_id) throw new Error("Empresa inválida");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email ?? "")) throw new Error("E-mail inválido");
@@ -217,7 +217,7 @@ export const criarAcesso = createServerFn({ method: "POST" })
   });
 
 export const redefinirSenhaAcesso = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireRuntimeSupabaseAuth])
   .inputValidator((input: { user_id: string; senha: string }) => {
     if (!input?.user_id) throw new Error("Usuário inválido");
     if (!input.senha || input.senha.length < 6) throw new Error("Senha muito curta");
@@ -237,7 +237,7 @@ export const redefinirSenhaAcesso = createServerFn({ method: "POST" })
   });
 
 export const removerAcesso = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireRuntimeSupabaseAuth])
   .inputValidator((input: { role_id: string }) => {
     if (!input?.role_id) throw new Error("Acesso inválido");
     return input;
