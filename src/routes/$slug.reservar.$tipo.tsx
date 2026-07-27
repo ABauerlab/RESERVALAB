@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate, useParams, notFound } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronLeft, Loader2, Minus, Plus } from "lucide-react";
+import { ChevronLeft, Loader2, Minus, Plus, CalendarX2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -9,7 +9,6 @@ import {
   TIPO_LABEL,
   formatTelefone,
   type ReservaArea,
-  type ReservaInsert,
   type ReservaTipo,
 } from "@/lib/reservations";
 import { getTenantBySlug } from "@/lib/tenant";
@@ -20,6 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+
 
 const TIPOS_VALIDOS: ReservaTipo[] = ["mesa", "aniversario", "evento", "casamento"];
 
@@ -41,6 +41,16 @@ function ReservarPage() {
   const { slug, tipo } = useParams({ from: "/$slug/reservar/$tipo" }) as { slug: string; tipo: ReservaTipo };
   const navigate = useNavigate();
   const tenantQ = useQuery({ queryKey: ["tenant", slug], queryFn: () => getTenantBySlug(slug), staleTime: 5 * 60_000 });
+
+  const bloqueiosQ = useQuery({
+    queryKey: ["bloqueios", slug],
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("bloqueios_do_tenant", { _slug: slug });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
 
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
@@ -65,8 +75,25 @@ function ReservarPage() {
 
   const hoje = useMemo(() => new Date().toISOString().slice(0, 10), []);
 
+  // Bloqueio de agenda aplicável à data/horário escolhidos
+  const bloqueio = useMemo(() => {
+    if (!data) return null;
+    const doDia = (bloqueiosQ.data ?? []).filter((b) => b.data === data);
+    if (doDia.length === 0) return null;
+    const diaTodo = doDia.find((b) => !b.hora_inicio && !b.hora_fim);
+    if (diaTodo) return { motivo: diaTodo.motivo, diaTodo: true as const };
+    if (!horario) return null;
+    const faixa = doDia.find((b) => {
+      const ini = b.hora_inicio ?? "00:00:00";
+      const fim = b.hora_fim ?? "23:59:59";
+      return horario >= ini.slice(0, 5) && horario <= fim.slice(0, 5);
+    });
+    return faixa ? { motivo: faixa.motivo, diaTodo: false as const } : null;
+  }, [bloqueiosQ.data, data, horario]);
+
   const podeEnviar =
     !!tenantQ.data &&
+    !bloqueio &&
     nome.trim().length >= 2 &&
     telefone.replace(/\D/g, "").length >= 10 &&
     quantidade > 0 &&
@@ -81,37 +108,37 @@ function ReservarPage() {
     if (!tenant) { toast.error("Empresa indisponível no momento."); return; }
 
     setEnviando(true);
-    const payload: ReservaInsert = {
-      tenant_id: tenant.id,
-      codigo_acompanhamento: "",
-      tipo,
-      nome: nome.trim(),
-      telefone: telefone.trim(),
-      quantidade,
-      data,
-      horario: precisaHorario && horario ? horario : null,
-      area: isMesa ? area : null,
-      leva_bolo: isAniv ? levaBolo === "sim" : null,
-      comandas: isAniv ? comandas === "sim" : null,
-      tipo_evento: isEvento ? tipoEvento.trim() : null,
-      observacoes: (isEvento || isCasa) ? (mensagem.trim() || null) : (observacoes.trim() || null),
-      status: "pendente",
-    };
+    // Criação via função segura no servidor: valida empresa, tipos aceitos e
+    // bloqueios de agenda, e devolve o código sem expor a lista de reservas.
+    const { data: codigo, error } = await supabase.rpc("criar_reserva", {
+      _slug: slug,
+      _tipo: tipo,
+      _nome: nome.trim(),
+      _telefone: telefone.trim(),
+      _quantidade: quantidade,
+      _data: data,
+      _horario: precisaHorario && horario ? horario : undefined,
+      _area: isMesa ? area : undefined,
+      _leva_bolo: isAniv ? levaBolo === "sim" : undefined,
+      _comandas: isAniv ? comandas === "sim" : undefined,
+      _tipo_evento: isEvento ? tipoEvento.trim() : undefined,
+      _observacoes: (isEvento || isCasa) ? (mensagem.trim() || undefined) : (observacoes.trim() || undefined),
 
-    const { data: inserted, error } = await supabase
-      .from("reservas")
-      .insert(payload)
-      .select("codigo_acompanhamento")
-      .single();
+    });
     setEnviando(false);
 
-    if (error || !inserted) {
-      toast.error("Não foi possível enviar sua reserva. Tente novamente.");
+    if (error || !codigo) {
+      const msg = error?.message ?? "";
+      if (msg.includes("indisponivel")) toast.error("Essa data ou horário não está disponível. Escolha outro.");
+      else if (msg.includes("Telefone")) toast.error("Confira o telefone informado.");
+      else if (msg.includes("nao esta disponivel")) toast.error("Este tipo de reserva não está disponível.");
+      else toast.error("Não foi possível enviar sua reserva. Tente novamente.");
       return;
     }
-    try { sessionStorage.setItem("ultima-reserva-codigo", inserted.codigo_acompanhamento); } catch { /* noop */ }
+    try { sessionStorage.setItem("ultima-reserva-codigo", codigo); } catch { /* noop */ }
     navigate({ to: "/$slug/obrigado", params: { slug } });
   }
+
 
   return (
     <main className="min-h-screen bg-background">
@@ -159,6 +186,22 @@ function ReservarPage() {
               </Field>
             )}
           </div>
+
+          {bloqueio && (
+            <div className="flex items-start gap-3 rounded-xl border border-destructive/25 bg-destructive/5 p-4">
+              <CalendarX2 className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+              <div className="text-sm">
+                <p className="font-medium text-destructive">
+                  {bloqueio.diaTodo ? "Esta data não está disponível" : "Este horário não está disponível"}
+                </p>
+                <p className="mt-0.5 text-muted-foreground">
+                  {bloqueio.motivo?.trim() || "Escolha outra opção para continuar."}
+                </p>
+              </div>
+            </div>
+          )}
+
+
 
           {isMesa && (
             <Field label="Área desejada">

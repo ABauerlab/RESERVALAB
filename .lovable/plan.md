@@ -1,129 +1,87 @@
 
-# ReservaLab — Reconstrução completa
+## Diagnóstico atual (rodei checagens no banco antes de planejar)
 
-Sistema deixa de ser específico do Iracema e vira SaaS multi-tenant hospedado em `reserva.bauerlab.com.br`. Iracema passa a ser o primeiro tenant em `/iracema`.
+- **Tenants**: apenas `iracema` cadastrado (id `13bb5e82…`) e ativo — **preservar**.
+- **Reservas**: 6 registros existentes, todos vinculados ao Iracema — **preservar**.
+- **Causa raiz do BUG 3 e do BUG 4 (não é sessão, é permissão)**: as tabelas `reservas`, `tenants`, `push_subscriptions` e `user_roles` **não têm GRANT para anon nem authenticated**. Sem esses GRANTs o PostgREST (a API que o navegador usa) devolve permission denied para qualquer chamada — RLS por si só não basta. Isso também explica por que só funciona em ambientes muito específicos (algum cache/sessão residual) e falha em navegador limpo/anônimo.
+- **BUG 1 (env do Supabase)**: as chaves estão no `.env` do projeto, mas o erro aparece em runtime. Vou validar que o build publicado está carregando `VITE_SUPABASE_URL/PUBLISHABLE_KEY` corretamente; se estiver stale, republicar resolve. Não vou trocar as credenciais.
 
-## 1. Rebrand (Lovable → ReservaLab)
+## Regras de segurança
 
-- Substituir todos os textos, títulos, meta tags, `manifest.webmanifest`, robots, sitemap e favicon por identidade ReservaLab.
-- Gerar novo favicon + ícones PWA 192/512 (marca ReservaLab).
-- Apagar `public/favicon.ico` padrão do template.
-- Head do `__root.tsx`: title "ReservaLab", description SaaS de reservas.
+- Nenhuma migração fará `DELETE` ou `TRUNCATE`. Toda mudança em `reservas` é aditiva.
+- Antes e depois de cada migração eu conto as reservas do Iracema e valido `SELECT COUNT(*)`.
+- O cadastro do Iracema como primeira empresa no master **já existe** — não vou recriar. Vou apenas garantir que o login novo (`iracemabarbh@gmail.com` / senha provisória `123456`, com "trocar no primeiro acesso") esteja vinculado ao tenant Iracema existente.
 
-## 2. Banco de dados — nova estrutura multi-tenant
+## Fases (executo em ordem, cada fase é publicável)
 
-Nova migração (apaga reservas atuais):
+### Fase A — Correções críticas de produção (bloqueiam uso hoje)
 
-```text
-tenants
-  id, slug (unique, ex: "iracema"), nome, logo_url, endereco,
-  telefone_contato, email_contato, cor_primaria, whatsapp,
-  tipos_aceitos (text[]: mesa/aniversario/evento/casamento),
-  ativo, created_at, updated_at
+1. **Migração de GRANTs (base para tudo funcionar)**
+   - `GRANT INSERT` em `reservas` para `anon` (clientes fazem reserva sem login) — WITH CHECK já limita a tenants ativos.
+   - `GRANT SELECT, INSERT, UPDATE, DELETE` em `reservas` para `authenticated` (admin do tenant + super_admin).
+   - `GRANT SELECT` em `tenants` para `anon` (home pública do tenant precisa ler nome/config).
+   - `GRANT SELECT, INSERT, UPDATE, DELETE` em `tenants`, `user_roles`, `push_subscriptions` para `authenticated`.
+   - `GRANT ALL` em todas as tabelas para `service_role` (para as server functions).
+   - `GRANT EXECUTE` nas funções `get_reserva_by_codigo` e `update_reserva_by_codigo` para `anon` e `authenticated`.
+   - **Resolve BUG 3, BUG 4 e destrava BUG 2.**
 
-app_role  enum: super_admin | tenant_admin
-user_roles
-  user_id (auth.users), role, tenant_id (null p/ super_admin)
+2. **BUG 1 — env**: republicar após a migração acima; se ainda aparecer, ajusto `src/integrations/supabase/client.ts` para dar mensagem clara e verifico se `.env` está sendo lido no build de produção.
 
-reservas  (recriada)
-  + tenant_id (FK tenants), codigo_acompanhamento (text unique, 8 chars),
-  quantidade agora inteiro livre, telefone texto livre com DDI opcional.
-  Mantém: tipo, nome, telefone, data, horario, area, leva_bolo,
-  comandas, tipo_evento, observacoes, status.
-```
+3. **BUG 5 — link de acompanhamento**: hoje `/{slug}/acompanhar/{codigo}` já vai direto pra reserva. Vou verificar se o problema é o link truncado no WhatsApp (Bug 6) fazendo a pessoa cair em `/acompanhar` sem código. Se for, o fix é o Bug 6. Também vou tornar o parse de `codigo` case-insensitive e aceitar com/sem prefixo `RL-`.
 
-RLS:
-- `tenants`: SELECT público (para renderizar `/slug`); INSERT/UPDATE/DELETE apenas super_admin.
-- `user_roles`: leitura pelo próprio user; escrita apenas super_admin. Função `has_role(uuid, app_role)` SECURITY DEFINER.
-- `reservas`: INSERT público (anon + authenticated); SELECT/UPDATE/DELETE por tenant_admin do próprio tenant OU super_admin; SELECT anônimo apenas via RPC `get_reserva_by_codigo(codigo)` SECURITY DEFINER que retorna 1 reserva.
-- UPDATE público (cliente edita própria reserva pelo código): RPC `update_reserva_by_codigo(codigo, payload)` SECURITY DEFINER, valida status ≠ finalizada/cancelada.
+4. **BUG 6 — mensagem truncada no WhatsApp**: template atual usa `.replaceAll` com `\n`? Vou revisar o template padrão e o link. Provável causa: quebras de linha e caracteres especiais mal-encodados fazendo o WhatsApp cortar. Vou padronizar o template (sem emoji, com `\n` reais), garantir `encodeURIComponent` correto, e limitar o link (talvez encurtar). Também vou expor o campo `mensagem_confirmacao` do tenant no painel para a empresa editar.
 
-Grants apropriados em cada tabela.
+5. **Login novo do Iracema**: server fn no master que verifica se `iracemabarbh@gmail.com` já é `tenant_admin` de Iracema; se não, cria o usuário com senha `123456`, marca metadata `must_change_password: true` e faz o grant. **A conta de marketing atual não é removida** — o master decide depois.
 
-Seed: criar tenant `iracema` com tipos `[mesa, aniversario, evento, casamento]` para não perder o cliente atual.
+6. **Fluxo "trocar senha no primeiro login"**: rota `/$slug/admin/trocar-senha` que só sai quando `user_metadata.must_change_password` estiver `false`. `$slug/admin/login` verifica essa flag e redireciona antes do dashboard.
 
-## 3. Admin master
+### Fase B — Isolamento de acesso por empresa
 
-- Não guardo senha em texto. Crio o usuário `contato.bauerlab@gmail.com` via Supabase Auth Admin (senha fornecida) e insiro role `super_admin` na migração usando função SQL que chama `auth.admin_create_user`… como Lovable Cloud não expõe isso via SQL, faço via server function `bootstrapSuperAdmin` chamada uma única vez (idempotente) no primeiro request ao painel master. **Recomendação: trocar a senha após primeiro login.**
-- Painel master em `/master` (autenticado, `_authenticated/master.tsx` com checagem `has_role super_admin`):
-  - Listar tenants
-  - Criar novo tenant (slug, nome, e-mail admin, senha inicial → cria user + role tenant_admin)
-  - Ativar/desativar, editar
+- Reforçar que `tenant_admin` só enxerga o próprio `tenant_id` (RLS já faz isso; auditar todas as queries do painel para garantir `.eq("tenant_id", tenantId)` explícito como defesa em profundidade).
+- Rota `/$slug/admin/login` só aceita usuários com `has_tenant_role(user, tenant_do_slug)` — hoje já faz isso, mas vou adicionar mensagem clara "Este login não pertence a esta empresa" ao invés de deslogar silenciosamente.
+- Nenhuma alteração destrutiva; migração cria índice em `user_roles(user_id, tenant_id)` se faltar.
 
-## 4. Rotas por tenant
+### Fase C — Painel de configuração por empresa
 
-```
-/                       Landing ReservaLab (SaaS)
-/master                 Painel master (super_admin)
-/master/login
-/$slug                  Home do tenant (usa dados do tenant)
-/$slug/reservar/$tipo   Formulário (só tipos que tenant aceita)
-/$slug/obrigado         Confirmação — exibe código de acompanhamento
-/$slug/acompanhar       Consulta por código (input)
-/$slug/acompanhar/$cod  Detalhes + edição pelo cliente
-/$slug/admin/login      Login do tenant
-/$slug/admin            Dashboard do tenant
-```
+- Rota `/$slug/admin/configuracoes` com abas:
+  - **Empresa**: nome, logo (upload em bucket `tenant-assets`), endereço, telefone, WhatsApp de contato, email.
+  - **Tipos de reserva aceitos**: checkboxes de mesa/aniversário/evento/casamento (já existe coluna `tipos_aceitos`).
+  - **Mensagem de confirmação WhatsApp**: editor com placeholders `{nome}`, `{data}`, `{horario}`, `{empresa}`, `{endereco}`, `{link_acompanhar}`, `{codigo}`.
+- Home pública `/$slug` já lê `tenant.logo_url`, `nome`, `tipos_aceitos` — vou garantir que use os campos configurados.
+- Migração cria bucket `tenant-assets` (público) e políticas de upload restritas ao próprio tenant_admin.
 
-Loaders públicos: server fn `getTenantBySlug` com client publishable (SELECT anon). 404 se inativo ou inexistente.
-Tenant admin: `_authenticated` layout já existe; adiciono checagem `has_role tenant_admin AND tenant_id = X` via `beforeLoad` client-side.
+### Fase D — Bloqueio de agenda
 
-## 5. Melhorias no formulário público
+- Nova tabela `agenda_bloqueios (id, tenant_id, data, hora_inicio, hora_fim, motivo, created_at, updated_at)` — permite bloquear dia inteiro (hora_inicio/fim null) ou faixas.
+- RLS: tenant_admin gerencia os próprios; anon pode ler os do tenant (para o formulário checar).
+- No formulário `/$slug/reservar/$tipo`: ao escolher data+horário, valida contra `agenda_bloqueios` antes de permitir enviar.
+- No admin: aba `/$slug/admin/agenda` com calendário simples (lista + adicionar bloqueio).
 
-- Quantidade: componente híbrido — stepper +/- **e** input numérico editável (aceita digitar). Máx 500.
-- Telefone: máscara flexível — se começa com `+`, mantém DDI livre; caso contrário aplica máscara BR (11 dígitos). Validação: mínimo 10 dígitos.
-- Após enviar: gera código 8 chars alfanuméricos (ex: `RL-4F9K2A`), mostrado na `/obrigado` com botão "Copiar" e link "Acompanhar reserva".
+### Fase E — Dashboard da empresa (métricas)
 
-## 6. Acompanhamento sem login
+- Enriquece `/$slug/admin` (que já tem 4 stats) com um painel `/$slug/admin/relatorios`:
+  - Reservas por dia (últimos 30 dias) — gráfico de barras.
+  - Distribuição por tipo (pizza).
+  - Taxa de confirmação vs cancelamento.
+  - Top horários mais reservados.
+- Usa Recharts (já disponível). Sem novas tabelas; agrega em SQL.
 
-- `/$slug/acompanhar`: input de código → navega para `/$slug/acompanhar/$cod`.
-- `/$slug/acompanhar/$cod`: server fn `getReservaByCodigo` (RPC). Exibe status colorido, dados. Se status ∈ {pendente, confirmada}, permite editar campos (data, horário, quantidade, área, observações) via RPC `updateReservaByCodigo`. Bloqueio se cancelada/finalizada.
+### Fase F — Feedback (só master vê)
 
-## 7. Admin do tenant — filtros e edição total
+- Nova tabela `feedbacks (id, tenant_id, autor_user_id, titulo, descricao, status enum('novo','em_analise','feito','recusado'), created_at)`.
+- RLS: tenant_admin pode INSERT + SELECT dos próprios; super_admin SELECT/UPDATE de todos.
+- No admin do tenant: página `/$slug/admin/sugestoes` para enviar (fica invisível no menu do master? o enunciado diz "aba só visível pra master" — vou interpretar como: a **lista consolidada** só o master vê; enviar sugestão fica disponível a todos os tenants).
+- No master: `/master/feedbacks` — lista, marca status, filtra por empresa.
 
-- Filtros por status: chips (Todas / Pendente / Confirmada / Cancelada / Finalizada) + filtros existentes (busca, data).
-- Modal de detalhes ganha modo edição: qualquer campo editável (nome, telefone, data, horário, quantidade, área, tipo, observações, tipo_evento, leva_bolo, comandas, status). Botão "Salvar alterações".
-- Ao clicar "Confirmar": abre `wa.me/<telefone>?text=<msg personalizada>` em nova aba. Mensagem template configurável no tenant (default: `"Ola {nome}, sua reserva no {empresa} para {data} as {horario} foi confirmada. Endereco: {endereco}. Qualquer alteracao acesse {link_acompanhar}."`). Sem emojis.
-- Botão "Nova reserva" — admin cria reserva manualmente.
-- Botão "Excluir" com confirmação.
+## Ordem de entrega e checkpoints
 
-## 8. Push notifications VAPID (background real)
+1. Executo **Fase A migração 1 (GRANTs)** — peço aprovação da migração (obrigatório) e valido `COUNT(*) reservas` antes/depois.
+2. Corrijo BUGs 1, 5, 6 em código; crio login do Iracema + fluxo trocar-senha.
+3. Publico e espero você validar em navegador anônimo que reservas voltam a funcionar e que o Iracema loga com a nova credencial.
+4. Sigo para Fase B → C → D → E → F, cada uma como PR/fase separada com aprovação sua.
 
-- Instalar `web-push` (Worker-compat? Verificar; se não, uso fetch direto para FCM/Web Push endpoints com JWT VAPID assinado via `crypto.subtle`). **Nota técnica**: `web-push` npm usa Node crypto e não roda no Cloudflare Worker. Vou implementar assinatura VAPID manual usando WebCrypto (ES256) — padrão suportado em Workers.
-- Chaves VAPID: gero via `generate_secret` não serve (precisa par ECDSA). Gero um par via script one-shot em migração/server fn e salvo `VAPID_PUBLIC_KEY` (também exposta como `VITE_VAPID_PUBLIC_KEY`) e `VAPID_PRIVATE_KEY` como secrets.
-- Nova tabela `push_subscriptions` (tenant_id, endpoint, p256dh, auth, user_id, created_at).
-- `sw.js` atualizado: listener `push` mostra notificação, `notificationclick` foca/abre `/{slug}/admin`.
-- Admin: botão "Ativar notificações" → `pushManager.subscribe({applicationServerKey})` → grava no banco.
-- Trigger no INSERT em `reservas`: chama server route `/api/public/notify` via `pg_net` com HMAC secret; route busca subs do tenant, envia push VAPID para cada endpoint.
-- iOS: só funciona com PWA instalado (documentado no UI).
+## Perguntas rápidas antes de começar (respondendo, sigo direto pra Fase A)
 
-## 9. Zerar cadastros
-
-Migração faz `TRUNCATE reservas` (recriação já cobre isso). Nenhum dado do Iracema preservado.
-
-## 10. Domínio
-
-Confirmado apontado. Configurar custom domain reserva.bauerlab.com.br no publish depois do deploy — passo manual seu no painel Lovable.
-
----
-
-## Escopo técnico resumido
-
-Arquivos novos/alterados (~35):
-- 3 migrações SQL (multi-tenant + push + seed)
-- `src/lib/tenant.functions.ts`, `admin.functions.ts`, `reservas.functions.ts`, `push.functions.ts`
-- `src/routes/api/public/notify.ts`, `src/routes/api/public/vapid-generate.ts` (one-shot)
-- Novas rotas `$slug.*`, `master.*`, `acompanhar.*`
-- Refatorar `admin.index.tsx`, `admin.login.tsx` → `$slug.admin.*`
-- `public/sw.js`, `public/manifest.webmanifest`, novos ícones
-- Componentes: `QuantityInput`, `PhoneInput`, `StatusFilter`, `EditReservaForm`, `TenantHeader`
-
-## Riscos
-
-- VAPID em Cloudflare Worker exige ES256 manual — implementação delicada mas viável.
-- Bootstrap do super_admin depende de `supabaseAdmin.auth.admin.createUser` na primeira visita ao `/master/login` (idempotente).
-- Multi-tenant + RLS por tenant_id precisa de política sem recursão (usa `has_role` + coluna `tenant_id` na `user_roles`).
-
-## Confirmação necessária
-
-Aprova o plano? Vou executar em sequência, com migrations submetidas para sua aprovação individual.
+1. Posso remover o acesso "de marketing" que hoje entra no admin do Iracema, ou você prefere deixá-lo ativo até confirmar que a nova credencial funciona? (recomendo deixar até você confirmar).
+2. Bucket de logos de empresa: público (URL direta) ok? — recomendo sim, pra performance.
+3. Fase D bloqueio de agenda: começar simples (dia inteiro ou faixa por dia) ou já quer recorrência semanal (ex: "toda segunda fechado")?

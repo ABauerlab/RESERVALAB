@@ -1,28 +1,44 @@
 import { createFileRoute, Link, useNavigate, useParams } from "@tanstack/react-router";
 import { ChevronLeft, Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export const Route = createFileRoute("/$slug/acompanhar")({
+/** Normaliza o código: maiúsculas, sem espaços, com o prefixo RL-. */
+export function normalizeCodigo(v: string): string {
+  let s = v.toUpperCase().replace(/\s+/g, "").replace(/[^A-Z0-9-]/g, "");
+  s = s.replace(/^RL-?/, "");
+  return s.length > 0 ? `RL-${s}` : "";
+}
+
+export const Route = createFileRoute("/$slug/acompanhar/")({
   head: () => ({
     meta: [
       { title: "Acompanhar reserva — ReservaLab" },
       { name: "robots", content: "noindex" },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>) => ({
+    codigo: typeof search.codigo === "string" ? search.codigo : undefined,
+  }),
   component: AcompanharPage,
 });
 
 function AcompanharPage() {
-  const { slug } = useParams({ from: "/$slug/acompanhar" });
+  const { slug } = useParams({ from: "/$slug/acompanhar/" });
+  const { codigo: codigoQuery } = Route.useSearch();
   const navigate = useNavigate();
   const [codigo, setCodigo] = useState("");
 
-  function normalize(v: string) {
-    return v.toUpperCase().replace(/\s+/g, "").replace(/[^A-Z0-9-]/g, "");
-  }
+  // Se o link já trouxer ?codigo=..., abre a reserva direto, sem pedir de novo.
+  useEffect(() => {
+    if (!codigoQuery) return;
+    const cod = normalizeCodigo(codigoQuery);
+    if (cod.length >= 5) {
+      navigate({ to: "/$slug/acompanhar/$codigo", params: { slug, codigo: cod }, replace: true });
+    }
+  }, [codigoQuery, navigate, slug]);
 
   return (
     <main className="min-h-screen bg-background">
@@ -42,15 +58,15 @@ function AcompanharPage() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            const cod = normalize(codigo);
-            if (cod.length < 4) return;
+            const cod = normalizeCodigo(codigo);
+            if (cod.length < 5) return;
             navigate({ to: "/$slug/acompanhar/$codigo", params: { slug, codigo: cod } });
           }}
           className="mt-8 space-y-5 animate-in-up"
         >
           <div className="space-y-2">
             <Label className="text-[13px] font-medium text-foreground">Código</Label>
-            <Input value={codigo} onChange={(e) => setCodigo(normalize(e.target.value))} placeholder="RL-XXXXXX" autoCapitalize="characters" autoComplete="off" className="h-12 rounded-xl font-mono tracking-wider" required />
+            <Input value={codigo} onChange={(e) => setCodigo(normalizeCodigo(e.target.value))} placeholder="RL-XXXXXX" autoCapitalize="characters" autoComplete="off" className="h-12 rounded-xl font-mono tracking-wider" required />
           </div>
 
           <Button type="submit" className="h-12 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90">

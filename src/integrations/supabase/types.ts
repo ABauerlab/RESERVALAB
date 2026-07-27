@@ -14,6 +14,91 @@ export type Database = {
   }
   public: {
     Tables: {
+      agenda_bloqueios: {
+        Row: {
+          created_at: string
+          data: string
+          hora_fim: string | null
+          hora_inicio: string | null
+          id: string
+          motivo: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          data: string
+          hora_fim?: string | null
+          hora_inicio?: string | null
+          id?: string
+          motivo?: string | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          hora_fim?: string | null
+          hora_inicio?: string | null
+          id?: string
+          motivo?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agenda_bloqueios_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feedbacks: {
+        Row: {
+          autor_user_id: string | null
+          created_at: string
+          descricao: string
+          id: string
+          resposta_master: string | null
+          status: Database["public"]["Enums"]["feedback_status"]
+          tenant_id: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          autor_user_id?: string | null
+          created_at?: string
+          descricao: string
+          id?: string
+          resposta_master?: string | null
+          status?: Database["public"]["Enums"]["feedback_status"]
+          tenant_id: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          autor_user_id?: string | null
+          created_at?: string
+          descricao?: string
+          id?: string
+          resposta_master?: string | null
+          status?: Database["public"]["Enums"]["feedback_status"]
+          tenant_id?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedbacks_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       push_subscriptions: {
         Row: {
           auth: string
@@ -211,6 +296,32 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      bloqueios_do_tenant: {
+        Args: { _slug: string }
+        Returns: {
+          data: string
+          hora_fim: string
+          hora_inicio: string
+          motivo: string
+        }[]
+      }
+      criar_reserva: {
+        Args: {
+          _area?: Database["public"]["Enums"]["reserva_area"]
+          _comandas?: boolean
+          _data: string
+          _horario?: string
+          _leva_bolo?: boolean
+          _nome: string
+          _observacoes?: string
+          _quantidade: number
+          _slug: string
+          _telefone: string
+          _tipo: Database["public"]["Enums"]["reserva_tipo"]
+          _tipo_evento?: string
+        }
+        Returns: string
+      }
       get_my_tenant_id: { Args: never; Returns: string }
       get_reserva_by_codigo: {
         Args: { _codigo: string }
@@ -289,6 +400,7 @@ export type Database = {
     }
     Enums: {
       app_role: "super_admin" | "tenant_admin"
+      feedback_status: "novo" | "em_analise" | "feito" | "recusado"
       reserva_area: "interna" | "externa" | "sem_preferencia"
       reserva_status: "pendente" | "confirmada" | "cancelada" | "finalizada"
       reserva_tipo: "mesa" | "aniversario" | "evento" | "casamento"
@@ -420,6 +532,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["super_admin", "tenant_admin"],
+      feedback_status: ["novo", "em_analise", "feito", "recusado"],
       reserva_area: ["interna", "externa", "sem_preferencia"],
       reserva_status: ["pendente", "confirmada", "cancelada", "finalizada"],
       reserva_tipo: ["mesa", "aniversario", "evento", "casamento"],

@@ -15,6 +15,11 @@ import {
   type Reserva, type ReservaArea, type ReservaStatus, type ReservaTipo, type ReservaUpdate,
 } from "@/lib/reservations";
 import { getTenantBySlug } from "@/lib/tenant";
+import { buildMensagemConfirmacao, whatsappUrl } from "@/lib/confirmacao";
+import { useTenantAdmin } from "@/hooks/use-tenant-admin";
+import { AdminShell } from "@/components/admin/AdminShell";
+
+
 import {
   canNotify, initInstallPrompt, isStandalone, notificationPermission,
   registerServiceWorker, requestNotificationPermission, showNotification,
@@ -72,9 +77,12 @@ function AdminDashboard() {
   const navigate = useNavigate();
   const qc = useQueryClient();
 
-  const [ready, setReady] = useState(false);
-  const [tenantId, setTenantId] = useState<string | null>(null);
-  const [tenantNome, setTenantNome] = useState<string>("");
+  // Guarda única: sessão, vínculo com a empresa e troca de senha obrigatória.
+  const admin = useTenantAdmin(slug);
+  const ready = admin.ready;
+  const tenantId = admin.tenant?.id ?? null;
+  const tenantNome = admin.tenant?.nome ?? "";
+
   const [filtroData, setFiltroData] = useState<FiltroData>("hoje");
   const [filtroStatus, setFiltroStatus] = useState<FiltroStatus>("todos");
   const [busca, setBusca] = useState("");
@@ -85,35 +93,6 @@ function AdminDashboard() {
   const [pushBusy, setPushBusy] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      const { data: sess } = await supabase.auth.getSession();
-      if (!mounted) return;
-      if (!sess.session) { navigate({ to: "/$slug/admin/login", params: { slug } }); return; }
-
-      const tenant = await getTenantBySlug(slug);
-      if (!mounted) return;
-      if (!tenant) { toast.error("Empresa não encontrada."); navigate({ to: "/" }); return; }
-      setTenantId(tenant.id);
-      setTenantNome(tenant.nome);
-
-      // Autoriza: super_admin OU tenant_admin desse tenant
-      const { data: allowed } = await supabase.rpc("has_tenant_role", { _user_id: sess.session.user.id, _tenant_id: tenant.id });
-      if (!mounted) return;
-      if (!allowed) {
-        toast.error("Você não tem acesso a esta empresa.");
-        await supabase.auth.signOut();
-        navigate({ to: "/$slug/admin/login", params: { slug } });
-        return;
-      }
-      setReady(true);
-    })();
-    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_OUT") navigate({ to: "/$slug/admin/login", params: { slug } });
-    });
-    return () => { mounted = false; sub.subscription.unsubscribe(); };
-  }, [navigate, slug]);
 
   useEffect(() => {
     registerServiceWorker();
@@ -222,20 +201,16 @@ function AdminDashboard() {
     const tenant = await getTenantBySlug(slug);
     const numero = telefoneToWhatsApp(r.telefone);
     if (!numero) return;
-    const template = tenant?.mensagem_confirmacao ??
-      "Ola {nome}, sua reserva no {empresa} para {data} as {horario} foi confirmada. Endereco: {endereco}. Para acompanhar ou alterar acesse: {link_acompanhar}";
-    const link = `${window.location.origin}/${slug}/acompanhar/${r.codigo_acompanhamento}`;
-    const msg = template
-      .replaceAll("{nome}", r.nome)
-      .replaceAll("{empresa}", tenant?.nome ?? "")
-      .replaceAll("{data}", formatData(r.data))
-      .replaceAll("{horario}", formatHorario(r.horario))
-      .replaceAll("{endereco}", tenant?.endereco ?? "")
-      .replaceAll("{link_acompanhar}", link)
-      .replaceAll("{codigo}", r.codigo_acompanhamento);
-    const url = `https://wa.me/${numero}?text=${encodeURIComponent(msg)}`;
-    window.open(url, "_blank", "noopener");
+    const msg = buildMensagemConfirmacao(tenant?.mensagem_confirmacao, {
+      reserva: r,
+      empresaNome: tenant?.nome ?? "",
+      endereco: tenant?.endereco,
+      telefoneEmpresa: tenant?.telefone_contato,
+      linkAcompanhar: `${window.location.origin}/${slug}/acompanhar/${r.codigo_acompanhamento}`,
+    });
+    window.open(whatsappUrl(numero, msg), "_blank", "noopener");
   }
+
 
   async function handleEnablePush() {
     if (!tenantId) return;
@@ -300,20 +275,9 @@ function AdminDashboard() {
   const showLegacyNotifCTA = !canUsePush && canNotify() && notifPerm !== "granted" && notifPerm !== "unsupported";
 
   return (
-    <main className="min-h-screen bg-background pb-16 safe-top safe-bottom">
-      <header className="sticky top-0 z-20 border-b border-border/70 bg-background/85 backdrop-blur-md">
-        <div className="mx-auto flex max-w-4xl items-center gap-3 px-5 py-4">
-          <div className="min-w-0 flex-1">
-            <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-terracotta">
-              ReservaLab · {tenantNome}
-            </p>
-            <h1 className="truncate text-lg font-medium">Painel de reservas</h1>
-          </div>
-          <button onClick={signOut} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground" aria-label="Sair">
-            <LogOut className="h-4 w-4" />
-          </button>
-        </div>
-      </header>
+    <AdminShell slug={slug} tenantNome={tenantNome} active="reservas">
+
+
 
       <div className="mx-auto max-w-4xl px-5 pt-6">
         {(showInstall || showPushCTA || showLegacyNotifCTA || pushActive) && (
@@ -391,7 +355,7 @@ function AdminDashboard() {
       />
 
       <audio ref={audioRef} preload="auto" />
-    </main>
+    </AdminShell>
   );
 }
 

@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
+import { getTenantBySlug } from "@/lib/tenant";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,22 +29,60 @@ function AdminLogin() {
   const [manter, setManter] = useState(true);
   const [loading, setLoading] = useState(false);
 
+  /** Encaminha para troca de senha ou painel, validando o vínculo com a empresa. */
+  async function encaminhar(userId: string, mustChange: boolean) {
+    if (mustChange) {
+      navigate({ to: "/$slug/admin/trocar-senha", params: { slug } });
+      return;
+    }
+    const tenant = await getTenantBySlug(slug);
+    if (!tenant) {
+      toast.error("Empresa não encontrada.");
+      await supabase.auth.signOut();
+      return;
+    }
+    const { data: allowed } = await supabase.rpc("has_tenant_role", {
+      _user_id: userId, _tenant_id: tenant.id,
+    });
+    if (!allowed) {
+      await supabase.auth.signOut();
+      toast.error("Este login não pertence a esta empresa.");
+      return;
+    }
+    navigate({ to: "/$slug/admin", params: { slug } });
+  }
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/$slug/admin", params: { slug } });
+      if (!data.session) return;
+      void encaminhar(
+        data.session.user.id,
+        data.session.user.user_metadata?.must_change_password === true,
+      );
     });
-  }, [navigate, slug]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (loading) return;
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password: senha });
-    setLoading(false);
-    if (error) { toast.error("E-mail ou senha inválidos."); return; }
+    const { data: signIn, error } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password: senha,
+    });
+    if (error || !signIn.session) {
+      setLoading(false);
+      toast.error("E-mail ou senha inválidos.");
+      return;
+    }
     void manter;
-    navigate({ to: "/$slug/admin", params: { slug } });
+    await encaminhar(
+      signIn.session.user.id,
+      signIn.session.user.user_metadata?.must_change_password === true,
+    );
+    setLoading(false);
   }
 
   return (
