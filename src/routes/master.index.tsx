@@ -243,3 +243,107 @@ function NovoTenantDialog({ open, onClose, onSubmit, pending }: {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return <div className="space-y-1.5"><Label className="text-[12px] text-muted-foreground">{label}</Label>{children}</div>;
 }
+
+const FEEDBACK_STATUS = ["aberto", "em_analise", "planejado", "concluido", "recusado"] as const;
+type FeedbackStatus = (typeof FEEDBACK_STATUS)[number];
+const FEEDBACK_LABEL: Record<FeedbackStatus, string> = {
+  aberto: "Aberto",
+  em_analise: "Em análise",
+  planejado: "Planejado",
+  concluido: "Concluído",
+  recusado: "Recusado",
+};
+
+/** Sugestões enviadas pelas empresas — visível apenas para o master. */
+function MasterFeedbacks() {
+  const qc = useQueryClient();
+  const [respostas, setRespostas] = useState<Record<string, string>>({});
+
+  const feedbacksQ = useQuery({
+    queryKey: ["master-feedbacks"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("feedbacks")
+        .select("*, tenants(nome, slug)")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const atualizar = useMutation({
+    mutationFn: async (v: { id: string; status?: FeedbackStatus; resposta_master?: string }) => {
+      const { id, ...patch } = v;
+      const { error } = await supabase.from("feedbacks").update(patch).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Sugestão atualizada.");
+      qc.invalidateQueries({ queryKey: ["master-feedbacks"] });
+    },
+    onError: () => toast.error("Falha ao atualizar."),
+  });
+
+  return (
+    <section>
+      <h2 className="font-serif text-3xl tracking-tight">Sugestões das empresas</h2>
+      <p className="text-sm text-muted-foreground">{feedbacksQ.data?.length ?? 0} recebidas</p>
+
+      {feedbacksQ.isLoading ? (
+        <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
+      ) : (feedbacksQ.data ?? []).length === 0 ? (
+        <div className="mt-6 rounded-2xl border border-dashed border-border bg-card/50 py-14 text-center">
+          <p className="font-serif text-2xl">Nenhuma sugestão</p>
+        </div>
+      ) : (
+        <ul className="mt-6 space-y-3">
+          {(feedbacksQ.data ?? []).map((f) => {
+            const empresa = (f as unknown as { tenants?: { nome?: string } }).tenants?.nome ?? "—";
+            return (
+              <li key={f.id} className="rounded-2xl border border-border bg-card p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-medium">{f.titulo}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {empresa} · {new Date(f.created_at).toLocaleDateString("pt-BR")}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {FEEDBACK_STATUS.map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => atualizar.mutate({ id: f.id, status: s })}
+                        className={`h-8 rounded-full px-3 text-[11px] font-medium transition-all ${
+                          f.status === s ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-accent"
+                        }`}
+                      >
+                        {FEEDBACK_LABEL[s]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <p className="mt-3 whitespace-pre-wrap text-sm text-muted-foreground">{f.descricao}</p>
+
+                <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                  <Input
+                    value={respostas[f.id] ?? f.resposta_master ?? ""}
+                    onChange={(e) => setRespostas((r) => ({ ...r, [f.id]: e.target.value }))}
+                    placeholder="Resposta para a empresa (opcional)"
+                    className="h-10 flex-1 rounded-xl"
+                  />
+                  <Button
+                    onClick={() => atualizar.mutate({ id: f.id, resposta_master: respostas[f.id] ?? "" })}
+                    className="h-10 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                    Responder
+                  </Button>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
+  );
+}
