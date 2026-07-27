@@ -187,6 +187,22 @@ function ReservarPage() {
             )}
           </div>
 
+          {bloqueio && (
+            <div className="flex items-start gap-3 rounded-xl border border-destructive/25 bg-destructive/5 p-4">
+              <CalendarX2 className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+              <div className="text-sm">
+                <p className="font-medium text-destructive">
+                  {bloqueio.diaTodo ? "Esta data não está disponível" : "Este horário não está disponível"}
+                </p>
+                <p className="mt-0.5 text-muted-foreground">
+                  {bloqueio.motivo?.trim() || "Escolha outra opção para continuar."}
+                </p>
+              </div>
+            </div>
+          )}
+
+
+
           {isMesa && (
             <Field label="Área desejada">
               <Select value={area} onValueChange={(v) => setArea(v as ReservaArea)}>
