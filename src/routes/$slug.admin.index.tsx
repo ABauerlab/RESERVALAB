@@ -16,6 +16,9 @@ import {
 } from "@/lib/reservations";
 import { getTenantBySlug } from "@/lib/tenant";
 import { buildMensagemConfirmacao, whatsappUrl } from "@/lib/confirmacao";
+import { useTenantAdmin } from "@/hooks/use-tenant-admin";
+import { AdminShell } from "@/components/admin/AdminShell";
+
 
 import {
   canNotify, initInstallPrompt, isStandalone, notificationPermission,
