@@ -95,6 +95,24 @@ function MasterPanel() {
       </header>
 
       <div className="mx-auto max-w-4xl px-5 pt-6 pb-16">
+        <div className="mb-6 flex gap-1.5">
+          {(["empresas", "sugestoes"] as const).map((id) => (
+            <button
+              key={id}
+              onClick={() => setAba(id)}
+              className={`h-9 rounded-full px-4 text-xs font-medium transition-all ${
+                aba === id ? "bg-primary text-primary-foreground shadow-[var(--shadow-sm)]" : "bg-muted text-muted-foreground hover:bg-accent"
+              }`}
+            >
+              {id === "empresas" ? "Empresas" : "Sugestões"}
+            </button>
+          ))}
+        </div>
+
+        {aba === "sugestoes" ? (
+          <MasterFeedbacks />
+        ) : (
+        <>
         <div className="flex items-center justify-between gap-3">
           <div>
             <h2 className="font-serif text-3xl tracking-tight">Empresas</h2>
@@ -104,6 +122,8 @@ function MasterPanel() {
             <Plus className="mr-1.5 h-4 w-4" /> Nova empresa
           </Button>
         </div>
+
+
 
         <div className="mt-6 space-y-2.5">
           {tenantsQ.isLoading ? (
