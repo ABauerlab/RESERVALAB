@@ -275,20 +275,9 @@ function AdminDashboard() {
   const showLegacyNotifCTA = !canUsePush && canNotify() && notifPerm !== "granted" && notifPerm !== "unsupported";
 
   return (
-    <main className="min-h-screen bg-background pb-16 safe-top safe-bottom">
-      <header className="sticky top-0 z-20 border-b border-border/70 bg-background/85 backdrop-blur-md">
-        <div className="mx-auto flex max-w-4xl items-center gap-3 px-5 py-4">
-          <div className="min-w-0 flex-1">
-            <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-terracotta">
-              ReservaLab · {tenantNome}
-            </p>
-            <h1 className="truncate text-lg font-medium">Painel de reservas</h1>
-          </div>
-          <button onClick={signOut} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground" aria-label="Sair">
-            <LogOut className="h-4 w-4" />
-          </button>
-        </div>
-      </header>
+    <AdminShell slug={slug} tenantNome={tenantNome} active="reservas">
+
+
 
       <div className="mx-auto max-w-4xl px-5 pt-6">
         {(showInstall || showPushCTA || showLegacyNotifCTA || pushActive) && (
