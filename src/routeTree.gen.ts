@@ -64,9 +64,9 @@ const SlugAdminIndexRoute = SlugAdminIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const SlugAcompanharIndexRoute = SlugAcompanharIndexRouteImport.update({
-  id: '/$slug/acompanhar/',
-  path: '/$slug/acompanhar/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => SlugAcompanharRoute,
 } as any)
 const ApiPublicVapidPublicKeyRoute = ApiPublicVapidPublicKeyRouteImport.update({
   id: '/api/public/vapid-public-key',
@@ -109,9 +109,9 @@ const SlugAdminAgendaRoute = SlugAdminAgendaRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const SlugAcompanharCodigoRoute = SlugAcompanharCodigoRouteImport.update({
-  id: '/$slug/acompanhar/$codigo',
-  path: '/$slug/acompanhar/$codigo',
-  getParentRoute: () => rootRouteImport,
+  id: '/$codigo',
+  path: '/$codigo',
+  getParentRoute: () => SlugAcompanharRoute,
 } as any)
 const ApiPublicHooksSendPushRoute = ApiPublicHooksSendPushRouteImport.update({
   id: '/api/public/hooks/send-push',
@@ -250,7 +250,6 @@ export interface RootRouteChildren {
   MasterLoginRoute: typeof MasterLoginRoute
   SlugIndexRoute: typeof SlugIndexRoute
   MasterIndexRoute: typeof MasterIndexRoute
-  SlugAcompanharCodigoRoute: typeof SlugAcompanharCodigoRoute
   SlugAdminAgendaRoute: typeof SlugAdminAgendaRoute
   SlugAdminConfiguracoesRoute: typeof SlugAdminConfiguracoesRoute
   SlugAdminLoginRoute: typeof SlugAdminLoginRoute
@@ -259,7 +258,6 @@ export interface RootRouteChildren {
   SlugAdminTrocarSenhaRoute: typeof SlugAdminTrocarSenhaRoute
   SlugReservarTipoRoute: typeof SlugReservarTipoRoute
   ApiPublicVapidPublicKeyRoute: typeof ApiPublicVapidPublicKeyRoute
-  SlugAcompanharIndexRoute: typeof SlugAcompanharIndexRoute
   SlugAdminIndexRoute: typeof SlugAdminIndexRoute
   ApiPublicHooksSendPushRoute: typeof ApiPublicHooksSendPushRoute
 }
@@ -317,10 +315,10 @@ declare module '@tanstack/react-router' {
     }
     '/$slug/acompanhar/': {
       id: '/$slug/acompanhar/'
-      path: '/$slug/acompanhar'
+      path: '/'
       fullPath: '/$slug/acompanhar/'
       preLoaderRoute: typeof SlugAcompanharIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof SlugAcompanharRoute
     }
     '/api/public/vapid-public-key': {
       id: '/api/public/vapid-public-key'
@@ -380,10 +378,10 @@ declare module '@tanstack/react-router' {
     }
     '/$slug/acompanhar/$codigo': {
       id: '/$slug/acompanhar/$codigo'
-      path: '/$slug/acompanhar/$codigo'
+      path: '/$codigo'
       fullPath: '/$slug/acompanhar/$codigo'
       preLoaderRoute: typeof SlugAcompanharCodigoRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof SlugAcompanharRoute
     }
     '/api/public/hooks/send-push': {
       id: '/api/public/hooks/send-push'
@@ -402,7 +400,6 @@ const rootRouteChildren: RootRouteChildren = {
   MasterLoginRoute: MasterLoginRoute,
   SlugIndexRoute: SlugIndexRoute,
   MasterIndexRoute: MasterIndexRoute,
-  SlugAcompanharCodigoRoute: SlugAcompanharCodigoRoute,
   SlugAdminAgendaRoute: SlugAdminAgendaRoute,
   SlugAdminConfiguracoesRoute: SlugAdminConfiguracoesRoute,
   SlugAdminLoginRoute: SlugAdminLoginRoute,
@@ -411,10 +408,19 @@ const rootRouteChildren: RootRouteChildren = {
   SlugAdminTrocarSenhaRoute: SlugAdminTrocarSenhaRoute,
   SlugReservarTipoRoute: SlugReservarTipoRoute,
   ApiPublicVapidPublicKeyRoute: ApiPublicVapidPublicKeyRoute,
-  SlugAcompanharIndexRoute: SlugAcompanharIndexRoute,
   SlugAdminIndexRoute: SlugAdminIndexRoute,
   ApiPublicHooksSendPushRoute: ApiPublicHooksSendPushRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
