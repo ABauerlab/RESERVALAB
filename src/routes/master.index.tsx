@@ -58,7 +58,12 @@ function MasterPanel() {
     enabled: ready,
     queryKey: ["master-tenants"],
     queryFn: async () => (await listar()).tenants,
+    retry: 1,
+    refetchOnWindowFocus: true,
+    refetchOnMount: "always",
+    staleTime: 0,
   });
+
 
   const criarM = useMutation({
     mutationFn: async (input: Parameters<typeof criar>[0]) => criar(input),
@@ -135,7 +140,18 @@ function MasterPanel() {
         <div className="mt-6 space-y-2.5">
           {tenantsQ.isLoading ? (
             <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
+          ) : tenantsQ.isError ? (
+            <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-6 text-center">
+              <p className="font-serif text-2xl">Não foi possível carregar</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {tenantsQ.error instanceof Error ? tenantsQ.error.message : "Erro desconhecido."}
+              </p>
+              <Button onClick={() => tenantsQ.refetch()} variant="outline" className="mt-4 h-10 rounded-xl">
+                Tentar novamente
+              </Button>
+            </div>
           ) : (tenantsQ.data ?? []).length === 0 ? (
+
             <div className="rounded-2xl border border-dashed border-border bg-card/50 py-14 text-center">
               <p className="font-serif text-2xl">Nenhuma empresa</p>
               <p className="mt-1 text-sm text-muted-foreground">Clique em "Nova empresa" para começar.</p>
