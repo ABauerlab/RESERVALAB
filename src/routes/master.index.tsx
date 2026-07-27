@@ -2,17 +2,21 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ExternalLink, Loader2, LogOut, Plus, Power } from "lucide-react";
+import { ExternalLink, Loader2, LogOut, Plus, Power, KeyRound, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
-import { criarTenant, listarTenants, toggleTenantAtivo } from "@/lib/master.functions";
+import {
+  criarTenant, listarTenants, toggleTenantAtivo,
+  listarAcessos, criarAcesso, redefinirSenhaAcesso, removerAcesso,
+} from "@/lib/master.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
+
 
 export const Route = createFileRoute("/master/")({
   head: () => ({
