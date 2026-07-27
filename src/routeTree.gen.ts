@@ -15,10 +15,11 @@ import { Route as MasterIndexRouteImport } from './routes/master.index'
 import { Route as SlugIndexRouteImport } from './routes/$slug.index'
 import { Route as MasterLoginRouteImport } from './routes/master.login'
 import { Route as SlugObrigadoRouteImport } from './routes/$slug.obrigado'
-import { Route as SlugAcompanharRouteImport } from './routes/$slug.acompanhar'
 import { Route as SlugAdminIndexRouteImport } from './routes/$slug.admin.index'
+import { Route as SlugAcompanharIndexRouteImport } from './routes/$slug.acompanhar.index'
 import { Route as ApiPublicVapidPublicKeyRouteImport } from './routes/api/public/vapid-public-key'
 import { Route as SlugReservarTipoRouteImport } from './routes/$slug.reservar.$tipo'
+import { Route as SlugAdminTrocarSenhaRouteImport } from './routes/$slug.admin.trocar-senha'
 import { Route as SlugAdminLoginRouteImport } from './routes/$slug.admin.login'
 import { Route as SlugAcompanharCodigoRouteImport } from './routes/$slug.acompanhar.$codigo'
 import { Route as ApiPublicHooksSendPushRouteImport } from './routes/api/public/hooks.send-push'
@@ -53,15 +54,15 @@ const SlugObrigadoRoute = SlugObrigadoRouteImport.update({
   path: '/$slug/obrigado',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SlugAcompanharRoute = SlugAcompanharRouteImport.update({
-  id: '/$slug/acompanhar',
-  path: '/$slug/acompanhar',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SlugAdminIndexRoute = SlugAdminIndexRouteImport.update({
   id: '/$slug/admin/',
   path: '/$slug/admin/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const SlugAcompanharIndexRoute = SlugAcompanharIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SlugAcompanharRoute,
 } as any)
 const ApiPublicVapidPublicKeyRoute = ApiPublicVapidPublicKeyRouteImport.update({
   id: '/api/public/vapid-public-key',
@@ -71,6 +72,11 @@ const ApiPublicVapidPublicKeyRoute = ApiPublicVapidPublicKeyRouteImport.update({
 const SlugReservarTipoRoute = SlugReservarTipoRouteImport.update({
   id: '/$slug/reservar/$tipo',
   path: '/$slug/reservar/$tipo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SlugAdminTrocarSenhaRoute = SlugAdminTrocarSenhaRouteImport.update({
+  id: '/$slug/admin/trocar-senha',
+  path: '/$slug/admin/trocar-senha',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SlugAdminLoginRoute = SlugAdminLoginRouteImport.update({
@@ -92,30 +98,32 @@ const ApiPublicHooksSendPushRoute = ApiPublicHooksSendPushRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/$slug/acompanhar': typeof SlugAcompanharRouteWithChildren
   '/$slug/obrigado': typeof SlugObrigadoRoute
   '/master/login': typeof MasterLoginRoute
   '/$slug/': typeof SlugIndexRoute
   '/master/': typeof MasterIndexRoute
   '/$slug/acompanhar/$codigo': typeof SlugAcompanharCodigoRoute
   '/$slug/admin/login': typeof SlugAdminLoginRoute
+  '/$slug/admin/trocar-senha': typeof SlugAdminTrocarSenhaRoute
   '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
   '/api/public/vapid-public-key': typeof ApiPublicVapidPublicKeyRoute
+  '/$slug/acompanhar/': typeof SlugAcompanharIndexRoute
   '/$slug/admin/': typeof SlugAdminIndexRoute
   '/api/public/hooks/send-push': typeof ApiPublicHooksSendPushRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/$slug/acompanhar': typeof SlugAcompanharRouteWithChildren
   '/$slug/obrigado': typeof SlugObrigadoRoute
   '/master/login': typeof MasterLoginRoute
   '/$slug': typeof SlugIndexRoute
   '/master': typeof MasterIndexRoute
   '/$slug/acompanhar/$codigo': typeof SlugAcompanharCodigoRoute
   '/$slug/admin/login': typeof SlugAdminLoginRoute
+  '/$slug/admin/trocar-senha': typeof SlugAdminTrocarSenhaRoute
   '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
   '/api/public/vapid-public-key': typeof ApiPublicVapidPublicKeyRoute
+  '/$slug/acompanhar': typeof SlugAcompanharIndexRoute
   '/$slug/admin': typeof SlugAdminIndexRoute
   '/api/public/hooks/send-push': typeof ApiPublicHooksSendPushRoute
 }
@@ -123,15 +131,16 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/$slug/acompanhar': typeof SlugAcompanharRouteWithChildren
   '/$slug/obrigado': typeof SlugObrigadoRoute
   '/master/login': typeof MasterLoginRoute
   '/$slug/': typeof SlugIndexRoute
   '/master/': typeof MasterIndexRoute
   '/$slug/acompanhar/$codigo': typeof SlugAcompanharCodigoRoute
   '/$slug/admin/login': typeof SlugAdminLoginRoute
+  '/$slug/admin/trocar-senha': typeof SlugAdminTrocarSenhaRoute
   '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
   '/api/public/vapid-public-key': typeof ApiPublicVapidPublicKeyRoute
+  '/$slug/acompanhar/': typeof SlugAcompanharIndexRoute
   '/$slug/admin/': typeof SlugAdminIndexRoute
   '/api/public/hooks/send-push': typeof ApiPublicHooksSendPushRoute
 }
@@ -140,45 +149,48 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/sitemap.xml'
-    | '/$slug/acompanhar'
     | '/$slug/obrigado'
     | '/master/login'
     | '/$slug/'
     | '/master/'
     | '/$slug/acompanhar/$codigo'
     | '/$slug/admin/login'
+    | '/$slug/admin/trocar-senha'
     | '/$slug/reservar/$tipo'
     | '/api/public/vapid-public-key'
+    | '/$slug/acompanhar/'
     | '/$slug/admin/'
     | '/api/public/hooks/send-push'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/sitemap.xml'
-    | '/$slug/acompanhar'
     | '/$slug/obrigado'
     | '/master/login'
     | '/$slug'
     | '/master'
     | '/$slug/acompanhar/$codigo'
     | '/$slug/admin/login'
+    | '/$slug/admin/trocar-senha'
     | '/$slug/reservar/$tipo'
     | '/api/public/vapid-public-key'
+    | '/$slug/acompanhar'
     | '/$slug/admin'
     | '/api/public/hooks/send-push'
   id:
     | '__root__'
     | '/'
     | '/sitemap.xml'
-    | '/$slug/acompanhar'
     | '/$slug/obrigado'
     | '/master/login'
     | '/$slug/'
     | '/master/'
     | '/$slug/acompanhar/$codigo'
     | '/$slug/admin/login'
+    | '/$slug/admin/trocar-senha'
     | '/$slug/reservar/$tipo'
     | '/api/public/vapid-public-key'
+    | '/$slug/acompanhar/'
     | '/$slug/admin/'
     | '/api/public/hooks/send-push'
   fileRoutesById: FileRoutesById
@@ -186,12 +198,12 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  SlugAcompanharRoute: typeof SlugAcompanharRouteWithChildren
   SlugObrigadoRoute: typeof SlugObrigadoRoute
   MasterLoginRoute: typeof MasterLoginRoute
   SlugIndexRoute: typeof SlugIndexRoute
   MasterIndexRoute: typeof MasterIndexRoute
   SlugAdminLoginRoute: typeof SlugAdminLoginRoute
+  SlugAdminTrocarSenhaRoute: typeof SlugAdminTrocarSenhaRoute
   SlugReservarTipoRoute: typeof SlugReservarTipoRoute
   ApiPublicVapidPublicKeyRoute: typeof ApiPublicVapidPublicKeyRoute
   SlugAdminIndexRoute: typeof SlugAdminIndexRoute
@@ -242,19 +254,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlugObrigadoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/$slug/acompanhar': {
-      id: '/$slug/acompanhar'
-      path: '/$slug/acompanhar'
-      fullPath: '/$slug/acompanhar'
-      preLoaderRoute: typeof SlugAcompanharRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/$slug/admin/': {
       id: '/$slug/admin/'
       path: '/$slug/admin'
       fullPath: '/$slug/admin/'
       preLoaderRoute: typeof SlugAdminIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/$slug/acompanhar/': {
+      id: '/$slug/acompanhar/'
+      path: '/'
+      fullPath: '/$slug/acompanhar/'
+      preLoaderRoute: typeof SlugAcompanharIndexRouteImport
+      parentRoute: typeof SlugAcompanharRoute
     }
     '/api/public/vapid-public-key': {
       id: '/api/public/vapid-public-key'
@@ -268,6 +280,13 @@ declare module '@tanstack/react-router' {
       path: '/$slug/reservar/$tipo'
       fullPath: '/$slug/reservar/$tipo'
       preLoaderRoute: typeof SlugReservarTipoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$slug/admin/trocar-senha': {
+      id: '/$slug/admin/trocar-senha'
+      path: '/$slug/admin/trocar-senha'
+      fullPath: '/$slug/admin/trocar-senha'
+      preLoaderRoute: typeof SlugAdminTrocarSenhaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$slug/admin/login': {
@@ -294,27 +313,15 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface SlugAcompanharRouteChildren {
-  SlugAcompanharCodigoRoute: typeof SlugAcompanharCodigoRoute
-}
-
-const SlugAcompanharRouteChildren: SlugAcompanharRouteChildren = {
-  SlugAcompanharCodigoRoute: SlugAcompanharCodigoRoute,
-}
-
-const SlugAcompanharRouteWithChildren = SlugAcompanharRoute._addFileChildren(
-  SlugAcompanharRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  SlugAcompanharRoute: SlugAcompanharRouteWithChildren,
   SlugObrigadoRoute: SlugObrigadoRoute,
   MasterLoginRoute: MasterLoginRoute,
   SlugIndexRoute: SlugIndexRoute,
   MasterIndexRoute: MasterIndexRoute,
   SlugAdminLoginRoute: SlugAdminLoginRoute,
+  SlugAdminTrocarSenhaRoute: SlugAdminTrocarSenhaRoute,
   SlugReservarTipoRoute: SlugReservarTipoRoute,
   ApiPublicVapidPublicKeyRoute: ApiPublicVapidPublicKeyRoute,
   SlugAdminIndexRoute: SlugAdminIndexRoute,
@@ -323,3 +330,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
