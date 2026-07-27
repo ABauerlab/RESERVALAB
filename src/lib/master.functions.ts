@@ -143,12 +143,6 @@ export const toggleTenantAtivo = createServerFn({ method: "POST" })
 
 // ---- Gestão de logins (acessos) de cada empresa ----
 
-async function assertSuper(context: { supabase: any; userId: string }) {
-  const { data: isSuper } = await context.supabase
-    .rpc("has_role", { _user_id: context.userId, _role: "super_admin" });
-  if (!isSuper) throw new Error("Acesso negado");
-}
-
 export const listarAcessos = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { tenant_id: string }) => {
@@ -156,7 +150,9 @@ export const listarAcessos = createServerFn({ method: "POST" })
     return input;
   })
   .handler(async ({ data, context }) => {
-    await assertSuper(context);
+    const { data: isSuper } = await context.supabase
+      .rpc("has_role", { _user_id: context.userId, _role: "super_admin" });
+    if (!isSuper) throw new Error("Acesso negado");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: roles, error } = await supabaseAdmin
       .from("user_roles").select("id, user_id, created_at")
@@ -187,7 +183,9 @@ export const criarAcesso = createServerFn({ method: "POST" })
     return { ...input, email: input.email.toLowerCase().trim() };
   })
   .handler(async ({ data, context }) => {
-    await assertSuper(context);
+    const { data: isSuper } = await context.supabase
+      .rpc("has_role", { _user_id: context.userId, _role: "super_admin" });
+    if (!isSuper) throw new Error("Acesso negado");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const list = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
@@ -226,7 +224,9 @@ export const redefinirSenhaAcesso = createServerFn({ method: "POST" })
     return input;
   })
   .handler(async ({ data, context }) => {
-    await assertSuper(context);
+    const { data: isSuper } = await context.supabase
+      .rpc("has_role", { _user_id: context.userId, _role: "super_admin" });
+    if (!isSuper) throw new Error("Acesso negado");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.auth.admin.updateUserById(data.user_id, {
       password: data.senha,
@@ -243,7 +243,9 @@ export const removerAcesso = createServerFn({ method: "POST" })
     return input;
   })
   .handler(async ({ data, context }) => {
-    await assertSuper(context);
+    const { data: isSuper } = await context.supabase
+      .rpc("has_role", { _user_id: context.userId, _role: "super_admin" });
+    if (!isSuper) throw new Error("Acesso negado");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.from("user_roles").delete().eq("id", data.role_id);
     if (error) throw new Error(error.message);
