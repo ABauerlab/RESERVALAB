@@ -24,11 +24,10 @@ export const Route = createFileRoute("/$slug/admin/sugestoes")({
 });
 
 const STATUS_TXT: Record<string, string> = {
-  aberto: "Em análise",
+  novo: "Recebida",
   em_analise: "Em análise",
-  planejado: "Planejado",
-  concluido: "Concluído",
-  recusado: "Não será feito",
+  feito: "Implementada",
+  recusado: "Não será feita",
 };
 
 function SugestoesPage() {

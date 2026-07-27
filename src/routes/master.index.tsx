@@ -244,13 +244,12 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   return <div className="space-y-1.5"><Label className="text-[12px] text-muted-foreground">{label}</Label>{children}</div>;
 }
 
-const FEEDBACK_STATUS = ["aberto", "em_analise", "planejado", "concluido", "recusado"] as const;
+const FEEDBACK_STATUS = ["novo", "em_analise", "feito", "recusado"] as const;
 type FeedbackStatus = (typeof FEEDBACK_STATUS)[number];
 const FEEDBACK_LABEL: Record<FeedbackStatus, string> = {
-  aberto: "Aberto",
+  novo: "Novo",
   em_analise: "Em análise",
-  planejado: "Planejado",
-  concluido: "Concluído",
+  feito: "Feito",
   recusado: "Recusado",
 };
 
