@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate, useParams, notFound } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronLeft, Loader2, Minus, Plus } from "lucide-react";
+import { ChevronLeft, Loader2, Minus, Plus, CalendarX2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -9,7 +9,6 @@ import {
   TIPO_LABEL,
   formatTelefone,
   type ReservaArea,
-  type ReservaInsert,
   type ReservaTipo,
 } from "@/lib/reservations";
 import { getTenantBySlug } from "@/lib/tenant";
@@ -20,6 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+
 
 const TIPOS_VALIDOS: ReservaTipo[] = ["mesa", "aniversario", "evento", "casamento"];
 
