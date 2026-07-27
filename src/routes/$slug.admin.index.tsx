@@ -74,9 +74,12 @@ function AdminDashboard() {
   const navigate = useNavigate();
   const qc = useQueryClient();
 
-  const [ready, setReady] = useState(false);
-  const [tenantId, setTenantId] = useState<string | null>(null);
-  const [tenantNome, setTenantNome] = useState<string>("");
+  // Guarda única: sessão, vínculo com a empresa e troca de senha obrigatória.
+  const admin = useTenantAdmin(slug);
+  const ready = admin.ready;
+  const tenantId = admin.tenant?.id ?? null;
+  const tenantNome = admin.tenant?.nome ?? "";
+
   const [filtroData, setFiltroData] = useState<FiltroData>("hoje");
   const [filtroStatus, setFiltroStatus] = useState<FiltroStatus>("todos");
   const [busca, setBusca] = useState("");
@@ -87,35 +90,6 @@ function AdminDashboard() {
   const [pushBusy, setPushBusy] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      const { data: sess } = await supabase.auth.getSession();
-      if (!mounted) return;
-      if (!sess.session) { navigate({ to: "/$slug/admin/login", params: { slug } }); return; }
-
-      const tenant = await getTenantBySlug(slug);
-      if (!mounted) return;
-      if (!tenant) { toast.error("Empresa não encontrada."); navigate({ to: "/" }); return; }
-      setTenantId(tenant.id);
-      setTenantNome(tenant.nome);
-
-      // Autoriza: super_admin OU tenant_admin desse tenant
-      const { data: allowed } = await supabase.rpc("has_tenant_role", { _user_id: sess.session.user.id, _tenant_id: tenant.id });
-      if (!mounted) return;
-      if (!allowed) {
-        toast.error("Você não tem acesso a esta empresa.");
-        await supabase.auth.signOut();
-        navigate({ to: "/$slug/admin/login", params: { slug } });
-        return;
-      }
-      setReady(true);
-    })();
-    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_OUT") navigate({ to: "/$slug/admin/login", params: { slug } });
-    });
-    return () => { mounted = false; sub.subscription.unsubscribe(); };
-  }, [navigate, slug]);
 
   useEffect(() => {
     registerServiceWorker();
