@@ -117,12 +117,13 @@ function ReservarPage() {
       _telefone: telefone.trim(),
       _quantidade: quantidade,
       _data: data,
-      _horario: precisaHorario && horario ? horario : null,
-      _area: isMesa ? area : null,
-      _leva_bolo: isAniv ? levaBolo === "sim" : null,
-      _comandas: isAniv ? comandas === "sim" : null,
-      _tipo_evento: isEvento ? tipoEvento.trim() : null,
-      _observacoes: (isEvento || isCasa) ? (mensagem.trim() || null) : (observacoes.trim() || null),
+      _horario: precisaHorario && horario ? horario : undefined,
+      _area: isMesa ? area : undefined,
+      _leva_bolo: isAniv ? levaBolo === "sim" : undefined,
+      _comandas: isAniv ? comandas === "sim" : undefined,
+      _tipo_evento: isEvento ? tipoEvento.trim() : undefined,
+      _observacoes: (isEvento || isCasa) ? (mensagem.trim() || undefined) : (observacoes.trim() || undefined),
+
     });
     setEnviando(false);
 
