@@ -20,7 +20,11 @@ import { Route as SlugAcompanharIndexRouteImport } from './routes/$slug.acompanh
 import { Route as ApiPublicVapidPublicKeyRouteImport } from './routes/api/public/vapid-public-key'
 import { Route as SlugReservarTipoRouteImport } from './routes/$slug.reservar.$tipo'
 import { Route as SlugAdminTrocarSenhaRouteImport } from './routes/$slug.admin.trocar-senha'
+import { Route as SlugAdminSugestoesRouteImport } from './routes/$slug.admin.sugestoes'
+import { Route as SlugAdminRelatoriosRouteImport } from './routes/$slug.admin.relatorios'
 import { Route as SlugAdminLoginRouteImport } from './routes/$slug.admin.login'
+import { Route as SlugAdminConfiguracoesRouteImport } from './routes/$slug.admin.configuracoes'
+import { Route as SlugAdminAgendaRouteImport } from './routes/$slug.admin.agenda'
 import { Route as SlugAcompanharCodigoRouteImport } from './routes/$slug.acompanhar.$codigo'
 import { Route as ApiPublicHooksSendPushRouteImport } from './routes/api/public/hooks.send-push'
 
@@ -79,9 +83,29 @@ const SlugAdminTrocarSenhaRoute = SlugAdminTrocarSenhaRouteImport.update({
   path: '/$slug/admin/trocar-senha',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SlugAdminSugestoesRoute = SlugAdminSugestoesRouteImport.update({
+  id: '/$slug/admin/sugestoes',
+  path: '/$slug/admin/sugestoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SlugAdminRelatoriosRoute = SlugAdminRelatoriosRouteImport.update({
+  id: '/$slug/admin/relatorios',
+  path: '/$slug/admin/relatorios',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SlugAdminLoginRoute = SlugAdminLoginRouteImport.update({
   id: '/$slug/admin/login',
   path: '/$slug/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SlugAdminConfiguracoesRoute = SlugAdminConfiguracoesRouteImport.update({
+  id: '/$slug/admin/configuracoes',
+  path: '/$slug/admin/configuracoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SlugAdminAgendaRoute = SlugAdminAgendaRouteImport.update({
+  id: '/$slug/admin/agenda',
+  path: '/$slug/admin/agenda',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SlugAcompanharCodigoRoute = SlugAcompanharCodigoRouteImport.update({
@@ -103,7 +127,11 @@ export interface FileRoutesByFullPath {
   '/$slug/': typeof SlugIndexRoute
   '/master/': typeof MasterIndexRoute
   '/$slug/acompanhar/$codigo': typeof SlugAcompanharCodigoRoute
+  '/$slug/admin/agenda': typeof SlugAdminAgendaRoute
+  '/$slug/admin/configuracoes': typeof SlugAdminConfiguracoesRoute
   '/$slug/admin/login': typeof SlugAdminLoginRoute
+  '/$slug/admin/relatorios': typeof SlugAdminRelatoriosRoute
+  '/$slug/admin/sugestoes': typeof SlugAdminSugestoesRoute
   '/$slug/admin/trocar-senha': typeof SlugAdminTrocarSenhaRoute
   '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
   '/api/public/vapid-public-key': typeof ApiPublicVapidPublicKeyRoute
@@ -119,7 +147,11 @@ export interface FileRoutesByTo {
   '/$slug': typeof SlugIndexRoute
   '/master': typeof MasterIndexRoute
   '/$slug/acompanhar/$codigo': typeof SlugAcompanharCodigoRoute
+  '/$slug/admin/agenda': typeof SlugAdminAgendaRoute
+  '/$slug/admin/configuracoes': typeof SlugAdminConfiguracoesRoute
   '/$slug/admin/login': typeof SlugAdminLoginRoute
+  '/$slug/admin/relatorios': typeof SlugAdminRelatoriosRoute
+  '/$slug/admin/sugestoes': typeof SlugAdminSugestoesRoute
   '/$slug/admin/trocar-senha': typeof SlugAdminTrocarSenhaRoute
   '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
   '/api/public/vapid-public-key': typeof ApiPublicVapidPublicKeyRoute
@@ -136,7 +168,11 @@ export interface FileRoutesById {
   '/$slug/': typeof SlugIndexRoute
   '/master/': typeof MasterIndexRoute
   '/$slug/acompanhar/$codigo': typeof SlugAcompanharCodigoRoute
+  '/$slug/admin/agenda': typeof SlugAdminAgendaRoute
+  '/$slug/admin/configuracoes': typeof SlugAdminConfiguracoesRoute
   '/$slug/admin/login': typeof SlugAdminLoginRoute
+  '/$slug/admin/relatorios': typeof SlugAdminRelatoriosRoute
+  '/$slug/admin/sugestoes': typeof SlugAdminSugestoesRoute
   '/$slug/admin/trocar-senha': typeof SlugAdminTrocarSenhaRoute
   '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
   '/api/public/vapid-public-key': typeof ApiPublicVapidPublicKeyRoute
@@ -154,7 +190,11 @@ export interface FileRouteTypes {
     | '/$slug/'
     | '/master/'
     | '/$slug/acompanhar/$codigo'
+    | '/$slug/admin/agenda'
+    | '/$slug/admin/configuracoes'
     | '/$slug/admin/login'
+    | '/$slug/admin/relatorios'
+    | '/$slug/admin/sugestoes'
     | '/$slug/admin/trocar-senha'
     | '/$slug/reservar/$tipo'
     | '/api/public/vapid-public-key'
@@ -170,7 +210,11 @@ export interface FileRouteTypes {
     | '/$slug'
     | '/master'
     | '/$slug/acompanhar/$codigo'
+    | '/$slug/admin/agenda'
+    | '/$slug/admin/configuracoes'
     | '/$slug/admin/login'
+    | '/$slug/admin/relatorios'
+    | '/$slug/admin/sugestoes'
     | '/$slug/admin/trocar-senha'
     | '/$slug/reservar/$tipo'
     | '/api/public/vapid-public-key'
@@ -186,7 +230,11 @@ export interface FileRouteTypes {
     | '/$slug/'
     | '/master/'
     | '/$slug/acompanhar/$codigo'
+    | '/$slug/admin/agenda'
+    | '/$slug/admin/configuracoes'
     | '/$slug/admin/login'
+    | '/$slug/admin/relatorios'
+    | '/$slug/admin/sugestoes'
     | '/$slug/admin/trocar-senha'
     | '/$slug/reservar/$tipo'
     | '/api/public/vapid-public-key'
@@ -203,7 +251,11 @@ export interface RootRouteChildren {
   SlugIndexRoute: typeof SlugIndexRoute
   MasterIndexRoute: typeof MasterIndexRoute
   SlugAcompanharCodigoRoute: typeof SlugAcompanharCodigoRoute
+  SlugAdminAgendaRoute: typeof SlugAdminAgendaRoute
+  SlugAdminConfiguracoesRoute: typeof SlugAdminConfiguracoesRoute
   SlugAdminLoginRoute: typeof SlugAdminLoginRoute
+  SlugAdminRelatoriosRoute: typeof SlugAdminRelatoriosRoute
+  SlugAdminSugestoesRoute: typeof SlugAdminSugestoesRoute
   SlugAdminTrocarSenhaRoute: typeof SlugAdminTrocarSenhaRoute
   SlugReservarTipoRoute: typeof SlugReservarTipoRoute
   ApiPublicVapidPublicKeyRoute: typeof ApiPublicVapidPublicKeyRoute
@@ -291,11 +343,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlugAdminTrocarSenhaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$slug/admin/sugestoes': {
+      id: '/$slug/admin/sugestoes'
+      path: '/$slug/admin/sugestoes'
+      fullPath: '/$slug/admin/sugestoes'
+      preLoaderRoute: typeof SlugAdminSugestoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$slug/admin/relatorios': {
+      id: '/$slug/admin/relatorios'
+      path: '/$slug/admin/relatorios'
+      fullPath: '/$slug/admin/relatorios'
+      preLoaderRoute: typeof SlugAdminRelatoriosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$slug/admin/login': {
       id: '/$slug/admin/login'
       path: '/$slug/admin/login'
       fullPath: '/$slug/admin/login'
       preLoaderRoute: typeof SlugAdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$slug/admin/configuracoes': {
+      id: '/$slug/admin/configuracoes'
+      path: '/$slug/admin/configuracoes'
+      fullPath: '/$slug/admin/configuracoes'
+      preLoaderRoute: typeof SlugAdminConfiguracoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$slug/admin/agenda': {
+      id: '/$slug/admin/agenda'
+      path: '/$slug/admin/agenda'
+      fullPath: '/$slug/admin/agenda'
+      preLoaderRoute: typeof SlugAdminAgendaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$slug/acompanhar/$codigo': {
@@ -323,7 +403,11 @@ const rootRouteChildren: RootRouteChildren = {
   SlugIndexRoute: SlugIndexRoute,
   MasterIndexRoute: MasterIndexRoute,
   SlugAcompanharCodigoRoute: SlugAcompanharCodigoRoute,
+  SlugAdminAgendaRoute: SlugAdminAgendaRoute,
+  SlugAdminConfiguracoesRoute: SlugAdminConfiguracoesRoute,
   SlugAdminLoginRoute: SlugAdminLoginRoute,
+  SlugAdminRelatoriosRoute: SlugAdminRelatoriosRoute,
+  SlugAdminSugestoesRoute: SlugAdminSugestoesRoute,
   SlugAdminTrocarSenhaRoute: SlugAdminTrocarSenhaRoute,
   SlugReservarTipoRoute: SlugReservarTipoRoute,
   ApiPublicVapidPublicKeyRoute: ApiPublicVapidPublicKeyRoute,
