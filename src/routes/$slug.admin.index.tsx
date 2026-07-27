@@ -355,7 +355,7 @@ function AdminDashboard() {
       />
 
       <audio ref={audioRef} preload="auto" />
-    </main>
+    </AdminShell>
   );
 }
 
