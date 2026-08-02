@@ -55,10 +55,7 @@ function AdminLogin() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (!data.session) return;
-      void encaminhar(
-        data.session.user.id,
-        data.session.user.user_metadata?.must_change_password === true,
-      );
+      void encaminhar(data.session.user.id, false);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug]);
