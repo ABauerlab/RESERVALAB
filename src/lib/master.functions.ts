@@ -84,8 +84,7 @@ export const toggleTenantAtivo = createServerFn({ method: "POST" })
     const { data: isSuper } = await context.supabase
       .rpc("has_role", { _user_id: context.userId, _role: "super_admin" });
     if (!isSuper) throw new Error("Acesso negado");
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.from("tenants").update({ ativo: data.ativo }).eq("id", data.id);
+    const { error } = await context.supabase.from("tenants").update({ ativo: data.ativo }).eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
