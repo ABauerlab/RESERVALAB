@@ -2,16 +2,14 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ExternalLink, Loader2, LogOut, Plus, Power, KeyRound, Pencil, Trash2 } from "lucide-react";
+import { ExternalLink, Loader2, LogOut, Plus, Power, KeyRound, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import {
-  criarTenant, toggleTenantAtivo,
+  criarTenant, listarTenants, toggleTenantAtivo,
   listarAcessos, criarAcesso, redefinirSenhaAcesso, removerAcesso,
 } from "@/lib/master.functions";
-import type { Tenant } from "@/lib/tenant";
-import { clearTenantCache } from "@/lib/tenant";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -35,11 +33,11 @@ function MasterPanel() {
   const navigate = useNavigate();
   const [ready, setReady] = useState(false);
   const [openNew, setOpenNew] = useState(false);
-  const [editando, setEditando] = useState<Tenant | null>(null);
   const [aba, setAba] = useState<"empresas" | "sugestoes">("empresas");
   const [acessosDe, setAcessosDe] = useState<{ id: string; nome: string } | null>(null);
 
 
+  const listar = useServerFn(listarTenants);
   const criar = useServerFn(criarTenant);
   const toggle = useServerFn(toggleTenantAtivo);
   const qc = useQueryClient();
@@ -59,11 +57,7 @@ function MasterPanel() {
   const tenantsQ = useQuery({
     enabled: ready,
     queryKey: ["master-tenants"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("tenants").select("*").order("created_at", { ascending: false });
-      if (error) throw error;
-      return data ?? [];
-    },
+    queryFn: async () => (await listar()).tenants,
     retry: 1,
     refetchOnWindowFocus: true,
     refetchOnMount: "always",
@@ -180,12 +174,6 @@ function MasterPanel() {
                       <ExternalLink className="h-3.5 w-3.5" /> Abrir
                     </Link>
                     <button
-                      onClick={() => setEditando(t)}
-                      className="inline-flex h-9 items-center gap-1 rounded-lg border border-border bg-background px-3 text-xs font-medium hover:bg-accent"
-                    >
-                      <Pencil className="h-3.5 w-3.5" /> Editar
-                    </button>
-                    <button
                       onClick={() => setAcessosDe({ id: t.id, nome: t.nome })}
                       className="inline-flex h-9 items-center gap-1 rounded-lg border border-border bg-background px-3 text-xs font-medium hover:bg-accent"
                     >
@@ -209,15 +197,6 @@ function MasterPanel() {
 
 
       <AcessosDialog tenant={acessosDe} onClose={() => setAcessosDe(null)} />
-      <EditarTenantDialog
-        tenant={editando}
-        onClose={() => setEditando(null)}
-        onSaved={() => {
-          if (editando) clearTenantCache(editando.slug);
-          setEditando(null);
-          qc.invalidateQueries({ queryKey: ["master-tenants"] });
-        }}
-      />
 
       <NovoTenantDialog
         open={openNew}
@@ -226,68 +205,6 @@ function MasterPanel() {
         pending={criarM.isPending}
       />
     </main>
-  );
-}
-
-function EditarTenantDialog({ tenant, onClose, onSaved }: {
-  tenant: Tenant | null;
-  onClose: () => void;
-  onSaved: () => void;
-}) {
-  const [nome, setNome] = useState("");
-  const [endereco, setEndereco] = useState("");
-  const [telefone, setTelefone] = useState("");
-  const [email, setEmail] = useState("");
-  const [whatsapp, setWhatsapp] = useState("");
-
-  useEffect(() => {
-    setNome(tenant?.nome ?? "");
-    setEndereco(tenant?.endereco ?? "");
-    setTelefone(tenant?.telefone_contato ?? "");
-    setEmail(tenant?.email_contato ?? "");
-    setWhatsapp(tenant?.whatsapp ?? "");
-  }, [tenant]);
-
-  const salvar = useMutation({
-    mutationFn: async () => {
-      if (!tenant) throw new Error("Empresa inválida.");
-      const { error } = await supabase.from("tenants").update({
-        nome: nome.trim(),
-        endereco: endereco.trim() || null,
-        telefone_contato: telefone.trim() || null,
-        email_contato: email.trim() || null,
-        whatsapp: whatsapp.trim() || null,
-      }).eq("id", tenant.id);
-      if (error) throw error;
-    },
-    onSuccess: () => { toast.success("Empresa atualizada."); onSaved(); },
-    onError: (error: unknown) => toast.error(error instanceof Error ? error.message : "Falha ao atualizar."),
-  });
-
-  return (
-    <Dialog open={!!tenant} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-lg rounded-2xl">
-        <DialogHeader>
-          <DialogTitle className="font-serif text-2xl font-normal">Editar empresa</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={(event) => { event.preventDefault(); salvar.mutate(); }} className="space-y-3.5">
-          <Field label="Endereço no sistema"><Input value={tenant ? `/${tenant.slug}` : ""} disabled className="h-11 rounded-xl font-mono" /></Field>
-          <Field label="Nome"><Input value={nome} onChange={(event) => setNome(event.target.value)} required minLength={2} className="h-11 rounded-xl" /></Field>
-          <Field label="Endereço"><Input value={endereco} onChange={(event) => setEndereco(event.target.value)} className="h-11 rounded-xl" /></Field>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <Field label="Telefone"><Input value={telefone} onChange={(event) => setTelefone(event.target.value)} className="h-11 rounded-xl" /></Field>
-            <Field label="WhatsApp"><Input value={whatsapp} onChange={(event) => setWhatsapp(event.target.value)} className="h-11 rounded-xl" /></Field>
-          </div>
-          <Field label="E-mail de contato"><Input type="email" value={email} onChange={(event) => setEmail(event.target.value)} className="h-11 rounded-xl" /></Field>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button type="submit" disabled={salvar.isPending || nome.trim().length < 2}>
-              {salvar.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Salvar"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
   );
 }
 

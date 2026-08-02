@@ -1,9 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
+import { bootstrapSuperAdmin } from "@/lib/master.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,12 +23,21 @@ export const Route = createFileRoute("/master/login")({
 
 function MasterLogin() {
   const navigate = useNavigate();
+  const bootstrap = useServerFn(bootstrapSuperAdmin);
   const [email, setEmail] = useState("contato.bauerlab@gmail.com");
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
+  const [booting, setBooting] = useState(true);
 
   useEffect(() => {
     (async () => {
+      try {
+        await bootstrap();
+      } catch {
+        // Ignora: idempotente. Se falhar, o login abaixo dará erro claro.
+      } finally {
+        setBooting(false);
+      }
       const { data } = await supabase.auth.getSession();
       if (data.session) {
         const { data: isSuper } = await supabase.rpc("has_role", {
@@ -35,7 +46,7 @@ function MasterLogin() {
         if (isSuper) navigate({ to: "/master" });
       }
     })();
-  }, [navigate]);
+  }, [navigate, bootstrap]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -83,8 +94,8 @@ function MasterLogin() {
               <Input type="password" value={senha} onChange={(e) => setSenha(e.target.value)} required minLength={6} className="h-12 rounded-xl" />
             </div>
 
-            <Button type="submit" disabled={loading} className="h-12 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90">
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Entrar"}
+            <Button type="submit" disabled={loading || booting} className="h-12 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90">
+              {loading || booting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Entrar"}
             </Button>
           </form>
         </div>
