@@ -31,10 +31,6 @@ function AdminLogin() {
 
   /** Encaminha para troca de senha ou painel, validando o vínculo com a empresa. */
   async function encaminhar(userId: string, mustChange: boolean) {
-    if (mustChange) {
-      navigate({ to: "/$slug/admin/trocar-senha", params: { slug } });
-      return;
-    }
     const tenant = await getTenantBySlug(slug);
     if (!tenant) {
       toast.error("Empresa não encontrada.");
@@ -49,15 +45,19 @@ function AdminLogin() {
       toast.error("Este login não pertence a esta empresa.");
       return;
     }
+    if (mustChange) {
+      navigate({ to: "/$slug/admin/trocar-senha", params: { slug } });
+      return;
+    }
     navigate({ to: "/$slug/admin", params: { slug } });
   }
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (!data.session) return;
+    supabase.auth.getUser().then(({ data }) => {
+      if (!data.user) return;
       void encaminhar(
-        data.session.user.id,
-        data.session.user.user_metadata?.must_change_password === true,
+        data.user.id,
+        data.user.user_metadata?.must_change_password === true,
       );
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
