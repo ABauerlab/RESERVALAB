@@ -124,6 +124,20 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  // Após um novo deploy, abas antigas pedem chunks com hash antigo (404).
+  // Recarrega uma única vez para buscar o index.html atualizado.
+  useEffect(() => {
+    const onPreloadError = () => {
+      const key = "reservalab:chunk-reload";
+      if (sessionStorage.getItem(key)) return;
+      sessionStorage.setItem(key, "1");
+      window.location.reload();
+    };
+    window.addEventListener("vite:preloadError", onPreloadError);
+    return () => window.removeEventListener("vite:preloadError", onPreloadError);
+  }, []);
+
+
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
