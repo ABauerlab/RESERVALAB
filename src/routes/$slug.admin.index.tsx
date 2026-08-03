@@ -304,7 +304,7 @@ function AdminDashboard() {
               </button>
             )}
           </div>
-        )}
+
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <StatCard icon={CalendarDays} label="Hoje"          value={stats.data?.hoje}      loading={stats.isLoading} />
