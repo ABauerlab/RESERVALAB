@@ -18,6 +18,8 @@ import { getTenantBySlug } from "@/lib/tenant";
 import { buildMensagemConfirmacao, whatsappUrl } from "@/lib/confirmacao";
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
 import { AdminShell } from "@/components/admin/AdminShell";
+import { MensagemDoDiaButton } from "@/components/admin/MensagemDoDia";
+
 
 
 import {
@@ -280,8 +282,9 @@ function AdminDashboard() {
 
 
       <div className="mx-auto max-w-4xl px-5 pt-6">
-        {(showInstall || showPushCTA || showLegacyNotifCTA || pushActive) && (
-          <div className="mb-5 flex flex-wrap gap-2 animate-fade">
+        <div className="mb-5 flex flex-wrap gap-2 animate-fade">
+          <MensagemDoDiaButton tenantId={tenantId} />
+
             {showPushCTA && (
               <button disabled={pushBusy} onClick={handleEnablePush} className="inline-flex items-center gap-2 rounded-full border border-terracotta/30 bg-terracotta/5 px-3.5 py-1.5 text-xs font-medium text-terracotta transition-colors hover:bg-terracotta/10 disabled:opacity-50">
                 <Bell className="h-3.5 w-3.5" /> {pushBusy ? "Ativando…" : "Ativar notificações push"}
@@ -303,7 +306,7 @@ function AdminDashboard() {
               </button>
             )}
           </div>
-        )}
+
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <StatCard icon={CalendarDays} label="Hoje"          value={stats.data?.hoje}      loading={stats.isLoading} />
