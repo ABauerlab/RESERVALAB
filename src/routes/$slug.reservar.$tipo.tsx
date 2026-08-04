@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate, useParams, notFound } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft, Loader2, Minus, Plus, CalendarX2 } from "lucide-react";
 import { toast } from "sonner";
@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   TIPO_LABEL,
   formatTelefone,
+  horariosDisponiveis,
   type ReservaArea,
   type ReservaTipo,
 } from "@/lib/reservations";
@@ -74,6 +75,17 @@ function ReservarPage() {
   const precisaHorario = isMesa || isAniv;
 
   const hoje = useMemo(() => new Date().toISOString().slice(0, 10), []);
+
+  const horariosOpcoes = useMemo(
+    () => (precisaHorario ? horariosDisponiveis(data, quantidade) : []),
+    [precisaHorario, data, quantidade],
+  );
+
+  // Mantém a seleção válida quando data/quantidade mudam.
+  useEffect(() => {
+    if (horario && !horariosOpcoes.includes(horario)) setHorario("");
+  }, [horariosOpcoes, horario]);
+
 
   // Bloqueio de agenda aplicável à data/horário escolhidos
   const bloqueio = useMemo(() => {
@@ -182,10 +194,20 @@ function ReservarPage() {
             </Field>
             {precisaHorario && (
               <Field label="Horário">
-                <Input type="time" value={horario} onChange={(e) => setHorario(e.target.value)} className="h-12 rounded-xl" required />
+                <Select value={horario} onValueChange={setHorario} disabled={!data}>
+                  <SelectTrigger className="h-12 rounded-xl">
+                    <SelectValue placeholder={data ? "Selecione" : "Escolha a data"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {horariosOpcoes.map((h) => (
+                      <SelectItem key={h} value={h}>{h}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </Field>
             )}
           </div>
+
 
           {bloqueio && (
             <div className="flex items-start gap-3 rounded-xl border border-destructive/25 bg-destructive/5 p-4">
