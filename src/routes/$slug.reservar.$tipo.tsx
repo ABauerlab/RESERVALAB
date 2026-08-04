@@ -75,6 +75,17 @@ function ReservarPage() {
 
   const hoje = useMemo(() => new Date().toISOString().slice(0, 10), []);
 
+  const horariosOpcoes = useMemo(
+    () => (precisaHorario ? horariosDisponiveis(data, quantidade) : []),
+    [precisaHorario, data, quantidade],
+  );
+
+  // Mantém a seleção válida quando data/quantidade mudam.
+  useEffect(() => {
+    if (horario && !horariosOpcoes.includes(horario)) setHorario("");
+  }, [horariosOpcoes, horario]);
+
+
   // Bloqueio de agenda aplicável à data/horário escolhidos
   const bloqueio = useMemo(() => {
     if (!data) return null;
