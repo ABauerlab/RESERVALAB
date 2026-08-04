@@ -91,3 +91,35 @@ export function formatHorario(v?: string | null): string {
   if (!v) return "—";
   return v.slice(0, 5);
 }
+
+/* ---------- Horários de funcionamento ---------- */
+
+function slots(inicio: string, fim: string, stepMin = 30): string[] {
+  const toMin = (h: string) => Number(h.slice(0, 2)) * 60 + Number(h.slice(3, 5));
+  const out: string[] = [];
+  for (let m = toMin(inicio); m <= toMin(fim); m += stepMin) {
+    out.push(`${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`);
+  }
+  return out;
+}
+
+/**
+ * Horários oferecidos ao cliente para uma data (YYYY-MM-DD).
+ * Padrão: seg–sex 11h–15h, sáb–dom 12h–17h.
+ * Acima de 30 pessoas, opções adicionais entram na mesma lista.
+ */
+export function horariosDisponiveis(dataIso: string, quantidade: number): string[] {
+  if (!dataIso) return [];
+  const [y, m, d] = dataIso.split("-").map(Number);
+  const dia = new Date(y!, (m ?? 1) - 1, d!).getDay(); // 0=dom, 6=sáb
+  const fimDeSemana = dia === 0 || dia === 6;
+
+  const base = fimDeSemana ? slots("12:00", "17:00") : slots("11:00", "15:00");
+  if (quantidade <= 30) return base;
+
+  const extras = fimDeSemana
+    ? [...slots("09:00", "11:30"), ...slots("17:30", "23:00")]
+    : [...slots("08:00", "10:30"), ...slots("15:30", "23:00")];
+
+  return Array.from(new Set([...base, ...extras])).sort();
+}
