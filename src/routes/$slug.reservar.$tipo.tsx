@@ -182,10 +182,20 @@ function ReservarPage() {
             </Field>
             {precisaHorario && (
               <Field label="Horário">
-                <Input type="time" value={horario} onChange={(e) => setHorario(e.target.value)} className="h-12 rounded-xl" required />
+                <Select value={horario} onValueChange={setHorario} disabled={!data}>
+                  <SelectTrigger className="h-12 rounded-xl">
+                    <SelectValue placeholder={data ? "Selecione" : "Escolha a data"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {horariosOpcoes.map((h) => (
+                      <SelectItem key={h} value={h}>{h}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </Field>
             )}
           </div>
+
 
           {bloqueio && (
             <div className="flex items-start gap-3 rounded-xl border border-destructive/25 bg-destructive/5 p-4">
