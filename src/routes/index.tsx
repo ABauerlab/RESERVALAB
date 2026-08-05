@@ -433,11 +433,12 @@ function Landing() {
             <Reveal delay={180} className="relative">
               <div className="relative">
                 <DesktopMockup />
-                <div className="pointer-events-none absolute -bottom-10 -left-4 hidden sm:block lg:-left-10">
+                <div className="pointer-events-none absolute -bottom-14 hidden xl:block xl:-left-24">
                   <MobileMockup />
                 </div>
               </div>
-              <div className="mt-8 sm:hidden">
+              <div className="mt-10 xl:hidden">
+
                 <MobileMockup />
               </div>
             </Reveal>
