@@ -39,8 +39,8 @@ export function Reveal({
     return () => io.disconnect();
   }, []);
 
-  const Component = Tag as never;
-  return (
+  const Component = Tag as React.ElementType;
+
     <Component
       ref={ref as never}
       style={{ transitionDelay: `${delay}ms` }}
