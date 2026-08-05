@@ -41,7 +41,9 @@ export function Reveal({
 
   const Component = Tag as React.ElementType;
 
+  return (
     <Component
+
       ref={ref as never}
       style={{ transitionDelay: `${delay}ms` }}
       className={`reveal ${shown ? "reveal-in" : ""} ${className}`}
