@@ -7,9 +7,10 @@ import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import {
-  criarTenant, listarTenants, toggleTenantAtivo,
+  listarTenants, toggleTenantAtivo,
   listarAcessos, criarAcesso, redefinirSenhaAcesso, removerAcesso,
 } from "@/lib/master.functions";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
