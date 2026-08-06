@@ -39,9 +39,9 @@ function MasterPanel() {
 
 
   const listar = useServerFn(listarTenants);
-  const criar = useServerFn(criarTenant);
   const toggle = useServerFn(toggleTenantAtivo);
   const qc = useQueryClient();
+
 
   useEffect(() => {
     (async () => {
