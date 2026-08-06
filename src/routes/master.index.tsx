@@ -67,7 +67,19 @@ function MasterPanel() {
 
 
   const criarM = useMutation({
-    mutationFn: async (input: Parameters<typeof criar>[0]) => criar(input),
+    mutationFn: async (input: NovaEmpresaInput) => {
+      const { data, error } = await supabase.functions.invoke("create-company", { body: input });
+      if (error) {
+        const detalhe = await (error as { context?: Response }).context
+          ?.clone()
+          .json()
+          .catch(() => null);
+        throw new Error(detalhe?.error ?? error.message ?? "Falha ao criar empresa.");
+      }
+      if (data?.error) throw new Error(data.error);
+      return data;
+    },
+
     onSuccess: () => {
       toast.success("Empresa criada.");
       qc.invalidateQueries({ queryKey: ["master-tenants"] });
