@@ -219,7 +219,7 @@ function MasterPanel() {
       <NovoTenantDialog
         open={openNew}
         onClose={() => setOpenNew(false)}
-        onSubmit={(input) => criarM.mutate({ data: input })}
+        onSubmit={(input) => criarM.mutate(input)}
         pending={criarM.isPending}
       />
     </main>
