@@ -7,15 +7,21 @@ import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import {
-  criarTenant, listarTenants, toggleTenantAtivo,
+  listarTenants, toggleTenantAtivo,
   listarAcessos, criarAcesso, redefinirSenhaAcesso, removerAcesso,
 } from "@/lib/master.functions";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
+
+type NovaEmpresaInput = {
+  slug: string; nome: string; email_admin: string; senha_admin: string;
+  endereco?: string; telefone_contato?: string; whatsapp?: string;
+};
 
 
 export const Route = createFileRoute("/master/")({
@@ -38,9 +44,9 @@ function MasterPanel() {
 
 
   const listar = useServerFn(listarTenants);
-  const criar = useServerFn(criarTenant);
   const toggle = useServerFn(toggleTenantAtivo);
   const qc = useQueryClient();
+
 
   useEffect(() => {
     (async () => {
@@ -66,7 +72,19 @@ function MasterPanel() {
 
 
   const criarM = useMutation({
-    mutationFn: async (input: Parameters<typeof criar>[0]) => criar(input),
+    mutationFn: async (input: NovaEmpresaInput) => {
+      const { data, error } = await supabase.functions.invoke("create-company", { body: input });
+      if (error) {
+        const detalhe = await (error as { context?: Response }).context
+          ?.clone()
+          .json()
+          .catch(() => null);
+        throw new Error(detalhe?.error ?? error.message ?? "Falha ao criar empresa.");
+      }
+      if (data?.error) throw new Error(data.error);
+      return data;
+    },
+
     onSuccess: () => {
       toast.success("Empresa criada.");
       qc.invalidateQueries({ queryKey: ["master-tenants"] });
@@ -201,7 +219,7 @@ function MasterPanel() {
       <NovoTenantDialog
         open={openNew}
         onClose={() => setOpenNew(false)}
-        onSubmit={(input) => criarM.mutate({ data: input })}
+        onSubmit={(input) => criarM.mutate(input)}
         pending={criarM.isPending}
       />
     </main>
