@@ -18,6 +18,11 @@ import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 
+type NovaEmpresaInput = {
+  slug: string; nome: string; email_admin: string; senha_admin: string;
+  endereco?: string; telefone_contato?: string; whatsapp?: string;
+};
+
 
 export const Route = createFileRoute("/master/")({
   head: () => ({
