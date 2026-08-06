@@ -19,9 +19,9 @@ export const Route = createFileRoute("/$slug/acompanhar/")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  validateSearch: (search: Record<string, unknown>) => ({
-    codigo: typeof search.codigo === "string" ? search.codigo : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { codigo?: string } =>
+    typeof search.codigo === "string" ? { codigo: search.codigo } : {},
+
   component: AcompanharPage,
 });
 
