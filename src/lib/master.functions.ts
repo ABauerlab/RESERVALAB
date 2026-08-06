@@ -123,10 +123,10 @@ export const listarTenants = createServerFn({ method: "GET" })
     const { data: isSuper } = await context.supabase
       .rpc("has_role", { _user_id: context.userId, _role: "super_admin" });
     if (!isSuper) throw new Error("Acesso negado");
-    const { getSupabaseAdmin } = await import("@/integrations/supabase/admin.server");
-    const supabaseAdmin = getSupabaseAdmin();
-    const { data, error } = await supabaseAdmin
+    // Leitura normal: RLS já permite ao super_admin ver todas as empresas.
+    const { data, error } = await context.supabase
       .from("tenants").select("*").order("created_at", { ascending: false });
+
     if (error) throw new Error(error.message);
     return { tenants: data ?? [] };
   });
