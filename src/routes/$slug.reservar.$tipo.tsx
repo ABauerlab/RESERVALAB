@@ -207,6 +207,63 @@ function ReservarPage() {
             </ul>
           </section>
         )}
+        {isEvento && (
+          <section className="mt-6 space-y-4 rounded-2xl border border-terracotta/25 bg-terracotta/5 p-5 animate-in-up">
+            <div>
+              <p className="font-serif text-xl leading-snug sm:text-2xl">Orçamento — eventos particulares</p>
+              <p className="mt-1.5 text-sm text-muted-foreground">Mínimo de 50 pessoas • Máximo de 180 pessoas</p>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="rounded-xl bg-card p-4">
+                <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-terracotta">
+                  <UtensilsCrossed className="h-3.5 w-3.5" /> Petiscos
+                </p>
+                <ul className="mt-2.5 space-y-1 text-sm text-muted-foreground">
+                  <li>Carne de panela com pãozinho</li>
+                  <li>Bolinho de linguiça</li>
+                  <li>Chips de jiló</li>
+                  <li>Coxinha de moranga com rabada</li>
+                  <li>Batata frita</li>
+                  <li>Harumaki de carne de panela</li>
+                </ul>
+              </div>
+
+              <div className="rounded-xl bg-card p-4">
+                <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-terracotta">
+                  <Beer className="h-3.5 w-3.5" /> Bebidas
+                </p>
+                <ul className="mt-2.5 space-y-1 text-sm text-muted-foreground">
+                  <li>Água mineral</li>
+                  <li>Água gasosa</li>
+                  <li>Cerveja Eisenbahn</li>
+                  <li>Refrigerante Guaraná/Coca-Cola normal ou zero</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="rounded-xl bg-card p-4">
+              <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-terracotta">
+                <Receipt className="h-3.5 w-3.5" /> Valores (5 horas de evento)
+              </p>
+              <ul className="mt-2.5 space-y-1.5 text-sm">
+                <li className="flex flex-wrap justify-between gap-2"><span className="text-muted-foreground">Menu sem bebidas</span><span className="font-medium">R$ 110,00/pessoa</span></li>
+                <li className="flex flex-wrap justify-between gap-2"><span className="text-muted-foreground">Menu, bebidas e cerveja Eisenbahn</span><span className="font-medium">R$ 160,00/pessoa</span></li>
+                <li className="flex flex-wrap justify-between gap-2"><span className="text-muted-foreground">Bebidas e cerveja Heineken</span><span className="font-medium">R$ 180,00/pessoa</span></li>
+                <li className="flex flex-wrap justify-between gap-2"><span className="text-muted-foreground">Bebidas, cerveja Heineken e drinks</span><span className="font-medium">R$ 200,00/pessoa</span></li>
+              </ul>
+              <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+                Couvert artístico de R$ 10,00 por pessoa caso haja interesse em banda.
+              </p>
+            </div>
+
+            <p className="flex gap-2.5 text-sm leading-relaxed text-muted-foreground">
+              <Wallet className="mt-0.5 h-4 w-4 shrink-0 text-terracotta" />
+              <span>Pagamento: 50% de sinal no ato da reserva e 50% restante no dia.</span>
+            </p>
+          </section>
+        )}
+
 
 
 
