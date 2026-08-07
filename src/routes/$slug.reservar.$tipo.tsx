@@ -36,6 +36,16 @@ export const Route = createFileRoute("/$slug/reservar/$tipo")({
     if (!TIPOS_VALIDOS.includes(params.tipo as ReservaTipo)) throw notFound();
     return {};
   },
+  notFoundComponent: () => (
+    <main className="flex min-h-screen items-center justify-center bg-background px-6 text-center">
+      <p className="text-sm text-muted-foreground">Tipo de reserva não encontrado.</p>
+    </main>
+  ),
+  errorComponent: () => (
+    <main className="flex min-h-screen items-center justify-center bg-background px-6 text-center">
+      <p className="text-sm text-muted-foreground">Não foi possível carregar esta página.</p>
+    </main>
+  ),
   component: ReservarPage,
 });
 
