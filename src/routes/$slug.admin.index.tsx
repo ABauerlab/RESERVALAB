@@ -113,6 +113,7 @@ function AdminDashboard() {
           const r = payload.new as Reserva;
           qc.invalidateQueries({ queryKey: ["reservas", tenantId] });
           qc.invalidateQueries({ queryKey: ["reservas-stats", tenantId] });
+          qc.invalidateQueries({ queryKey: ["novas-reservas", tenantId] });
           const line = `${TIPO_SHORT[r.tipo]} • ${r.quantidade ?? "?"} pessoas • ${formatData(r.data)}${r.horario ? ` às ${formatHorario(r.horario)}` : ""}`;
           toast.success(`Nova reserva — ${r.nome}`, { description: line });
           showNotification(`Nova reserva — ${r.nome}`, line);
