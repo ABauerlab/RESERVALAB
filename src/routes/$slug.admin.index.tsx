@@ -282,6 +282,7 @@ function AdminDashboard() {
 
 
       <div className="mx-auto max-w-4xl px-5 pt-6">
+        <NovasReservasBanner tenantId={tenantId} />
         <div className="mb-5 flex flex-wrap gap-2 animate-fade">
           <MensagemDoDiaButton tenantId={tenantId} />
 
