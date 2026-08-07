@@ -32,8 +32,9 @@ export const Route = createFileRoute("/$slug/reservar/$tipo")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  beforeLoad: ({ params }) => {
+  loader: ({ params }) => {
     if (!TIPOS_VALIDOS.includes(params.tipo as ReservaTipo)) throw notFound();
+    return {};
   },
   component: ReservarPage,
 });
