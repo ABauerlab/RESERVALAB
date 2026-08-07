@@ -19,6 +19,7 @@ import { buildMensagemConfirmacao, whatsappUrl } from "@/lib/confirmacao";
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { MensagemDoDiaButton } from "@/components/admin/MensagemDoDia";
+import { NovasReservasBanner } from "@/components/admin/NovasReservas";
 
 
 
