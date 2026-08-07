@@ -61,6 +61,8 @@ export function buildMensagemDoDia(dataISO: string, reservas: Reserva[]): string
       partes.push(`Quantidade de pessoas: ${r.quantidade ?? "-"}`);
       partes.push(`Horário: ${r.horario ? formatHorario(r.horario) : "-"}`);
       partes.push(`Telefone: ${r.telefone}`);
+      const obs = (r.observacoes ?? "").trim();
+      partes.push(`Observação: ${obs.length > 0 ? obs.replace(/\s*\n\s*/g, " ") : "-"}`);
     }
   }
 

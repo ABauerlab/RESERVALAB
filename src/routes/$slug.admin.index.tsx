@@ -19,6 +19,7 @@ import { buildMensagemConfirmacao, whatsappUrl } from "@/lib/confirmacao";
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { MensagemDoDiaButton } from "@/components/admin/MensagemDoDia";
+import { NovasReservasBanner } from "@/components/admin/NovasReservas";
 
 
 
@@ -112,6 +113,7 @@ function AdminDashboard() {
           const r = payload.new as Reserva;
           qc.invalidateQueries({ queryKey: ["reservas", tenantId] });
           qc.invalidateQueries({ queryKey: ["reservas-stats", tenantId] });
+          qc.invalidateQueries({ queryKey: ["novas-reservas", tenantId] });
           const line = `${TIPO_SHORT[r.tipo]} • ${r.quantidade ?? "?"} pessoas • ${formatData(r.data)}${r.horario ? ` às ${formatHorario(r.horario)}` : ""}`;
           toast.success(`Nova reserva — ${r.nome}`, { description: line });
           showNotification(`Nova reserva — ${r.nome}`, line);
@@ -282,6 +284,7 @@ function AdminDashboard() {
 
 
       <div className="mx-auto max-w-4xl px-5 pt-6">
+        <NovasReservasBanner tenantId={tenantId} />
         <div className="mb-5 flex flex-wrap gap-2 animate-fade">
           <MensagemDoDiaButton tenantId={tenantId} />
 

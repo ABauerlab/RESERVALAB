@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate, useParams, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronLeft, Loader2, Minus, Plus, CalendarX2 } from "lucide-react";
+import { ChevronLeft, Loader2, Minus, Plus, CalendarX2, Gift, Receipt, Cake } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -32,9 +32,20 @@ export const Route = createFileRoute("/$slug/reservar/$tipo")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  beforeLoad: ({ params }) => {
+  loader: ({ params }) => {
     if (!TIPOS_VALIDOS.includes(params.tipo as ReservaTipo)) throw notFound();
+    return {};
   },
+  notFoundComponent: () => (
+    <main className="flex min-h-screen items-center justify-center bg-background px-6 text-center">
+      <p className="text-sm text-muted-foreground">Tipo de reserva não encontrado.</p>
+    </main>
+  ),
+  errorComponent: () => (
+    <main className="flex min-h-screen items-center justify-center bg-background px-6 text-center">
+      <p className="text-sm text-muted-foreground">Não foi possível carregar esta página.</p>
+    </main>
+  ),
   component: ReservarPage,
 });
 
@@ -174,6 +185,30 @@ function ReservarPage() {
             Preencha e nossa equipe confirmará em seguida.
           </p>
         </header>
+
+        {isAniv && (
+          <section className="mt-6 rounded-2xl border border-terracotta/25 bg-terracotta/5 p-5 animate-in-up">
+            <p className="font-serif text-xl leading-snug sm:text-2xl">
+              Vai ser um prazer comemorar seu aniversário no {tenantQ.data?.nome ?? "Iracema"}!
+            </p>
+            <ul className="mt-4 space-y-3 text-sm leading-relaxed text-muted-foreground">
+              <li className="flex gap-2.5">
+                <Gift className="mt-0.5 h-4 w-4 shrink-0 text-terracotta" />
+                <span>O aniversariante da semana ganha um drink ou uma sobremesa e também 10% do valor gasto na própria comanda em cashback para uma próxima visita.</span>
+              </li>
+              <li className="flex gap-2.5">
+                <Receipt className="mt-0.5 h-4 w-4 shrink-0 text-terracotta" />
+                <span>A partir de 15 convidados, disponibilizamos comandas individuais.</span>
+              </li>
+              <li className="flex gap-2.5">
+                <Cake className="mt-0.5 h-4 w-4 shrink-0 text-terracotta" />
+                <span>Pode trazer seu bolo! Nós guardamos e disponibilizamos pratos e talheres.</span>
+              </li>
+            </ul>
+          </section>
+        )}
+
+
 
         <form onSubmit={onSubmit} className="mt-8 space-y-5 animate-in-up">
           <Field label="Nome">
