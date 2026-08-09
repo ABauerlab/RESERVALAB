@@ -91,6 +91,8 @@ function AdminDashboard() {
   const [filtroData, setFiltroData] = useState<FiltroData>("hoje");
   const [filtroStatus, setFiltroStatus] = useState<FiltroStatus>("todos");
   const [busca, setBusca] = useState("");
+  const [mostrarFinalizadas, setMostrarFinalizadas] = useState(false);
+
   const [selected, setSelected] = useState<Reserva | null>(null);
   const [notifPerm, setNotifPerm] = useState<string>("default");
   const [installReady, setInstallReady] = useState(false);
