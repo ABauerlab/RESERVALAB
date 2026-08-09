@@ -149,30 +149,57 @@ function AdminDashboard() {
     },
   });
 
+  // Filtros de data/busca compartilhados entre a lista e a contagem de finalizadas.
+  function aplicarFiltrosBase<T>(q: T): T {
+    let out = q as never as {
+      eq: (c: string, v: string) => unknown; gte: (c: string, v: string) => unknown;
+      lte: (c: string, v: string) => unknown; or: (f: string) => unknown;
+    };
+    if (filtroData === "hoje") out = out.eq("data", todayISO()) as typeof out;
+    else if (filtroData === "amanha") out = out.eq("data", tomorrowISO()) as typeof out;
+    else if (filtroData === "semana") out = (out.gte("data", todayISO()) as typeof out).lte("data", endOfWeekISO()) as typeof out;
+    else if (filtroData === "mes") out = (out.gte("data", todayISO()) as typeof out).lte("data", endOfMonthISO()) as typeof out;
+
+    const term = busca.trim();
+    if (term) out = out.or(`nome.ilike.%${term}%,telefone.ilike.%${term}%,codigo_acompanhamento.ilike.%${term.toUpperCase()}%`) as typeof out;
+    return out as never as T;
+  }
+
   const listaQ = useQuery({
     enabled: ready && !!tenantId,
-    queryKey: ["reservas", tenantId, filtroData, filtroStatus, busca],
+    queryKey: ["reservas", tenantId, filtroData, filtroStatus, busca, mostrarFinalizadas],
     queryFn: async () => {
       let q = supabase.from("reservas").select("*").eq("tenant_id", tenantId!)
         .order("data", { ascending: true, nullsFirst: false })
         .order("horario", { ascending: true })
         .order("created_at", { ascending: false });
 
-      if (filtroData === "hoje") q = q.eq("data", todayISO());
-      else if (filtroData === "amanha") q = q.eq("data", tomorrowISO());
-      else if (filtroData === "semana") q = q.gte("data", todayISO()).lte("data", endOfWeekISO());
-      else if (filtroData === "mes") q = q.gte("data", todayISO()).lte("data", endOfMonthISO());
+      q = aplicarFiltrosBase(q);
 
       if (filtroStatus !== "todos") q = q.eq("status", filtroStatus);
-
-      const term = busca.trim();
-      if (term) q = q.or(`nome.ilike.%${term}%,telefone.ilike.%${term}%,codigo_acompanhamento.ilike.%${term.toUpperCase()}%`);
+      // Finalizadas ficam escondidas por padrão para não poluir a lista atual.
+      else if (!mostrarFinalizadas) q = q.neq("status", "finalizada");
 
       const { data, error } = await q.limit(200);
       if (error) throw error;
       return data as Reserva[];
     },
   });
+
+  const finalizadasCountQ = useQuery({
+    enabled: ready && !!tenantId && filtroStatus === "todos" && !mostrarFinalizadas,
+    queryKey: ["reservas-finalizadas-count", tenantId, filtroData, busca],
+    queryFn: async () => {
+      let q = supabase.from("reservas").select("id", { count: "exact", head: true })
+        .eq("tenant_id", tenantId!).eq("status", "finalizada");
+      q = aplicarFiltrosBase(q);
+      const { count, error } = await q;
+      if (error) throw error;
+      return count ?? 0;
+    },
+  });
+
+
 
   const updateReserva = useMutation({
     mutationFn: async ({ id, patch }: { id: string; patch: ReservaUpdate }) => {
