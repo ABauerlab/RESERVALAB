@@ -1,3 +1,4 @@
+import { pwaHeadLinks } from "@/lib/pwa-manifest";
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -12,11 +13,12 @@ import {
 } from "@/lib/reservations";
 
 export const Route = createFileRoute("/$slug/admin/relatorios")({
-  head: () => ({
+  head: ({ params }) => ({
     meta: [
       { title: "Relatórios — ReservaLab" },
       { name: "robots", content: "noindex" },
     ],
+    links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),
   }),
   ssr: false,
   component: RelatoriosPage,

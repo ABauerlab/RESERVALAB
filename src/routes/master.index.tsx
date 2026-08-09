@@ -1,3 +1,4 @@
+import { pwaHeadLinks } from "@/lib/pwa-manifest";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -30,6 +31,7 @@ export const Route = createFileRoute("/master/")({
       { title: "Master — ReservaLab" },
       { name: "robots", content: "noindex" },
     ],
+    links: pwaHeadLinks("/master", "Master"),
   }),
   ssr: false,
   component: MasterPanel,

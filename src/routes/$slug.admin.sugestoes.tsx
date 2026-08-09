@@ -1,3 +1,4 @@
+import { pwaHeadLinks } from "@/lib/pwa-manifest";
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -13,11 +14,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 export const Route = createFileRoute("/$slug/admin/sugestoes")({
-  head: () => ({
+  head: ({ params }) => ({
     meta: [
       { title: "Sugestões — ReservaLab" },
       { name: "robots", content: "noindex" },
     ],
+    links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),
   }),
   ssr: false,
   component: SugestoesPage,

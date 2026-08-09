@@ -1,3 +1,4 @@
+import { pwaHeadLinks } from "@/lib/pwa-manifest";
 import { createFileRoute, Link, useNavigate, useParams } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
@@ -11,11 +12,12 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 
 export const Route = createFileRoute("/$slug/admin/login")({
-  head: () => ({
+  head: ({ params }) => ({
     meta: [
       { title: "Admin — ReservaLab" },
       { name: "robots", content: "noindex" },
     ],
+    links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),
   }),
   ssr: false,
   component: AdminLogin,
