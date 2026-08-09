@@ -18,6 +18,7 @@ import { Route as SlugObrigadoRouteImport } from './routes/$slug.obrigado'
 import { Route as SlugAdminIndexRouteImport } from './routes/$slug.admin.index'
 import { Route as SlugAcompanharIndexRouteImport } from './routes/$slug.acompanhar.index'
 import { Route as ApiPublicVapidPublicKeyRouteImport } from './routes/api/public/vapid-public-key'
+import { Route as ApiPublicManifestDotwebmanifestRouteImport } from './routes/api/public/manifest[.]webmanifest'
 import { Route as SlugReservarTipoRouteImport } from './routes/$slug.reservar.$tipo'
 import { Route as SlugAdminTrocarSenhaRouteImport } from './routes/$slug.admin.trocar-senha'
 import { Route as SlugAdminSugestoesRouteImport } from './routes/$slug.admin.sugestoes'
@@ -73,6 +74,12 @@ const ApiPublicVapidPublicKeyRoute = ApiPublicVapidPublicKeyRouteImport.update({
   path: '/api/public/vapid-public-key',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicManifestDotwebmanifestRoute =
+  ApiPublicManifestDotwebmanifestRouteImport.update({
+    id: '/api/public/manifest.webmanifest',
+    path: '/api/public/manifest.webmanifest',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const SlugReservarTipoRoute = SlugReservarTipoRouteImport.update({
   id: '/$slug/reservar/$tipo',
   path: '/$slug/reservar/$tipo',
@@ -134,6 +141,7 @@ export interface FileRoutesByFullPath {
   '/$slug/admin/sugestoes': typeof SlugAdminSugestoesRoute
   '/$slug/admin/trocar-senha': typeof SlugAdminTrocarSenhaRoute
   '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
+  '/api/public/manifest.webmanifest': typeof ApiPublicManifestDotwebmanifestRoute
   '/api/public/vapid-public-key': typeof ApiPublicVapidPublicKeyRoute
   '/$slug/acompanhar/': typeof SlugAcompanharIndexRoute
   '/$slug/admin/': typeof SlugAdminIndexRoute
@@ -154,6 +162,7 @@ export interface FileRoutesByTo {
   '/$slug/admin/sugestoes': typeof SlugAdminSugestoesRoute
   '/$slug/admin/trocar-senha': typeof SlugAdminTrocarSenhaRoute
   '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
+  '/api/public/manifest.webmanifest': typeof ApiPublicManifestDotwebmanifestRoute
   '/api/public/vapid-public-key': typeof ApiPublicVapidPublicKeyRoute
   '/$slug/acompanhar': typeof SlugAcompanharIndexRoute
   '/$slug/admin': typeof SlugAdminIndexRoute
@@ -175,6 +184,7 @@ export interface FileRoutesById {
   '/$slug/admin/sugestoes': typeof SlugAdminSugestoesRoute
   '/$slug/admin/trocar-senha': typeof SlugAdminTrocarSenhaRoute
   '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
+  '/api/public/manifest.webmanifest': typeof ApiPublicManifestDotwebmanifestRoute
   '/api/public/vapid-public-key': typeof ApiPublicVapidPublicKeyRoute
   '/$slug/acompanhar/': typeof SlugAcompanharIndexRoute
   '/$slug/admin/': typeof SlugAdminIndexRoute
@@ -197,6 +207,7 @@ export interface FileRouteTypes {
     | '/$slug/admin/sugestoes'
     | '/$slug/admin/trocar-senha'
     | '/$slug/reservar/$tipo'
+    | '/api/public/manifest.webmanifest'
     | '/api/public/vapid-public-key'
     | '/$slug/acompanhar/'
     | '/$slug/admin/'
@@ -217,6 +228,7 @@ export interface FileRouteTypes {
     | '/$slug/admin/sugestoes'
     | '/$slug/admin/trocar-senha'
     | '/$slug/reservar/$tipo'
+    | '/api/public/manifest.webmanifest'
     | '/api/public/vapid-public-key'
     | '/$slug/acompanhar'
     | '/$slug/admin'
@@ -237,6 +249,7 @@ export interface FileRouteTypes {
     | '/$slug/admin/sugestoes'
     | '/$slug/admin/trocar-senha'
     | '/$slug/reservar/$tipo'
+    | '/api/public/manifest.webmanifest'
     | '/api/public/vapid-public-key'
     | '/$slug/acompanhar/'
     | '/$slug/admin/'
@@ -258,6 +271,7 @@ export interface RootRouteChildren {
   SlugAdminSugestoesRoute: typeof SlugAdminSugestoesRoute
   SlugAdminTrocarSenhaRoute: typeof SlugAdminTrocarSenhaRoute
   SlugReservarTipoRoute: typeof SlugReservarTipoRoute
+  ApiPublicManifestDotwebmanifestRoute: typeof ApiPublicManifestDotwebmanifestRoute
   ApiPublicVapidPublicKeyRoute: typeof ApiPublicVapidPublicKeyRoute
   SlugAcompanharIndexRoute: typeof SlugAcompanharIndexRoute
   SlugAdminIndexRoute: typeof SlugAdminIndexRoute
@@ -327,6 +341,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/vapid-public-key'
       fullPath: '/api/public/vapid-public-key'
       preLoaderRoute: typeof ApiPublicVapidPublicKeyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/manifest.webmanifest': {
+      id: '/api/public/manifest.webmanifest'
+      path: '/api/public/manifest.webmanifest'
+      fullPath: '/api/public/manifest.webmanifest'
+      preLoaderRoute: typeof ApiPublicManifestDotwebmanifestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$slug/reservar/$tipo': {
@@ -410,6 +431,7 @@ const rootRouteChildren: RootRouteChildren = {
   SlugAdminSugestoesRoute: SlugAdminSugestoesRoute,
   SlugAdminTrocarSenhaRoute: SlugAdminTrocarSenhaRoute,
   SlugReservarTipoRoute: SlugReservarTipoRoute,
+  ApiPublicManifestDotwebmanifestRoute: ApiPublicManifestDotwebmanifestRoute,
   ApiPublicVapidPublicKeyRoute: ApiPublicVapidPublicKeyRoute,
   SlugAcompanharIndexRoute: SlugAcompanharIndexRoute,
   SlugAdminIndexRoute: SlugAdminIndexRoute,
