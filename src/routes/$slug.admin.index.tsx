@@ -378,7 +378,26 @@ function AdminDashboard() {
           ) : (
             <EmptyState />
           )}
+
+          {filtroStatus === "todos" && !mostrarFinalizadas && (finalizadasCountQ.data ?? 0) > 0 && (
+            <button
+              onClick={() => setMostrarFinalizadas(true)}
+              className="w-full rounded-2xl border border-dashed border-border bg-card/60 px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            >
+              Ver mais {finalizadasCountQ.data} finalizada{finalizadasCountQ.data === 1 ? "" : "s"}
+            </button>
+          )}
+
+          {filtroStatus === "todos" && mostrarFinalizadas && (
+            <button
+              onClick={() => setMostrarFinalizadas(false)}
+              className="w-full rounded-2xl border border-dashed border-border bg-card/60 px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            >
+              Ocultar finalizadas
+            </button>
+          )}
         </div>
+
       </div>
 
       <ReservaDialog
