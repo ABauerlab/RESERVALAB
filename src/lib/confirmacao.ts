@@ -87,8 +87,22 @@ export function buildMensagemConfirmacao(
   for (const [token, valor] of Object.entries(valores)) {
     out = out.split(token).join(valor);
   }
-  return limparLinhasVazias(out);
+  out = limparLinhasVazias(out);
+
+  // Garante que o cliente sempre receba o código e o link de acompanhamento,
+  // mesmo que o template personalizado da empresa não use os placeholders.
+  const extras: string[] = [];
+  if (!tpl.includes("{codigo}") && valores["{codigo}"]) {
+    extras.push(`Codigo da reserva: ${valores["{codigo}"]}`);
+  }
+  if (!tpl.includes("{link_acompanhar}") && ctx.linkAcompanhar) {
+    extras.push("Acompanhe, altere ou cancele sua reserva em:", ctx.linkAcompanhar);
+  }
+  if (extras.length > 0) out = `${out}\n\n${extras.join("\n")}`;
+
+  return out;
 }
+
 
 /**
  * Monta a URL do WhatsApp. Usa api.whatsapp.com/send, que lida melhor com
