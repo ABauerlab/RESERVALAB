@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireRuntimeSupabaseAuth } from "@/integrations/supabase/auth-middleware-runtime";
+import { isValidEmail, isValidNome, isValidSenha, isValidSlug, slugify } from "@/lib/validators";
 
 const SUPER_ADMIN_EMAIL = "contato.bauerlab@gmail.com";
 const SUPER_ADMIN_PASSWORD = "21254775";
@@ -8,11 +9,14 @@ const SUPER_ADMIN_PASSWORD = "21254775";
 // Chamado pela tela /master/login para bootstrap na primeira visita.
 export const bootstrapSuperAdmin = createServerFn({ method: "POST" }).handler(async () => {
   const { getSupabaseAdmin } = await import("@/integrations/supabase/admin.server");
-    const supabaseAdmin = getSupabaseAdmin();
+  const supabaseAdmin = getSupabaseAdmin();
 
   // Já existe super_admin?
   const { data: existing, error: rolesErr } = await supabaseAdmin
-    .from("user_roles").select("id").eq("role", "super_admin").limit(1);
+    .from("user_roles")
+    .select("id")
+    .eq("role", "super_admin")
+    .limit(1);
   if (rolesErr) throw new Error(rolesErr.message);
   if (existing && existing.length > 0) return { created: false };
 
@@ -55,20 +59,23 @@ export const criarTenant = createServerFn({ method: "POST" })
   .middleware([requireRuntimeSupabaseAuth])
   .inputValidator((input: CriarTenantInput) => {
     if (!input || typeof input !== "object") throw new Error("Payload inválido");
-    const slug = String(input.slug ?? "").toLowerCase().trim().replace(/[^a-z0-9-]/g, "-");
-    if (!/^[a-z0-9][a-z0-9-]{1,40}$/.test(slug)) throw new Error("Slug inválido");
-    if (!input.nome || input.nome.trim().length < 2) throw new Error("Nome inválido");
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email_admin ?? "")) throw new Error("E-mail inválido");
-    if (!input.senha_admin || input.senha_admin.length < 6) throw new Error("Senha muito curta");
-    const tipos = input.tipos_aceitos && input.tipos_aceitos.length
-      ? input.tipos_aceitos
-      : ["mesa", "aniversario", "evento", "casamento"] as const;
+    const slug = slugify(input.slug);
+    if (!isValidSlug(slug)) throw new Error("Slug inválido");
+    if (!isValidNome(input.nome)) throw new Error("Nome inválido");
+    if (!isValidEmail(input.email_admin)) throw new Error("E-mail inválido");
+    if (!isValidSenha(input.senha_admin)) throw new Error("Senha muito curta");
+    const tipos =
+      input.tipos_aceitos && input.tipos_aceitos.length
+        ? input.tipos_aceitos
+        : (["mesa", "aniversario", "evento", "casamento"] as const);
     return { ...input, slug, tipos_aceitos: tipos as CriarTenantInput["tipos_aceitos"] };
   })
   .handler(async ({ data, context }) => {
     // Verifica super_admin
-    const { data: isSuper, error: roleErr } = await context.supabase
-      .rpc("has_role", { _user_id: context.userId, _role: "super_admin" });
+    const { data: isSuper, error: roleErr } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "super_admin",
+    });
     if (roleErr) throw new Error(roleErr.message);
     if (!isSuper) throw new Error("Acesso negado");
 
@@ -95,7 +102,9 @@ export const criarTenant = createServerFn({ method: "POST" })
     // Cria user admin do tenant (ou reusa)
     let adminUserId: string | null = null;
     const list = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
-    const existing = list.data?.users?.find((u) => u.email?.toLowerCase() === data.email_admin.toLowerCase());
+    const existing = list.data?.users?.find(
+      (u) => u.email?.toLowerCase() === data.email_admin.toLowerCase(),
+    );
     if (existing) {
       adminUserId = existing.id;
     } else {
@@ -120,12 +129,16 @@ export const criarTenant = createServerFn({ method: "POST" })
 export const listarTenants = createServerFn({ method: "GET" })
   .middleware([requireRuntimeSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data: isSuper } = await context.supabase
-      .rpc("has_role", { _user_id: context.userId, _role: "super_admin" });
+    const { data: isSuper } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "super_admin",
+    });
     if (!isSuper) throw new Error("Acesso negado");
     // Leitura normal: RLS já permite ao super_admin ver todas as empresas.
     const { data, error } = await context.supabase
-      .from("tenants").select("*").order("created_at", { ascending: false });
+      .from("tenants")
+      .select("*")
+      .order("created_at", { ascending: false });
 
     if (error) throw new Error(error.message);
     return { tenants: data ?? [] };
@@ -135,12 +148,17 @@ export const toggleTenantAtivo = createServerFn({ method: "POST" })
   .middleware([requireRuntimeSupabaseAuth])
   .inputValidator((input: { id: string; ativo: boolean }) => input)
   .handler(async ({ data, context }) => {
-    const { data: isSuper } = await context.supabase
-      .rpc("has_role", { _user_id: context.userId, _role: "super_admin" });
+    const { data: isSuper } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "super_admin",
+    });
     if (!isSuper) throw new Error("Acesso negado");
     const { getSupabaseAdmin } = await import("@/integrations/supabase/admin.server");
     const supabaseAdmin = getSupabaseAdmin();
-    const { error } = await supabaseAdmin.from("tenants").update({ ativo: data.ativo }).eq("id", data.id);
+    const { error } = await supabaseAdmin
+      .from("tenants")
+      .update({ ativo: data.ativo })
+      .eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -154,14 +172,18 @@ export const listarAcessos = createServerFn({ method: "POST" })
     return input;
   })
   .handler(async ({ data, context }) => {
-    const { data: isSuper } = await context.supabase
-      .rpc("has_role", { _user_id: context.userId, _role: "super_admin" });
+    const { data: isSuper } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "super_admin",
+    });
     if (!isSuper) throw new Error("Acesso negado");
     const { getSupabaseAdmin } = await import("@/integrations/supabase/admin.server");
     const supabaseAdmin = getSupabaseAdmin();
     const { data: roles, error } = await supabaseAdmin
-      .from("user_roles").select("id, user_id, created_at")
-      .eq("tenant_id", data.tenant_id).eq("role", "tenant_admin");
+      .from("user_roles")
+      .select("id, user_id, created_at")
+      .eq("tenant_id", data.tenant_id)
+      .eq("role", "tenant_admin");
     if (error) throw new Error(error.message);
     const list = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
     const users = list.data?.users ?? [];
@@ -183,13 +205,15 @@ export const criarAcesso = createServerFn({ method: "POST" })
   .middleware([requireRuntimeSupabaseAuth])
   .inputValidator((input: { tenant_id: string; email: string; senha: string }) => {
     if (!input?.tenant_id) throw new Error("Empresa inválida");
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email ?? "")) throw new Error("E-mail inválido");
-    if (!input.senha || input.senha.length < 6) throw new Error("Senha muito curta");
+    if (!isValidEmail(input.email)) throw new Error("E-mail inválido");
+    if (!isValidSenha(input.senha)) throw new Error("Senha muito curta");
     return { ...input, email: input.email.toLowerCase().trim() };
   })
   .handler(async ({ data, context }) => {
-    const { data: isSuper } = await context.supabase
-      .rpc("has_role", { _user_id: context.userId, _role: "super_admin" });
+    const { data: isSuper } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "super_admin",
+    });
     if (!isSuper) throw new Error("Acesso negado");
     const { getSupabaseAdmin } = await import("@/integrations/supabase/admin.server");
     const supabaseAdmin = getSupabaseAdmin();
@@ -226,12 +250,14 @@ export const redefinirSenhaAcesso = createServerFn({ method: "POST" })
   .middleware([requireRuntimeSupabaseAuth])
   .inputValidator((input: { user_id: string; senha: string }) => {
     if (!input?.user_id) throw new Error("Usuário inválido");
-    if (!input.senha || input.senha.length < 6) throw new Error("Senha muito curta");
+    if (!isValidSenha(input.senha)) throw new Error("Senha muito curta");
     return input;
   })
   .handler(async ({ data, context }) => {
-    const { data: isSuper } = await context.supabase
-      .rpc("has_role", { _user_id: context.userId, _role: "super_admin" });
+    const { data: isSuper } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "super_admin",
+    });
     if (!isSuper) throw new Error("Acesso negado");
     const { getSupabaseAdmin } = await import("@/integrations/supabase/admin.server");
     const supabaseAdmin = getSupabaseAdmin();
@@ -250,8 +276,10 @@ export const removerAcesso = createServerFn({ method: "POST" })
     return input;
   })
   .handler(async ({ data, context }) => {
-    const { data: isSuper } = await context.supabase
-      .rpc("has_role", { _user_id: context.userId, _role: "super_admin" });
+    const { data: isSuper } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "super_admin",
+    });
     if (!isSuper) throw new Error("Acesso negado");
     const { getSupabaseAdmin } = await import("@/integrations/supabase/admin.server");
     const supabaseAdmin = getSupabaseAdmin();
