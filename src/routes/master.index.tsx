@@ -28,7 +28,7 @@ type NovaEmpresaInput = {
 export const Route = createFileRoute("/master/")({
   head: () => ({
     meta: [
-      { title: "Master — ReservaLab" },
+      { title: "Master — Reservi" },
       { name: "robots", content: "noindex" },
     ],
     links: pwaHeadLinks("/master", "Master"),
@@ -117,7 +117,7 @@ function MasterPanel() {
       <header className="sticky top-0 z-20 border-b border-border/70 bg-background/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-4xl items-center gap-3 px-5 py-4">
           <div className="min-w-0 flex-1">
-            <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-terracotta">ReservaLab</p>
+            <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-terracotta">Reservi</p>
             <h1 className="truncate text-lg font-medium">Painel master</h1>
           </div>
           <button onClick={signOut} className="flex h-10 w-10 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground" aria-label="Sair">

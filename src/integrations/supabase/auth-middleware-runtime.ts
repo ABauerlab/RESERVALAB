@@ -54,7 +54,7 @@ export const requireRuntimeSupabaseAuth = createMiddleware({ type: "function" })
       ...(!publishableKey ? ["SUPABASE_PUBLISHABLE_KEY"] : []),
     ];
     const message = `Configuração do backend indisponível: ${missing.join(", ")}.`;
-    console.error(`[ReservaLab] ${message}`);
+    console.error(`[Reservi] ${message}`);
     throw new Error(message);
   }
 

@@ -20,7 +20,7 @@ import { Textarea } from "@/components/ui/textarea";
 export const Route = createFileRoute("/$slug/admin/configuracoes")({
   head: ({ params }) => ({
     meta: [
-      { title: "Configurações — ReservaLab" },
+      { title: "Configurações — Reservi" },
       { name: "robots", content: "noindex" },
     ],
     links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),

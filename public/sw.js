@@ -1,4 +1,4 @@
-// ReservaLab PWA service worker with Web Push support.
+// Reservi PWA service worker with Web Push support.
 
 self.addEventListener("install", () => {
   self.skipWaiting();

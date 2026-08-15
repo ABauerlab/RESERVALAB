@@ -39,7 +39,7 @@ export function AdminShell({
         <div className="mx-auto flex max-w-4xl items-center gap-3 px-5 py-4">
           <div className="min-w-0 flex-1">
             <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-terracotta">
-              ReservaLab · {tenantNome}
+              Reservi · {tenantNome}
             </p>
             <h1 className="truncate text-lg font-medium">Painel da empresa</h1>
           </div>

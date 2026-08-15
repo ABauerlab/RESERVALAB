@@ -49,7 +49,7 @@ function TenantHome() {
             to="/"
             className="mt-6 inline-flex h-11 items-center justify-center rounded-xl border border-border bg-card px-5 text-sm font-medium hover:bg-accent"
           >
-            Ir para ReservaLab
+            Ir para Reservi
           </Link>
         </div>
       </main>
@@ -112,7 +112,7 @@ function TenantHome() {
 
         <div className="mt-auto pt-16 text-center">
           <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/60">
-            ReservaLab
+            Reservi
           </p>
         </div>
       </div>

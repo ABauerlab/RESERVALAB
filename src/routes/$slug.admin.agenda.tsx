@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/$slug/admin/agenda")({
   head: ({ params }) => ({
     meta: [
-      { title: "Agenda — ReservaLab" },
+      { title: "Agenda — Reservi" },
       { name: "robots", content: "noindex" },
     ],
     links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),

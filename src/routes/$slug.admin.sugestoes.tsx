@@ -16,7 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 export const Route = createFileRoute("/$slug/admin/sugestoes")({
   head: ({ params }) => ({
     meta: [
-      { title: "Sugestões — ReservaLab" },
+      { title: "Sugestões — Reservi" },
       { name: "robots", content: "noindex" },
     ],
     links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),
@@ -89,7 +89,7 @@ function SugestoesPage() {
         <header className="animate-fade">
           <h2 className="font-serif text-3xl tracking-tight">Sugestões de melhoria</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Conte o que falta ou o que poderia funcionar melhor. A equipe ReservaLab recebe direto.
+            Conte o que falta ou o que poderia funcionar melhor. A equipe Reservi recebe direto.
           </p>
         </header>
 
@@ -130,7 +130,7 @@ function SugestoesPage() {
                   <p className="mt-1.5 whitespace-pre-wrap text-sm text-muted-foreground">{f.descricao}</p>
                   {f.resposta_master && (
                     <p className="mt-3 rounded-lg bg-cream/60 p-3 text-sm">
-                      <span className="font-medium">Resposta ReservaLab: </span>{f.resposta_master}
+                      <span className="font-medium">Resposta Reservi: </span>{f.resposta_master}
                     </p>
                   )}
                 </li>

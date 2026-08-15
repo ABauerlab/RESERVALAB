@@ -27,7 +27,7 @@ const TIPOS_VALIDOS: ReservaTipo[] = ["mesa", "aniversario", "evento", "casament
 export const Route = createFileRoute("/$slug/reservar/$tipo")({
   head: ({ params }) => ({
     meta: [
-      { title: `${TIPO_LABEL[params.tipo as ReservaTipo] ?? "Reserva"} — ReservaLab` },
+      { title: `${TIPO_LABEL[params.tipo as ReservaTipo] ?? "Reserva"} — Reservi` },
       { name: "description", content: "Envie sua solicitação de reserva em poucos toques." },
       { name: "robots", content: "noindex" },
     ],
