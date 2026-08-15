@@ -6,7 +6,7 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/$slug/obrigado")({
   head: () => ({
     meta: [
-      { title: "Reserva enviada — Reservi" },
+      { title: "Reserva enviada — ReservaLab" },
       { name: "robots", content: "noindex" },
     ],
   }),

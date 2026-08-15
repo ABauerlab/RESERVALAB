@@ -15,7 +15,7 @@ export function normalizeCodigo(v: string): string {
 export const Route = createFileRoute("/$slug/acompanhar/")({
   head: () => ({
     meta: [
-      { title: "Acompanhar reserva — Reservi" },
+      { title: "Acompanhar reserva — ReservaLab" },
       { name: "robots", content: "noindex" },
     ],
   }),

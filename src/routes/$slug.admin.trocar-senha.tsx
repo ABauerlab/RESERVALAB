@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/$slug/admin/trocar-senha")({
   head: () => ({
     meta: [
-      { title: "Trocar senha — Reservi" },
+      { title: "Trocar senha — ReservaLab" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -66,7 +66,7 @@ function TrocarSenha() {
     <main className="flex min-h-screen items-center justify-center bg-background px-5 safe-top safe-bottom">
       <div className="w-full max-w-sm animate-in-up">
         <div className="mb-8 text-center">
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-terracotta">Reservi</p>
+          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-terracotta">ReservaLab</p>
         </div>
 
         <div className="rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-md)]">

@@ -27,25 +27,25 @@ import {
 
 const WHATSAPP =
   "https://wa.me/5531998021169?text=" +
-  encodeURIComponent("Ola! Quero usar o Reservi na minha empresa.");
+  encodeURIComponent("Ola! Quero usar o ReservaLab na minha empresa.");
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Reservi | Sistema de Reservas e Agendamentos para Empresas" },
+      { title: "ReservaLab | Sistema de Reservas e Agendamentos para Empresas" },
       {
         name: "description",
         content:
-          "Organize reservas, horários e clientes em um único sistema. Simplifique a gestão de reservas da sua empresa com o Reservi.",
+          "Organize reservas, horários e clientes em um único sistema. Simplifique a gestão de reservas da sua empresa com o ReservaLab.",
       },
       {
         property: "og:title",
-        content: "Reservi | Sistema de Reservas e Agendamentos para Empresas",
+        content: "ReservaLab | Sistema de Reservas e Agendamentos para Empresas",
       },
       {
         property: "og:description",
         content:
-          "Organize reservas, horários e clientes em um único sistema. Simplifique a gestão de reservas da sua empresa com o Reservi.",
+          "Organize reservas, horários e clientes em um único sistema. Simplifique a gestão de reservas da sua empresa com o ReservaLab.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://reservatestelab.lovable.app/" },
@@ -58,7 +58,7 @@ export const Route = createFileRoute("/")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "SoftwareApplication",
-          name: "Reservi",
+          name: "ReservaLab",
           applicationCategory: "BusinessApplication",
           operatingSystem: "Web",
           description:
@@ -80,7 +80,7 @@ function CTAPrimary({ className = "" }: { className?: string }) {
       rel="noopener noreferrer"
       className={`group inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-terracotta px-6 text-sm font-medium text-terracotta-foreground shadow-[var(--shadow-md)] transition-all hover:bg-terracotta/90 hover:shadow-[var(--shadow-lg)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring motion-safe:hover:-translate-y-0.5 ${className}`}
     >
-      Quero usar o Reservi
+      Quero usar o ReservaLab
       <ArrowRight className="h-4 w-4 transition-transform motion-safe:group-hover:translate-x-0.5" />
     </a>
   );
@@ -362,7 +362,7 @@ function Landing() {
     },
     {
       q: "Serve para o meu tipo de negócio?",
-      a: "O Reservi atende negócios que trabalham com reservas e agendamentos, como restaurantes, bares, estúdios, clínicas, barbearias, salões, coworkings, espaços esportivos e eventos.",
+      a: "O ReservaLab atende negócios que trabalham com reservas e agendamentos, como restaurantes, bares, estúdios, clínicas, barbearias, salões, coworkings, espaços esportivos e eventos.",
     },
     {
       q: "Como começo a usar?",
@@ -376,7 +376,7 @@ function Landing() {
       <header className="sticky top-0 z-30 border-b border-border/60 bg-background/80 backdrop-blur-md safe-top">
         <div className="mx-auto flex max-w-6xl items-center gap-4 px-5 py-3.5">
           <a href="#hero" className="min-w-0 flex-1">
-            <span className="font-serif text-xl tracking-tight">Reservi</span>
+            <span className="font-serif text-xl tracking-tight">ReservaLab</span>
           </a>
           <nav aria-label="Navegação principal" className="hidden items-center gap-6 md:flex">
             <a href="#como-funciona" className="text-sm text-muted-foreground transition hover:text-foreground">Como funciona</a>
@@ -407,7 +407,7 @@ function Landing() {
               <Reveal>
                 <SectionTag>Reservas e agendamentos</SectionTag>
                 <h1 className="mt-5 font-serif text-[2.6rem] leading-[1.05] tracking-tight sm:text-6xl lg:text-[4.1rem]">
-                  Sua empresa recebe reservas.<br className="hidden sm:block" /> O Reservi cuida do resto.
+                  Sua empresa recebe reservas.<br className="hidden sm:block" /> O ReservaLab cuida do resto.
                 </h1>
                 <p className="mt-6 max-w-xl text-[15px] leading-relaxed text-muted-foreground sm:text-lg">
                   Centralize reservas, horários e clientes em um sistema simples, profissional e feito para facilitar sua operação.
@@ -667,7 +667,7 @@ function Landing() {
                   Pronto para organizar as reservas da sua empresa?
                 </h2>
                 <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-primary-foreground/70 sm:text-base">
-                  Fale com a nossa equipe e receba o acesso da sua empresa no Reservi.
+                  Fale com a nossa equipe e receba o acesso da sua empresa no ReservaLab.
                 </p>
                 <div className="mt-9 flex justify-center">
                   <CTAPrimary />
@@ -682,7 +682,7 @@ function Landing() {
       <footer className="border-t border-border bg-card safe-bottom">
         <div className="mx-auto grid max-w-6xl gap-8 px-5 py-12 sm:grid-cols-2">
           <div>
-            <p className="font-serif text-xl">Reservi</p>
+            <p className="font-serif text-xl">ReservaLab</p>
             <p className="mt-2 max-w-sm text-sm text-muted-foreground">
               Sistema de reservas e agendamentos para empresas. Um produto bauerlab.
             </p>
@@ -704,7 +704,7 @@ function Landing() {
         </div>
         <div className="border-t border-border">
           <p className="mx-auto max-w-6xl px-5 py-5 text-[10px] uppercase tracking-[0.22em] text-muted-foreground/60">
-            Reservi · bauerlab
+            ReservaLab · bauerlab
           </p>
         </div>
       </footer>

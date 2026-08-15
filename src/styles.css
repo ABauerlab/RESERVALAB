@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Reservi Design System
+ * ReservaLab Design System
  * Paleta: paper (fundo frio), reservi blue, petrol, teal de confirmação.
  * Tipografia: Space Grotesk (marca/hero) + Inter (UI).
  */
@@ -82,7 +82,7 @@
   --input: oklch(0.88 0.02 260);
   --ring: oklch(0.45 0.19 265);
 
-  /* Reservi tokens */
+  /* ReservaLab tokens */
   --terracotta: oklch(0.45 0.19 265);            /* reservi blue (accent forte) */
   --terracotta-foreground: oklch(0.97 0.01 260);
   --cream: oklch(0.93 0.02 262);                 /* tinta azul clara */

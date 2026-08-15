@@ -15,7 +15,7 @@ import {
 export const Route = createFileRoute("/$slug/admin/relatorios")({
   head: ({ params }) => ({
     meta: [
-      { title: "Relatórios — Reservi" },
+      { title: "Relatórios — ReservaLab" },
       { name: "robots", content: "noindex" },
     ],
     links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),

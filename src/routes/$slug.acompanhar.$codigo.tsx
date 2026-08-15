@@ -21,7 +21,7 @@ import {
 export const Route = createFileRoute("/$slug/acompanhar/$codigo")({
   head: () => ({
     meta: [
-      { title: "Sua reserva — Reservi" },
+      { title: "Sua reserva — ReservaLab" },
       { name: "robots", content: "noindex" },
     ],
   }),

@@ -14,7 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 export const Route = createFileRoute("/$slug/admin/login")({
   head: ({ params }) => ({
     meta: [
-      { title: "Admin — Reservi" },
+      { title: "Admin — ReservaLab" },
       { name: "robots", content: "noindex" },
     ],
     links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),
@@ -91,7 +91,7 @@ function AdminLogin() {
     <main className="flex min-h-screen items-center justify-center bg-background px-5 safe-top safe-bottom">
       <div className="w-full max-w-sm animate-in-up">
         <Link to="/$slug" params={{ slug }} className="mb-10 block text-center">
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-terracotta">Reservi</p>
+          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-terracotta">ReservaLab</p>
           <p className="mt-1 text-xs text-muted-foreground">Painel administrativo</p>
         </Link>
 

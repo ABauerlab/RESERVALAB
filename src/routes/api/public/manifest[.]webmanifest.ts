@@ -14,13 +14,13 @@ export const Route = createFileRoute("/api/public/manifest.webmanifest")({
         const raw = url.searchParams.get("start") ?? "/";
         // Aceita apenas caminhos internos simples.
         const start = /^\/[A-Za-z0-9\-_/]*$/.test(raw) ? raw : "/";
-        const name = url.searchParams.get("name")?.slice(0, 40) || "Reservi";
+        const name = url.searchParams.get("name")?.slice(0, 40) || "ReservaLab";
 
         const manifest = {
           id: start,
           name,
           short_name: name.slice(0, 12),
-          description: "Painel de reservas Reservi.",
+          description: "Painel de reservas ReservaLab.",
           start_url: start,
           scope: "/",
           display: "standalone",
