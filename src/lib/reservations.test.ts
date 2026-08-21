@@ -129,4 +129,41 @@ describe("horariosDisponiveis", () => {
     const sorted = [...slots].sort();
     expect(slots).toEqual(sorted);
   });
+
+  it("aplica o horário-limite de dia de semana configurado pela empresa", () => {
+    const slots = horariosDisponiveis("2026-08-17", 4, { semana: "13:00" }); // segunda-feira
+    expect(slots[slots.length - 1]).toBe("13:00");
+    expect(slots).not.toContain("13:30");
+    expect(slots).not.toContain("15:00");
+  });
+
+  it("aplica o horário-limite de fim de semana configurado pela empresa", () => {
+    const slots = horariosDisponiveis("2026-08-15", 4, { fimDeSemana: "14:00" }); // sábado
+    expect(slots[slots.length - 1]).toBe("14:00");
+    expect(slots).not.toContain("14:30");
+  });
+
+  it("ignora o limite de fim de semana em dia de semana e vice-versa", () => {
+    const semana = horariosDisponiveis("2026-08-17", 4, { fimDeSemana: "10:00" }); // segunda
+    expect(semana[semana.length - 1]).toBe("15:00");
+
+    const fds = horariosDisponiveis("2026-08-15", 4, { semana: "10:00" }); // sábado
+    expect(fds[fds.length - 1]).toBe("17:00");
+  });
+
+  it("aceita horário no formato HH:MM:SS (como vem do Postgres)", () => {
+    const slots = horariosDisponiveis("2026-08-17", 4, { semana: "13:00:00" });
+    expect(slots[slots.length - 1]).toBe("13:00");
+  });
+
+  it("sem limite configurado, mantém o horário de fechamento padrão", () => {
+    const slots = horariosDisponiveis("2026-08-17", 4, {});
+    expect(slots[slots.length - 1]).toBe("15:00");
+  });
+
+  it("não aplica o horário-limite a grupos grandes (acima de 30 pessoas)", () => {
+    const slots = horariosDisponiveis("2026-08-17", 40, { semana: "13:00" });
+    expect(slots).toContain("13:30");
+    expect(slots[slots.length - 1]).toBe("23:00");
+  });
 });
