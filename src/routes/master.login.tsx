@@ -42,10 +42,11 @@ function MasterLogin() {
       }
       const { data } = await supabase.auth.getSession();
       if (data.session) {
-        const { data: isSuper } = await supabase.rpc("has_role", {
+        const { data: isSuper, error } = await supabase.rpc("has_role", {
           _user_id: data.session.user.id, _role: "super_admin",
         });
-        if (isSuper) navigate({ to: "/master" });
+        if (error) console.error("[master/login] Falha ao verificar permissão:", error.message);
+        else if (isSuper) navigate({ to: "/master" });
       }
     })();
   }, [navigate, bootstrap]);
@@ -60,10 +61,17 @@ function MasterLogin() {
       toast.error("E-mail ou senha inválidos.");
       return;
     }
-    const { data: isSuper } = await supabase.rpc("has_role", {
+    const { data: isSuper, error: roleError } = await supabase.rpc("has_role", {
       _user_id: signIn.session.user.id, _role: "super_admin",
     });
     setLoading(false);
+    if (roleError) {
+      // Erro de verificação (ex.: Supabase mal configurado) NÃO é a mesma
+      // coisa que "não é master" — não desloga nem mostra a mensagem errada.
+      console.error("[master/login] Falha ao verificar permissão:", roleError.message);
+      toast.error("Não foi possível verificar seu acesso agora. Tente novamente em instantes.");
+      return;
+    }
     if (!isSuper) {
       await supabase.auth.signOut();
       toast.error("Este acesso não é master.");

@@ -43,9 +43,16 @@ function AdminLogin() {
       await supabase.auth.signOut();
       return;
     }
-    const { data: allowed } = await supabase.rpc("has_tenant_role", {
+    const { data: allowed, error } = await supabase.rpc("has_tenant_role", {
       _user_id: userId, _tenant_id: tenant.id,
     });
+    if (error) {
+      // Erro de verificação (ex.: Supabase mal configurado) NÃO é a mesma
+      // coisa que "login não pertence à empresa" — não desloga o usuário.
+      console.error("[admin/login] Falha ao verificar permissão:", error.message);
+      toast.error("Não foi possível verificar seu acesso agora. Tente novamente em instantes.");
+      return;
+    }
     if (!allowed) {
       await supabase.auth.signOut();
       toast.error("Este login não pertence a esta empresa.");
