@@ -5,14 +5,14 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Iracema Design System
- * Paleta: creme, terracota, marrom escuro, branco, cinza claro.
- * Tipografia: Instrument Serif (marca/hero) + Inter (UI).
+ * ReservaLab Design System
+ * Paleta: paper (fundo frio), reservi blue, petrol, teal de confirmação.
+ * Tipografia: Space Grotesk (marca/hero) + Inter (UI).
  */
 
 @theme inline {
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-serif: "Instrument Serif", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --font-serif: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -49,71 +49,75 @@
 }
 
 :root {
-  --radius: 0.875rem;
+  --radius: 0.75rem;
 
   /* Base */
-  --background: oklch(0.985 0.008 85);           /* creme muito claro */
-  --foreground: oklch(0.22 0.03 40);             /* marrom escuro */
+  --background: oklch(0.97 0.01 260);            /* paper */
+  --foreground: oklch(0.18 0.03 260);            /* ink */
 
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.03 40);
+  --card-foreground: oklch(0.18 0.03 260);
 
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.03 40);
+  --popover-foreground: oklch(0.18 0.03 260);
 
-  /* Primary: marrom escuro */
-  --primary: oklch(0.28 0.035 40);
-  --primary-foreground: oklch(0.985 0.008 85);
+  /* Primary: reservi blue */
+  --primary: oklch(0.45 0.19 265);
+  --primary-foreground: oklch(0.97 0.01 260);
 
-  /* Secondary: creme */
-  --secondary: oklch(0.95 0.015 80);
-  --secondary-foreground: oklch(0.28 0.035 40);
+  /* Secondary: tinta azul clara */
+  --secondary: oklch(0.93 0.015 260);
+  --secondary-foreground: oklch(0.18 0.03 260);
 
-  --muted: oklch(0.96 0.008 85);
-  --muted-foreground: oklch(0.5 0.02 50);
+  --muted: oklch(0.95 0.008 260);
+  --muted-foreground: oklch(0.42 0.025 262);
 
-  --accent: oklch(0.94 0.02 60);
-  --accent-foreground: oklch(0.28 0.035 40);
+  --accent: oklch(0.92 0.03 265);
+  --accent-foreground: oklch(0.33 0.13 265);
 
   --destructive: oklch(0.55 0.19 25);
-  --destructive-foreground: oklch(0.985 0.008 85);
+  --destructive-foreground: oklch(0.97 0.01 260);
 
-  --border: oklch(0.9 0.012 70);
-  --input: oklch(0.92 0.01 70);
-  --ring: oklch(0.55 0.13 45);
+  --border: oklch(0.88 0.02 260);
+  --input: oklch(0.88 0.02 260);
+  --ring: oklch(0.45 0.19 265);
 
-  /* Iracema tokens */
-  --terracotta: oklch(0.62 0.14 42);             /* terracota */
-  --terracotta-foreground: oklch(0.99 0.005 85);
-  --cream: oklch(0.965 0.018 82);
-  --brown: oklch(0.28 0.035 40);
-  --success: oklch(0.58 0.12 150);
+  /* ReservaLab tokens */
+  --terracotta: oklch(0.45 0.19 265);            /* reservi blue (accent forte) */
+  --terracotta-foreground: oklch(0.97 0.01 260);
+  --cream: oklch(0.93 0.02 262);                 /* tinta azul clara */
+  --brown: oklch(0.2 0.05 262);                  /* petrol */
+  --success: oklch(0.63 0.13 165);               /* signal teal */
   --warning: oklch(0.72 0.14 75);
 
   /* Shadows sutis, estilo SaaS */
-  --shadow-sm: 0 1px 2px 0 oklch(0.22 0.03 40 / 0.05);
-  --shadow-md: 0 4px 12px -2px oklch(0.22 0.03 40 / 0.08);
-  --shadow-lg: 0 12px 32px -8px oklch(0.22 0.03 40 / 0.12);
+  --shadow-sm: 0 1px 2px 0 oklch(0.18 0.03 260 / 0.05);
+  --shadow-md: 0 4px 12px -2px oklch(0.18 0.03 260 / 0.08);
+  --shadow-lg: 0 12px 32px -8px oklch(0.18 0.03 260 / 0.12);
 }
 
 .dark {
-  --background: oklch(0.18 0.02 40);
-  --foreground: oklch(0.96 0.01 80);
-  --card: oklch(0.22 0.025 40);
-  --card-foreground: oklch(0.96 0.01 80);
-  --popover: oklch(0.22 0.025 40);
-  --popover-foreground: oklch(0.96 0.01 80);
-  --primary: oklch(0.96 0.01 80);
-  --primary-foreground: oklch(0.22 0.025 40);
-  --secondary: oklch(0.28 0.025 40);
-  --secondary-foreground: oklch(0.96 0.01 80);
-  --muted: oklch(0.26 0.02 40);
-  --muted-foreground: oklch(0.7 0.02 50);
-  --accent: oklch(0.3 0.03 45);
-  --accent-foreground: oklch(0.96 0.01 80);
-  --border: oklch(0.32 0.02 40);
-  --input: oklch(0.32 0.02 40);
-  --ring: oklch(0.6 0.13 45);
+  --background: oklch(0.2 0.05 262);             /* petrol */
+  --foreground: oklch(0.97 0.01 260);            /* paper */
+  --card: oklch(0.24 0.045 262);
+  --card-foreground: oklch(0.97 0.01 260);
+  --popover: oklch(0.24 0.045 262);
+  --popover-foreground: oklch(0.97 0.01 260);
+  --primary: oklch(0.68 0.15 265);
+  --primary-foreground: oklch(0.16 0.04 262);
+  --secondary: oklch(0.28 0.04 262);
+  --secondary-foreground: oklch(0.97 0.01 260);
+  --muted: oklch(0.27 0.035 262);
+  --muted-foreground: oklch(0.72 0.03 262);
+  --accent: oklch(0.32 0.06 265);
+  --accent-foreground: oklch(0.97 0.01 260);
+  --border: oklch(0.34 0.04 262);
+  --input: oklch(0.34 0.04 262);
+  --ring: oklch(0.68 0.15 265);
+  --terracotta: oklch(0.68 0.15 265);
+  --terracotta-foreground: oklch(0.16 0.04 262);
+  --cream: oklch(0.3 0.05 262);
+  --brown: oklch(0.14 0.04 262);
 }
 
 @layer base {
@@ -140,10 +144,10 @@
     letter-spacing: -0.02em;
   }
 
-  /* Serif marca */
+  /* Display da marca (Space Grotesk) — nome da classe mantido por compatibilidade */
   .font-serif {
     font-family: var(--font-serif);
-    letter-spacing: -0.015em;
+    letter-spacing: -0.01em;
   }
 
   /* Fields confortáveis mobile */
