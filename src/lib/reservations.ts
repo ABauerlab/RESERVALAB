@@ -103,37 +103,20 @@ function slots(inicio: string, fim: string, stepMin = 30): string[] {
   return out;
 }
 
-/** Corte configurável por empresa do último horário aceito (seg-sex / sáb-dom). */
-export type HorarioLimites = {
-  semana?: string | null;
-  fimDeSemana?: string | null;
-};
-
 /**
  * Horários oferecidos ao cliente para uma data (YYYY-MM-DD).
  * Padrão: seg–sex 11h–15h, sáb–dom 12h–17h.
  * Acima de 30 pessoas, opções adicionais entram na mesma lista.
- *
- * `limites` permite que cada empresa antecipe o corte (ex.: parar de aceitar
- * reservas 1-2h antes do fechamento, para as mesas não ficarem ocupadas até
- * a casa fechar). Só afeta a janela de capacidade normal (até 30 pessoas) —
- * grupos maiores usam horários estendidos à parte.
  */
-export function horariosDisponiveis(dataIso: string, quantidade: number, limites?: HorarioLimites): string[] {
+export function horariosDisponiveis(dataIso: string, quantidade: number): string[] {
   if (!dataIso) return [];
   const [y, m, d] = dataIso.split("-").map(Number);
   const dia = new Date(y!, (m ?? 1) - 1, d!).getDay(); // 0=dom, 6=sáb
   const fimDeSemana = dia === 0 || dia === 6;
 
-  const fimPadrao = fimDeSemana ? "17:00" : "15:00";
+  const base = fimDeSemana ? slots("12:00", "17:00") : slots("11:00", "15:00");
+  if (quantidade <= 30) return base;
 
-  if (quantidade <= 30) {
-    const limite = (fimDeSemana ? limites?.fimDeSemana : limites?.semana)?.slice(0, 5);
-    const fim = limite || fimPadrao;
-    return fimDeSemana ? slots("12:00", fim) : slots("11:00", fim);
-  }
-
-  const base = fimDeSemana ? slots("12:00", fimPadrao) : slots("11:00", fimPadrao);
   const extras = fimDeSemana
     ? [...slots("09:00", "11:30"), ...slots("17:30", "23:00")]
     : [...slots("08:00", "10:30"), ...slots("15:30", "23:00")];

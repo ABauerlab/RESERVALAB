@@ -215,8 +215,6 @@ export type Database = {
           created_at: string
           email_contato: string | null
           endereco: string | null
-          horario_limite_fim_semana: string | null
-          horario_limite_semana: string | null
           id: string
           logo_url: string | null
           mensagem_confirmacao: string | null
@@ -233,8 +231,6 @@ export type Database = {
           created_at?: string
           email_contato?: string | null
           endereco?: string | null
-          horario_limite_fim_semana?: string | null
-          horario_limite_semana?: string | null
           id?: string
           logo_url?: string | null
           mensagem_confirmacao?: string | null
@@ -251,8 +247,6 @@ export type Database = {
           created_at?: string
           email_contato?: string | null
           endereco?: string | null
-          horario_limite_fim_semana?: string | null
-          horario_limite_semana?: string | null
           id?: string
           logo_url?: string | null
           mensagem_confirmacao?: string | null
