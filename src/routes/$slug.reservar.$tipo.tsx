@@ -88,11 +88,8 @@ function ReservarPage() {
   const hoje = useMemo(() => new Date().toISOString().slice(0, 10), []);
 
   const horariosOpcoes = useMemo(
-    () => (precisaHorario ? horariosDisponiveis(data, quantidade, {
-      semana: tenantQ.data?.horario_limite_semana,
-      fimDeSemana: tenantQ.data?.horario_limite_fim_semana,
-    }) : []),
-    [precisaHorario, data, quantidade, tenantQ.data?.horario_limite_semana, tenantQ.data?.horario_limite_fim_semana],
+    () => (precisaHorario ? horariosDisponiveis(data, quantidade) : []),
+    [precisaHorario, data, quantidade],
   );
 
   // Mantém a seleção válida quando data/quantidade mudam.
