@@ -48,10 +48,14 @@ export const Route = createFileRoute("/")({
           "Organize reservas, horários e clientes em um único sistema. Simplifique a gestão de reservas da sua empresa com o ReservaLab.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://reservatestelab.lovable.app/" },
+      { property: "og:url", content: "https://reserva.bauerlab.com.br/" },
+      { property: "og:image", content: "https://reserva.bauerlab.com.br/og-image.png" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "https://reserva.bauerlab.com.br/og-image.png" },
     ],
-    links: [{ rel: "canonical", href: "https://reservatestelab.lovable.app/" }],
+    links: [{ rel: "canonical", href: "https://reserva.bauerlab.com.br/" }],
     scripts: [
       {
         type: "application/ld+json",
