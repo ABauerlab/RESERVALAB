@@ -54,9 +54,16 @@ function MasterPanel() {
     (async () => {
       const { data } = await supabase.auth.getSession();
       if (!data.session) { navigate({ to: "/master/login" }); return; }
-      const { data: isSuper } = await supabase.rpc("has_role", {
+      const { data: isSuper, error } = await supabase.rpc("has_role", {
         _user_id: data.session.user.id, _role: "super_admin",
       });
+      if (error) {
+        // Erro de verificação (ex.: Supabase mal configurado) NÃO é a mesma
+        // coisa que "sem permissão" — não desloga o usuário.
+        console.error("[master] Falha ao verificar permissão:", error.message);
+        toast.error("Não foi possível verificar seu acesso agora. Tente novamente em instantes.");
+        return;
+      }
       if (!isSuper) { await supabase.auth.signOut(); navigate({ to: "/master/login" }); return; }
       setReady(true);
     })();
