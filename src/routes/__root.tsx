@@ -75,7 +75,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" },
       { title: "ReservaLab — Reservas simples e modernas" },
       { name: "description", content: "ReservaLab: sistema de reservas para restaurantes e eventos. Simples para o cliente, poderoso para o gestor." },
-      { name: "theme-color", content: "#171410" },
+      { name: "theme-color", content: "#10131f" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
       { name: "apple-mobile-web-app-title", content: "ReservaLab" },
