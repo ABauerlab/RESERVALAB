@@ -20,8 +20,11 @@ dist-ssr
 .wrangler/
 .dev.vars
 
-# Segredos locais — nunca commitar (chaves de serviço, VAPID, etc.)
-.env
+# .env é commitado de propósito: este deploy (Lovable Cloud) usa esse
+# arquivo para injetar VITE_SUPABASE_URL/VITE_SUPABASE_PUBLISHABLE_KEY no
+# build do Vite — só contém a publishable/anon key, pública por design.
+# NÃO remover de novo sem confirmar que o build client-side ainda funciona.
+# Outras variantes (.env.local, .env.production etc.) continuam ignoradas.
 .env.*
 !.env.example
 
