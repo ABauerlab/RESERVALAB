@@ -5,8 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Iracema Design System
- * Paleta: creme, terracota, marrom escuro, branco, cinza claro.
+ * ReservaLab Design System
+ * Paleta: preto quente, dourado/amarelo, creme claro.
  * Tipografia: Instrument Serif (marca/hero) + Inter (UI).
  */
 
@@ -52,68 +52,72 @@
   --radius: 0.875rem;
 
   /* Base */
-  --background: oklch(0.985 0.008 85);           /* creme muito claro */
-  --foreground: oklch(0.22 0.03 40);             /* marrom escuro */
+  --background: oklch(0.97 0.014 88);            /* creme quente */
+  --foreground: oklch(0.16 0.02 80);              /* preto quase puro, com calor */
 
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.03 40);
+  --card-foreground: oklch(0.16 0.02 80);
 
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.03 40);
+  --popover-foreground: oklch(0.16 0.02 80);
 
-  /* Primary: marrom escuro */
-  --primary: oklch(0.28 0.035 40);
-  --primary-foreground: oklch(0.985 0.008 85);
+  /* Primary: dourado/amarelo */
+  --primary: oklch(0.78 0.16 92);
+  --primary-foreground: oklch(0.16 0.02 80);
 
   /* Secondary: creme */
-  --secondary: oklch(0.95 0.015 80);
-  --secondary-foreground: oklch(0.28 0.035 40);
+  --secondary: oklch(0.94 0.02 85);
+  --secondary-foreground: oklch(0.16 0.02 80);
 
-  --muted: oklch(0.96 0.008 85);
-  --muted-foreground: oklch(0.5 0.02 50);
+  --muted: oklch(0.95 0.01 85);
+  --muted-foreground: oklch(0.45 0.02 75);
 
-  --accent: oklch(0.94 0.02 60);
-  --accent-foreground: oklch(0.28 0.035 40);
+  --accent: oklch(0.92 0.05 92);
+  --accent-foreground: oklch(0.2 0.03 80);
 
   --destructive: oklch(0.55 0.19 25);
-  --destructive-foreground: oklch(0.985 0.008 85);
+  --destructive-foreground: oklch(0.97 0.01 85);
 
-  --border: oklch(0.9 0.012 70);
-  --input: oklch(0.92 0.01 70);
-  --ring: oklch(0.55 0.13 45);
+  --border: oklch(0.88 0.02 85);
+  --input: oklch(0.9 0.015 85);
+  --ring: oklch(0.78 0.16 92);
 
-  /* Iracema tokens */
-  --terracotta: oklch(0.62 0.14 42);             /* terracota */
-  --terracotta-foreground: oklch(0.99 0.005 85);
-  --cream: oklch(0.965 0.018 82);
-  --brown: oklch(0.28 0.035 40);
+  /* ReservaLab tokens */
+  --terracotta: oklch(0.78 0.16 92);             /* dourado/amarelo (accent forte) */
+  --terracotta-foreground: oklch(0.16 0.02 80);
+  --cream: oklch(0.93 0.03 90);
+  --brown: oklch(0.16 0.02 80);                  /* preto, usado em faixas/rodapés escuros */
   --success: oklch(0.58 0.12 150);
   --warning: oklch(0.72 0.14 75);
 
   /* Shadows sutis, estilo SaaS */
-  --shadow-sm: 0 1px 2px 0 oklch(0.22 0.03 40 / 0.05);
-  --shadow-md: 0 4px 12px -2px oklch(0.22 0.03 40 / 0.08);
-  --shadow-lg: 0 12px 32px -8px oklch(0.22 0.03 40 / 0.12);
+  --shadow-sm: 0 1px 2px 0 oklch(0.16 0.02 80 / 0.06);
+  --shadow-md: 0 4px 12px -2px oklch(0.16 0.02 80 / 0.1);
+  --shadow-lg: 0 12px 32px -8px oklch(0.16 0.02 80 / 0.16);
 }
 
 .dark {
-  --background: oklch(0.18 0.02 40);
-  --foreground: oklch(0.96 0.01 80);
-  --card: oklch(0.22 0.025 40);
-  --card-foreground: oklch(0.96 0.01 80);
-  --popover: oklch(0.22 0.025 40);
-  --popover-foreground: oklch(0.96 0.01 80);
-  --primary: oklch(0.96 0.01 80);
-  --primary-foreground: oklch(0.22 0.025 40);
-  --secondary: oklch(0.28 0.025 40);
-  --secondary-foreground: oklch(0.96 0.01 80);
-  --muted: oklch(0.26 0.02 40);
-  --muted-foreground: oklch(0.7 0.02 50);
-  --accent: oklch(0.3 0.03 45);
-  --accent-foreground: oklch(0.96 0.01 80);
-  --border: oklch(0.32 0.02 40);
-  --input: oklch(0.32 0.02 40);
-  --ring: oklch(0.6 0.13 45);
+  --background: oklch(0.14 0.02 80);             /* preto profundo */
+  --foreground: oklch(0.96 0.02 88);             /* creme quase branco */
+  --card: oklch(0.18 0.02 80);
+  --card-foreground: oklch(0.96 0.02 88);
+  --popover: oklch(0.18 0.02 80);
+  --popover-foreground: oklch(0.96 0.02 88);
+  --primary: oklch(0.8 0.16 92);
+  --primary-foreground: oklch(0.14 0.02 80);
+  --secondary: oklch(0.24 0.02 80);
+  --secondary-foreground: oklch(0.96 0.02 88);
+  --muted: oklch(0.22 0.015 80);
+  --muted-foreground: oklch(0.68 0.02 85);
+  --accent: oklch(0.28 0.04 90);
+  --accent-foreground: oklch(0.96 0.02 88);
+  --border: oklch(0.3 0.02 80);
+  --input: oklch(0.3 0.02 80);
+  --ring: oklch(0.8 0.16 92);
+  --terracotta: oklch(0.8 0.16 92);
+  --terracotta-foreground: oklch(0.14 0.02 80);
+  --cream: oklch(0.26 0.03 88);
+  --brown: oklch(0.1 0.015 80);
 }
 
 @layer base {

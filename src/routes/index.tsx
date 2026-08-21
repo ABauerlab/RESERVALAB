@@ -704,7 +704,15 @@ function Landing() {
         </div>
         <div className="border-t border-border">
           <p className="mx-auto max-w-6xl px-5 py-5 text-[10px] uppercase tracking-[0.22em] text-muted-foreground/60">
-            ReservaLab · bauerlab
+            © {new Date().getFullYear()} BauerLab. Todos os direitos reservados. ·{" "}
+            <a
+              href="https://bauerlab.com.br"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition hover:text-foreground"
+            >
+              bauerlab.com.br
+            </a>
           </p>
         </div>
       </footer>
