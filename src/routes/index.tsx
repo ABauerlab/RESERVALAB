@@ -36,7 +36,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Organize reservas, horários e clientes em um único sistema. Simplifique a gestão de reservas da sua empresa com o ReservaLab.",
+          "Organize reservas de restaurantes, bares, estúdios e clínicas em um único sistema, com confirmação automática por WhatsApp.",
       },
       {
         property: "og:title",
@@ -45,7 +45,7 @@ export const Route = createFileRoute("/")({
       {
         property: "og:description",
         content:
-          "Organize reservas, horários e clientes em um único sistema. Simplifique a gestão de reservas da sua empresa com o ReservaLab.",
+          "Organize reservas de restaurantes, bares, estúdios e clínicas em um único sistema, com confirmação automática por WhatsApp.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://reserva.bauerlab.com.br/" },
@@ -414,7 +414,7 @@ function Landing() {
                   Sua empresa recebe reservas.<br className="hidden sm:block" /> O ReservaLab cuida do resto.
                 </h1>
                 <p className="mt-6 max-w-xl text-[15px] leading-relaxed text-muted-foreground sm:text-lg">
-                  Centralize reservas, horários e clientes em um sistema simples, profissional e feito para facilitar sua operação.
+                  Centralize reservas, horários e clientes em um sistema simples e profissional — sem depender de conversas perdidas no WhatsApp.
                 </p>
               </Reveal>
               <Reveal delay={120}>
@@ -676,6 +676,9 @@ function Landing() {
                 <div className="mt-9 flex justify-center">
                   <CTAPrimary />
                 </div>
+                <p className="mt-4 text-xs text-primary-foreground/60">
+                  Sem compromisso — é só uma conversa pra ver se faz sentido pra sua empresa.
+                </p>
               </div>
             </Reveal>
           </div>
