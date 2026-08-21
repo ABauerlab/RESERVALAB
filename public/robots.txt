@@ -5,3 +5,5 @@ Disallow: /*/admin
 Disallow: /*/reservar
 Disallow: /*/obrigado
 Disallow: /*/acompanhar
+
+Sitemap: https://reserva.bauerlab.com.br/sitemap.xml
