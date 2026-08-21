@@ -46,6 +46,8 @@ function ConfiguracoesPage() {
   const [cor, setCor] = useState("#B4552D");
   const [tipos, setTipos] = useState<ReservaTipo[]>([]);
   const [mensagem, setMensagem] = useState("");
+  const [limiteSemana, setLimiteSemana] = useState("");
+  const [limiteFimDeSemana, setLimiteFimDeSemana] = useState("");
 
   useEffect(() => {
     if (!tenant) return;
@@ -58,6 +60,8 @@ function ConfiguracoesPage() {
     setCor(tenant.cor_primaria ?? "#B4552D");
     setTipos((tenant.tipos_aceitos ?? []) as ReservaTipo[]);
     setMensagem(tenant.mensagem_confirmacao ?? DEFAULT_MENSAGEM_CONFIRMACAO);
+    setLimiteSemana(tenant.horario_limite_semana?.slice(0, 5) ?? "");
+    setLimiteFimDeSemana(tenant.horario_limite_fim_semana?.slice(0, 5) ?? "");
   }, [tenant]);
 
   const salvar = useMutation({
@@ -74,6 +78,8 @@ function ConfiguracoesPage() {
           cor_primaria: cor,
           tipos_aceitos: tipos.length > 0 ? tipos : TODOS_TIPOS,
           mensagem_confirmacao: mensagem.trim() || DEFAULT_MENSAGEM_CONFIRMACAO,
+          horario_limite_semana: limiteSemana || null,
+          horario_limite_fim_semana: limiteFimDeSemana || null,
         })
         .eq("id", tenant!.id);
       if (error) throw error;
@@ -174,6 +180,25 @@ function ConfiguracoesPage() {
                   </button>
                 );
               })}
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
+            <div>
+              <h3 className="font-medium">Horário-limite para reservas</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Último horário aceito para mesa/aniversário (capacidade normal, até 30 pessoas). Deixe em branco para não aplicar corte, além do horário de fechamento padrão.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label className="text-[13px]">Dias de semana (seg–sex)</Label>
+                <Input type="time" value={limiteSemana} onChange={(e) => setLimiteSemana(e.target.value)} className="h-11 rounded-xl" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[13px]">Fim de semana (sáb–dom)</Label>
+                <Input type="time" value={limiteFimDeSemana} onChange={(e) => setLimiteFimDeSemana(e.target.value)} className="h-11 rounded-xl" />
+              </div>
             </div>
           </div>
 
