@@ -78,4 +78,25 @@ describe("getTenantBySlug", () => {
 
     expect(from).toHaveBeenCalledTimes(3);
   });
+
+  it("erro de consulta retorna null mas NÃO fica em cache (evita confundir com 'não encontrado')", async () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    maybeSingle.mockResolvedValueOnce({ data: null, error: { message: "JWT inválido" } });
+    const primeiraTentativa = await getTenantBySlug("iracema");
+    expect(primeiraTentativa).toBeNull();
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Falha ao buscar "iracema"'),
+      "JWT inválido",
+    );
+
+    // Uma segunda chamada, já sem erro, deve bater no banco de novo — não
+    // pode ter ficado presa em cache como "tenant inexistente".
+    maybeSingle.mockResolvedValueOnce({ data: { id: "1", slug: "iracema" } });
+    const segundaTentativa = await getTenantBySlug("iracema");
+    expect(segundaTentativa).toEqual({ id: "1", slug: "iracema" });
+    expect(from).toHaveBeenCalledTimes(2);
+
+    errorSpy.mockRestore();
+  });
 });
