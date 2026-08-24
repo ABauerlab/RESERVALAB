@@ -11,12 +11,12 @@ import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import {
-  AREA_LABEL, STATUS_LABEL, STATUS_LIST, TIPO_LABEL, TIPO_SHORT,
+  AREA_LABEL, MOTIVO_CANCELAMENTO_OPCOES, STATUS_LABEL, STATUS_LIST, TIPO_LABEL, TIPO_SHORT,
   formatData, formatHorario, telefoneToWhatsApp,
   type Reserva, type ReservaArea, type ReservaStatus, type ReservaTipo, type ReservaUpdate,
 } from "@/lib/reservations";
 import { getTenantBySlug } from "@/lib/tenant";
-import { buildMensagemConfirmacao, whatsappUrl } from "@/lib/confirmacao";
+import { buildMensagemCancelamento, buildMensagemConfirmacao, whatsappUrl } from "@/lib/confirmacao";
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { MensagemDoDiaButton } from "@/components/admin/MensagemDoDia";
@@ -246,6 +246,24 @@ function AdminDashboard() {
     window.open(whatsappUrl(numero, msg), "_blank", "noopener");
   }
 
+  async function handleCancel(r: Reserva, motivo: string) {
+    await updateReserva.mutateAsync({
+      id: r.id,
+      patch: { status: "cancelada", motivo_cancelamento: motivo || null },
+    });
+    toast.success("Reserva cancelada.");
+    const numero = telefoneToWhatsApp(r.telefone);
+    if (!numero) return;
+    const tenant = await getTenantBySlug(slug);
+    const msg = buildMensagemCancelamento(tenant?.mensagem_cancelamento, {
+      reserva: r,
+      empresaNome: tenant?.nome ?? "",
+      motivoCancelamento: motivo,
+      linkNovaReserva: `${window.location.origin}/${slug}`,
+    });
+    window.open(whatsappUrl(numero, msg), "_blank", "noopener");
+  }
+
 
   async function handleEnablePush() {
     if (!tenantId) return;
@@ -406,6 +424,7 @@ function AdminDashboard() {
         onConfirm={() => selected && handleConfirm(selected)}
         onSetStatus={(status) => selected && updateReserva.mutate({ id: selected.id, patch: { status } })}
         onSave={(patch) => selected ? updateReserva.mutateAsync({ id: selected.id, patch }) : Promise.resolve()}
+        onCancel={(motivo) => selected ? handleCancel(selected, motivo) : Promise.resolve()}
         onDelete={() => selected && deleteReserva.mutate(selected.id)}
         pending={updateReserva.isPending || deleteReserva.isPending}
       />
@@ -480,20 +499,30 @@ function ReservaCard({ r, onClick, delay }: { r: Reserva; onClick: () => void; d
 }
 
 function ReservaDialog({
-  reserva, onClose, onConfirm, onSetStatus, onSave, onDelete, pending,
+  reserva, onClose, onConfirm, onSetStatus, onSave, onCancel, onDelete, pending,
 }: {
   reserva: Reserva | null;
   onClose: () => void;
   onConfirm: () => void;
   onSetStatus: (s: ReservaStatus) => void;
   onSave: (patch: ReservaUpdate) => Promise<void>;
+  onCancel: (motivo: string) => Promise<void>;
   onDelete: () => void;
   pending: boolean;
 }) {
   const [editing, setEditing] = useState(false);
+  const [cancelando, setCancelando] = useState(false);
+  const [motivo, setMotivo] = useState<string>(MOTIVO_CANCELAMENTO_OPCOES[0]);
+  const [motivoDetalhe, setMotivoDetalhe] = useState("");
   const [form, setForm] = useState<ReservaUpdate>({});
 
-  useEffect(() => { setEditing(false); setForm({}); }, [reserva?.id]);
+  useEffect(() => {
+    setEditing(false);
+    setCancelando(false);
+    setMotivo(MOTIVO_CANCELAMENTO_OPCOES[0]);
+    setMotivoDetalhe("");
+    setForm({});
+  }, [reserva?.id]);
 
   const r = reserva;
 
@@ -505,6 +534,17 @@ function ReservaDialog({
       leva_bolo: r.leva_bolo, comandas: r.comandas, status: r.status,
     });
     setEditing(true);
+  }
+
+  function startRemarcar() {
+    setCancelando(false);
+    startEdit();
+  }
+
+  async function confirmarCancelamento() {
+    const motivoFinal = motivo === "Outro" && motivoDetalhe.trim() ? motivoDetalhe.trim() : motivo;
+    await onCancel(motivoFinal);
+    setCancelando(false);
   }
 
   async function saveEdit() {
@@ -537,7 +577,15 @@ function ReservaDialog({
             </DialogHeader>
 
             <div className="max-h-[55vh] overflow-y-auto p-5">
-              {editing ? (
+              {cancelando ? (
+                <CancelFields
+                  motivo={motivo}
+                  setMotivo={setMotivo}
+                  motivoDetalhe={motivoDetalhe}
+                  setMotivoDetalhe={setMotivoDetalhe}
+                  onRemarcar={startRemarcar}
+                />
+              ) : editing ? (
                 <EditFields r={r} form={form} setForm={setForm} />
               ) : (
                 <div className="space-y-3.5 text-sm">
@@ -560,7 +608,12 @@ function ReservaDialog({
             </div>
 
             <DialogFooter className="border-t border-border/70 bg-muted/40 p-4 flex-col gap-2 sm:flex-col sm:space-x-0">
-              {editing ? (
+              {cancelando ? (
+                <div className="grid w-full grid-cols-2 gap-2">
+                  <ActionBtn onClick={() => setCancelando(false)} icon={X}>Voltar</ActionBtn>
+                  <ActionBtn onClick={confirmarCancelamento} disabled={pending} variant="danger" icon={X}>Confirmar cancelamento</ActionBtn>
+                </div>
+              ) : editing ? (
                 <div className="grid w-full grid-cols-2 gap-2">
                   <ActionBtn onClick={() => setEditing(false)} icon={X}>Cancelar</ActionBtn>
                   <ActionBtn onClick={saveEdit} disabled={pending} variant="primary" icon={Save}>Salvar</ActionBtn>
@@ -573,7 +626,7 @@ function ReservaDialog({
                   </div>
                   <div className="grid w-full grid-cols-3 gap-2">
                     <ActionBtn disabled={pending || r.status === "finalizada"} onClick={() => onSetStatus("finalizada")} icon={CheckCircle2}>Finalizar</ActionBtn>
-                    <ActionBtn disabled={pending || r.status === "cancelada"} onClick={() => onSetStatus("cancelada")} variant="danger" icon={X}>Cancelar</ActionBtn>
+                    <ActionBtn disabled={pending || r.status === "cancelada"} onClick={() => setCancelando(true)} variant="danger" icon={X}>Cancelar</ActionBtn>
                     <ActionBtn disabled={pending} onClick={confirmDelete} variant="danger" icon={Trash2}>Excluir</ActionBtn>
                   </div>
                 </>
@@ -632,6 +685,58 @@ function EditFields({ r, form, setForm }: { r: Reserva; form: ReservaUpdate; set
         <FieldRow label="Tipo do evento"><Input value={form.tipo_evento ?? ""} onChange={(e) => set("tipo_evento", e.target.value)} className="h-10 rounded-lg" /></FieldRow>
       )}
       <FieldRow label="Observações"><Textarea value={form.observacoes ?? ""} onChange={(e) => set("observacoes", e.target.value)} className="min-h-20 rounded-lg" /></FieldRow>
+    </div>
+  );
+}
+
+function CancelFields({
+  motivo, setMotivo, motivoDetalhe, setMotivoDetalhe, onRemarcar,
+}: {
+  motivo: string;
+  setMotivo: (v: string) => void;
+  motivoDetalhe: string;
+  setMotivoDetalhe: (v: string) => void;
+  onRemarcar: () => void;
+}) {
+  return (
+    <div className="space-y-4 text-sm">
+      <button
+        onClick={onRemarcar}
+        className="w-full rounded-xl border border-terracotta/30 bg-terracotta/5 p-4 text-left transition-colors hover:bg-terracotta/10"
+      >
+        <p className="font-medium text-terracotta">Remarcar em vez de cancelar</p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Altere a data ou o horário e mantenha a reserva — o cliente não precisa fazer tudo de novo.
+        </p>
+      </button>
+
+      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+        <div className="h-px flex-1 bg-border" /> ou cancele mesmo assim <div className="h-px flex-1 bg-border" />
+      </div>
+
+      <FieldRow label="Motivo do cancelamento">
+        <Select value={motivo} onValueChange={setMotivo}>
+          <SelectTrigger className="h-10 rounded-lg"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            {MOTIVO_CANCELAMENTO_OPCOES.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+          </SelectContent>
+        </Select>
+      </FieldRow>
+
+      {motivo === "Outro" && (
+        <FieldRow label="Detalhe">
+          <Textarea
+            value={motivoDetalhe}
+            onChange={(e) => setMotivoDetalhe(e.target.value)}
+            placeholder="Descreva o motivo…"
+            className="min-h-20 rounded-lg"
+          />
+        </FieldRow>
+      )}
+
+      <p className="text-xs text-muted-foreground">
+        Ao confirmar, o cliente recebe um aviso no WhatsApp com o motivo e um link para fazer uma nova reserva quando quiser.
+      </p>
     </div>
   );
 }

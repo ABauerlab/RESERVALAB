@@ -30,6 +30,14 @@ export const STATUS_LABEL: Record<ReservaStatus, string> = {
 
 export const STATUS_LIST: ReservaStatus[] = ["pendente", "confirmada", "cancelada", "finalizada"];
 
+export const MOTIVO_CANCELAMENTO_OPCOES = [
+  "Cliente desistiu",
+  "Cliente não compareceu",
+  "Pedido do cliente por telefone/WhatsApp",
+  "Indisponibilidade da casa",
+  "Outro",
+] as const;
+
 export const AREA_LABEL: Record<ReservaArea, string> = {
   interna: "Interna",
   externa: "Externa",

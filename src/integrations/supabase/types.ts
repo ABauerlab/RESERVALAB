@@ -150,6 +150,7 @@ export type Database = {
           horario: string | null
           id: string
           leva_bolo: boolean | null
+          motivo_cancelamento: string | null
           nome: string
           observacoes: string | null
           quantidade: number | null
@@ -169,6 +170,7 @@ export type Database = {
           horario?: string | null
           id?: string
           leva_bolo?: boolean | null
+          motivo_cancelamento?: string | null
           nome: string
           observacoes?: string | null
           quantidade?: number | null
@@ -188,6 +190,7 @@ export type Database = {
           horario?: string | null
           id?: string
           leva_bolo?: boolean | null
+          motivo_cancelamento?: string | null
           nome?: string
           observacoes?: string | null
           quantidade?: number | null
@@ -219,6 +222,7 @@ export type Database = {
           horario_limite_semana: string | null
           id: string
           logo_url: string | null
+          mensagem_cancelamento: string | null
           mensagem_confirmacao: string | null
           nome: string
           slug: string
@@ -237,6 +241,7 @@ export type Database = {
           horario_limite_semana?: string | null
           id?: string
           logo_url?: string | null
+          mensagem_cancelamento?: string | null
           mensagem_confirmacao?: string | null
           nome: string
           slug: string
@@ -255,6 +260,7 @@ export type Database = {
           horario_limite_semana?: string | null
           id?: string
           logo_url?: string | null
+          mensagem_cancelamento?: string | null
           mensagem_confirmacao?: string | null
           nome?: string
           slug?: string
@@ -340,6 +346,7 @@ export type Database = {
           horario: string | null
           id: string
           leva_bolo: boolean | null
+          motivo_cancelamento: string | null
           nome: string
           observacoes: string | null
           quantidade: number | null
@@ -386,6 +393,7 @@ export type Database = {
           horario: string | null
           id: string
           leva_bolo: boolean | null
+          motivo_cancelamento: string | null
           nome: string
           observacoes: string | null
           quantidade: number | null
