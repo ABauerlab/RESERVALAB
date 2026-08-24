@@ -28,6 +28,24 @@ Se precisar alterar ou cancelar, acesse:
 
 Ate breve.`;
 
+/**
+ * Template padrão da mensagem de cancelamento enviada ao cliente no WhatsApp.
+ * Sempre inclui o link para fazer uma nova reserva, reforçando que o cliente
+ * continua no controle mesmo com o cancelamento.
+ */
+export const DEFAULT_MENSAGEM_CANCELAMENTO = `Ola {nome}, tudo bem?
+
+Sua reserva no {empresa} (codigo {codigo}) foi CANCELADA.
+
+Data: {data}
+Horario: {horario}
+Motivo: {motivo_cancelamento}
+
+Se quiser, voce pode fazer uma nova reserva a qualquer momento:
+{link_nova_reserva}
+
+Qualquer duvida, e so chamar.`;
+
 export const PLACEHOLDERS: Array<{ token: string; descricao: string }> = [
   { token: "{nome}", descricao: "Nome do cliente" },
   { token: "{empresa}", descricao: "Nome do estabelecimento" },
@@ -40,6 +58,18 @@ export const PLACEHOLDERS: Array<{ token: string; descricao: string }> = [
   { token: "{endereco}", descricao: "Endereço do estabelecimento" },
   { token: "{telefone_empresa}", descricao: "Telefone de contato" },
   { token: "{link_acompanhar}", descricao: "Link direto da reserva" },
+];
+
+export const PLACEHOLDERS_CANCELAMENTO: Array<{ token: string; descricao: string }> = [
+  { token: "{nome}", descricao: "Nome do cliente" },
+  { token: "{empresa}", descricao: "Nome do estabelecimento" },
+  { token: "{codigo}", descricao: "Código de acompanhamento" },
+  { token: "{data}", descricao: "Data da reserva" },
+  { token: "{horario}", descricao: "Horário da reserva" },
+  { token: "{pessoas}", descricao: "Quantidade de pessoas" },
+  { token: "{tipo}", descricao: "Tipo da reserva" },
+  { token: "{motivo_cancelamento}", descricao: "Motivo do cancelamento" },
+  { token: "{link_nova_reserva}", descricao: "Link para fazer uma nova reserva" },
 ];
 
 export type ConfirmacaoContexto = {
@@ -103,6 +133,49 @@ export function buildMensagemConfirmacao(
   return out;
 }
 
+
+export type CancelamentoContexto = {
+  reserva: Reserva;
+  empresaNome: string;
+  motivoCancelamento?: string | null;
+  linkNovaReserva: string;
+};
+
+export function buildMensagemCancelamento(
+  template: string | null | undefined,
+  ctx: CancelamentoContexto,
+): string {
+  const r = ctx.reserva;
+  const tpl = (template && template.trim().length > 0)
+    ? template
+    : DEFAULT_MENSAGEM_CANCELAMENTO;
+
+  const valores: Record<string, string> = {
+    "{nome}": r.nome ?? "",
+    "{empresa}": ctx.empresaNome ?? "",
+    "{codigo}": r.codigo_acompanhamento ?? "",
+    "{data}": r.data ? formatData(r.data) : "",
+    "{horario}": r.horario ? formatHorario(r.horario) : "",
+    "{pessoas}": r.quantidade != null ? String(r.quantidade) : "",
+    "{tipo}": TIPO_LABEL[r.tipo] ?? "",
+    "{motivo_cancelamento}": ctx.motivoCancelamento ?? "",
+    "{link_nova_reserva}": ctx.linkNovaReserva,
+  };
+
+  let out = tpl;
+  for (const [token, valor] of Object.entries(valores)) {
+    out = out.split(token).join(valor);
+  }
+  out = limparLinhasVazias(out);
+
+  const extras: string[] = [];
+  if (!tpl.includes("{link_nova_reserva}") && ctx.linkNovaReserva) {
+    extras.push("Faça uma nova reserva quando quiser:", ctx.linkNovaReserva);
+  }
+  if (extras.length > 0) out = `${out}\n\n${extras.join("\n")}`;
+
+  return out;
+}
 
 /**
  * Monta a URL do WhatsApp. Usa api.whatsapp.com/send, que lida melhor com

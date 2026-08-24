@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   DEFAULT_MENSAGEM_CONFIRMACAO,
+  buildMensagemCancelamento,
   buildMensagemConfirmacao,
   whatsappUrl,
+  type CancelamentoContexto,
   type ConfirmacaoContexto,
 } from "@/lib/confirmacao";
 import type { Reserva } from "@/lib/reservations";
@@ -101,6 +103,51 @@ describe("buildMensagemConfirmacao", () => {
   it("colapsa múltiplas linhas em branco resultantes da limpeza", () => {
     const msg = buildMensagemConfirmacao("{nome}\n\n\n\n{empresa}", makeContexto());
     expect(msg).not.toMatch(/\n{3,}/);
+  });
+});
+
+function makeCancelamentoContexto(overrides: Partial<CancelamentoContexto> = {}): CancelamentoContexto {
+  return {
+    reserva: makeReserva({ status: "cancelada" }),
+    empresaNome: "Restaurante Exemplo",
+    motivoCancelamento: "Cliente desistiu",
+    linkNovaReserva: "https://exemplo.com/restaurante-exemplo",
+    ...overrides,
+  };
+}
+
+describe("buildMensagemCancelamento", () => {
+  it("substitui todos os placeholders do template padrão", () => {
+    const msg = buildMensagemCancelamento(null, makeCancelamentoContexto());
+    expect(msg).toContain("Ola Maria, tudo bem?");
+    expect(msg).toContain("codigo ABC123");
+    expect(msg).toContain("Data: 17/08/2026");
+    expect(msg).toContain("Horario: 19:30");
+    expect(msg).toContain("Motivo: Cliente desistiu");
+    expect(msg).toContain("https://exemplo.com/restaurante-exemplo");
+  });
+
+  it("usa o template padrão quando nenhum template customizado é passado", () => {
+    const msg = buildMensagemCancelamento(undefined, makeCancelamentoContexto());
+    expect(msg.startsWith("Ola Maria, tudo bem?")).toBe(true);
+  });
+
+  it("remove a linha de motivo quando nenhum motivo é informado", () => {
+    const msg = buildMensagemCancelamento(null, makeCancelamentoContexto({ motivoCancelamento: null }));
+    expect(msg).not.toMatch(/^Motivo:\s*$/m);
+  });
+
+  it("acrescenta o link de nova reserva quando o template customizado não o inclui", () => {
+    const msg = buildMensagemCancelamento("Oi {nome}, cancelado.", makeCancelamentoContexto());
+    expect(msg).toContain("https://exemplo.com/restaurante-exemplo");
+  });
+
+  it("não duplica o link quando o template customizado já o inclui", () => {
+    const msg = buildMensagemCancelamento(
+      "Oi {nome}, cancelado. Nova reserva: {link_nova_reserva}",
+      makeCancelamentoContexto(),
+    );
+    expect(msg.match(/https:\/\/exemplo\.com\/restaurante-exemplo/g)?.length).toBe(1);
   });
 });
 

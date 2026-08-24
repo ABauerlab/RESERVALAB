@@ -10,7 +10,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { clearTenantCache } from "@/lib/tenant";
-import { DEFAULT_MENSAGEM_CONFIRMACAO, PLACEHOLDERS } from "@/lib/confirmacao";
+import {
+  DEFAULT_MENSAGEM_CANCELAMENTO, DEFAULT_MENSAGEM_CONFIRMACAO,
+  PLACEHOLDERS, PLACEHOLDERS_CANCELAMENTO,
+} from "@/lib/confirmacao";
 import { TIPO_LABEL, type ReservaTipo } from "@/lib/reservations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,6 +49,7 @@ function ConfiguracoesPage() {
   const [cor, setCor] = useState("#B4552D");
   const [tipos, setTipos] = useState<ReservaTipo[]>([]);
   const [mensagem, setMensagem] = useState("");
+  const [mensagemCancelamento, setMensagemCancelamento] = useState("");
   const [limiteSemana, setLimiteSemana] = useState("");
   const [limiteFimDeSemana, setLimiteFimDeSemana] = useState("");
 
@@ -60,6 +64,7 @@ function ConfiguracoesPage() {
     setCor(tenant.cor_primaria ?? "#B4552D");
     setTipos((tenant.tipos_aceitos ?? []) as ReservaTipo[]);
     setMensagem(tenant.mensagem_confirmacao ?? DEFAULT_MENSAGEM_CONFIRMACAO);
+    setMensagemCancelamento(tenant.mensagem_cancelamento ?? DEFAULT_MENSAGEM_CANCELAMENTO);
     setLimiteSemana(tenant.horario_limite_semana?.slice(0, 5) ?? "");
     setLimiteFimDeSemana(tenant.horario_limite_fim_semana?.slice(0, 5) ?? "");
   }, [tenant]);
@@ -78,6 +83,7 @@ function ConfiguracoesPage() {
           cor_primaria: cor,
           tipos_aceitos: tipos.length > 0 ? tipos : TODOS_TIPOS,
           mensagem_confirmacao: mensagem.trim() || DEFAULT_MENSAGEM_CONFIRMACAO,
+          mensagem_cancelamento: mensagemCancelamento.trim() || DEFAULT_MENSAGEM_CANCELAMENTO,
           horario_limite_semana: limiteSemana || null,
           horario_limite_fim_semana: limiteFimDeSemana || null,
         })
@@ -224,6 +230,34 @@ function ConfiguracoesPage() {
             <button
               type="button"
               onClick={() => setMensagem(DEFAULT_MENSAGEM_CONFIRMACAO)}
+              className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+            >
+              Restaurar mensagem padrão
+            </button>
+          </div>
+
+          <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
+            <h3 className="font-medium">Mensagem de cancelamento (WhatsApp)</h3>
+            <p className="text-sm text-muted-foreground">
+              Texto enviado ao cliente quando uma reserva é cancelada pelo painel. Sempre inclui um link para o cliente fazer uma nova reserva.
+            </p>
+            <Textarea value={mensagemCancelamento} onChange={(e) => setMensagemCancelamento(e.target.value)} className="min-h-56 rounded-xl font-mono text-[13px] leading-relaxed" />
+            <div className="flex flex-wrap gap-1.5">
+              {PLACEHOLDERS_CANCELAMENTO.map((p) => (
+                <button
+                  key={p.token}
+                  type="button"
+                  onClick={() => setMensagemCancelamento((m) => `${m}${p.token}`)}
+                  title={p.descricao}
+                  className="rounded-md bg-muted px-2 py-1 font-mono text-[11px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                >
+                  {p.token}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => setMensagemCancelamento(DEFAULT_MENSAGEM_CANCELAMENTO)}
               className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
             >
               Restaurar mensagem padrão
