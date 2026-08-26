@@ -1,9 +1,9 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { BarChart3, CalendarX2, LayoutList, Lightbulb, LogOut, Settings } from "lucide-react";
+import { BarChart3, CalendarX2, LayoutList, Lightbulb, LogOut, Settings, Users } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 
-export type AdminTab = "reservas" | "agenda" | "relatorios" | "configuracoes" | "sugestoes";
+export type AdminTab = "reservas" | "agenda" | "relatorios" | "contatos" | "configuracoes" | "sugestoes";
 
 const TABS: Array<{
   id: AdminTab;
@@ -14,6 +14,7 @@ const TABS: Array<{
   { id: "reservas",      label: "Reservas",     icon: LayoutList, to: "/$slug/admin" },
   { id: "agenda",        label: "Agenda",       icon: CalendarX2, to: "/$slug/admin/agenda" },
   { id: "relatorios",    label: "Relatórios",   icon: BarChart3,  to: "/$slug/admin/relatorios" },
+  { id: "contatos",      label: "Contatos",     icon: Users,      to: "/$slug/admin/contatos" },
   { id: "configuracoes", label: "Configurações",icon: Settings,   to: "/$slug/admin/configuracoes" },
   { id: "sugestoes",     label: "Sugestões",    icon: Lightbulb,  to: "/$slug/admin/sugestoes" },
 ];
