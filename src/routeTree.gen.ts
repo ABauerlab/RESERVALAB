@@ -23,6 +23,7 @@ import { Route as SlugReservarTipoRouteImport } from './routes/$slug.reservar.$t
 import { Route as SlugAdminTrocarSenhaRouteImport } from './routes/$slug.admin.trocar-senha'
 import { Route as SlugAdminSugestoesRouteImport } from './routes/$slug.admin.sugestoes'
 import { Route as SlugAdminRelatoriosRouteImport } from './routes/$slug.admin.relatorios'
+import { Route as SlugAdminContatosRouteImport } from './routes/$slug.admin.contatos'
 import { Route as SlugAdminLoginRouteImport } from './routes/$slug.admin.login'
 import { Route as SlugAdminConfiguracoesRouteImport } from './routes/$slug.admin.configuracoes'
 import { Route as SlugAdminAgendaRouteImport } from './routes/$slug.admin.agenda'
@@ -100,6 +101,11 @@ const SlugAdminRelatoriosRoute = SlugAdminRelatoriosRouteImport.update({
   path: '/$slug/admin/relatorios',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SlugAdminContatosRoute = SlugAdminContatosRouteImport.update({
+  id: '/$slug/admin/contatos',
+  path: '/$slug/admin/contatos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SlugAdminLoginRoute = SlugAdminLoginRouteImport.update({
   id: '/$slug/admin/login',
   path: '/$slug/admin/login',
@@ -138,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/$slug/admin/configuracoes': typeof SlugAdminConfiguracoesRoute
   '/$slug/admin/login': typeof SlugAdminLoginRoute
   '/$slug/admin/relatorios': typeof SlugAdminRelatoriosRoute
+  '/$slug/admin/contatos': typeof SlugAdminContatosRoute
   '/$slug/admin/sugestoes': typeof SlugAdminSugestoesRoute
   '/$slug/admin/trocar-senha': typeof SlugAdminTrocarSenhaRoute
   '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
@@ -159,6 +166,7 @@ export interface FileRoutesByTo {
   '/$slug/admin/configuracoes': typeof SlugAdminConfiguracoesRoute
   '/$slug/admin/login': typeof SlugAdminLoginRoute
   '/$slug/admin/relatorios': typeof SlugAdminRelatoriosRoute
+  '/$slug/admin/contatos': typeof SlugAdminContatosRoute
   '/$slug/admin/sugestoes': typeof SlugAdminSugestoesRoute
   '/$slug/admin/trocar-senha': typeof SlugAdminTrocarSenhaRoute
   '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
@@ -181,6 +189,7 @@ export interface FileRoutesById {
   '/$slug/admin/configuracoes': typeof SlugAdminConfiguracoesRoute
   '/$slug/admin/login': typeof SlugAdminLoginRoute
   '/$slug/admin/relatorios': typeof SlugAdminRelatoriosRoute
+  '/$slug/admin/contatos': typeof SlugAdminContatosRoute
   '/$slug/admin/sugestoes': typeof SlugAdminSugestoesRoute
   '/$slug/admin/trocar-senha': typeof SlugAdminTrocarSenhaRoute
   '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
@@ -204,6 +213,7 @@ export interface FileRouteTypes {
     | '/$slug/admin/configuracoes'
     | '/$slug/admin/login'
     | '/$slug/admin/relatorios'
+    | '/$slug/admin/contatos'
     | '/$slug/admin/sugestoes'
     | '/$slug/admin/trocar-senha'
     | '/$slug/reservar/$tipo'
@@ -225,6 +235,7 @@ export interface FileRouteTypes {
     | '/$slug/admin/configuracoes'
     | '/$slug/admin/login'
     | '/$slug/admin/relatorios'
+    | '/$slug/admin/contatos'
     | '/$slug/admin/sugestoes'
     | '/$slug/admin/trocar-senha'
     | '/$slug/reservar/$tipo'
@@ -246,6 +257,7 @@ export interface FileRouteTypes {
     | '/$slug/admin/configuracoes'
     | '/$slug/admin/login'
     | '/$slug/admin/relatorios'
+    | '/$slug/admin/contatos'
     | '/$slug/admin/sugestoes'
     | '/$slug/admin/trocar-senha'
     | '/$slug/reservar/$tipo'
@@ -268,6 +280,7 @@ export interface RootRouteChildren {
   SlugAdminConfiguracoesRoute: typeof SlugAdminConfiguracoesRoute
   SlugAdminLoginRoute: typeof SlugAdminLoginRoute
   SlugAdminRelatoriosRoute: typeof SlugAdminRelatoriosRoute
+  SlugAdminContatosRoute: typeof SlugAdminContatosRoute
   SlugAdminSugestoesRoute: typeof SlugAdminSugestoesRoute
   SlugAdminTrocarSenhaRoute: typeof SlugAdminTrocarSenhaRoute
   SlugReservarTipoRoute: typeof SlugReservarTipoRoute
@@ -378,6 +391,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlugAdminRelatoriosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$slug/admin/contatos': {
+      id: '/$slug/admin/contatos'
+      path: '/$slug/admin/contatos'
+      fullPath: '/$slug/admin/contatos'
+      preLoaderRoute: typeof SlugAdminContatosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$slug/admin/login': {
       id: '/$slug/admin/login'
       path: '/$slug/admin/login'
@@ -428,6 +448,7 @@ const rootRouteChildren: RootRouteChildren = {
   SlugAdminConfiguracoesRoute: SlugAdminConfiguracoesRoute,
   SlugAdminLoginRoute: SlugAdminLoginRoute,
   SlugAdminRelatoriosRoute: SlugAdminRelatoriosRoute,
+  SlugAdminContatosRoute: SlugAdminContatosRoute,
   SlugAdminSugestoesRoute: SlugAdminSugestoesRoute,
   SlugAdminTrocarSenhaRoute: SlugAdminTrocarSenhaRoute,
   SlugReservarTipoRoute: SlugReservarTipoRoute,
