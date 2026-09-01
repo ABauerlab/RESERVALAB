@@ -41,7 +41,20 @@ export function initFacebookPixel(pixelId: string | null | undefined): void {
 
   if (!window.fbq) {
     const fbq: Fbq = function (...args: unknown[]) {
-      (fbq.callMethod ? fbq.callMethod : fbq.queue!.push).apply(fbq, args as never);
+      // Mesma lógica do snippet oficial do Meta Pixel: antes do fbevents.js
+      // carregar, empilha as chamadas em `queue` (chamando .push() NO ARRAY,
+      // com `this` apontando pra ele); depois que o script real assume e
+      // define `callMethod`, delega pra ele (com `this` apontando pro
+      // próprio `fbq`, que é o que `callMethod` espera). Um bug anterior
+      // aqui fazia `.apply(fbq, ...)` nos dois casos — como toda função tem
+      // uma propriedade `.length` não-gravável, `Array.prototype.push`
+      // tentando incrementar `fbq.length` lançava um TypeError toda vez,
+      // então o pixel nunca chegava a ser inicializado de verdade.
+      if (fbq.callMethod) {
+        fbq.callMethod(...(args as never[]));
+      } else {
+        fbq.queue!.push(args);
+      }
     };
     window.fbq = fbq;
     if (!window._fbq) window._fbq = fbq;
@@ -54,15 +67,6 @@ export function initFacebookPixel(pixelId: string | null | undefined): void {
     script.async = true;
     script.src = "https://connect.facebook.net/en_US/fbevents.js";
     document.head.appendChild(script);
-
-    const noscript = document.createElement("noscript");
-    const img = document.createElement("img");
-    img.height = 1;
-    img.width = 1;
-    img.style.display = "none";
-    img.src = `https://www.facebook.com/tr?id=${encodeURIComponent(pixelId)}&ev=PageView&noscript=1`;
-    noscript.appendChild(img);
-    document.body.appendChild(noscript);
   }
 
   if (!loadedPixelIds.has(pixelId)) {
