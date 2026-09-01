@@ -18,6 +18,54 @@ describe("initFacebookPixel", () => {
     expect(() => initFacebookPixel(undefined)).not.toThrow();
     expect(() => initFacebookPixel("")).not.toThrow();
   });
+
+  it("regressão: enfileira init+PageView em fbq.queue sem lançar TypeError antes do fbevents.js carregar", () => {
+    const appended: unknown[] = [];
+    const fakeDocument = {
+      createElement: () => ({}) as { async?: boolean; src?: string },
+      head: { appendChild: (el: unknown) => appended.push(el) },
+      body: { appendChild: (el: unknown) => appended.push(el) },
+    };
+    (globalThis as { document?: unknown }).document = fakeDocument;
+    (globalThis as { window?: { fbq?: { queue?: unknown[] } } }).window = {};
+
+    expect(() => initFacebookPixel("831333738696755")).not.toThrow();
+
+    const win = (globalThis as { window?: { fbq?: { queue?: unknown[] } } }).window;
+    expect(win?.fbq?.queue).toEqual([
+      ["init", "831333738696755"],
+      ["track", "PageView"],
+    ]);
+    expect(appended).toHaveLength(1);
+
+    delete (globalThis as { document?: unknown }).document;
+    delete (globalThis as { window?: unknown }).window;
+  });
+
+  it("depois que fbevents.js define callMethod, delega as chamadas pra ele (com `this` = fbq)", () => {
+    const fakeDocument = {
+      createElement: () => ({}) as { async?: boolean; src?: string },
+      head: { appendChild: () => {} },
+      body: { appendChild: () => {} },
+    };
+    (globalThis as { document?: unknown }).document = fakeDocument;
+    (globalThis as { window?: { fbq?: { callMethod?: (...a: unknown[]) => void } } }).window = {};
+
+    initFacebookPixel("831333738696755");
+
+    const win = (globalThis as { window?: { fbq?: { callMethod?: (...a: unknown[]) => void } } })
+      .window;
+    const callMethod = vi.fn();
+    win!.fbq!.callMethod = callMethod;
+
+    (win!.fbq as unknown as (...a: unknown[]) => void)("trackCustom", "Click_Reserva_Mesa");
+
+    expect(callMethod).toHaveBeenCalledWith("trackCustom", "Click_Reserva_Mesa");
+    expect(callMethod.mock.instances[0]).toBe(win!.fbq);
+
+    delete (globalThis as { document?: unknown }).document;
+    delete (globalThis as { window?: unknown }).window;
+  });
 });
 
 describe("trackFacebookEvent / trackFacebookCustomEvent", () => {
