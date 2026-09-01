@@ -1,7 +1,11 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { Check, Copy, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+
+import { getTenantBySlug } from "@/lib/tenant";
+import { initFacebookPixel } from "@/lib/fbpixel";
 
 export const Route = createFileRoute("/$slug/obrigado")({
   head: () => ({
@@ -17,10 +21,15 @@ export const Route = createFileRoute("/$slug/obrigado")({
 function Obrigado() {
   const { slug } = useParams({ from: "/$slug/obrigado" });
   const [codigo, setCodigo] = useState<string>("");
+  const tenantQ = useQuery({ queryKey: ["tenant", slug], queryFn: () => getTenantBySlug(slug), staleTime: 5 * 60_000 });
 
   useEffect(() => {
     try { setCodigo(sessionStorage.getItem("ultima-reserva-codigo") ?? ""); } catch { /* noop */ }
   }, []);
+
+  useEffect(() => {
+    initFacebookPixel(tenantQ.data?.pixel_facebook_id);
+  }, [tenantQ.data?.pixel_facebook_id]);
 
   function copiar() {
     if (!codigo) return;

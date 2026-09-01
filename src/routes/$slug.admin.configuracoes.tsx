@@ -52,6 +52,7 @@ function ConfiguracoesPage() {
   const [mensagemCancelamento, setMensagemCancelamento] = useState("");
   const [limiteSemana, setLimiteSemana] = useState("");
   const [limiteFimDeSemana, setLimiteFimDeSemana] = useState("");
+  const [pixelFacebook, setPixelFacebook] = useState("");
 
   useEffect(() => {
     if (!tenant) return;
@@ -67,6 +68,7 @@ function ConfiguracoesPage() {
     setMensagemCancelamento(tenant.mensagem_cancelamento ?? DEFAULT_MENSAGEM_CANCELAMENTO);
     setLimiteSemana(tenant.horario_limite_semana?.slice(0, 5) ?? "");
     setLimiteFimDeSemana(tenant.horario_limite_fim_semana?.slice(0, 5) ?? "");
+    setPixelFacebook(tenant.pixel_facebook_id ?? "");
   }, [tenant]);
 
   const salvar = useMutation({
@@ -86,6 +88,7 @@ function ConfiguracoesPage() {
           mensagem_cancelamento: mensagemCancelamento.trim() || DEFAULT_MENSAGEM_CANCELAMENTO,
           horario_limite_semana: limiteSemana || null,
           horario_limite_fim_semana: limiteFimDeSemana || null,
+          pixel_facebook_id: pixelFacebook.trim() || null,
         })
         .eq("id", tenant!.id);
       if (error) throw error;
@@ -206,6 +209,25 @@ function ConfiguracoesPage() {
                 <Input type="time" value={limiteFimDeSemana} onChange={(e) => setLimiteFimDeSemana(e.target.value)} className="h-11 rounded-xl" />
               </div>
             </div>
+          </div>
+
+          <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
+            <div>
+              <h3 className="font-medium">Pixel do Meta (Facebook/Instagram Ads)</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                ID do pixel para medir conversões dos anúncios. Quando preenchido, a página desta empresa passa a
+                registrar PageView, um clique por tipo de reserva (Click_Reserva_Mesa, Click_Reserva_Aniversario,
+                Click_Reserva_Evento, Click_Reserva_Casamento) e o evento Lead ao enviar uma reserva. Deixe em branco
+                para não carregar nenhum pixel nesta empresa.
+              </p>
+            </div>
+            <Input
+              value={pixelFacebook}
+              onChange={(e) => setPixelFacebook(e.target.value.replace(/\D/g, ""))}
+              placeholder="Ex: 831333738696755"
+              inputMode="numeric"
+              className="h-11 rounded-xl font-mono"
+            />
           </div>
 
           <div className="rounded-2xl border border-border bg-card p-5 space-y-3">

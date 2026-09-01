@@ -1,8 +1,10 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { ArrowRight, UtensilsCrossed, Cake, Sparkles, Heart, Search, Loader2 } from "lucide-react";
 import { TIPO_CARDS, type ReservaTipo } from "@/lib/reservations";
 import { getTenantBySlug } from "@/lib/tenant";
+import { CLICK_RESERVA_EVENT, initFacebookPixel, trackFacebookCustomEvent } from "@/lib/fbpixel";
 
 export const Route = createFileRoute("/$slug/")({
   head: ({ params }) => ({
@@ -28,6 +30,10 @@ function TenantHome() {
     queryFn: () => getTenantBySlug(slug),
     staleTime: 5 * 60_000,
   });
+
+  useEffect(() => {
+    initFacebookPixel(tenantQ.data?.pixel_facebook_id);
+  }, [tenantQ.data?.pixel_facebook_id]);
 
   if (tenantQ.isLoading) {
     return (
@@ -83,6 +89,7 @@ function TenantHome() {
                 key={card.tipo}
                 to="/$slug/reservar/$tipo"
                 params={{ slug, tipo: card.tipo }}
+                onClick={() => trackFacebookCustomEvent(tenant.pixel_facebook_id, CLICK_RESERVA_EVENT[card.tipo])}
                 className="group relative flex items-center gap-4 rounded-2xl border border-border bg-card px-5 py-4 shadow-[var(--shadow-sm)] transition-all duration-200 hover:-translate-y-0.5 hover:border-terracotta/40 hover:shadow-[var(--shadow-md)] active:scale-[0.99] animate-in-up"
                 style={{ animationDelay: `${60 + i * 50}ms` }}
               >

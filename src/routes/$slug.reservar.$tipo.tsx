@@ -13,6 +13,7 @@ import {
   type ReservaTipo,
 } from "@/lib/reservations";
 import { getTenantBySlug } from "@/lib/tenant";
+import { initFacebookPixel, trackFacebookEvent } from "@/lib/fbpixel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -100,6 +101,10 @@ function ReservarPage() {
     if (horario && !horariosOpcoes.includes(horario)) setHorario("");
   }, [horariosOpcoes, horario]);
 
+  useEffect(() => {
+    initFacebookPixel(tenantQ.data?.pixel_facebook_id);
+  }, [tenantQ.data?.pixel_facebook_id]);
+
 
   // Bloqueio de agenda aplicável à data/horário escolhidos
   const bloqueio = useMemo(() => {
@@ -162,6 +167,7 @@ function ReservarPage() {
       return;
     }
     try { sessionStorage.setItem("ultima-reserva-codigo", codigo); } catch { /* noop */ }
+    trackFacebookEvent(tenant.pixel_facebook_id, "Lead", { content_name: tipo });
     navigate({ to: "/$slug/obrigado", params: { slug } });
   }
 
