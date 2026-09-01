@@ -225,6 +225,7 @@ export type Database = {
           mensagem_cancelamento: string | null
           mensagem_confirmacao: string | null
           nome: string
+          pixel_facebook_id: string | null
           slug: string
           telefone_contato: string | null
           tipos_aceitos: Database["public"]["Enums"]["reserva_tipo"][]
@@ -244,6 +245,7 @@ export type Database = {
           mensagem_cancelamento?: string | null
           mensagem_confirmacao?: string | null
           nome: string
+          pixel_facebook_id?: string | null
           slug: string
           telefone_contato?: string | null
           tipos_aceitos?: Database["public"]["Enums"]["reserva_tipo"][]
@@ -263,6 +265,7 @@ export type Database = {
           mensagem_cancelamento?: string | null
           mensagem_confirmacao?: string | null
           nome?: string
+          pixel_facebook_id?: string | null
           slug?: string
           telefone_contato?: string | null
           tipos_aceitos?: Database["public"]["Enums"]["reserva_tipo"][]
