@@ -166,4 +166,27 @@ describe("horariosDisponiveis", () => {
     expect(slots).toContain("13:30");
     expect(slots[slots.length - 1]).toBe("23:00");
   });
+
+  it("feriado em dia de semana usa a janela de horário de fim de semana", () => {
+    const slots = horariosDisponiveis("2026-09-07", 4, undefined, true); // segunda-feira, feriado
+    expect(slots[0]).toBe("12:00");
+    expect(slots[slots.length - 1]).toBe("17:00");
+  });
+
+  it("feriado em dia de semana usa o horário-limite de fim de semana configurado", () => {
+    const slots = horariosDisponiveis("2026-09-07", 4, { semana: "13:00", fimDeSemana: "14:00" }, true);
+    expect(slots[slots.length - 1]).toBe("14:00");
+  });
+
+  it("sem a flag de feriado, dia de semana continua com a janela normal de dia útil", () => {
+    const slots = horariosDisponiveis("2026-09-07", 4, undefined, false);
+    expect(slots[0]).toBe("11:00");
+    expect(slots[slots.length - 1]).toBe("15:00");
+  });
+
+  it("feriado em dia que já é fim de semana não muda nada", () => {
+    const semFeriado = horariosDisponiveis("2026-08-15", 4); // sábado
+    const comFeriado = horariosDisponiveis("2026-08-15", 4, undefined, true);
+    expect(comFeriado).toEqual(semFeriado);
+  });
 });

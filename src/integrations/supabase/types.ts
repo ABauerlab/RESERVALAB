@@ -99,6 +99,38 @@ export type Database = {
           },
         ]
       }
+      feriados: {
+        Row: {
+          created_at: string
+          data: string
+          id: string
+          motivo: string | null
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          data: string
+          id?: string
+          motivo?: string | null
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          id?: string
+          motivo?: string | null
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feriados_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       push_subscriptions: {
         Row: {
           auth: string
@@ -317,6 +349,13 @@ export type Database = {
           data: string
           hora_fim: string
           hora_inicio: string
+          motivo: string
+        }[]
+      }
+      feriados_do_tenant: {
+        Args: { _slug: string }
+        Returns: {
+          data: string
           motivo: string
         }[]
       }

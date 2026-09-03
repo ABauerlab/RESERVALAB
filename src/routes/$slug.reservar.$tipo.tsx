@@ -65,6 +65,16 @@ function ReservarPage() {
     },
   });
 
+  const feriadosQ = useQuery({
+    queryKey: ["feriados", slug],
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("feriados_do_tenant", { _slug: slug });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [quantidade, setQuantidade] = useState<number>(2);
@@ -88,12 +98,17 @@ function ReservarPage() {
 
   const hoje = useMemo(() => new Date().toISOString().slice(0, 10), []);
 
+  const ehFeriado = useMemo(
+    () => (feriadosQ.data ?? []).some((f: { data: string }) => f.data === data),
+    [feriadosQ.data, data],
+  );
+
   const horariosOpcoes = useMemo(
     () => (precisaHorario ? horariosDisponiveis(data, quantidade, {
       semana: tenantQ.data?.horario_limite_semana,
       fimDeSemana: tenantQ.data?.horario_limite_fim_semana,
-    }) : []),
-    [precisaHorario, data, quantidade, tenantQ.data?.horario_limite_semana, tenantQ.data?.horario_limite_fim_semana],
+    }, ehFeriado) : []),
+    [precisaHorario, data, quantidade, tenantQ.data?.horario_limite_semana, tenantQ.data?.horario_limite_fim_semana, ehFeriado],
   );
 
   // Mantém a seleção válida quando data/quantidade mudam.
@@ -309,6 +324,11 @@ function ReservarPage() {
             )}
           </div>
 
+          {precisaHorario && ehFeriado && (
+            <p className="-mt-2 text-xs text-terracotta">
+              {data && new Date(data + "T00:00:00").toLocaleDateString("pt-BR")} é feriado — horários de fim de semana.
+            </p>
+          )}
 
           {bloqueio && (
             <div className="flex items-start gap-3 rounded-xl border border-destructive/25 bg-destructive/5 p-4">

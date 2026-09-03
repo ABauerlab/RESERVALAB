@@ -2,7 +2,7 @@ import { pwaHeadLinks } from "@/lib/pwa-manifest";
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CalendarX2, Loader2, Plus, Trash2 } from "lucide-react";
+import { CalendarHeart, CalendarX2, Loader2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -83,7 +83,59 @@ function AgendaPage() {
     onError: () => toast.error("Não foi possível remover."),
   });
 
-  const podeCriar = !!data && (diaTodo || (!!horaInicio && !!horaFim && horaFim > horaInicio)) && !criar.isPending;
+  const podeCriar = !!data && (diaTodo || (!!horaInicio && (!horaFim || horaFim > horaInicio))) && !criar.isPending;
+
+  const [feriadoData, setFeriadoData] = useState("");
+  const [feriadoMotivo, setFeriadoMotivo] = useState("");
+
+  const feriadosQ = useQuery({
+    enabled: !!tenantId,
+    queryKey: ["feriados-admin", tenantId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("feriados")
+        .select("*")
+        .eq("tenant_id", tenantId!)
+        .gte("data", new Date().toISOString().slice(0, 10))
+        .order("data", { ascending: true });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const criarFeriado = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("feriados").insert({
+        tenant_id: tenantId!,
+        data: feriadoData,
+        motivo: feriadoMotivo.trim() || null,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Feriado adicionado.");
+      setFeriadoData(""); setFeriadoMotivo("");
+      qc.invalidateQueries({ queryKey: ["feriados-admin", tenantId] });
+    },
+    onError: (err: { code?: string }) => {
+      if (err?.code === "23505") toast.error("Essa data já está marcada como feriado.");
+      else toast.error("Não foi possível adicionar o feriado.");
+    },
+  });
+
+  const removerFeriado = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("feriados").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Feriado removido.");
+      qc.invalidateQueries({ queryKey: ["feriados-admin", tenantId] });
+    },
+    onError: () => toast.error("Não foi possível remover."),
+  });
+
+  const podeCriarFeriado = !!feriadoData && !criarFeriado.isPending;
 
   if (!admin.ready) {
     return (
@@ -128,6 +180,7 @@ function AgendaPage() {
               <div className="space-y-2">
                 <Label className="text-[13px]">Até</Label>
                 <Input type="time" value={horaFim} onChange={(e) => setHoraFim(e.target.value)} className="h-11 rounded-xl" />
+                <p className="text-[11px] text-muted-foreground">Deixe em branco para bloquear até o fim do dia.</p>
               </div>
             </div>
           )}
@@ -162,6 +215,10 @@ function AgendaPage() {
                     <p className="text-sm text-muted-foreground">
                       {b.hora_inicio && b.hora_fim
                         ? `Das ${formatHorario(b.hora_inicio)} às ${formatHorario(b.hora_fim)}`
+                        : b.hora_inicio
+                        ? `A partir das ${formatHorario(b.hora_inicio)}`
+                        : b.hora_fim
+                        ? `Até as ${formatHorario(b.hora_fim)}`
                         : "Dia inteiro"}
                       {b.motivo ? ` · ${b.motivo}` : ""}
                     </p>
@@ -170,6 +227,59 @@ function AgendaPage() {
                     onClick={() => remover.mutate(b.id)}
                     className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                     aria-label="Remover bloqueio"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <section className="mt-10 rounded-2xl border border-border bg-card p-5 animate-in-up">
+          <h3 className="font-medium">Feriados</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Uma data marcada como feriado passa a usar os horários de fim de semana (janela e horário-limite),
+            mesmo caindo num dia de semana.
+          </p>
+          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label className="text-[13px]">Data</Label>
+              <Input type="date" min={new Date().toISOString().slice(0, 10)} value={feriadoData} onChange={(e) => setFeriadoData(e.target.value)} className="h-11 rounded-xl" />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-[13px]">Motivo (opcional)</Label>
+              <Input value={feriadoMotivo} onChange={(e) => setFeriadoMotivo(e.target.value)} placeholder="Ex.: Independência do Brasil" className="h-11 rounded-xl" />
+            </div>
+          </div>
+          <Button onClick={() => criarFeriado.mutate()} disabled={!podeCriarFeriado} className="mt-5 h-11 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 sm:w-auto sm:px-6">
+            {criarFeriado.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
+            Adicionar feriado
+          </Button>
+        </section>
+
+        <section className="mt-6">
+          <h3 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Próximos feriados</h3>
+          {feriadosQ.isLoading ? (
+            <div className="mt-6 flex justify-center"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
+          ) : (feriadosQ.data?.length ?? 0) === 0 ? (
+            <div className="mt-4 rounded-2xl border border-dashed border-border bg-card/50 py-12 text-center">
+              <CalendarHeart className="mx-auto h-6 w-6 text-muted-foreground/60" />
+              <p className="mt-3 font-serif text-2xl">Nenhum feriado cadastrado</p>
+              <p className="mt-1 text-sm text-muted-foreground">Todos os dias seguem o horário normal da semana.</p>
+            </div>
+          ) : (
+            <ul className="mt-4 space-y-2.5">
+              {feriadosQ.data!.map((f: { id: string; data: string; motivo: string | null }) => (
+                <li key={f.id} className="flex items-center gap-3 rounded-xl border border-border bg-card p-4">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium">{formatData(f.data)}</p>
+                    {f.motivo && <p className="text-sm text-muted-foreground">{f.motivo}</p>}
+                  </div>
+                  <button
+                    onClick={() => removerFeriado.mutate(f.id)}
+                    className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                    aria-label="Remover feriado"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
