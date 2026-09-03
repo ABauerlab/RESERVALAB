@@ -126,12 +126,15 @@ export type HorarioLimites = {
  * reservas 1-2h antes do fechamento, para as mesas não ficarem ocupadas até
  * a casa fechar). Só afeta a janela de capacidade normal (até 30 pessoas) —
  * grupos maiores usam horários estendidos à parte.
+ *
+ * `feriado` faz a data ser tratada como fim de semana (mesma janela e mesmo
+ * horário-limite), independente do dia da semana em que ela realmente cai.
  */
-export function horariosDisponiveis(dataIso: string, quantidade: number, limites?: HorarioLimites): string[] {
+export function horariosDisponiveis(dataIso: string, quantidade: number, limites?: HorarioLimites, feriado?: boolean): string[] {
   if (!dataIso) return [];
   const [y, m, d] = dataIso.split("-").map(Number);
   const dia = new Date(y!, (m ?? 1) - 1, d!).getDay(); // 0=dom, 6=sáb
-  const fimDeSemana = dia === 0 || dia === 6;
+  const fimDeSemana = feriado || dia === 0 || dia === 6;
 
   const fimPadrao = fimDeSemana ? "17:00" : "15:00";
 
