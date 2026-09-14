@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate, useParams } from "@tanstack/react-router"
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  Bell, Calendar, CalendarDays, Download, LogOut, PartyPopper, Search,
+  Bell, BellRing, Calendar, CalendarDays, Download, LogOut, PartyPopper, Search,
   Sparkles, User, Loader2, Check, X, CheckCircle2, Phone, Utensils, Heart, Cake,
   MessageCircle, Pencil, Trash2, Save,
 } from "lucide-react";
@@ -16,7 +16,9 @@ import {
   type Reserva, type ReservaArea, type ReservaStatus, type ReservaTipo, type ReservaUpdate,
 } from "@/lib/reservations";
 import { getTenantBySlug } from "@/lib/tenant";
-import { buildMensagemCancelamento, buildMensagemConfirmacao, whatsappUrl } from "@/lib/confirmacao";
+import {
+  buildMensagemCancelamento, buildMensagemConfirmacao, buildMensagemReconfirmacao, whatsappUrl,
+} from "@/lib/confirmacao";
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { MensagemDoDiaButton } from "@/components/admin/MensagemDoDia";
@@ -246,6 +248,22 @@ function AdminDashboard() {
     window.open(whatsappUrl(numero, msg), "_blank", "noopener");
   }
 
+  async function handleReconfirm(r: Reserva) {
+    await updateReserva.mutateAsync({ id: r.id, patch: { reconfirmada_em: new Date().toISOString() } });
+    toast.success("Reconfirmação enviada.");
+    const tenant = await getTenantBySlug(slug);
+    const numero = telefoneToWhatsApp(r.telefone);
+    if (!numero) return;
+    const msg = buildMensagemReconfirmacao(tenant?.mensagem_reconfirmacao, {
+      reserva: r,
+      empresaNome: tenant?.nome ?? "",
+      endereco: tenant?.endereco,
+      telefoneEmpresa: tenant?.telefone_contato,
+      linkAcompanhar: `${window.location.origin}/${slug}/acompanhar/${r.codigo_acompanhamento}`,
+    });
+    window.open(whatsappUrl(numero, msg), "_blank", "noopener");
+  }
+
   async function handleCancel(r: Reserva, motivo: string) {
     await updateReserva.mutateAsync({
       id: r.id,
@@ -422,6 +440,7 @@ function AdminDashboard() {
         reserva={selected}
         onClose={() => setSelected(null)}
         onConfirm={() => selected && handleConfirm(selected)}
+        onReconfirm={() => selected && handleReconfirm(selected)}
         onSetStatus={(status) => selected && updateReserva.mutate({ id: selected.id, patch: { status } })}
         onSave={(patch) => selected ? updateReserva.mutateAsync({ id: selected.id, patch }) : Promise.resolve()}
         onCancel={(motivo) => selected ? handleCancel(selected, motivo) : Promise.resolve()}
@@ -499,11 +518,12 @@ function ReservaCard({ r, onClick, delay }: { r: Reserva; onClick: () => void; d
 }
 
 function ReservaDialog({
-  reserva, onClose, onConfirm, onSetStatus, onSave, onCancel, onDelete, pending,
+  reserva, onClose, onConfirm, onReconfirm, onSetStatus, onSave, onCancel, onDelete, pending,
 }: {
   reserva: Reserva | null;
   onClose: () => void;
   onConfirm: () => void;
+  onReconfirm: () => void;
   onSetStatus: (s: ReservaStatus) => void;
   onSave: (patch: ReservaUpdate) => Promise<void>;
   onCancel: (motivo: string) => Promise<void>;
@@ -624,6 +644,16 @@ function ReservaDialog({
                     <ActionBtn disabled={pending || r.status === "confirmada"} onClick={onConfirm} variant="primary" icon={MessageCircle}>Confirmar + WhatsApp</ActionBtn>
                     <ActionBtn onClick={startEdit} icon={Pencil}>Editar</ActionBtn>
                   </div>
+                  {r.status === "confirmada" && (
+                    <div className="grid w-full grid-cols-1 gap-1.5">
+                      <ActionBtn disabled={pending} onClick={onReconfirm} icon={BellRing}>Reconfirmar + WhatsApp</ActionBtn>
+                      {r.reconfirmada_em && (
+                        <p className="text-center text-[11px] text-muted-foreground">
+                          Última reconfirmação enviada em {new Date(r.reconfirmada_em).toLocaleString("pt-BR")}
+                        </p>
+                      )}
+                    </div>
+                  )}
                   <div className="grid w-full grid-cols-3 gap-2">
                     <ActionBtn disabled={pending || r.status === "finalizada"} onClick={() => onSetStatus("finalizada")} icon={CheckCircle2}>Finalizar</ActionBtn>
                     <ActionBtn disabled={pending || r.status === "cancelada"} onClick={() => setCancelando(true)} variant="danger" icon={X}>Cancelar</ActionBtn>

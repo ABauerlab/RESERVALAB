@@ -3,6 +3,7 @@ import {
   DEFAULT_MENSAGEM_CONFIRMACAO,
   buildMensagemCancelamento,
   buildMensagemConfirmacao,
+  buildMensagemReconfirmacao,
   whatsappUrl,
   type CancelamentoContexto,
   type ConfirmacaoContexto,
@@ -103,6 +104,58 @@ describe("buildMensagemConfirmacao", () => {
   it("colapsa múltiplas linhas em branco resultantes da limpeza", () => {
     const msg = buildMensagemConfirmacao("{nome}\n\n\n\n{empresa}", makeContexto());
     expect(msg).not.toMatch(/\n{3,}/);
+  });
+});
+
+describe("buildMensagemReconfirmacao", () => {
+  it("substitui todos os placeholders do template padrão", () => {
+    const msg = buildMensagemReconfirmacao(null, makeContexto());
+    expect(msg).toContain("Ola Maria, tudo bem?");
+    expect(msg).toContain("Restaurante Exemplo");
+    expect(msg).toContain("Codigo: ABC123");
+    expect(msg).toContain("Data: 17/08/2026");
+    expect(msg).toContain("Horario: 19:30");
+    expect(msg).toContain("Pessoas: 4");
+    expect(msg).toContain("https://exemplo.com/acompanhar/ABC123");
+  });
+
+  it("usa o template padrão quando nenhum template customizado é passado", () => {
+    const msg = buildMensagemReconfirmacao(undefined, makeContexto());
+    expect(msg.startsWith("Ola Maria, tudo bem?")).toBe(true);
+  });
+
+  it("usa o template padrão quando o template customizado é string vazia/em branco", () => {
+    const msg = buildMensagemReconfirmacao("   ", makeContexto());
+    expect(msg).toContain("Ola Maria, tudo bem?");
+  });
+
+  it("aceita template customizado simples", () => {
+    const msg = buildMensagemReconfirmacao(
+      "Oi {nome}, confirma que ainda vem em {data}?",
+      makeContexto(),
+    );
+    expect(msg).toContain("Oi Maria, confirma que ainda vem em 17/08/2026?");
+  });
+
+  it("acrescenta código e link quando o template customizado não os inclui", () => {
+    const msg = buildMensagemReconfirmacao("Oi {nome}, confirma?", makeContexto());
+    expect(msg).toContain("Codigo da reserva: ABC123");
+    expect(msg).toContain("https://exemplo.com/acompanhar/ABC123");
+  });
+
+  it("não duplica código/link quando o template customizado já os inclui", () => {
+    const msg = buildMensagemReconfirmacao(
+      "Oi {nome}, codigo {codigo}, link {link_acompanhar}",
+      makeContexto(),
+    );
+    expect(msg).not.toContain("Codigo da reserva:");
+    expect(msg.match(/https:\/\/exemplo\.com\/acompanhar\/ABC123/g)?.length).toBe(1);
+  });
+
+  it("é independente do template de confirmação (não usa DEFAULT_MENSAGEM_CONFIRMACAO)", () => {
+    const msg = buildMensagemReconfirmacao(null, makeContexto());
+    expect(msg).not.toContain("CONFIRMADA");
+    expect(msg).toContain("chegando");
   });
 });
 

@@ -11,7 +11,7 @@ import { useTenantAdmin } from "@/hooks/use-tenant-admin";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { clearTenantCache } from "@/lib/tenant";
 import {
-  DEFAULT_MENSAGEM_CANCELAMENTO, DEFAULT_MENSAGEM_CONFIRMACAO,
+  DEFAULT_MENSAGEM_CANCELAMENTO, DEFAULT_MENSAGEM_CONFIRMACAO, DEFAULT_MENSAGEM_RECONFIRMACAO,
   PLACEHOLDERS, PLACEHOLDERS_CANCELAMENTO,
 } from "@/lib/confirmacao";
 import { TIPO_LABEL, type ReservaTipo } from "@/lib/reservations";
@@ -50,6 +50,7 @@ function ConfiguracoesPage() {
   const [tipos, setTipos] = useState<ReservaTipo[]>([]);
   const [mensagem, setMensagem] = useState("");
   const [mensagemCancelamento, setMensagemCancelamento] = useState("");
+  const [mensagemReconfirmacao, setMensagemReconfirmacao] = useState("");
   const [limiteSemana, setLimiteSemana] = useState("");
   const [limiteFimDeSemana, setLimiteFimDeSemana] = useState("");
   const [pixelFacebook, setPixelFacebook] = useState("");
@@ -66,6 +67,7 @@ function ConfiguracoesPage() {
     setTipos((tenant.tipos_aceitos ?? []) as ReservaTipo[]);
     setMensagem(tenant.mensagem_confirmacao ?? DEFAULT_MENSAGEM_CONFIRMACAO);
     setMensagemCancelamento(tenant.mensagem_cancelamento ?? DEFAULT_MENSAGEM_CANCELAMENTO);
+    setMensagemReconfirmacao(tenant.mensagem_reconfirmacao ?? DEFAULT_MENSAGEM_RECONFIRMACAO);
     setLimiteSemana(tenant.horario_limite_semana?.slice(0, 5) ?? "");
     setLimiteFimDeSemana(tenant.horario_limite_fim_semana?.slice(0, 5) ?? "");
     setPixelFacebook(tenant.pixel_facebook_id ?? "");
@@ -86,6 +88,7 @@ function ConfiguracoesPage() {
           tipos_aceitos: tipos.length > 0 ? tipos : TODOS_TIPOS,
           mensagem_confirmacao: mensagem.trim() || DEFAULT_MENSAGEM_CONFIRMACAO,
           mensagem_cancelamento: mensagemCancelamento.trim() || DEFAULT_MENSAGEM_CANCELAMENTO,
+          mensagem_reconfirmacao: mensagemReconfirmacao.trim() || DEFAULT_MENSAGEM_RECONFIRMACAO,
           horario_limite_semana: limiteSemana || null,
           horario_limite_fim_semana: limiteFimDeSemana || null,
           pixel_facebook_id: pixelFacebook.trim() || null,
@@ -280,6 +283,37 @@ function ConfiguracoesPage() {
             <button
               type="button"
               onClick={() => setMensagemCancelamento(DEFAULT_MENSAGEM_CANCELAMENTO)}
+              className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+            >
+              Restaurar mensagem padrão
+            </button>
+          </div>
+
+          <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
+            <div>
+              <h3 className="font-medium">Mensagem de reconfirmação (WhatsApp)</h3>
+              <p className="text-sm text-muted-foreground">
+                Texto enviado ao clicar em "Reconfirmar + WhatsApp" numa reserva já confirmada — use perto do dia do
+                evento para reduzir faltas, pedindo que o cliente confirme presença de novo.
+              </p>
+            </div>
+            <Textarea value={mensagemReconfirmacao} onChange={(e) => setMensagemReconfirmacao(e.target.value)} className="min-h-56 rounded-xl font-mono text-[13px] leading-relaxed" />
+            <div className="flex flex-wrap gap-1.5">
+              {PLACEHOLDERS.map((p) => (
+                <button
+                  key={p.token}
+                  type="button"
+                  onClick={() => setMensagemReconfirmacao((m) => `${m}${p.token}`)}
+                  title={p.descricao}
+                  className="rounded-md bg-muted px-2 py-1 font-mono text-[11px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                >
+                  {p.token}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => setMensagemReconfirmacao(DEFAULT_MENSAGEM_RECONFIRMACAO)}
               className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
             >
               Restaurar mensagem padrão

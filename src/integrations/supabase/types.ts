@@ -186,6 +186,7 @@ export type Database = {
           nome: string
           observacoes: string | null
           quantidade: number | null
+          reconfirmada_em: string | null
           status: Database["public"]["Enums"]["reserva_status"]
           telefone: string
           tenant_id: string
@@ -206,6 +207,7 @@ export type Database = {
           nome: string
           observacoes?: string | null
           quantidade?: number | null
+          reconfirmada_em?: string | null
           status?: Database["public"]["Enums"]["reserva_status"]
           telefone: string
           tenant_id: string
@@ -226,6 +228,7 @@ export type Database = {
           nome?: string
           observacoes?: string | null
           quantidade?: number | null
+          reconfirmada_em?: string | null
           status?: Database["public"]["Enums"]["reserva_status"]
           telefone?: string
           tenant_id?: string
@@ -256,6 +259,7 @@ export type Database = {
           logo_url: string | null
           mensagem_cancelamento: string | null
           mensagem_confirmacao: string | null
+          mensagem_reconfirmacao: string | null
           nome: string
           pixel_facebook_id: string | null
           slug: string
@@ -276,6 +280,7 @@ export type Database = {
           logo_url?: string | null
           mensagem_cancelamento?: string | null
           mensagem_confirmacao?: string | null
+          mensagem_reconfirmacao?: string | null
           nome: string
           pixel_facebook_id?: string | null
           slug: string
@@ -296,6 +301,7 @@ export type Database = {
           logo_url?: string | null
           mensagem_cancelamento?: string | null
           mensagem_confirmacao?: string | null
+          mensagem_reconfirmacao?: string | null
           nome?: string
           pixel_facebook_id?: string | null
           slug?: string
@@ -392,6 +398,7 @@ export type Database = {
           nome: string
           observacoes: string | null
           quantidade: number | null
+          reconfirmada_em: string | null
           status: Database["public"]["Enums"]["reserva_status"]
           telefone: string
           tenant_id: string
@@ -439,6 +446,7 @@ export type Database = {
           nome: string
           observacoes: string | null
           quantidade: number | null
+          reconfirmada_em: string | null
           status: Database["public"]["Enums"]["reserva_status"]
           telefone: string
           tenant_id: string
