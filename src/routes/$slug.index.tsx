@@ -1,8 +1,9 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { ArrowRight, UtensilsCrossed, Cake, Sparkles, Heart, Search, Loader2 } from "lucide-react";
-import { TIPO_CARDS, type ReservaTipo } from "@/lib/reservations";
+import { ArrowRight, UtensilsCrossed, Cake, Sparkles, Heart, Search, Loader2, PartyPopper } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { TIPO_CARDS, formatData, formatHorario, type ReservaTipo } from "@/lib/reservations";
 import { getTenantBySlug } from "@/lib/tenant";
 import { CLICK_RESERVA_EVENT, initFacebookPixel, trackFacebookCustomEvent } from "@/lib/fbpixel";
 
@@ -34,6 +35,17 @@ function TenantHome() {
   useEffect(() => {
     initFacebookPixel(tenantQ.data?.pixel_facebook_id);
   }, [tenantQ.data?.pixel_facebook_id]);
+
+  const eventoQ = useQuery({
+    queryKey: ["proximo-evento", slug],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("proximo_evento_do_tenant", { _slug: slug });
+      if (error) throw error;
+      const first = Array.isArray(data) ? data[0] : null;
+      return first ?? null;
+    },
+    staleTime: 5 * 60_000,
+  });
 
   if (tenantQ.isLoading) {
     return (
@@ -80,6 +92,31 @@ function TenantHome() {
             Escolha o tipo de reserva. Levamos poucos segundos, e nossa equipe confirma com você em seguida.
           </p>
         </header>
+
+        {eventoQ.data && (
+          <div className="mt-8 overflow-hidden rounded-2xl border border-terracotta/25 bg-terracotta/5 animate-in-up">
+            {eventoQ.data.imagem_url && (
+              <img
+                src={eventoQ.data.imagem_url}
+                alt={eventoQ.data.titulo}
+                className="max-h-72 w-full object-cover"
+              />
+            )}
+            <div className="p-5">
+              <p className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.18em] text-terracotta">
+                <PartyPopper className="h-3.5 w-3.5" /> Evento em destaque
+              </p>
+              <p className="mt-2 font-serif text-2xl leading-snug text-foreground">{eventoQ.data.titulo}</p>
+              <p className="mt-1 text-sm font-medium text-terracotta">
+                {formatData(eventoQ.data.data)}
+                {eventoQ.data.horario ? ` às ${formatHorario(eventoQ.data.horario)}` : ""}
+              </p>
+              {eventoQ.data.descricao && (
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{eventoQ.data.descricao}</p>
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="mt-10 grid gap-3 sm:mt-12">
           {cards.map((card, i) => {

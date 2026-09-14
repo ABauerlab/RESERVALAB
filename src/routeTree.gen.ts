@@ -27,6 +27,7 @@ import { Route as SlugAdminContatosRouteImport } from './routes/$slug.admin.cont
 import { Route as SlugAdminLoginRouteImport } from './routes/$slug.admin.login'
 import { Route as SlugAdminConfiguracoesRouteImport } from './routes/$slug.admin.configuracoes'
 import { Route as SlugAdminAgendaRouteImport } from './routes/$slug.admin.agenda'
+import { Route as SlugAdminEventosRouteImport } from './routes/$slug.admin.eventos'
 import { Route as SlugAcompanharCodigoRouteImport } from './routes/$slug.acompanhar.$codigo'
 import { Route as ApiPublicHooksSendPushRouteImport } from './routes/api/public/hooks.send-push'
 
@@ -121,6 +122,11 @@ const SlugAdminAgendaRoute = SlugAdminAgendaRouteImport.update({
   path: '/$slug/admin/agenda',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SlugAdminEventosRoute = SlugAdminEventosRouteImport.update({
+  id: '/$slug/admin/eventos',
+  path: '/$slug/admin/eventos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SlugAcompanharCodigoRoute = SlugAcompanharCodigoRouteImport.update({
   id: '/$slug/acompanhar/$codigo',
   path: '/$slug/acompanhar/$codigo',
@@ -141,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/master/': typeof MasterIndexRoute
   '/$slug/acompanhar/$codigo': typeof SlugAcompanharCodigoRoute
   '/$slug/admin/agenda': typeof SlugAdminAgendaRoute
+  '/$slug/admin/eventos': typeof SlugAdminEventosRoute
   '/$slug/admin/configuracoes': typeof SlugAdminConfiguracoesRoute
   '/$slug/admin/login': typeof SlugAdminLoginRoute
   '/$slug/admin/relatorios': typeof SlugAdminRelatoriosRoute
@@ -163,6 +170,7 @@ export interface FileRoutesByTo {
   '/master': typeof MasterIndexRoute
   '/$slug/acompanhar/$codigo': typeof SlugAcompanharCodigoRoute
   '/$slug/admin/agenda': typeof SlugAdminAgendaRoute
+  '/$slug/admin/eventos': typeof SlugAdminEventosRoute
   '/$slug/admin/configuracoes': typeof SlugAdminConfiguracoesRoute
   '/$slug/admin/login': typeof SlugAdminLoginRoute
   '/$slug/admin/relatorios': typeof SlugAdminRelatoriosRoute
@@ -186,6 +194,7 @@ export interface FileRoutesById {
   '/master/': typeof MasterIndexRoute
   '/$slug/acompanhar/$codigo': typeof SlugAcompanharCodigoRoute
   '/$slug/admin/agenda': typeof SlugAdminAgendaRoute
+  '/$slug/admin/eventos': typeof SlugAdminEventosRoute
   '/$slug/admin/configuracoes': typeof SlugAdminConfiguracoesRoute
   '/$slug/admin/login': typeof SlugAdminLoginRoute
   '/$slug/admin/relatorios': typeof SlugAdminRelatoriosRoute
@@ -210,6 +219,7 @@ export interface FileRouteTypes {
     | '/master/'
     | '/$slug/acompanhar/$codigo'
     | '/$slug/admin/agenda'
+    | '/$slug/admin/eventos'
     | '/$slug/admin/configuracoes'
     | '/$slug/admin/login'
     | '/$slug/admin/relatorios'
@@ -232,6 +242,7 @@ export interface FileRouteTypes {
     | '/master'
     | '/$slug/acompanhar/$codigo'
     | '/$slug/admin/agenda'
+    | '/$slug/admin/eventos'
     | '/$slug/admin/configuracoes'
     | '/$slug/admin/login'
     | '/$slug/admin/relatorios'
@@ -254,6 +265,7 @@ export interface FileRouteTypes {
     | '/master/'
     | '/$slug/acompanhar/$codigo'
     | '/$slug/admin/agenda'
+    | '/$slug/admin/eventos'
     | '/$slug/admin/configuracoes'
     | '/$slug/admin/login'
     | '/$slug/admin/relatorios'
@@ -277,6 +289,7 @@ export interface RootRouteChildren {
   MasterIndexRoute: typeof MasterIndexRoute
   SlugAcompanharCodigoRoute: typeof SlugAcompanharCodigoRoute
   SlugAdminAgendaRoute: typeof SlugAdminAgendaRoute
+  SlugAdminEventosRoute: typeof SlugAdminEventosRoute
   SlugAdminConfiguracoesRoute: typeof SlugAdminConfiguracoesRoute
   SlugAdminLoginRoute: typeof SlugAdminLoginRoute
   SlugAdminRelatoriosRoute: typeof SlugAdminRelatoriosRoute
@@ -419,6 +432,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlugAdminAgendaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$slug/admin/eventos': {
+      id: '/$slug/admin/eventos'
+      path: '/$slug/admin/eventos'
+      fullPath: '/$slug/admin/eventos'
+      preLoaderRoute: typeof SlugAdminEventosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$slug/acompanhar/$codigo': {
       id: '/$slug/acompanhar/$codigo'
       path: '/$slug/acompanhar/$codigo'
@@ -445,6 +465,7 @@ const rootRouteChildren: RootRouteChildren = {
   MasterIndexRoute: MasterIndexRoute,
   SlugAcompanharCodigoRoute: SlugAcompanharCodigoRoute,
   SlugAdminAgendaRoute: SlugAdminAgendaRoute,
+  SlugAdminEventosRoute: SlugAdminEventosRoute,
   SlugAdminConfiguracoesRoute: SlugAdminConfiguracoesRoute,
   SlugAdminLoginRoute: SlugAdminLoginRoute,
   SlugAdminRelatoriosRoute: SlugAdminRelatoriosRoute,
