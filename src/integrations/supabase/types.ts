@@ -55,6 +55,47 @@ export type Database = {
           },
         ]
       }
+      eventos_destaque: {
+        Row: {
+          created_at: string
+          data: string
+          descricao: string | null
+          horario: string | null
+          id: string
+          imagem_url: string | null
+          tenant_id: string
+          titulo: string
+        }
+        Insert: {
+          created_at?: string
+          data: string
+          descricao?: string | null
+          horario?: string | null
+          id?: string
+          imagem_url?: string | null
+          tenant_id: string
+          titulo: string
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          descricao?: string | null
+          horario?: string | null
+          id?: string
+          imagem_url?: string | null
+          tenant_id?: string
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eventos_destaque_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       feedbacks: {
         Row: {
           autor_user_id: string | null
@@ -363,6 +404,16 @@ export type Database = {
         Returns: {
           data: string
           motivo: string
+        }[]
+      }
+      proximo_evento_do_tenant: {
+        Args: { _slug: string }
+        Returns: {
+          data: string
+          descricao: string
+          horario: string
+          imagem_url: string
+          titulo: string
         }[]
       }
       criar_reserva: {
