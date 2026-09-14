@@ -46,6 +46,28 @@ Se quiser, voce pode fazer uma nova reserva a qualquer momento:
 
 Qualquer duvida, e so chamar.`;
 
+/**
+ * Template padrão da mensagem de reconfirmação enviada ao cliente perto do
+ * dia da reserva, para reduzir no-show — pedimos que ele confirme de novo,
+ * já que a primeira confirmação sozinha não garante que ele vai comparecer.
+ */
+export const DEFAULT_MENSAGEM_RECONFIRMACAO = `Ola {nome}, tudo bem?
+
+Sua reserva no {empresa} esta chegando!
+
+Codigo: {codigo}
+Data: {data}
+Horario: {horario}
+Pessoas: {pessoas}
+
+Por favor, responda esta mensagem confirmando se ainda vai comparecer.
+Se não puder mais vir, nos avise para liberarmos o horário para outro cliente.
+
+Se precisar alterar ou cancelar, acesse:
+{link_acompanhar}
+
+Ate breve.`;
+
 export const PLACEHOLDERS: Array<{ token: string; descricao: string }> = [
   { token: "{nome}", descricao: "Nome do cliente" },
   { token: "{empresa}", descricao: "Nome do estabelecimento" },
@@ -90,16 +112,9 @@ function limparLinhasVazias(texto: string): string {
     .trim();
 }
 
-export function buildMensagemConfirmacao(
-  template: string | null | undefined,
-  ctx: ConfirmacaoContexto,
-): string {
+function valoresDeContexto(ctx: ConfirmacaoContexto): Record<string, string> {
   const r = ctx.reserva;
-  const tpl = (template && template.trim().length > 0)
-    ? template
-    : DEFAULT_MENSAGEM_CONFIRMACAO;
-
-  const valores: Record<string, string> = {
+  return {
     "{nome}": r.nome ?? "",
     "{empresa}": ctx.empresaNome ?? "",
     "{codigo}": r.codigo_acompanhamento ?? "",
@@ -112,25 +127,55 @@ export function buildMensagemConfirmacao(
     "{telefone_empresa}": ctx.telefoneEmpresa ?? "",
     "{link_acompanhar}": ctx.linkAcompanhar,
   };
+}
 
+/**
+ * Aplica o template, garantindo que o cliente sempre receba o código e o
+ * link de acompanhamento, mesmo que o template personalizado da empresa não
+ * use os placeholders.
+ */
+function renderComFallback(tpl: string, valores: Record<string, string>, linkAcompanhar: string): string {
   let out = tpl;
   for (const [token, valor] of Object.entries(valores)) {
     out = out.split(token).join(valor);
   }
   out = limparLinhasVazias(out);
 
-  // Garante que o cliente sempre receba o código e o link de acompanhamento,
-  // mesmo que o template personalizado da empresa não use os placeholders.
   const extras: string[] = [];
   if (!tpl.includes("{codigo}") && valores["{codigo}"]) {
     extras.push(`Codigo da reserva: ${valores["{codigo}"]}`);
   }
-  if (!tpl.includes("{link_acompanhar}") && ctx.linkAcompanhar) {
-    extras.push("Acompanhe, altere ou cancele sua reserva em:", ctx.linkAcompanhar);
+  if (!tpl.includes("{link_acompanhar}") && linkAcompanhar) {
+    extras.push("Acompanhe, altere ou cancele sua reserva em:", linkAcompanhar);
   }
   if (extras.length > 0) out = `${out}\n\n${extras.join("\n")}`;
 
   return out;
+}
+
+export function buildMensagemConfirmacao(
+  template: string | null | undefined,
+  ctx: ConfirmacaoContexto,
+): string {
+  const tpl = (template && template.trim().length > 0)
+    ? template
+    : DEFAULT_MENSAGEM_CONFIRMACAO;
+  return renderComFallback(tpl, valoresDeContexto(ctx), ctx.linkAcompanhar);
+}
+
+/**
+ * Mensagem de reconfirmação: enviada perto do dia da reserva para reduzir
+ * no-show. Usa o mesmo contexto/placeholders da confirmação — o cliente
+ * pode continuar alterando ou cancelando pelo link de acompanhamento.
+ */
+export function buildMensagemReconfirmacao(
+  template: string | null | undefined,
+  ctx: ConfirmacaoContexto,
+): string {
+  const tpl = (template && template.trim().length > 0)
+    ? template
+    : DEFAULT_MENSAGEM_RECONFIRMACAO;
+  return renderComFallback(tpl, valoresDeContexto(ctx), ctx.linkAcompanhar);
 }
 
 
