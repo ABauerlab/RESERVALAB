@@ -356,6 +356,9 @@ function ReservarPage() {
                   <SelectItem value="sem_preferencia">Sem preferência</SelectItem>
                 </SelectContent>
               </Select>
+              {tenantQ.data?.observacao_area && (
+                <p className="text-[12px] leading-relaxed text-muted-foreground">{tenantQ.data.observacao_area}</p>
+              )}
             </Field>
           )}
 
