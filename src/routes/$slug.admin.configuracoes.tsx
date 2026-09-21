@@ -54,6 +54,7 @@ function ConfiguracoesPage() {
   const [limiteSemana, setLimiteSemana] = useState("");
   const [limiteFimDeSemana, setLimiteFimDeSemana] = useState("");
   const [pixelFacebook, setPixelFacebook] = useState("");
+  const [observacaoArea, setObservacaoArea] = useState("");
 
   useEffect(() => {
     if (!tenant) return;
@@ -71,6 +72,7 @@ function ConfiguracoesPage() {
     setLimiteSemana(tenant.horario_limite_semana?.slice(0, 5) ?? "");
     setLimiteFimDeSemana(tenant.horario_limite_fim_semana?.slice(0, 5) ?? "");
     setPixelFacebook(tenant.pixel_facebook_id ?? "");
+    setObservacaoArea(tenant.observacao_area ?? "");
   }, [tenant]);
 
   const salvar = useMutation({
@@ -92,6 +94,7 @@ function ConfiguracoesPage() {
           horario_limite_semana: limiteSemana || null,
           horario_limite_fim_semana: limiteFimDeSemana || null,
           pixel_facebook_id: pixelFacebook.trim() || null,
+          observacao_area: observacaoArea.trim() || null,
         })
         .eq("id", tenant!.id);
       if (error) throw error;
@@ -193,6 +196,22 @@ function ConfiguracoesPage() {
                 );
               })}
             </div>
+          </div>
+
+          <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
+            <div>
+              <h3 className="font-medium">Observação sobre áreas (reserva de mesa)</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Aparece na tela de reserva de mesa, junto ao campo "Área desejada". Use para listar as áreas da casa
+                e avisar que a escolhida não é garantida. Deixe em branco para não mostrar nada.
+              </p>
+            </div>
+            <Textarea
+              value={observacaoArea}
+              onChange={(e) => setObservacaoArea(e.target.value)}
+              placeholder='Ex: Trabalhamos com as áreas Salão, Fundos, Corredor e Varanda. Não garantimos o local de preferência — isso depende da quantidade de reservas na data escolhida.'
+              className="min-h-24 rounded-xl text-sm leading-relaxed"
+            />
           </div>
 
           <div className="rounded-2xl border border-border bg-card p-5 space-y-4">

@@ -302,6 +302,7 @@ export type Database = {
           mensagem_confirmacao: string | null
           mensagem_reconfirmacao: string | null
           nome: string
+          observacao_area: string | null
           pixel_facebook_id: string | null
           slug: string
           telefone_contato: string | null
@@ -323,6 +324,7 @@ export type Database = {
           mensagem_confirmacao?: string | null
           mensagem_reconfirmacao?: string | null
           nome: string
+          observacao_area?: string | null
           pixel_facebook_id?: string | null
           slug: string
           telefone_contato?: string | null
@@ -344,6 +346,7 @@ export type Database = {
           mensagem_confirmacao?: string | null
           mensagem_reconfirmacao?: string | null
           nome?: string
+          observacao_area?: string | null
           pixel_facebook_id?: string | null
           slug?: string
           telefone_contato?: string | null
