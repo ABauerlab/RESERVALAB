@@ -39,9 +39,22 @@ export const MOTIVO_CANCELAMENTO_OPCOES = [
 ] as const;
 
 export const AREA_LABEL: Record<ReservaArea, string> = {
+  salao: "Salão",
+  fundos: "Fundos",
+  corredor: "Corredor",
+  varanda: "Varanda",
+  sem_preferencia: "Sem preferência",
+  // Valores legados: reservas antigas podem ter sido salvas com estes,
+  // mantidos aqui só para exibição, não oferecidos mais no formulário.
   interna: "Interna",
   externa: "Externa",
-  sem_preferencia: "Sem preferência",
+};
+
+export const AREA_DESCRICAO: Record<"salao" | "fundos" | "corredor" | "varanda", string> = {
+  salao: "interna, próxima à música",
+  fundos: "interna, próxima à cozinha",
+  corredor: "interna, área lateral",
+  varanda: "externa, entrada da casa",
 };
 
 export const TIPO_CARDS: Array<{

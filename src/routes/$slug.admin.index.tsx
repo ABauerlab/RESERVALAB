@@ -696,8 +696,10 @@ function EditFields({ r, form, setForm }: { r: Reserva; form: ReservaUpdate; set
           <Select value={form.area ?? "sem_preferencia"} onValueChange={(v) => set("area", v as ReservaArea)}>
             <SelectTrigger className="h-10 rounded-lg"><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="interna">Interna</SelectItem>
-              <SelectItem value="externa">Externa</SelectItem>
+              <SelectItem value="salao">Salão</SelectItem>
+              <SelectItem value="fundos">Fundos</SelectItem>
+              <SelectItem value="corredor">Corredor</SelectItem>
+              <SelectItem value="varanda">Varanda</SelectItem>
               <SelectItem value="sem_preferencia">Sem preferência</SelectItem>
             </SelectContent>
           </Select>

@@ -519,7 +519,7 @@ export type Database = {
     Enums: {
       app_role: "super_admin" | "tenant_admin"
       feedback_status: "novo" | "em_analise" | "feito" | "recusado"
-      reserva_area: "interna" | "externa" | "sem_preferencia"
+      reserva_area: "interna" | "externa" | "sem_preferencia" | "salao" | "fundos" | "corredor" | "varanda"
       reserva_status: "pendente" | "confirmada" | "cancelada" | "finalizada"
       reserva_tipo: "mesa" | "aniversario" | "evento" | "casamento"
     }
@@ -651,7 +651,7 @@ export const Constants = {
     Enums: {
       app_role: ["super_admin", "tenant_admin"],
       feedback_status: ["novo", "em_analise", "feito", "recusado"],
-      reserva_area: ["interna", "externa", "sem_preferencia"],
+      reserva_area: ["interna", "externa", "sem_preferencia", "salao", "fundos", "corredor", "varanda"],
       reserva_status: ["pendente", "confirmada", "cancelada", "finalizada"],
       reserva_tipo: ["mesa", "aniversario", "evento", "casamento"],
     },
