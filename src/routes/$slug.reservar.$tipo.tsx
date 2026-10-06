@@ -6,6 +6,8 @@ import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import {
+  AREA_DESCRICAO,
+  AREA_LABEL,
   TIPO_LABEL,
   formatTelefone,
   horariosDisponiveis,
@@ -351,9 +353,11 @@ function ReservarPage() {
               <Select value={area} onValueChange={(v) => setArea(v as ReservaArea)}>
                 <SelectTrigger className="h-12 rounded-xl"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="interna">Interna</SelectItem>
-                  <SelectItem value="externa">Externa</SelectItem>
-                  <SelectItem value="sem_preferencia">Sem preferência</SelectItem>
+                  <SelectItem value="salao">{AREA_LABEL.salao} ({AREA_DESCRICAO.salao})</SelectItem>
+                  <SelectItem value="fundos">{AREA_LABEL.fundos} ({AREA_DESCRICAO.fundos})</SelectItem>
+                  <SelectItem value="corredor">{AREA_LABEL.corredor} ({AREA_DESCRICAO.corredor})</SelectItem>
+                  <SelectItem value="varanda">{AREA_LABEL.varanda} ({AREA_DESCRICAO.varanda})</SelectItem>
+                  <SelectItem value="sem_preferencia">{AREA_LABEL.sem_preferencia}</SelectItem>
                 </SelectContent>
               </Select>
               {tenantQ.data?.observacao_area && (
