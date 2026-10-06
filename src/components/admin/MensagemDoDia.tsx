@@ -97,7 +97,7 @@ export function MensagemDoDiaButton({ tenantId }: { tenantId: string | null }) {
       let query = supabase
         .from("reservas").select("*")
         .eq("tenant_id", tenantId!)
-        .neq("status", "cancelada");
+        .eq("status", "confirmada");
       query = modo === "dia" ? query.eq("data", data) : query.gte("data", data);
       const { data: rows, error } = await query
         .order("data", { ascending: true })
