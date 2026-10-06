@@ -1,12 +1,12 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { ChevronLeft, Loader2, Save } from "lucide-react";
+import { ChevronLeft, Loader2, Save, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import {
-  AREA_LABEL, STATUS_LABEL, TIPO_LABEL,
+  AREA_DESCRICAO, AREA_LABEL, STATUS_LABEL, TIPO_LABEL,
   formatData, formatHorario,
   type Reserva, type ReservaArea, type ReservaStatus,
 } from "@/lib/reservations";
@@ -17,6 +17,10 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/$slug/acompanhar/$codigo")({
   head: () => ({
@@ -107,6 +111,18 @@ function ReservaEdit({ reserva, onUpdated }: { reserva: Reserva; onUpdated: (r: 
     onError: () => toast.error("Não foi possível atualizar."),
   });
 
+  const cancelar = useMutation({
+    mutationFn: async () => {
+      const { data: updated, error } = await supabase.rpc("cancelar_reserva_por_codigo", {
+        _codigo: reserva.codigo_acompanhamento,
+      });
+      if (error) throw error;
+      return updated;
+    },
+    onSuccess: (r) => { toast.success("Reserva cancelada."); if (r) onUpdated(r); },
+    onError: () => toast.error("Não foi possível cancelar."),
+  });
+
   return (
     <div className="mt-6 space-y-5 animate-in-up">
       <div className="rounded-2xl border border-border bg-card p-5">
@@ -154,9 +170,11 @@ function ReservaEdit({ reserva, onUpdated }: { reserva: Reserva; onUpdated: (r: 
                   <Select value={area || undefined} onValueChange={(v) => setArea(v as ReservaArea)}>
                     <SelectTrigger className="h-11 rounded-xl"><SelectValue placeholder="Sem preferência" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="interna">Interna</SelectItem>
-                      <SelectItem value="externa">Externa</SelectItem>
-                      <SelectItem value="sem_preferencia">Sem preferência</SelectItem>
+                      <SelectItem value="salao">{AREA_LABEL.salao} ({AREA_DESCRICAO.salao})</SelectItem>
+                      <SelectItem value="fundos">{AREA_LABEL.fundos} ({AREA_DESCRICAO.fundos})</SelectItem>
+                      <SelectItem value="corredor">{AREA_LABEL.corredor} ({AREA_DESCRICAO.corredor})</SelectItem>
+                      <SelectItem value="varanda">{AREA_LABEL.varanda} ({AREA_DESCRICAO.varanda})</SelectItem>
+                      <SelectItem value="sem_preferencia">{AREA_LABEL.sem_preferencia}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -172,6 +190,29 @@ function ReservaEdit({ reserva, onUpdated }: { reserva: Reserva; onUpdated: (r: 
             {salvar.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             Salvar alterações
           </Button>
+
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="outline" disabled={cancelar.isPending} className="h-12 w-full rounded-xl border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive">
+                {cancelar.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <X className="mr-2 h-4 w-4" />}
+                Cancelar reserva
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Cancelar esta reserva?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Essa ação não pode ser desfeita. Se quiser, você pode fazer uma nova reserva depois.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Voltar</AlertDialogCancel>
+                <AlertDialogAction onClick={() => cancelar.mutate()} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                  Sim, cancelar
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </>
       )}
     </div>
