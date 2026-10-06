@@ -26,7 +26,9 @@ Endereco: {endereco}
 Se precisar alterar ou cancelar, acesse:
 {link_acompanhar}
 
-Ate breve.`;
+Ate breve.
+
+_*Essa é uma mensagem automática de confirmação de reserva*_`;
 
 /**
  * Template padrão da mensagem de cancelamento enviada ao cliente no WhatsApp.
@@ -44,7 +46,9 @@ Motivo: {motivo_cancelamento}
 Se quiser, voce pode fazer uma nova reserva a qualquer momento:
 {link_nova_reserva}
 
-Qualquer duvida, e so chamar.`;
+Qualquer duvida, e so chamar.
+
+_*Essa é uma mensagem automática*_`;
 
 /**
  * Template padrão da mensagem de reconfirmação enviada ao cliente perto do
@@ -66,7 +70,9 @@ Se não puder mais vir, nos avise para liberarmos o horário para outro cliente.
 Se precisar alterar ou cancelar, acesse:
 {link_acompanhar}
 
-Ate breve.`;
+Ate breve.
+
+_*Essa é uma mensagem automática de reconfirmação de reserva*_`;
 
 export const PLACEHOLDERS: Array<{ token: string; descricao: string }> = [
   { token: "{nome}", descricao: "Nome do cliente" },
