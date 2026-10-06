@@ -17,7 +17,7 @@ import {
 } from "@/lib/reservations";
 import { getTenantBySlug } from "@/lib/tenant";
 import {
-  buildMensagemCancelamento, buildMensagemConfirmacao, buildMensagemReconfirmacao, whatsappUrl,
+  buildMensagemCancelamento, buildMensagemReconfirmacao, whatsappUrl,
 } from "@/lib/confirmacao";
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
 import { AdminShell } from "@/components/admin/AdminShell";
@@ -233,19 +233,11 @@ function AdminDashboard() {
   });
 
   async function handleConfirm(r: Reserva) {
+    // A confirmação no WhatsApp agora é enviada automaticamente pelo backend
+    // (trigger no banco) assim que o status muda para "confirmada" — não
+    // abrimos mais o WhatsApp manualmente aqui, pra não duplicar a mensagem.
     await updateReserva.mutateAsync({ id: r.id, patch: { status: "confirmada" } });
-    toast.success("Reserva confirmada.");
-    const tenant = await getTenantBySlug(slug);
-    const numero = telefoneToWhatsApp(r.telefone);
-    if (!numero) return;
-    const msg = buildMensagemConfirmacao(tenant?.mensagem_confirmacao, {
-      reserva: r,
-      empresaNome: tenant?.nome ?? "",
-      endereco: tenant?.endereco,
-      telefoneEmpresa: tenant?.telefone_contato,
-      linkAcompanhar: `${window.location.origin}/${slug}/acompanhar/${r.codigo_acompanhamento}`,
-    });
-    window.open(whatsappUrl(numero, msg), "_blank", "noopener");
+    toast.success("Reserva confirmada. O cliente recebe a confirmação automaticamente.");
   }
 
   async function handleReconfirm(r: Reserva) {
