@@ -61,7 +61,7 @@ describe("initFacebookPixel", () => {
     (win!.fbq as unknown as (...a: unknown[]) => void)("trackCustom", "Click_Reserva_Mesa");
 
     expect(callMethod).toHaveBeenCalledWith("trackCustom", "Click_Reserva_Mesa");
-    expect(callMethod.mock.instances[0]).toBe(win!.fbq);
+    expect(callMethod.mock.contexts[0]).toBe(win!.fbq);
 
     delete (globalThis as { document?: unknown }).document;
     delete (globalThis as { window?: unknown }).window;
