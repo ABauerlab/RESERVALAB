@@ -17,7 +17,7 @@ import {
 } from "@/lib/reservations";
 import { getTenantBySlug } from "@/lib/tenant";
 import {
-  buildMensagemCancelamento, buildMensagemReconfirmacao, whatsappUrl,
+  buildMensagemReconfirmacao, whatsappUrl,
 } from "@/lib/confirmacao";
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
 import { AdminShell } from "@/components/admin/AdminShell";
@@ -275,21 +275,15 @@ function AdminDashboard() {
   }
 
   async function handleCancel(r: Reserva, motivo: string) {
+    // A mensagem de cancelamento no WhatsApp agora é enviada automaticamente
+    // pelo backend (trigger no banco) assim que o status muda para
+    // "cancelada" — não abrimos mais o WhatsApp manualmente aqui, pra não
+    // duplicar a mensagem.
     await updateReserva.mutateAsync({
       id: r.id,
       patch: { status: "cancelada", motivo_cancelamento: motivo || null },
     });
-    toast.success("Reserva cancelada.");
-    const numero = telefoneToWhatsApp(r.telefone);
-    if (!numero) return;
-    const tenant = await getTenantBySlug(slug);
-    const msg = buildMensagemCancelamento(tenant?.mensagem_cancelamento, {
-      reserva: r,
-      empresaNome: tenant?.nome ?? "",
-      motivoCancelamento: motivo,
-      linkNovaReserva: `${window.location.origin}/${slug}`,
-    });
-    window.open(whatsappUrl(numero, msg), "_blank", "noopener");
+    toast.success("Reserva cancelada. O cliente recebe o aviso automaticamente.");
   }
 
 
