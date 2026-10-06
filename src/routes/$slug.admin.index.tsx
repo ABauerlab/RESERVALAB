@@ -232,12 +232,30 @@ function AdminDashboard() {
     onError: () => toast.error("Não foi possível excluir."),
   });
 
+  const confirmarSemNotificar = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.rpc("confirmar_reserva_sem_notificar", { _id: id });
+      if (error) throw error;
+    },
+    onSuccess: (_data, id) => {
+      qc.invalidateQueries({ queryKey: ["reservas", tenantId] });
+      qc.invalidateQueries({ queryKey: ["reservas-stats", tenantId] });
+      setSelected((s) => (s && s.id === id ? { ...s, status: "confirmada" } as Reserva : s));
+      toast.success("Reserva confirmada sem avisar o cliente.");
+    },
+    onError: () => toast.error("Não foi possível confirmar."),
+  });
+
   async function handleConfirm(r: Reserva) {
     // A confirmação no WhatsApp agora é enviada automaticamente pelo backend
     // (trigger no banco) assim que o status muda para "confirmada" — não
     // abrimos mais o WhatsApp manualmente aqui, pra não duplicar a mensagem.
     await updateReserva.mutateAsync({ id: r.id, patch: { status: "confirmada" } });
     toast.success("Reserva confirmada. O cliente recebe a confirmação automaticamente.");
+  }
+
+  async function handleConfirmSemNotificar(r: Reserva) {
+    await confirmarSemNotificar.mutateAsync(r.id);
   }
 
   async function handleReconfirm(r: Reserva) {
@@ -432,12 +450,13 @@ function AdminDashboard() {
         reserva={selected}
         onClose={() => setSelected(null)}
         onConfirm={() => selected && handleConfirm(selected)}
+        onConfirmSemNotificar={() => selected && handleConfirmSemNotificar(selected)}
         onReconfirm={() => selected && handleReconfirm(selected)}
         onSetStatus={(status) => selected && updateReserva.mutate({ id: selected.id, patch: { status } })}
         onSave={(patch) => selected ? updateReserva.mutateAsync({ id: selected.id, patch }) : Promise.resolve()}
         onCancel={(motivo) => selected ? handleCancel(selected, motivo) : Promise.resolve()}
         onDelete={() => selected && deleteReserva.mutate(selected.id)}
-        pending={updateReserva.isPending || deleteReserva.isPending}
+        pending={updateReserva.isPending || deleteReserva.isPending || confirmarSemNotificar.isPending}
       />
 
       <audio ref={audioRef} preload="auto" />
@@ -510,11 +529,12 @@ function ReservaCard({ r, onClick, delay }: { r: Reserva; onClick: () => void; d
 }
 
 function ReservaDialog({
-  reserva, onClose, onConfirm, onReconfirm, onSetStatus, onSave, onCancel, onDelete, pending,
+  reserva, onClose, onConfirm, onConfirmSemNotificar, onReconfirm, onSetStatus, onSave, onCancel, onDelete, pending,
 }: {
   reserva: Reserva | null;
   onClose: () => void;
   onConfirm: () => void;
+  onConfirmSemNotificar: () => void;
   onReconfirm: () => void;
   onSetStatus: (s: ReservaStatus) => void;
   onSave: (patch: ReservaUpdate) => Promise<void>;
@@ -636,6 +656,17 @@ function ReservaDialog({
                     <ActionBtn disabled={pending || r.status === "confirmada"} onClick={onConfirm} variant="primary" icon={MessageCircle}>Confirmar + WhatsApp</ActionBtn>
                     <ActionBtn onClick={startEdit} icon={Pencil}>Editar</ActionBtn>
                   </div>
+                  {r.status !== "confirmada" && (
+                    <button
+                      type="button"
+                      disabled={pending}
+                      onClick={onConfirmSemNotificar}
+                      className="flex w-full items-center justify-center gap-1.5 text-[12px] text-muted-foreground underline-offset-2 transition-colors hover:text-foreground hover:underline disabled:opacity-50"
+                    >
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      Confirmar sem avisar o cliente
+                    </button>
+                  )}
                   {r.status === "confirmada" && (
                     <div className="grid w-full grid-cols-1 gap-1.5">
                       <ActionBtn disabled={pending} onClick={onReconfirm} icon={BellRing}>Reconfirmar + WhatsApp</ActionBtn>

@@ -419,6 +419,36 @@ export type Database = {
           titulo: string
         }[]
       }
+      confirmar_reserva_sem_notificar: {
+        Args: { _id: string }
+        Returns: {
+          area: Database["public"]["Enums"]["reserva_area"] | null
+          codigo_acompanhamento: string
+          comandas: boolean | null
+          created_at: string
+          data: string | null
+          horario: string | null
+          id: string
+          leva_bolo: boolean | null
+          motivo_cancelamento: string | null
+          nome: string
+          observacoes: string | null
+          quantidade: number | null
+          reconfirmada_em: string | null
+          status: Database["public"]["Enums"]["reserva_status"]
+          telefone: string
+          tenant_id: string
+          tipo: Database["public"]["Enums"]["reserva_tipo"]
+          tipo_evento: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "reservas"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       criar_reserva: {
         Args: {
           _area?: Database["public"]["Enums"]["reserva_area"]
