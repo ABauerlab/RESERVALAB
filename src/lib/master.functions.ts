@@ -2,48 +2,6 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireRuntimeSupabaseAuth } from "@/integrations/supabase/auth-middleware-runtime";
 import { isValidEmail, isValidNome, isValidSenha, isValidSlug, slugify } from "@/lib/validators";
 
-const SUPER_ADMIN_EMAIL = "contato.bauerlab@gmail.com";
-const SUPER_ADMIN_PASSWORD = "21254775";
-
-// Idempotente: cria user + role super_admin se ainda não existir NENHUM super_admin no sistema.
-// Chamado pela tela /master/login para bootstrap na primeira visita.
-export const bootstrapSuperAdmin = createServerFn({ method: "POST" }).handler(async () => {
-  const { getSupabaseAdmin } = await import("@/integrations/supabase/admin.server");
-  const supabaseAdmin = getSupabaseAdmin();
-
-  // Já existe super_admin?
-  const { data: existing, error: rolesErr } = await supabaseAdmin
-    .from("user_roles")
-    .select("id")
-    .eq("role", "super_admin")
-    .limit(1);
-  if (rolesErr) throw new Error(rolesErr.message);
-  if (existing && existing.length > 0) return { created: false };
-
-  // Procura pelo user (pode existir sem role)
-  let userId: string | null = null;
-  const list = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
-  const found = list.data?.users?.find((u) => u.email?.toLowerCase() === SUPER_ADMIN_EMAIL);
-  if (found) userId = found.id;
-
-  if (!userId) {
-    const { data: created, error: cErr } = await supabaseAdmin.auth.admin.createUser({
-      email: SUPER_ADMIN_EMAIL,
-      password: SUPER_ADMIN_PASSWORD,
-      email_confirm: true,
-    });
-    if (cErr || !created.user) throw new Error(cErr?.message ?? "createUser falhou");
-    userId = created.user.id;
-  }
-
-  const { error: rErr } = await supabaseAdmin
-    .from("user_roles")
-    .insert({ user_id: userId, role: "super_admin", tenant_id: null });
-  if (rErr) throw new Error(rErr.message);
-
-  return { created: true };
-});
-
 export type CriarTenantInput = {
   slug: string;
   nome: string;
