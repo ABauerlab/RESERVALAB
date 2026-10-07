@@ -82,7 +82,7 @@ function CTAPrimary({ className = "" }: { className?: string }) {
       href={WHATSAPP}
       target="_blank"
       rel="noopener noreferrer"
-      className={`group inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-terracotta px-6 text-sm font-medium text-terracotta-foreground shadow-[var(--shadow-md)] transition-all hover:bg-terracotta/90 hover:shadow-[var(--shadow-lg)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring motion-safe:hover:-translate-y-0.5 ${className}`}
+      className={`group inline-flex h-12 items-center justify-center gap-2 rounded-md bg-terracotta px-6 text-sm font-medium text-terracotta-foreground shadow-[var(--shadow-md)] transition-all hover:bg-terracotta/90 hover:shadow-[var(--shadow-lg)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring motion-safe:hover:-translate-y-0.5 ${className}`}
     >
       Quero usar o ReservaLab
       <ArrowRight className="h-4 w-4 transition-transform motion-safe:group-hover:translate-x-0.5" />
@@ -124,7 +124,7 @@ function DesktopMockup() {
             ["Confirmadas", "8"],
             ["Pessoas", "46"],
           ].map(([k, v]) => (
-            <div key={k} className="rounded-xl border border-border bg-background p-3">
+            <div key={k} className="rounded-lg border border-border bg-background p-3">
               <p className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
                 {k}
               </p>
@@ -152,7 +152,7 @@ function DesktopMockup() {
           {rows.map((r) => (
             <li
               key={r.n}
-              className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl border border-border bg-background px-3 py-2.5"
+              className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-lg border border-border bg-background px-3 py-2.5"
             >
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium">{r.n}</p>
@@ -248,9 +248,9 @@ function Fluxograma() {
     <ol className="relative space-y-3 md:grid md:grid-cols-5 md:gap-3 md:space-y-0">
       {steps.map((s, i) => (
         <Reveal as="li" key={s.t} delay={i * 70} className="relative">
-          <div className="h-full rounded-2xl border border-border bg-card p-4 transition-all motion-safe:hover:-translate-y-1 hover:shadow-[var(--shadow-md)]">
+          <div className="h-full rounded-lg border border-border bg-card p-4 transition-all motion-safe:hover:-translate-y-1 hover:shadow-[var(--shadow-md)]">
             <div className="flex items-center gap-2">
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cream text-terracotta">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-cream text-terracotta">
                 <s.icon className="h-4 w-4" aria-hidden="true" />
               </span>
               <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
@@ -392,7 +392,7 @@ function Landing() {
             href={WHATSAPP}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex h-10 shrink-0 items-center rounded-xl bg-terracotta px-4 text-xs font-medium text-terracotta-foreground transition hover:bg-terracotta/90 sm:text-sm"
+            className="inline-flex h-10 shrink-0 items-center rounded-md bg-terracotta px-4 text-xs font-medium text-terracotta-foreground transition hover:bg-terracotta/90 sm:text-sm"
           >
             Falar com a gente
           </a>
@@ -422,7 +422,7 @@ function Landing() {
                   <CTAPrimary />
                   <a
                     href="#como-funciona"
-                    className="inline-flex h-12 items-center justify-center rounded-xl border border-border bg-card px-6 text-sm font-medium transition hover:bg-accent motion-safe:hover:-translate-y-0.5"
+                    className="inline-flex h-12 items-center justify-center rounded-md border border-border bg-card px-6 text-sm font-medium transition hover:bg-accent motion-safe:hover:-translate-y-0.5"
                   >
                     Ver como funciona
                   </a>
@@ -466,7 +466,7 @@ function Landing() {
                 ["Cliente sem retorno", "Ele volta a perguntar porque não sabe se foi confirmado."],
               ].map(([t, d], i) => (
                 <Reveal key={t} delay={i * 70}>
-                  <div className="h-full rounded-2xl border border-border bg-card p-5">
+                  <div className="h-full rounded-lg border border-border bg-card p-5">
                     <p className="font-medium">{t}</p>
                     <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{d}</p>
                   </div>
@@ -523,7 +523,7 @@ function Landing() {
                 ["03", "Gerencie pelo painel", "Receba, confirme, edite, bloqueie a agenda e acompanhe os relatórios."],
               ].map(([n, t, d], i) => (
                 <Reveal key={n} delay={i * 90}>
-                  <div className="h-full rounded-2xl border border-border bg-card p-6 transition-all motion-safe:hover:-translate-y-1 hover:shadow-[var(--shadow-md)]">
+                  <div className="h-full rounded-lg border border-border bg-card p-6 transition-all motion-safe:hover:-translate-y-1 hover:shadow-[var(--shadow-md)]">
                     <p className="font-serif text-4xl text-terracotta">{n}</p>
                     <p className="mt-4 font-medium">{t}</p>
                     <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{d}</p>
@@ -555,8 +555,8 @@ function Landing() {
             <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {recursos.map((r, i) => (
                 <Reveal key={r.t} delay={(i % 3) * 70}>
-                  <article className="h-full rounded-2xl border border-border bg-card p-5 transition-all motion-safe:hover:-translate-y-1 hover:shadow-[var(--shadow-md)]">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-cream text-terracotta">
+                  <article className="h-full rounded-lg border border-border bg-card p-5 transition-all motion-safe:hover:-translate-y-1 hover:shadow-[var(--shadow-md)]">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-md bg-cream text-terracotta">
                       <r.icon className="h-4 w-4" aria-hidden="true" />
                     </span>
                     <h3 className="mt-4 font-medium">{r.t}</h3>
@@ -626,7 +626,7 @@ function Landing() {
             <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {beneficios.map((b, i) => (
                 <Reveal key={b.t} delay={(i % 3) * 70}>
-                  <div className="h-full rounded-2xl border border-border bg-card p-5">
+                  <div className="h-full rounded-lg border border-border bg-card p-5">
                     <p className="font-medium">{b.t}</p>
                     <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{b.d}</p>
                   </div>

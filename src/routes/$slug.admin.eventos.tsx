@@ -118,36 +118,36 @@ function EventosPage() {
           </p>
         </header>
 
-        <section className="mt-6 rounded-2xl border border-border bg-card p-5 animate-in-up">
+        <section className="mt-6 rounded-lg border border-border bg-card p-5 animate-in-up">
           <h3 className="font-medium">Novo evento</h3>
           <div className="mt-4 space-y-4">
             <div className="space-y-2">
               <Label className="text-[13px]">Título</Label>
-              <Input value={titulo} onChange={(e) => setTitulo(e.target.value)} placeholder="Ex: Samba com Sérgio Santiago e Banda" className="h-11 rounded-xl" />
+              <Input value={titulo} onChange={(e) => setTitulo(e.target.value)} placeholder="Ex: Samba com Sérgio Santiago e Banda" className="h-11 rounded-md" />
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label className="text-[13px]">Data</Label>
-                <Input type="date" min={hoje} value={data} onChange={(e) => setData(e.target.value)} className="h-11 rounded-xl" />
+                <Input type="date" min={hoje} value={data} onChange={(e) => setData(e.target.value)} className="h-11 rounded-md" />
               </div>
               <div className="space-y-2">
                 <Label className="text-[13px]">Horário (opcional)</Label>
-                <Input type="time" value={horario} onChange={(e) => setHorario(e.target.value)} className="h-11 rounded-xl" />
+                <Input type="time" value={horario} onChange={(e) => setHorario(e.target.value)} className="h-11 rounded-md" />
               </div>
             </div>
             <div className="space-y-2">
               <Label className="text-[13px]">Descrição (opcional)</Label>
-              <Textarea value={descricao} onChange={(e) => setDescricao(e.target.value)} placeholder="Detalhes que aparecem para o cliente na página de reservas." className="min-h-20 rounded-xl" />
+              <Textarea value={descricao} onChange={(e) => setDescricao(e.target.value)} placeholder="Detalhes que aparecem para o cliente na página de reservas." className="min-h-20 rounded-md" />
             </div>
             <div className="space-y-2">
               <Label className="text-[13px]">URL da imagem/flyer (opcional)</Label>
-              <Input value={imagemUrl} onChange={(e) => setImagemUrl(e.target.value)} placeholder="https://..." className="h-11 rounded-xl" />
+              <Input value={imagemUrl} onChange={(e) => setImagemUrl(e.target.value)} placeholder="https://..." className="h-11 rounded-md" />
               {imagemUrl.trim() && (
                 <img src={imagemUrl} alt="Prévia do evento" className="mt-2 max-h-48 w-auto rounded-lg object-contain" />
               )}
             </div>
           </div>
-          <Button onClick={() => criar.mutate()} disabled={!podeCriar} className="mt-5 h-11 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 sm:w-auto sm:px-6">
+          <Button onClick={() => criar.mutate()} disabled={!podeCriar} className="mt-5 h-11 w-full rounded-md bg-primary text-primary-foreground hover:bg-primary/90 sm:w-auto sm:px-6">
             {criar.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
             Adicionar evento
           </Button>
@@ -158,7 +158,7 @@ function EventosPage() {
           {eventosQ.isLoading ? (
             <div className="mt-6 flex justify-center"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
           ) : futuros.length === 0 ? (
-            <div className="mt-4 rounded-2xl border border-dashed border-border bg-card/50 py-12 text-center">
+            <div className="mt-4 rounded-lg border border-dashed border-border bg-card/50 py-12 text-center">
               <Music className="mx-auto h-6 w-6 text-muted-foreground/60" />
               <p className="mt-3 font-serif text-2xl">Nenhum evento</p>
               <p className="mt-1 text-sm text-muted-foreground">A página de reservas não mostra nenhum destaque no momento.</p>
@@ -166,7 +166,7 @@ function EventosPage() {
           ) : (
             <ul className="mt-4 space-y-2.5">
               {futuros.map((e: EventoRow, i: number) => (
-                <li key={e.id} className={`flex items-center gap-3 rounded-xl border bg-card p-4 ${i === 0 ? "border-terracotta/40" : "border-border"}`}>
+                <li key={e.id} className={`flex items-center gap-3 rounded-lg border bg-card p-4 ${i === 0 ? "border-terracotta/40" : "border-border"}`}>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <p className="font-medium">{e.titulo}</p>
@@ -180,7 +180,7 @@ function EventosPage() {
                   </div>
                   <button
                     onClick={() => remover.mutate(e.id)}
-                    className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                    className="flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                     aria-label="Remover evento"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -196,7 +196,7 @@ function EventosPage() {
             <h3 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Já realizados</h3>
             <ul className="mt-4 space-y-2.5">
               {passados.map((e: EventoRow) => (
-                <li key={e.id} className="flex items-center gap-3 rounded-xl border border-border bg-card/60 p-4 opacity-70">
+                <li key={e.id} className="flex items-center gap-3 rounded-lg border border-border bg-card/60 p-4 opacity-70">
                   <div className="min-w-0 flex-1">
                     <p className="font-medium">{e.titulo}</p>
                     <p className="text-sm text-muted-foreground">
@@ -205,7 +205,7 @@ function EventosPage() {
                   </div>
                   <button
                     onClick={() => remover.mutate(e.id)}
-                    className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                    className="flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                     aria-label="Remover evento"
                   >
                     <Trash2 className="h-4 w-4" />

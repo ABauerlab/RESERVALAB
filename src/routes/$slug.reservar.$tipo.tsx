@@ -213,7 +213,7 @@ function ReservarPage() {
         </header>
 
         {isAniv && (
-          <section className="mt-6 rounded-2xl border border-terracotta/25 bg-terracotta/5 p-5 animate-in-up">
+          <section className="mt-6 rounded-lg border border-terracotta/25 bg-terracotta/5 p-5 animate-in-up">
             <p className="font-serif text-xl leading-snug sm:text-2xl">
               Vai ser um prazer comemorar seu aniversário no {tenantQ.data?.nome ?? "Iracema"}!
             </p>
@@ -234,14 +234,14 @@ function ReservarPage() {
           </section>
         )}
         {isEvento && (
-          <section className="mt-6 space-y-4 rounded-2xl border border-terracotta/25 bg-terracotta/5 p-5 animate-in-up">
+          <section className="mt-6 space-y-4 rounded-lg border border-terracotta/25 bg-terracotta/5 p-5 animate-in-up">
             <div>
               <p className="font-serif text-xl leading-snug sm:text-2xl">Orçamento — eventos particulares</p>
               <p className="mt-1.5 text-sm text-muted-foreground">Mínimo de 50 pessoas • Máximo de 180 pessoas</p>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="rounded-xl bg-card p-4">
+              <div className="rounded-lg bg-card p-4">
                 <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-terracotta">
                   <UtensilsCrossed className="h-3.5 w-3.5" /> Petiscos
                 </p>
@@ -255,7 +255,7 @@ function ReservarPage() {
                 </ul>
               </div>
 
-              <div className="rounded-xl bg-card p-4">
+              <div className="rounded-lg bg-card p-4">
                 <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-terracotta">
                   <Beer className="h-3.5 w-3.5" /> Bebidas
                 </p>
@@ -268,7 +268,7 @@ function ReservarPage() {
               </div>
             </div>
 
-            <div className="rounded-xl bg-card p-4">
+            <div className="rounded-lg bg-card p-4">
               <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-terracotta">
                 <Receipt className="h-3.5 w-3.5" /> Valores (5 horas de evento)
               </p>
@@ -295,11 +295,11 @@ function ReservarPage() {
 
         <form onSubmit={onSubmit} className="mt-8 space-y-5 animate-in-up">
           <Field label="Nome">
-            <Input value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Seu nome completo" autoComplete="name" className="h-12 rounded-xl" required />
+            <Input value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Seu nome completo" autoComplete="name" className="h-12 rounded-md" required />
           </Field>
 
           <Field label="Telefone / WhatsApp" hint="Se for do exterior, comece com + e o código do país">
-            <Input value={telefone} onChange={(e) => setTelefone(formatTelefone(e.target.value))} placeholder="(11) 91234-5678 ou +1 555 1234" inputMode="tel" autoComplete="tel" className="h-12 rounded-xl" required />
+            <Input value={telefone} onChange={(e) => setTelefone(formatTelefone(e.target.value))} placeholder="(11) 91234-5678 ou +1 555 1234" inputMode="tel" autoComplete="tel" className="h-12 rounded-md" required />
           </Field>
 
           <Field label={isEvento || isCasa ? "Quantidade prevista" : "Quantidade de pessoas"}>
@@ -308,12 +308,12 @@ function ReservarPage() {
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <Field label="Data">
-              <Input type="date" min={hoje} value={data} onChange={(e) => setData(e.target.value)} className="h-12 rounded-xl" required />
+              <Input type="date" min={hoje} value={data} onChange={(e) => setData(e.target.value)} className="h-12 rounded-md" required />
             </Field>
             {precisaHorario && (
               <Field label="Horário">
                 <Select value={horario} onValueChange={setHorario} disabled={!data}>
-                  <SelectTrigger className="h-12 rounded-xl">
+                  <SelectTrigger className="h-12 rounded-md">
                     <SelectValue placeholder={data ? "Selecione" : "Escolha a data"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -333,7 +333,7 @@ function ReservarPage() {
           )}
 
           {bloqueio && (
-            <div className="flex items-start gap-3 rounded-xl border border-destructive/25 bg-destructive/5 p-4">
+            <div className="flex items-start gap-3 rounded-lg border border-destructive/25 bg-destructive/5 p-4">
               <CalendarX2 className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
               <div className="text-sm">
                 <p className="font-medium text-destructive">
@@ -351,7 +351,7 @@ function ReservarPage() {
           {isMesa && (
             <Field label="Área desejada">
               <Select value={area} onValueChange={(v) => setArea(v as ReservaArea)}>
-                <SelectTrigger className="h-12 rounded-xl"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="h-12 rounded-md"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="salao">{AREA_LABEL.salao} ({AREA_DESCRICAO.salao})</SelectItem>
                   <SelectItem value="fundos">{AREA_LABEL.fundos} ({AREA_DESCRICAO.fundos})</SelectItem>
@@ -379,21 +379,21 @@ function ReservarPage() {
 
           {isEvento && (
             <Field label="Tipo do evento">
-              <Input value={tipoEvento} onChange={(e) => setTipoEvento(e.target.value)} placeholder="Ex: confraternização de empresa" className="h-12 rounded-xl" required />
+              <Input value={tipoEvento} onChange={(e) => setTipoEvento(e.target.value)} placeholder="Ex: confraternização de empresa" className="h-12 rounded-md" required />
             </Field>
           )}
 
           {(isEvento || isCasa) ? (
             <Field label="Mensagem">
-              <Textarea value={mensagem} onChange={(e) => setMensagem(e.target.value)} placeholder="Conte um pouco sobre o que você imagina." className="min-h-28 rounded-xl" />
+              <Textarea value={mensagem} onChange={(e) => setMensagem(e.target.value)} placeholder="Conte um pouco sobre o que você imagina." className="min-h-28 rounded-md" />
             </Field>
           ) : (
             <Field label="Observações">
-              <Textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} placeholder="Alguma preferência ou informação adicional?" className="min-h-24 rounded-xl" />
+              <Textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} placeholder="Alguma preferência ou informação adicional?" className="min-h-24 rounded-md" />
             </Field>
           )}
 
-          <Button type="submit" disabled={!podeEnviar || enviando} className="mt-2 w-full rounded-xl bg-terracotta text-terracotta-foreground hover:bg-terracotta/90 disabled:opacity-50" style={{ height: 52 }}>
+          <Button type="submit" disabled={!podeEnviar || enviando} className="mt-2 w-full rounded-lg bg-terracotta text-terracotta-foreground hover:bg-terracotta/90 disabled:opacity-50" style={{ height: 52 }}>
             {enviando ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Enviando…</>) : "Enviar reserva"}
           </Button>
         </form>
@@ -419,15 +419,15 @@ function QuantityInput({ value, onChange, min, max }: { value: number; onChange:
     onChange(clamped); setText(String(clamped));
   }
   return (
-    <div className="flex h-12 items-center justify-between rounded-xl border border-input bg-background px-2">
-      <button type="button" onClick={() => commit(value - 1)} className="flex h-10 w-10 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-accent active:scale-95 disabled:opacity-40" disabled={value <= min} aria-label="Diminuir">
+    <div className="flex h-12 items-center justify-between rounded-md border border-input bg-background px-2">
+      <button type="button" onClick={() => commit(value - 1)} className="flex h-10 w-10 items-center justify-center rounded-md text-foreground transition-colors hover:bg-accent active:scale-95 disabled:opacity-40" disabled={value <= min} aria-label="Diminuir">
         <Minus className="h-4 w-4" />
       </button>
       <input type="text" inputMode="numeric" pattern="[0-9]*" value={text}
         onChange={(e) => { const v = e.target.value.replace(/\D/g, "").slice(0, 4); setText(v); if (v !== "") onChange(Math.max(min, Math.min(max, parseInt(v, 10)))); }}
         onBlur={() => { if (text === "") commit(min); else commit(parseInt(text, 10)); }}
         className="w-16 bg-transparent text-center text-lg font-medium tabular-nums outline-none" aria-label="Quantidade" />
-      <button type="button" onClick={() => commit(value + 1)} className="flex h-10 w-10 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-accent active:scale-95 disabled:opacity-40" disabled={value >= max} aria-label="Aumentar">
+      <button type="button" onClick={() => commit(value + 1)} className="flex h-10 w-10 items-center justify-center rounded-md text-foreground transition-colors hover:bg-accent active:scale-95 disabled:opacity-40" disabled={value >= max} aria-label="Aumentar">
         <Plus className="h-4 w-4" />
       </button>
     </div>
@@ -436,10 +436,10 @@ function QuantityInput({ value, onChange, min, max }: { value: number; onChange:
 
 function SegmentedButtons<T extends string>({ value, onChange, options }: { value: T; onChange: (v: T) => void; options: Array<{ value: T; label: string }> }) {
   return (
-    <div className="grid grid-cols-2 gap-2 rounded-xl bg-muted p-1">
+    <div className="grid grid-cols-2 gap-2 rounded-[12px] bg-muted p-1">
       {options.map((o) => (
         <button key={o.value} type="button" onClick={() => onChange(o.value)}
-          className={`h-10 rounded-lg text-sm font-medium transition-all ${value === o.value ? "bg-background text-foreground shadow-[var(--shadow-sm)]" : "text-muted-foreground hover:text-foreground"}`}>
+          className={`h-10 rounded-md text-sm font-medium transition-all ${value === o.value ? "bg-background text-foreground shadow-[var(--shadow-sm)]" : "text-muted-foreground hover:text-foreground"}`}>
           {o.label}
         </button>
       ))}

@@ -93,16 +93,16 @@ function SugestoesPage() {
           </p>
         </header>
 
-        <section className="mt-6 rounded-2xl border border-border bg-card p-5 space-y-4 animate-in-up">
+        <section className="mt-6 rounded-lg border border-border bg-card p-5 space-y-4 animate-in-up">
           <div className="space-y-2">
             <Label className="text-[13px]">Título</Label>
-            <Input value={titulo} onChange={(e) => setTitulo(e.target.value)} placeholder="Ex.: Exportar reservas em planilha" className="h-11 rounded-xl" />
+            <Input value={titulo} onChange={(e) => setTitulo(e.target.value)} placeholder="Ex.: Exportar reservas em planilha" className="h-11 rounded-md" />
           </div>
           <div className="space-y-2">
             <Label className="text-[13px]">Descrição</Label>
-            <Textarea value={descricao} onChange={(e) => setDescricao(e.target.value)} placeholder="Explique como isso ajudaria no dia a dia." className="min-h-32 rounded-xl" />
+            <Textarea value={descricao} onChange={(e) => setDescricao(e.target.value)} placeholder="Explique como isso ajudaria no dia a dia." className="min-h-32 rounded-md" />
           </div>
-          <Button onClick={() => enviar.mutate()} disabled={!podeEnviar} className="h-11 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 sm:w-auto sm:px-6">
+          <Button onClick={() => enviar.mutate()} disabled={!podeEnviar} className="h-11 w-full rounded-md bg-primary text-primary-foreground hover:bg-primary/90 sm:w-auto sm:px-6">
             {enviar.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
             Enviar sugestão
           </Button>
@@ -113,14 +113,14 @@ function SugestoesPage() {
           {listaQ.isLoading ? (
             <div className="mt-6 flex justify-center"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
           ) : (listaQ.data?.length ?? 0) === 0 ? (
-            <div className="mt-4 rounded-2xl border border-dashed border-border bg-card/50 py-12 text-center">
+            <div className="mt-4 rounded-lg border border-dashed border-border bg-card/50 py-12 text-center">
               <Lightbulb className="mx-auto h-6 w-6 text-muted-foreground/60" />
               <p className="mt-3 font-serif text-2xl">Nenhuma sugestão ainda</p>
             </div>
           ) : (
             <ul className="mt-4 space-y-2.5">
               {listaQ.data!.map((f) => (
-                <li key={f.id} className="rounded-xl border border-border bg-card p-4">
+                <li key={f.id} className="rounded-lg border border-border bg-card p-4">
                   <div className="flex items-start justify-between gap-3">
                     <p className="font-medium">{f.titulo}</p>
                     <span className="shrink-0 rounded-full bg-muted px-2.5 py-1 text-[11px] text-muted-foreground">

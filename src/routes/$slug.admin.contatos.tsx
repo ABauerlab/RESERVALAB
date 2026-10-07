@@ -111,18 +111,18 @@ function ContatosPage() {
           <div className="mt-3 grid grid-cols-2 gap-3 animate-in-up sm:max-w-sm">
             <div className="space-y-1.5">
               <Label className="text-[12px] text-muted-foreground">De</Label>
-              <Input type="date" value={de} onChange={(e) => setDe(e.target.value)} className="h-10 rounded-lg" />
+              <Input type="date" value={de} onChange={(e) => setDe(e.target.value)} className="h-10 rounded-md" />
             </div>
             <div className="space-y-1.5">
               <Label className="text-[12px] text-muted-foreground">Até</Label>
-              <Input type="date" value={ate} onChange={(e) => setAte(e.target.value)} className="h-10 rounded-lg" />
+              <Input type="date" value={ate} onChange={(e) => setAte(e.target.value)} className="h-10 rounded-md" />
             </div>
           </div>
         )}
 
-        <div className="mt-5 flex items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4">
+        <div className="mt-5 flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-4">
           <div className="flex items-center gap-2.5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-cream text-terracotta">
+            <span className="flex h-9 w-9 items-center justify-center rounded-md bg-cream text-terracotta">
               <Users className="h-4 w-4" />
             </span>
             <div>
@@ -133,7 +133,7 @@ function ContatosPage() {
           <button
             onClick={baixarCsv}
             disabled={contatos.length === 0}
-            className="inline-flex h-10 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 disabled:opacity-40 disabled:pointer-events-none"
+            className="inline-flex h-10 items-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 disabled:opacity-40 disabled:pointer-events-none"
           >
             <Download className="h-4 w-4" /> Baixar CSV
           </button>
@@ -143,12 +143,12 @@ function ContatosPage() {
           {reservasQ.isLoading ? (
             <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
           ) : contatos.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border bg-card/50 py-14 text-center">
+            <div className="rounded-lg border border-dashed border-border bg-card/50 py-14 text-center">
               <p className="font-serif text-2xl text-foreground">Nenhum contato</p>
               <p className="mt-1 text-sm text-muted-foreground">Ninguém reservou nesse período ainda.</p>
             </div>
           ) : (
-            <div className="overflow-hidden rounded-2xl border border-border bg-card">
+            <div className="overflow-hidden rounded-lg border border-border bg-card">
               <div className="max-h-[520px] overflow-y-auto">
                 <table className="w-full text-sm">
                   <thead className="sticky top-0 bg-muted/70 backdrop-blur-sm">

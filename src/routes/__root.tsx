@@ -18,14 +18,14 @@ function NotFoundComponent() {
     <div className="flex min-h-screen items-center justify-center bg-background px-6">
       <div className="max-w-md text-center animate-in-up">
         <p className="font-serif text-7xl text-terracotta">404</p>
-        <h2 className="mt-4 text-xl font-medium">Página não encontrada</h2>
+        <h2 className="mt-4 text-xl font-semibold">Página não encontrada</h2>
         <p className="mt-2 text-sm text-muted-foreground">
           O que você procura não existe ou foi movido.
         </p>
         <div className="mt-8">
           <Link
             to="/"
-            className="inline-flex h-11 items-center justify-center rounded-xl bg-primary px-5 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+            className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-5 text-[15px] font-semibold text-primary-foreground shadow-blue transition-colors hover:bg-blue-700"
           >
             Voltar ao início
           </Link>
@@ -45,20 +45,20 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-6">
       <div className="max-w-md text-center animate-in-up">
-        <h1 className="text-xl font-medium">Algo não saiu como esperado</h1>
+        <h1 className="text-xl font-semibold">Algo não saiu como esperado</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Tente novamente ou volte ao início.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
             onClick={() => { router.invalidate(); reset(); }}
-            className="inline-flex h-11 items-center justify-center rounded-xl bg-primary px-5 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+            className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-5 text-[15px] font-semibold text-primary-foreground shadow-blue transition-colors hover:bg-blue-700"
           >
             Tentar novamente
           </button>
           <a
             href="/"
-            className="inline-flex h-11 items-center justify-center rounded-xl border border-border bg-background px-5 text-sm font-medium transition hover:bg-accent"
+            className="inline-flex h-11 items-center justify-center rounded-md border border-border bg-card px-5 text-[15px] font-semibold shadow-xs transition-colors hover:border-slate-300 hover:bg-slate-50"
           >
             Início
           </a>

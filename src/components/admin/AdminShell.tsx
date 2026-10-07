@@ -37,20 +37,28 @@ export function AdminShell({
 
   return (
     <main className="min-h-screen bg-background pb-16 safe-top safe-bottom">
-      <header className="sticky top-0 z-20 border-b border-border/70 bg-background/85 backdrop-blur-md">
+      <header className="sticky top-0 z-20 border-b border-border bg-card/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-4xl items-center gap-3 px-5 py-4">
           <div className="min-w-0 flex-1">
-            <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-terracotta">
-              ReservaLab · {tenantNome}
-            </p>
-            <h1 className="truncate text-lg font-medium">Painel da empresa</h1>
+            <div className="flex min-w-0 items-center gap-3">
+              <img
+                src="/brand/Teggly_Logo_Primary.svg"
+                alt="Teggly"
+                width={101}
+                height={24}
+                className="h-6 w-auto shrink-0"
+              />
+              <span className="h-5 w-px shrink-0 bg-border" aria-hidden="true" />
+              <p className="truncate text-sm font-semibold text-foreground">{tenantNome}</p>
+            </div>
+            <h1 className="mt-1 truncate text-lg font-semibold">Painel da empresa</h1>
           </div>
           <button
             onClick={signOut}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             aria-label="Sair"
           >
-            <LogOut className="h-4 w-4" />
+            <LogOut className="h-5 w-5" />
           </button>
         </div>
 
@@ -64,13 +72,13 @@ export function AdminShell({
                   key={t.id}
                   to={t.to}
                   params={{ slug }}
-                  className={`inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-xs font-medium transition-all ${
+                  className={`inline-flex h-10 shrink-0 items-center gap-2 rounded-md px-3.5 text-sm transition-colors ${
                     isActive
-                      ? "bg-primary text-primary-foreground shadow-[var(--shadow-sm)]"
-                      : "bg-muted text-muted-foreground hover:bg-accent hover:text-foreground"
+                      ? "bg-accent font-semibold text-accent-foreground"
+                      : "font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
                   }`}
                 >
-                  <Icon className="h-3.5 w-3.5" />
+                  <Icon className="h-4 w-4" />
                   {t.label}
                 </Link>
               );

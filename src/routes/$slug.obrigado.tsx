@@ -54,13 +54,13 @@ function Obrigado() {
         </p>
 
         {codigo && (
-          <div className="mt-8 rounded-2xl border border-border bg-card p-5 text-left">
+          <div className="mt-8 rounded-lg border border-border bg-card p-5 text-left">
             <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
               Código de acompanhamento
             </p>
             <div className="mt-2 flex items-center justify-between gap-3">
               <p className="font-serif text-2xl tracking-wider text-foreground">{codigo}</p>
-              <button onClick={copiar} className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-background px-3 text-xs font-medium transition-colors hover:bg-accent">
+              <button onClick={copiar} className="inline-flex h-10 items-center gap-1.5 rounded-md border border-border bg-background px-3 text-xs font-medium transition-colors hover:bg-accent">
                 <Copy className="h-3.5 w-3.5" />
                 Copiar
               </button>
@@ -72,11 +72,11 @@ function Obrigado() {
         )}
 
         <div className="mt-6 flex flex-wrap justify-center gap-2">
-          <Link to="/$slug/acompanhar" params={{ slug }} className="inline-flex h-11 items-center justify-center gap-1.5 rounded-xl bg-primary px-5 text-sm font-medium text-primary-foreground transition hover:opacity-90">
+          <Link to="/$slug/acompanhar" params={{ slug }} className="inline-flex h-11 items-center justify-center gap-1.5 rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground transition hover:opacity-90">
             <Search className="h-3.5 w-3.5" />
             Acompanhar reserva
           </Link>
-          <Link to="/$slug" params={{ slug }} className="inline-flex h-11 items-center justify-center rounded-xl border border-border bg-background px-5 text-sm font-medium transition hover:bg-accent">
+          <Link to="/$slug" params={{ slug }} className="inline-flex h-11 items-center justify-center rounded-md border border-border bg-background px-5 text-sm font-medium transition hover:bg-accent">
             Voltar ao início
           </Link>
         </div>

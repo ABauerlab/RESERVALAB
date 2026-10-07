@@ -155,18 +155,18 @@ function AgendaPage() {
           </p>
         </header>
 
-        <section className="mt-6 rounded-2xl border border-border bg-card p-5 animate-in-up">
+        <section className="mt-6 rounded-lg border border-border bg-card p-5 animate-in-up">
           <h3 className="font-medium">Novo bloqueio</h3>
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label className="text-[13px]">Data</Label>
-              <Input type="date" min={new Date().toISOString().slice(0, 10)} value={data} onChange={(e) => setData(e.target.value)} className="h-11 rounded-xl" />
+              <Input type="date" min={new Date().toISOString().slice(0, 10)} value={data} onChange={(e) => setData(e.target.value)} className="h-11 rounded-md" />
             </div>
             <div className="space-y-2">
               <Label className="text-[13px]">Abrangência</Label>
-              <div className="flex gap-1.5 rounded-xl bg-muted p-1">
-                <button type="button" onClick={() => setDiaTodo(true)} className={`h-9 flex-1 rounded-lg text-xs font-medium transition-all ${diaTodo ? "bg-background shadow-[var(--shadow-sm)]" : "text-muted-foreground"}`}>Dia inteiro</button>
-                <button type="button" onClick={() => setDiaTodo(false)} className={`h-9 flex-1 rounded-lg text-xs font-medium transition-all ${!diaTodo ? "bg-background shadow-[var(--shadow-sm)]" : "text-muted-foreground"}`}>Faixa de horário</button>
+              <div className="flex gap-1.5 rounded-[12px] bg-muted p-1">
+                <button type="button" onClick={() => setDiaTodo(true)} className={`h-9 flex-1 rounded-md text-xs font-medium transition-all ${diaTodo ? "bg-background shadow-[var(--shadow-sm)]" : "text-muted-foreground"}`}>Dia inteiro</button>
+                <button type="button" onClick={() => setDiaTodo(false)} className={`h-9 flex-1 rounded-md text-xs font-medium transition-all ${!diaTodo ? "bg-background shadow-[var(--shadow-sm)]" : "text-muted-foreground"}`}>Faixa de horário</button>
               </div>
             </div>
           </div>
@@ -175,11 +175,11 @@ function AgendaPage() {
             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label className="text-[13px]">Das</Label>
-                <Input type="time" value={horaInicio} onChange={(e) => setHoraInicio(e.target.value)} className="h-11 rounded-xl" />
+                <Input type="time" value={horaInicio} onChange={(e) => setHoraInicio(e.target.value)} className="h-11 rounded-md" />
               </div>
               <div className="space-y-2">
                 <Label className="text-[13px]">Até</Label>
-                <Input type="time" value={horaFim} onChange={(e) => setHoraFim(e.target.value)} className="h-11 rounded-xl" />
+                <Input type="time" value={horaFim} onChange={(e) => setHoraFim(e.target.value)} className="h-11 rounded-md" />
                 <p className="text-[11px] text-muted-foreground">Deixe em branco para bloquear até o fim do dia.</p>
               </div>
             </div>
@@ -187,10 +187,10 @@ function AgendaPage() {
 
           <div className="mt-4 space-y-2">
             <Label className="text-[13px]">Motivo (opcional, visível ao cliente)</Label>
-            <Input value={motivo} onChange={(e) => setMotivo(e.target.value)} placeholder="Ex.: Evento fechado" className="h-11 rounded-xl" />
+            <Input value={motivo} onChange={(e) => setMotivo(e.target.value)} placeholder="Ex.: Evento fechado" className="h-11 rounded-md" />
           </div>
 
-          <Button onClick={() => criar.mutate()} disabled={!podeCriar} className="mt-5 h-11 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 sm:w-auto sm:px-6">
+          <Button onClick={() => criar.mutate()} disabled={!podeCriar} className="mt-5 h-11 w-full rounded-md bg-primary text-primary-foreground hover:bg-primary/90 sm:w-auto sm:px-6">
             {criar.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
             Bloquear
           </Button>
@@ -201,7 +201,7 @@ function AgendaPage() {
           {bloqueiosQ.isLoading ? (
             <div className="mt-6 flex justify-center"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
           ) : (bloqueiosQ.data?.length ?? 0) === 0 ? (
-            <div className="mt-4 rounded-2xl border border-dashed border-border bg-card/50 py-12 text-center">
+            <div className="mt-4 rounded-lg border border-dashed border-border bg-card/50 py-12 text-center">
               <CalendarX2 className="mx-auto h-6 w-6 text-muted-foreground/60" />
               <p className="mt-3 font-serif text-2xl">Nenhum bloqueio</p>
               <p className="mt-1 text-sm text-muted-foreground">A agenda está totalmente aberta.</p>
@@ -209,7 +209,7 @@ function AgendaPage() {
           ) : (
             <ul className="mt-4 space-y-2.5">
               {bloqueiosQ.data!.map((b) => (
-                <li key={b.id} className="flex items-center gap-3 rounded-xl border border-border bg-card p-4">
+                <li key={b.id} className="flex items-center gap-3 rounded-lg border border-border bg-card p-4">
                   <div className="min-w-0 flex-1">
                     <p className="font-medium">{formatData(b.data)}</p>
                     <p className="text-sm text-muted-foreground">
@@ -225,7 +225,7 @@ function AgendaPage() {
                   </div>
                   <button
                     onClick={() => remover.mutate(b.id)}
-                    className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                    className="flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                     aria-label="Remover bloqueio"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -236,7 +236,7 @@ function AgendaPage() {
           )}
         </section>
 
-        <section className="mt-10 rounded-2xl border border-border bg-card p-5 animate-in-up">
+        <section className="mt-10 rounded-lg border border-border bg-card p-5 animate-in-up">
           <h3 className="font-medium">Feriados</h3>
           <p className="mt-1 text-sm text-muted-foreground">
             Uma data marcada como feriado passa a usar os horários de fim de semana (janela e horário-limite),
@@ -245,14 +245,14 @@ function AgendaPage() {
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label className="text-[13px]">Data</Label>
-              <Input type="date" min={new Date().toISOString().slice(0, 10)} value={feriadoData} onChange={(e) => setFeriadoData(e.target.value)} className="h-11 rounded-xl" />
+              <Input type="date" min={new Date().toISOString().slice(0, 10)} value={feriadoData} onChange={(e) => setFeriadoData(e.target.value)} className="h-11 rounded-md" />
             </div>
             <div className="space-y-2">
               <Label className="text-[13px]">Motivo (opcional)</Label>
-              <Input value={feriadoMotivo} onChange={(e) => setFeriadoMotivo(e.target.value)} placeholder="Ex.: Independência do Brasil" className="h-11 rounded-xl" />
+              <Input value={feriadoMotivo} onChange={(e) => setFeriadoMotivo(e.target.value)} placeholder="Ex.: Independência do Brasil" className="h-11 rounded-md" />
             </div>
           </div>
-          <Button onClick={() => criarFeriado.mutate()} disabled={!podeCriarFeriado} className="mt-5 h-11 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 sm:w-auto sm:px-6">
+          <Button onClick={() => criarFeriado.mutate()} disabled={!podeCriarFeriado} className="mt-5 h-11 w-full rounded-md bg-primary text-primary-foreground hover:bg-primary/90 sm:w-auto sm:px-6">
             {criarFeriado.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
             Adicionar feriado
           </Button>
@@ -263,7 +263,7 @@ function AgendaPage() {
           {feriadosQ.isLoading ? (
             <div className="mt-6 flex justify-center"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
           ) : (feriadosQ.data?.length ?? 0) === 0 ? (
-            <div className="mt-4 rounded-2xl border border-dashed border-border bg-card/50 py-12 text-center">
+            <div className="mt-4 rounded-lg border border-dashed border-border bg-card/50 py-12 text-center">
               <CalendarHeart className="mx-auto h-6 w-6 text-muted-foreground/60" />
               <p className="mt-3 font-serif text-2xl">Nenhum feriado cadastrado</p>
               <p className="mt-1 text-sm text-muted-foreground">Todos os dias seguem o horário normal da semana.</p>
@@ -271,14 +271,14 @@ function AgendaPage() {
           ) : (
             <ul className="mt-4 space-y-2.5">
               {feriadosQ.data!.map((f: { id: string; data: string; motivo: string | null }) => (
-                <li key={f.id} className="flex items-center gap-3 rounded-xl border border-border bg-card p-4">
+                <li key={f.id} className="flex items-center gap-3 rounded-lg border border-border bg-card p-4">
                   <div className="min-w-0 flex-1">
                     <p className="font-medium">{formatData(f.data)}</p>
                     {f.motivo && <p className="text-sm text-muted-foreground">{f.motivo}</p>}
                   </div>
                   <button
                     onClick={() => removerFeriado.mutate(f.id)}
-                    className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                    className="flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                     aria-label="Remover feriado"
                   >
                     <Trash2 className="h-4 w-4" />

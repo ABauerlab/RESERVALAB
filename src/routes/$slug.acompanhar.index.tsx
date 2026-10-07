@@ -66,10 +66,10 @@ function AcompanharPage() {
         >
           <div className="space-y-2">
             <Label className="text-[13px] font-medium text-foreground">Código</Label>
-            <Input value={codigo} onChange={(e) => setCodigo(normalizeCodigo(e.target.value))} placeholder="RL-XXXXXX" autoCapitalize="characters" autoComplete="off" className="h-12 rounded-xl font-mono tracking-wider" required />
+            <Input value={codigo} onChange={(e) => setCodigo(normalizeCodigo(e.target.value))} placeholder="RL-XXXXXX" autoCapitalize="characters" autoComplete="off" className="h-12 rounded-md font-mono tracking-wider" required />
           </div>
 
-          <Button type="submit" className="h-12 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button type="submit" className="h-12 w-full rounded-md bg-primary text-primary-foreground hover:bg-primary/90">
             <Search className="mr-2 h-4 w-4" /> Consultar
           </Button>
         </form>

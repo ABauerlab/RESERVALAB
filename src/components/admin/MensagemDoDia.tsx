@@ -140,7 +140,7 @@ export function MensagemDoDiaButton({ tenantId }: { tenantId: string | null }) {
           </DialogHeader>
 
           <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-1 rounded-xl bg-muted p-1">
+            <div className="grid grid-cols-2 gap-1 rounded-[12px] bg-muted p-1">
               {([["dia", "Somente o dia"], ["proximas", "A partir da data"]] as Array<[Modo, string]>).map(([v, label]) => (
                 <button
                   key={v}
@@ -171,7 +171,7 @@ export function MensagemDoDiaButton({ tenantId }: { tenantId: string | null }) {
                 </Button>
               </>
             ) : (
-              <p className="rounded-xl bg-muted px-4 py-6 text-center text-sm text-muted-foreground">
+              <p className="rounded-lg bg-muted px-4 py-6 text-center text-sm text-muted-foreground">
                 Nenhuma reserva encontrada para esse período
               </p>
             )}

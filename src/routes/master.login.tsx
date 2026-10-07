@@ -88,7 +88,7 @@ function MasterLogin() {
           <p className="mt-1 text-xs text-muted-foreground">Painel master</p>
         </Link>
 
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-md)]">
+        <div className="rounded-lg border border-border bg-card p-6 shadow-[var(--shadow-md)]">
           <h1 className="font-serif text-3xl tracking-tight">Master</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Acesso restrito ao administrador da plataforma.
@@ -97,14 +97,14 @@ function MasterLogin() {
           <form onSubmit={onSubmit} className="mt-6 space-y-4">
             <div className="space-y-2">
               <Label className="text-[13px]">E-mail</Label>
-              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-12 rounded-xl" />
+              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-12 rounded-md" />
             </div>
             <div className="space-y-2">
               <Label className="text-[13px]">Senha</Label>
-              <Input type="password" value={senha} onChange={(e) => setSenha(e.target.value)} required minLength={6} className="h-12 rounded-xl" />
+              <Input type="password" value={senha} onChange={(e) => setSenha(e.target.value)} required minLength={6} className="h-12 rounded-md" />
             </div>
 
-            <Button type="submit" disabled={loading || booting} className="h-12 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button type="submit" disabled={loading || booting} className="h-12 w-full rounded-md bg-primary text-primary-foreground hover:bg-primary/90">
               {loading || booting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Entrar"}
             </Button>
           </form>

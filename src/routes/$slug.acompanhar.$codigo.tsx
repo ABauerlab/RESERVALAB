@@ -62,7 +62,7 @@ function AcompanharDetalhes() {
         {reservaQ.isLoading ? (
           <div className="mt-10 flex justify-center"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
         ) : !reservaQ.data ? (
-          <div className="mt-8 rounded-2xl border border-dashed border-border bg-card/50 py-14 text-center">
+          <div className="mt-8 rounded-lg border border-dashed border-border bg-card/50 py-14 text-center">
             <p className="font-serif text-2xl text-foreground">Não encontramos</p>
             <p className="mt-1 text-sm text-muted-foreground">Confira o código digitado.</p>
           </div>
@@ -125,7 +125,7 @@ function ReservaEdit({ reserva, onUpdated }: { reserva: Reserva; onUpdated: (r: 
 
   return (
     <div className="mt-6 space-y-5 animate-in-up">
-      <div className="rounded-2xl border border-border bg-card p-5">
+      <div className="rounded-lg border border-border bg-card p-5">
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{TIPO_LABEL[reserva.tipo]}</p>
@@ -142,33 +142,33 @@ function ReservaEdit({ reserva, onUpdated }: { reserva: Reserva; onUpdated: (r: 
       </div>
 
       {bloqueada ? (
-        <p className="rounded-xl border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
+        <p className="rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
           Esta reserva está {STATUS_LABEL[reserva.status].toLowerCase()} e não pode mais ser alterada. Para uma nova solicitação, faça uma reserva.
         </p>
       ) : (
         <>
-          <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
+          <div className="rounded-lg border border-border bg-card p-5 space-y-4">
             <h2 className="font-medium">Alterar dados</h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label className="text-[13px]">Data</Label>
-                <Input type="date" value={data} onChange={(e) => setData(e.target.value)} className="h-11 rounded-xl" />
+                <Input type="date" value={data} onChange={(e) => setData(e.target.value)} className="h-11 rounded-md" />
               </div>
               <div className="space-y-2">
                 <Label className="text-[13px]">Horário</Label>
-                <Input type="time" value={horario} onChange={(e) => setHorario(e.target.value)} className="h-11 rounded-xl" />
+                <Input type="time" value={horario} onChange={(e) => setHorario(e.target.value)} className="h-11 rounded-md" />
               </div>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label className="text-[13px]">Quantidade</Label>
-                <Input type="number" min={1} max={5000} value={quantidade} onChange={(e) => setQuantidade(e.target.value.replace(/\D/g, ""))} className="h-11 rounded-xl" />
+                <Input type="number" min={1} max={5000} value={quantidade} onChange={(e) => setQuantidade(e.target.value.replace(/\D/g, ""))} className="h-11 rounded-md" />
               </div>
               {reserva.tipo === "mesa" && (
                 <div className="space-y-2">
                   <Label className="text-[13px]">Área</Label>
                   <Select value={area || undefined} onValueChange={(v) => setArea(v as ReservaArea)}>
-                    <SelectTrigger className="h-11 rounded-xl"><SelectValue placeholder="Sem preferência" /></SelectTrigger>
+                    <SelectTrigger className="h-11 rounded-md"><SelectValue placeholder="Sem preferência" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="salao">{AREA_LABEL.salao} ({AREA_DESCRICAO.salao})</SelectItem>
                       <SelectItem value="fundos">{AREA_LABEL.fundos} ({AREA_DESCRICAO.fundos})</SelectItem>
@@ -182,18 +182,18 @@ function ReservaEdit({ reserva, onUpdated }: { reserva: Reserva; onUpdated: (r: 
             </div>
             <div className="space-y-2">
               <Label className="text-[13px]">Observações</Label>
-              <Textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} className="min-h-24 rounded-xl" />
+              <Textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} className="min-h-24 rounded-md" />
             </div>
           </div>
 
-          <Button onClick={() => salvar.mutate()} disabled={salvar.isPending} className="h-12 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button onClick={() => salvar.mutate()} disabled={salvar.isPending} className="h-12 w-full rounded-md bg-primary text-primary-foreground hover:bg-primary/90">
             {salvar.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             Salvar alterações
           </Button>
 
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="outline" disabled={cancelar.isPending} className="h-12 w-full rounded-xl border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive">
+              <Button variant="outline" disabled={cancelar.isPending} className="h-12 w-full rounded-md border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive">
                 {cancelar.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <X className="mr-2 h-4 w-4" />}
                 Cancelar reserva
               </Button>

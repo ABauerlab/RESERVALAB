@@ -49,7 +49,7 @@ export function NovasReservasBanner({ tenantId }: { tenantId: string | null }) {
   if (!tenantId || dispensado) return null;
   if (q.isLoading) {
     return (
-      <div className="mb-5 flex items-center gap-2 rounded-2xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
+      <div className="mb-5 flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
         <Loader2 className="h-4 w-4 animate-spin" /> Verificando novas reservas…
       </div>
     );
@@ -66,7 +66,7 @@ export function NovasReservasBanner({ tenantId }: { tenantId: string | null }) {
   }
 
   return (
-    <section className="mb-5 rounded-2xl border border-terracotta/30 bg-terracotta/5 p-4 animate-in-up">
+    <section className="mb-5 rounded-lg border border-terracotta/30 bg-terracotta/5 p-4 animate-in-up">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="flex items-center gap-2 text-sm font-medium text-terracotta">
           <BellRing className="h-4 w-4" />
@@ -82,7 +82,7 @@ export function NovasReservasBanner({ tenantId }: { tenantId: string | null }) {
 
       <ul className="mt-3 space-y-1.5">
         {novas.map((r) => (
-          <li key={r.id} className="rounded-xl bg-card px-3 py-2 text-sm">
+          <li key={r.id} className="rounded-lg bg-card px-3 py-2 text-sm">
             <span className="font-medium">{r.nome}</span>
             <span className="text-muted-foreground">
               {" — "}{TIPO_SHORT[r.tipo]} • {r.quantidade ?? "?"} pessoas • {formatData(r.data)}

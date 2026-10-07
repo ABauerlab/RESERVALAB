@@ -102,18 +102,18 @@ function AdminLogin() {
           <p className="mt-1 text-xs text-muted-foreground">Painel administrativo</p>
         </Link>
 
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-md)]">
+        <div className="rounded-lg border border-border bg-card p-6 shadow-[var(--shadow-md)]">
           <h1 className="font-serif text-3xl tracking-tight">Entrar</h1>
           <p className="mt-1 text-sm text-muted-foreground">Acesse o painel de reservas.</p>
 
           <form onSubmit={onSubmit} className="mt-6 space-y-4">
             <div className="space-y-2">
               <Label className="text-[13px]">E-mail</Label>
-              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="voce@empresa.com" autoComplete="email" required className="h-12 rounded-xl" />
+              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="voce@empresa.com" autoComplete="email" required className="h-12 rounded-md" />
             </div>
             <div className="space-y-2">
               <Label className="text-[13px]">Senha</Label>
-              <Input type="password" value={senha} onChange={(e) => setSenha(e.target.value)} autoComplete="current-password" required minLength={6} className="h-12 rounded-xl" />
+              <Input type="password" value={senha} onChange={(e) => setSenha(e.target.value)} autoComplete="current-password" required minLength={6} className="h-12 rounded-md" />
             </div>
 
             <label className="flex items-center gap-2.5 text-sm text-muted-foreground">
@@ -121,7 +121,7 @@ function AdminLogin() {
               Manter conectado neste dispositivo
             </label>
 
-            <Button type="submit" disabled={loading} className="h-12 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button type="submit" disabled={loading} className="h-12 w-full rounded-md bg-primary text-primary-foreground hover:bg-primary/90">
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Entrar"}
             </Button>
           </form>

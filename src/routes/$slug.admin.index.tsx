@@ -391,7 +391,7 @@ function AdminDashboard() {
 
         <div className="mt-6 relative">
           <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Nome, telefone ou código…" className="h-11 rounded-xl pl-10" />
+          <Input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Nome, telefone ou código…" className="h-11 rounded-md pl-10" />
         </div>
 
         <div className="mt-4 -mx-5 overflow-x-auto px-5 pb-1 scrollbar-none">
@@ -412,7 +412,7 @@ function AdminDashboard() {
 
         <div className="mt-5 space-y-2.5">
           {listaQ.isLoading ? (
-            Array.from({ length: 4 }).map((_, i) => (<Skeleton key={i} className="h-[88px] w-full rounded-2xl" />))
+            Array.from({ length: 4 }).map((_, i) => (<Skeleton key={i} className="h-[88px] w-full rounded-lg" />))
           ) : listaQ.data && listaQ.data.length > 0 ? (
             listaQ.data.map((r, i) => (<ReservaCard key={r.id} r={r} onClick={() => setSelected(r)} delay={i * 30} />))
           ) : (
@@ -422,7 +422,7 @@ function AdminDashboard() {
           {filtroStatus === "todos" && !mostrarFinalizadas && (finalizadasCountQ.data ?? 0) > 0 && (
             <button
               onClick={() => setMostrarFinalizadas(true)}
-              className="w-full rounded-2xl border border-dashed border-border bg-card/60 px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              className="w-full rounded-lg border border-dashed border-border bg-card/60 px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
             >
               Ver mais {finalizadasCountQ.data} finalizada{finalizadasCountQ.data === 1 ? "" : "s"}
             </button>
@@ -431,7 +431,7 @@ function AdminDashboard() {
           {filtroStatus === "todos" && mostrarFinalizadas && (
             <button
               onClick={() => setMostrarFinalizadas(false)}
-              className="w-full rounded-2xl border border-dashed border-border bg-card/60 px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              className="w-full rounded-lg border border-dashed border-border bg-card/60 px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
             >
               Ocultar finalizadas
             </button>
@@ -469,7 +469,7 @@ function FilterChip({ active, onClick, children, variant }: { active: boolean; o
 
 function StatCard({ icon: Icon, label, value, loading, accent }: { icon: React.ComponentType<{ className?: string }>; label: string; value?: number; loading?: boolean; accent?: boolean }) {
   return (
-    <div className={`rounded-2xl border border-border bg-card p-4 transition-colors ${accent ? "bg-cream" : ""}`}>
+    <div className={`rounded-lg border border-border bg-card p-4 transition-colors ${accent ? "bg-cream" : ""}`}>
       <div className="flex items-center gap-2">
         <Icon className={`h-3.5 w-3.5 ${accent ? "text-terracotta" : "text-muted-foreground"}`} />
         <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
@@ -499,10 +499,10 @@ function ReservaCard({ r, onClick, delay }: { r: Reserva; onClick: () => void; d
   const Icon = TIPO_ICON[r.tipo as ReservaTipo] ?? Utensils;
   return (
     <button onClick={onClick} style={{ animationDelay: `${delay}ms` }}
-      className="w-full rounded-2xl border border-border bg-card p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-terracotta/40 hover:shadow-[var(--shadow-md)] active:scale-[0.995] animate-in-up">
+      className="w-full rounded-lg border border-border bg-card p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-terracotta/40 hover:shadow-[var(--shadow-md)] active:scale-[0.995] animate-in-up">
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
         <div className="flex min-w-0 items-start gap-3">
-          <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cream text-terracotta">
+          <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-cream text-terracotta">
             <Icon className="h-4 w-4" />
           </div>
           <div className="min-w-0">
@@ -587,7 +587,7 @@ function ReservaDialog({
 
   return (
     <Dialog open={!!r} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-md rounded-2xl p-0 overflow-hidden">
+      <DialogContent className="max-w-md rounded-xl p-0 overflow-hidden">
         {r && (
           <>
             <DialogHeader className="border-b border-border/70 p-5 text-left">
@@ -624,7 +624,7 @@ function ReservaDialog({
                   {r.leva_bolo !== null && r.tipo === "aniversario" && (<DetailRow icon={Cake} label="Leva bolo" value={r.leva_bolo ? "Sim" : "Não"} />)}
                   {r.comandas !== null && r.tipo === "aniversario" && (<DetailRow icon={Check} label="Comandas individuais" value={r.comandas ? "Sim" : "Não"} />)}
                   {r.observacoes && (
-                    <div className="rounded-xl bg-muted p-3.5">
+                    <div className="rounded-lg bg-muted p-3.5">
                       <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Observações</p>
                       <p className="leading-relaxed text-foreground">{r.observacoes}</p>
                     </div>
@@ -690,24 +690,24 @@ function EditFields({ r, form, setForm }: { r: Reserva; form: ReservaUpdate; set
   function set<K extends keyof ReservaUpdate>(key: K, value: ReservaUpdate[K]) { setForm({ ...form, [key]: value }); }
   return (
     <div className="space-y-4 text-sm">
-      <FieldRow label="Nome"><Input value={form.nome ?? ""} onChange={(e) => set("nome", e.target.value)} className="h-10 rounded-lg" /></FieldRow>
-      <FieldRow label="Telefone"><Input value={form.telefone ?? ""} onChange={(e) => set("telefone", e.target.value)} className="h-10 rounded-lg" /></FieldRow>
+      <FieldRow label="Nome"><Input value={form.nome ?? ""} onChange={(e) => set("nome", e.target.value)} className="h-10 rounded-md" /></FieldRow>
+      <FieldRow label="Telefone"><Input value={form.telefone ?? ""} onChange={(e) => set("telefone", e.target.value)} className="h-10 rounded-md" /></FieldRow>
       <div className="grid grid-cols-2 gap-3">
-        <FieldRow label="Data"><Input type="date" value={form.data ?? ""} onChange={(e) => set("data", e.target.value || null)} className="h-10 rounded-lg" /></FieldRow>
-        <FieldRow label="Horário"><Input type="time" value={form.horario ?? ""} onChange={(e) => set("horario", e.target.value || null)} className="h-10 rounded-lg" /></FieldRow>
+        <FieldRow label="Data"><Input type="date" value={form.data ?? ""} onChange={(e) => set("data", e.target.value || null)} className="h-10 rounded-md" /></FieldRow>
+        <FieldRow label="Horário"><Input type="time" value={form.horario ?? ""} onChange={(e) => set("horario", e.target.value || null)} className="h-10 rounded-md" /></FieldRow>
       </div>
       <div className="grid grid-cols-2 gap-3">
-        <FieldRow label="Quantidade"><Input type="number" min={1} value={form.quantidade ?? ""} onChange={(e) => set("quantidade", e.target.value ? parseInt(e.target.value, 10) : null)} className="h-10 rounded-lg" /></FieldRow>
+        <FieldRow label="Quantidade"><Input type="number" min={1} value={form.quantidade ?? ""} onChange={(e) => set("quantidade", e.target.value ? parseInt(e.target.value, 10) : null)} className="h-10 rounded-md" /></FieldRow>
         <FieldRow label="Status">
           <Select value={form.status ?? r.status} onValueChange={(v) => set("status", v as ReservaStatus)}>
-            <SelectTrigger className="h-10 rounded-lg"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="h-10 rounded-md"><SelectValue /></SelectTrigger>
             <SelectContent>{STATUS_LIST.map((s) => <SelectItem key={s} value={s}>{STATUS_LABEL[s]}</SelectItem>)}</SelectContent>
           </Select>
         </FieldRow>
       </div>
       <FieldRow label="Tipo">
         <Select value={form.tipo ?? r.tipo} onValueChange={(v) => set("tipo", v as ReservaTipo)}>
-          <SelectTrigger className="h-10 rounded-lg"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="h-10 rounded-md"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="mesa">Mesa</SelectItem>
             <SelectItem value="aniversario">Aniversário</SelectItem>
@@ -719,7 +719,7 @@ function EditFields({ r, form, setForm }: { r: Reserva; form: ReservaUpdate; set
       {(form.tipo ?? r.tipo) === "mesa" && (
         <FieldRow label="Área">
           <Select value={form.area ?? "sem_preferencia"} onValueChange={(v) => set("area", v as ReservaArea)}>
-            <SelectTrigger className="h-10 rounded-lg"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="h-10 rounded-md"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="salao">Salão</SelectItem>
               <SelectItem value="fundos">Fundos</SelectItem>
@@ -731,9 +731,9 @@ function EditFields({ r, form, setForm }: { r: Reserva; form: ReservaUpdate; set
         </FieldRow>
       )}
       {(form.tipo ?? r.tipo) === "evento" && (
-        <FieldRow label="Tipo do evento"><Input value={form.tipo_evento ?? ""} onChange={(e) => set("tipo_evento", e.target.value)} className="h-10 rounded-lg" /></FieldRow>
+        <FieldRow label="Tipo do evento"><Input value={form.tipo_evento ?? ""} onChange={(e) => set("tipo_evento", e.target.value)} className="h-10 rounded-md" /></FieldRow>
       )}
-      <FieldRow label="Observações"><Textarea value={form.observacoes ?? ""} onChange={(e) => set("observacoes", e.target.value)} className="min-h-20 rounded-lg" /></FieldRow>
+      <FieldRow label="Observações"><Textarea value={form.observacoes ?? ""} onChange={(e) => set("observacoes", e.target.value)} className="min-h-20 rounded-md" /></FieldRow>
     </div>
   );
 }
@@ -751,7 +751,7 @@ function CancelFields({
     <div className="space-y-4 text-sm">
       <button
         onClick={onRemarcar}
-        className="w-full rounded-xl border border-terracotta/30 bg-terracotta/5 p-4 text-left transition-colors hover:bg-terracotta/10"
+        className="w-full rounded-lg border border-terracotta/30 bg-terracotta/5 p-4 text-left transition-colors hover:bg-terracotta/10"
       >
         <p className="font-medium text-terracotta">Remarcar em vez de cancelar</p>
         <p className="mt-1 text-xs text-muted-foreground">
@@ -765,7 +765,7 @@ function CancelFields({
 
       <FieldRow label="Motivo do cancelamento">
         <Select value={motivo} onValueChange={setMotivo}>
-          <SelectTrigger className="h-10 rounded-lg"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="h-10 rounded-md"><SelectValue /></SelectTrigger>
           <SelectContent>
             {MOTIVO_CANCELAMENTO_OPCOES.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
           </SelectContent>
@@ -778,7 +778,7 @@ function CancelFields({
             value={motivoDetalhe}
             onChange={(e) => setMotivoDetalhe(e.target.value)}
             placeholder="Descreva o motivo…"
-            className="min-h-20 rounded-lg"
+            className="min-h-20 rounded-md"
           />
         </FieldRow>
       )}
@@ -813,7 +813,7 @@ function DetailRow({ icon: Icon, label, value, link }: { icon: React.ComponentTy
 }
 
 function ActionBtn({ children, onClick, disabled, variant, icon: Icon }: { children: React.ReactNode; onClick: () => void; disabled?: boolean; variant?: "primary" | "danger"; icon: React.ComponentType<{ className?: string }>; }) {
-  const base = "flex h-11 items-center justify-center gap-1.5 rounded-xl text-xs font-medium transition-all active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none";
+  const base = "flex h-11 items-center justify-center gap-1.5 rounded-md text-xs font-medium transition-all active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none";
   const styles = variant === "primary" ? "bg-primary text-primary-foreground hover:bg-primary/90"
     : variant === "danger" ? "bg-background text-destructive border border-border hover:bg-destructive/5"
     : "bg-background text-foreground border border-border hover:bg-accent";
@@ -826,7 +826,7 @@ function ActionBtn({ children, onClick, disabled, variant, icon: Icon }: { child
 
 function EmptyState() {
   return (
-    <div className="rounded-2xl border border-dashed border-border bg-card/50 py-14 text-center animate-fade">
+    <div className="rounded-lg border border-dashed border-border bg-card/50 py-14 text-center animate-fade">
       <p className="font-serif text-2xl text-foreground">Nenhuma reserva</p>
       <p className="mt-1 text-sm text-muted-foreground">Nada por aqui neste filtro.</p>
     </div>
