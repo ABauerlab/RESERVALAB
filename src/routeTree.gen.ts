@@ -15,6 +15,8 @@ import { Route as MasterIndexRouteImport } from './routes/master.index'
 import { Route as SlugIndexRouteImport } from './routes/$slug.index'
 import { Route as MasterLoginRouteImport } from './routes/master.login'
 import { Route as SlugObrigadoRouteImport } from './routes/$slug.obrigado'
+import { Route as SlugLinksRouteImport } from './routes/$slug.links'
+import { Route as SlugCardapioRouteImport } from './routes/$slug.cardapio'
 import { Route as SlugAdminIndexRouteImport } from './routes/$slug.admin.index'
 import { Route as SlugAcompanharIndexRouteImport } from './routes/$slug.acompanhar.index'
 import { Route as ApiPublicVapidPublicKeyRouteImport } from './routes/api/public/vapid-public-key'
@@ -25,9 +27,11 @@ import { Route as SlugAdminSugestoesRouteImport } from './routes/$slug.admin.sug
 import { Route as SlugAdminReservasRouteImport } from './routes/$slug.admin.reservas'
 import { Route as SlugAdminRelatoriosRouteImport } from './routes/$slug.admin.relatorios'
 import { Route as SlugAdminLoginRouteImport } from './routes/$slug.admin.login'
+import { Route as SlugAdminLinksRouteImport } from './routes/$slug.admin.links'
 import { Route as SlugAdminEventosRouteImport } from './routes/$slug.admin.eventos'
 import { Route as SlugAdminContatosRouteImport } from './routes/$slug.admin.contatos'
 import { Route as SlugAdminConfiguracoesRouteImport } from './routes/$slug.admin.configuracoes'
+import { Route as SlugAdminCardapioRouteImport } from './routes/$slug.admin.cardapio'
 import { Route as SlugAdminAgendaRouteImport } from './routes/$slug.admin.agenda'
 import { Route as SlugAcompanharCodigoRouteImport } from './routes/$slug.acompanhar.$codigo'
 import { Route as ApiPublicHooksSendPushRouteImport } from './routes/api/public/hooks.send-push'
@@ -60,6 +64,16 @@ const MasterLoginRoute = MasterLoginRouteImport.update({
 const SlugObrigadoRoute = SlugObrigadoRouteImport.update({
   id: '/$slug/obrigado',
   path: '/$slug/obrigado',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SlugLinksRoute = SlugLinksRouteImport.update({
+  id: '/$slug/links',
+  path: '/$slug/links',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SlugCardapioRoute = SlugCardapioRouteImport.update({
+  id: '/$slug/cardapio',
+  path: '/$slug/cardapio',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SlugAdminIndexRoute = SlugAdminIndexRouteImport.update({
@@ -113,6 +127,11 @@ const SlugAdminLoginRoute = SlugAdminLoginRouteImport.update({
   path: '/$slug/admin/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SlugAdminLinksRoute = SlugAdminLinksRouteImport.update({
+  id: '/$slug/admin/links',
+  path: '/$slug/admin/links',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SlugAdminEventosRoute = SlugAdminEventosRouteImport.update({
   id: '/$slug/admin/eventos',
   path: '/$slug/admin/eventos',
@@ -126,6 +145,11 @@ const SlugAdminContatosRoute = SlugAdminContatosRouteImport.update({
 const SlugAdminConfiguracoesRoute = SlugAdminConfiguracoesRouteImport.update({
   id: '/$slug/admin/configuracoes',
   path: '/$slug/admin/configuracoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SlugAdminCardapioRoute = SlugAdminCardapioRouteImport.update({
+  id: '/$slug/admin/cardapio',
+  path: '/$slug/admin/cardapio',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SlugAdminAgendaRoute = SlugAdminAgendaRouteImport.update({
@@ -147,15 +171,19 @@ const ApiPublicHooksSendPushRoute = ApiPublicHooksSendPushRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/$slug/cardapio': typeof SlugCardapioRoute
+  '/$slug/links': typeof SlugLinksRoute
   '/$slug/obrigado': typeof SlugObrigadoRoute
   '/master/login': typeof MasterLoginRoute
   '/$slug/': typeof SlugIndexRoute
   '/master/': typeof MasterIndexRoute
   '/$slug/acompanhar/$codigo': typeof SlugAcompanharCodigoRoute
   '/$slug/admin/agenda': typeof SlugAdminAgendaRoute
+  '/$slug/admin/cardapio': typeof SlugAdminCardapioRoute
   '/$slug/admin/configuracoes': typeof SlugAdminConfiguracoesRoute
   '/$slug/admin/contatos': typeof SlugAdminContatosRoute
   '/$slug/admin/eventos': typeof SlugAdminEventosRoute
+  '/$slug/admin/links': typeof SlugAdminLinksRoute
   '/$slug/admin/login': typeof SlugAdminLoginRoute
   '/$slug/admin/relatorios': typeof SlugAdminRelatoriosRoute
   '/$slug/admin/reservas': typeof SlugAdminReservasRoute
@@ -171,15 +199,19 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/$slug/cardapio': typeof SlugCardapioRoute
+  '/$slug/links': typeof SlugLinksRoute
   '/$slug/obrigado': typeof SlugObrigadoRoute
   '/master/login': typeof MasterLoginRoute
   '/$slug': typeof SlugIndexRoute
   '/master': typeof MasterIndexRoute
   '/$slug/acompanhar/$codigo': typeof SlugAcompanharCodigoRoute
   '/$slug/admin/agenda': typeof SlugAdminAgendaRoute
+  '/$slug/admin/cardapio': typeof SlugAdminCardapioRoute
   '/$slug/admin/configuracoes': typeof SlugAdminConfiguracoesRoute
   '/$slug/admin/contatos': typeof SlugAdminContatosRoute
   '/$slug/admin/eventos': typeof SlugAdminEventosRoute
+  '/$slug/admin/links': typeof SlugAdminLinksRoute
   '/$slug/admin/login': typeof SlugAdminLoginRoute
   '/$slug/admin/relatorios': typeof SlugAdminRelatoriosRoute
   '/$slug/admin/reservas': typeof SlugAdminReservasRoute
@@ -196,15 +228,19 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/$slug/cardapio': typeof SlugCardapioRoute
+  '/$slug/links': typeof SlugLinksRoute
   '/$slug/obrigado': typeof SlugObrigadoRoute
   '/master/login': typeof MasterLoginRoute
   '/$slug/': typeof SlugIndexRoute
   '/master/': typeof MasterIndexRoute
   '/$slug/acompanhar/$codigo': typeof SlugAcompanharCodigoRoute
   '/$slug/admin/agenda': typeof SlugAdminAgendaRoute
+  '/$slug/admin/cardapio': typeof SlugAdminCardapioRoute
   '/$slug/admin/configuracoes': typeof SlugAdminConfiguracoesRoute
   '/$slug/admin/contatos': typeof SlugAdminContatosRoute
   '/$slug/admin/eventos': typeof SlugAdminEventosRoute
+  '/$slug/admin/links': typeof SlugAdminLinksRoute
   '/$slug/admin/login': typeof SlugAdminLoginRoute
   '/$slug/admin/relatorios': typeof SlugAdminRelatoriosRoute
   '/$slug/admin/reservas': typeof SlugAdminReservasRoute
@@ -222,15 +258,19 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/sitemap.xml'
+    | '/$slug/cardapio'
+    | '/$slug/links'
     | '/$slug/obrigado'
     | '/master/login'
     | '/$slug/'
     | '/master/'
     | '/$slug/acompanhar/$codigo'
     | '/$slug/admin/agenda'
+    | '/$slug/admin/cardapio'
     | '/$slug/admin/configuracoes'
     | '/$slug/admin/contatos'
     | '/$slug/admin/eventos'
+    | '/$slug/admin/links'
     | '/$slug/admin/login'
     | '/$slug/admin/relatorios'
     | '/$slug/admin/reservas'
@@ -246,15 +286,19 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/sitemap.xml'
+    | '/$slug/cardapio'
+    | '/$slug/links'
     | '/$slug/obrigado'
     | '/master/login'
     | '/$slug'
     | '/master'
     | '/$slug/acompanhar/$codigo'
     | '/$slug/admin/agenda'
+    | '/$slug/admin/cardapio'
     | '/$slug/admin/configuracoes'
     | '/$slug/admin/contatos'
     | '/$slug/admin/eventos'
+    | '/$slug/admin/links'
     | '/$slug/admin/login'
     | '/$slug/admin/relatorios'
     | '/$slug/admin/reservas'
@@ -270,15 +314,19 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/sitemap.xml'
+    | '/$slug/cardapio'
+    | '/$slug/links'
     | '/$slug/obrigado'
     | '/master/login'
     | '/$slug/'
     | '/master/'
     | '/$slug/acompanhar/$codigo'
     | '/$slug/admin/agenda'
+    | '/$slug/admin/cardapio'
     | '/$slug/admin/configuracoes'
     | '/$slug/admin/contatos'
     | '/$slug/admin/eventos'
+    | '/$slug/admin/links'
     | '/$slug/admin/login'
     | '/$slug/admin/relatorios'
     | '/$slug/admin/reservas'
@@ -295,15 +343,19 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  SlugCardapioRoute: typeof SlugCardapioRoute
+  SlugLinksRoute: typeof SlugLinksRoute
   SlugObrigadoRoute: typeof SlugObrigadoRoute
   MasterLoginRoute: typeof MasterLoginRoute
   SlugIndexRoute: typeof SlugIndexRoute
   MasterIndexRoute: typeof MasterIndexRoute
   SlugAcompanharCodigoRoute: typeof SlugAcompanharCodigoRoute
   SlugAdminAgendaRoute: typeof SlugAdminAgendaRoute
+  SlugAdminCardapioRoute: typeof SlugAdminCardapioRoute
   SlugAdminConfiguracoesRoute: typeof SlugAdminConfiguracoesRoute
   SlugAdminContatosRoute: typeof SlugAdminContatosRoute
   SlugAdminEventosRoute: typeof SlugAdminEventosRoute
+  SlugAdminLinksRoute: typeof SlugAdminLinksRoute
   SlugAdminLoginRoute: typeof SlugAdminLoginRoute
   SlugAdminRelatoriosRoute: typeof SlugAdminRelatoriosRoute
   SlugAdminReservasRoute: typeof SlugAdminReservasRoute
@@ -359,6 +411,20 @@ declare module '@tanstack/react-router' {
       path: '/$slug/obrigado'
       fullPath: '/$slug/obrigado'
       preLoaderRoute: typeof SlugObrigadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$slug/links': {
+      id: '/$slug/links'
+      path: '/$slug/links'
+      fullPath: '/$slug/links'
+      preLoaderRoute: typeof SlugLinksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$slug/cardapio': {
+      id: '/$slug/cardapio'
+      path: '/$slug/cardapio'
+      fullPath: '/$slug/cardapio'
+      preLoaderRoute: typeof SlugCardapioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$slug/admin/': {
@@ -431,6 +497,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlugAdminLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$slug/admin/links': {
+      id: '/$slug/admin/links'
+      path: '/$slug/admin/links'
+      fullPath: '/$slug/admin/links'
+      preLoaderRoute: typeof SlugAdminLinksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$slug/admin/eventos': {
       id: '/$slug/admin/eventos'
       path: '/$slug/admin/eventos'
@@ -450,6 +523,13 @@ declare module '@tanstack/react-router' {
       path: '/$slug/admin/configuracoes'
       fullPath: '/$slug/admin/configuracoes'
       preLoaderRoute: typeof SlugAdminConfiguracoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$slug/admin/cardapio': {
+      id: '/$slug/admin/cardapio'
+      path: '/$slug/admin/cardapio'
+      fullPath: '/$slug/admin/cardapio'
+      preLoaderRoute: typeof SlugAdminCardapioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$slug/admin/agenda': {
@@ -479,15 +559,19 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  SlugCardapioRoute: SlugCardapioRoute,
+  SlugLinksRoute: SlugLinksRoute,
   SlugObrigadoRoute: SlugObrigadoRoute,
   MasterLoginRoute: MasterLoginRoute,
   SlugIndexRoute: SlugIndexRoute,
   MasterIndexRoute: MasterIndexRoute,
   SlugAcompanharCodigoRoute: SlugAcompanharCodigoRoute,
   SlugAdminAgendaRoute: SlugAdminAgendaRoute,
+  SlugAdminCardapioRoute: SlugAdminCardapioRoute,
   SlugAdminConfiguracoesRoute: SlugAdminConfiguracoesRoute,
   SlugAdminContatosRoute: SlugAdminContatosRoute,
   SlugAdminEventosRoute: SlugAdminEventosRoute,
+  SlugAdminLinksRoute: SlugAdminLinksRoute,
   SlugAdminLoginRoute: SlugAdminLoginRoute,
   SlugAdminRelatoriosRoute: SlugAdminRelatoriosRoute,
   SlugAdminReservasRoute: SlugAdminReservasRoute,

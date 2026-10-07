@@ -9,6 +9,7 @@ import {
   Search,
   Loader2,
   PartyPopper,
+  BookOpen,
   MessageCircle,
   MapPin,
   Phone,
@@ -21,6 +22,7 @@ import {
   telefoneToWhatsApp,
   type ReservaTipo,
 } from "@/lib/reservations";
+import { fetchHub } from "@/lib/hub";
 import { getTenantBySlug } from "@/lib/tenant";
 import { CLICK_RESERVA_EVENT, initFacebookPixel, trackFacebookCustomEvent } from "@/lib/fbpixel";
 
@@ -52,6 +54,12 @@ function TenantHome() {
   useEffect(() => {
     initFacebookPixel(tenantQ.data?.pixel_facebook_id);
   }, [tenantQ.data?.pixel_facebook_id]);
+
+  const hubQ = useQuery({
+    queryKey: ["hub-publico", slug],
+    queryFn: () => fetchHub(slug),
+    staleTime: 60_000,
+  });
 
   const eventoQ = useQuery({
     queryKey: ["proximo-evento", slug],
@@ -173,6 +181,7 @@ function TenantHome() {
           whatsapp={tenant.whatsapp}
           telefone={tenant.telefone_contato}
           endereco={tenant.endereco}
+          cardapioHref={hubQ.data?.cardapio_publicado ? `/${slug}/cardapio` : null}
         />
 
         <div className="mt-8 flex justify-center">
@@ -206,14 +215,17 @@ function ContatoRapido({
   whatsapp,
   telefone,
   endereco,
+  cardapioHref,
 }: {
   whatsapp?: string | null;
   telefone?: string | null;
   endereco?: string | null;
+  cardapioHref?: string | null;
 }) {
   const wa = whatsapp ? telefoneToWhatsApp(whatsapp) : "";
   const tel = telefone ? telefone.replace(/[^\d+]/g, "") : "";
   const itens = [
+    cardapioHref && { href: cardapioHref, rotulo: "Cardápio", Icone: BookOpen, externo: false },
     wa && { href: `https://wa.me/${wa}`, rotulo: "WhatsApp", Icone: MessageCircle, externo: true },
     tel && { href: `tel:${tel}`, rotulo: "Ligar", Icone: Phone, externo: false },
     endereco && {
