@@ -44,8 +44,20 @@ describe("agruparContatos", () => {
 
   it("usa o nome e status da reserva mais recente de cada contato", () => {
     const contatos = agruparContatos([
-      makeReserva({ id: "1", nome: "Maria Antiga", telefone: "11911111111", data: "2026-08-01", status: "cancelada" }),
-      makeReserva({ id: "2", nome: "Maria Nova", telefone: "11911111111", data: "2026-08-15", status: "confirmada" }),
+      makeReserva({
+        id: "1",
+        nome: "Maria Antiga",
+        telefone: "11911111111",
+        data: "2026-08-01",
+        status: "cancelada",
+      }),
+      makeReserva({
+        id: "2",
+        nome: "Maria Nova",
+        telefone: "11911111111",
+        data: "2026-08-15",
+        status: "confirmada",
+      }),
     ]);
     expect(contatos[0].nome).toBe("Maria Nova");
     expect(contatos[0].ultimoStatus).toBe("confirmada");
@@ -84,7 +96,9 @@ describe("contatosToCsv", () => {
       agruparContatos([makeReserva({ nome: "Maria", telefone: "11912345678" })]),
     );
     const linhas = csv.split("\r\n");
-    expect(linhas[0]).toBe('"Nome","Telefone","WhatsApp","Reservas","Última reserva","Último status"');
+    expect(linhas[0]).toBe(
+      '"Nome","Telefone","WhatsApp","Reservas","Última reserva","Último status"',
+    );
     expect(linhas[1]).toContain('"Maria"');
     expect(linhas[1]).toContain('"5511912345678"');
   });

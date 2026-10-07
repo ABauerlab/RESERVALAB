@@ -62,10 +62,18 @@ export const TIPO_CARDS: Array<{
   titulo: string;
   descricao: string;
 }> = [
-  { tipo: "mesa",         titulo: "Reservar mesa",       descricao: "Almoço, jantar ou um brinde com amigos." },
-  { tipo: "aniversario",  titulo: "Aniversário",         descricao: "Celebre com bolo, comandas e a nossa equipe." },
-  { tipo: "evento",       titulo: "Evento particular",   descricao: "Confraternização, encontro corporativo, comemoração." },
-  { tipo: "casamento",    titulo: "Casamento",           descricao: "Cerimônia e recepção sob medida." },
+  { tipo: "mesa", titulo: "Reservar mesa", descricao: "Almoço, jantar ou um brinde com amigos." },
+  {
+    tipo: "aniversario",
+    titulo: "Aniversário",
+    descricao: "Celebre com bolo, comandas e a nossa equipe.",
+  },
+  {
+    tipo: "evento",
+    titulo: "Evento particular",
+    descricao: "Confraternização, encontro corporativo, comemoração.",
+  },
+  { tipo: "casamento", titulo: "Casamento", descricao: "Cerimônia e recepção sob medida." },
 ];
 
 /**
@@ -81,7 +89,8 @@ export function formatTelefone(v: string): string {
     if (digits.length === 0) return "+";
     if (digits.length <= 2) return `+${digits}`;
     if (digits.length <= 4) return `+${digits.slice(0, 2)} ${digits.slice(2)}`;
-    if (digits.length <= 8) return `+${digits.slice(0, 2)} ${digits.slice(2, 4)} ${digits.slice(4)}`;
+    if (digits.length <= 8)
+      return `+${digits.slice(0, 2)} ${digits.slice(2, 4)} ${digits.slice(4)}`;
     // Ex: +55 11 91234-5678
     return `+${digits.slice(0, 2)} ${digits.slice(2, 4)} ${digits.slice(4, 9)}-${digits.slice(9)}`;
   }
@@ -143,7 +152,12 @@ export type HorarioLimites = {
  * `feriado` faz a data ser tratada como fim de semana (mesma janela e mesmo
  * horário-limite), independente do dia da semana em que ela realmente cai.
  */
-export function horariosDisponiveis(dataIso: string, quantidade: number, limites?: HorarioLimites, feriado?: boolean): string[] {
+export function horariosDisponiveis(
+  dataIso: string,
+  quantidade: number,
+  limites?: HorarioLimites,
+  feriado?: boolean,
+): string[] {
   if (!dataIso) return [];
   const [y, m, d] = dataIso.split("-").map(Number);
   const dia = new Date(y!, (m ?? 1) - 1, d!).getDay(); // 0=dom, 6=sáb

@@ -3,33 +3,67 @@ import { createFileRoute, useNavigate, useParams } from "@tanstack/react-router"
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  Bell, BellRing, Calendar, CalendarDays, Download, LogOut, PartyPopper, Search,
-  Sparkles, User, Loader2, Check, X, CheckCircle2, Phone, Utensils, Heart, Cake,
-  MessageCircle, Pencil, Trash2, Save,
+  Bell,
+  BellRing,
+  Calendar,
+  CalendarDays,
+  Download,
+  LogOut,
+  PartyPopper,
+  Search,
+  Sparkles,
+  User,
+  Loader2,
+  Check,
+  X,
+  CheckCircle2,
+  Phone,
+  Utensils,
+  Heart,
+  Cake,
+  MessageCircle,
+  Pencil,
+  Trash2,
+  Save,
 } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import {
-  AREA_LABEL, MOTIVO_CANCELAMENTO_OPCOES, STATUS_LABEL, STATUS_LIST, TIPO_LABEL, TIPO_SHORT,
-  formatData, formatHorario, telefoneToWhatsApp,
-  type Reserva, type ReservaArea, type ReservaStatus, type ReservaTipo, type ReservaUpdate,
+  AREA_LABEL,
+  MOTIVO_CANCELAMENTO_OPCOES,
+  STATUS_LABEL,
+  STATUS_LIST,
+  TIPO_LABEL,
+  TIPO_SHORT,
+  formatData,
+  formatHorario,
+  telefoneToWhatsApp,
+  type Reserva,
+  type ReservaArea,
+  type ReservaStatus,
+  type ReservaTipo,
+  type ReservaUpdate,
 } from "@/lib/reservations";
 import { getTenantBySlug } from "@/lib/tenant";
-import {
-  buildMensagemReconfirmacao, whatsappUrl,
-} from "@/lib/confirmacao";
+import { buildMensagemReconfirmacao, whatsappUrl } from "@/lib/confirmacao";
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { MensagemDoDiaButton } from "@/components/admin/MensagemDoDia";
 import { NovasReservasBanner } from "@/components/admin/NovasReservas";
 
-
-
 import {
-  canNotify, initInstallPrompt, isStandalone, notificationPermission,
-  registerServiceWorker, requestNotificationPermission, showNotification,
-  triggerInstallPrompt, pushSupported, subscribeToPush, unsubscribeFromPush,
+  canNotify,
+  initInstallPrompt,
+  isStandalone,
+  notificationPermission,
+  registerServiceWorker,
+  requestNotificationPermission,
+  showNotification,
+  triggerInstallPrompt,
+  pushSupported,
+  subscribeToPush,
+  unsubscribeFromPush,
   currentPushEndpoint,
 } from "@/lib/pwa";
 
@@ -39,18 +73,24 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 
 export const Route = createFileRoute("/$slug/admin/")({
   head: ({ params }) => ({
-    meta: [
-      { title: "Painel — ReservaLab" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Painel — ReservaLab" }, { name: "robots", content: "noindex" }],
     links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),
   }),
   ssr: false,
@@ -72,12 +112,31 @@ const FILTROS_STATUS: Array<{ id: FiltroStatus; label: string }> = [
   ...STATUS_LIST.map((s) => ({ id: s as FiltroStatus, label: STATUS_LABEL[s] })),
 ];
 
-const TIPO_ICON = { mesa: Utensils, aniversario: Cake, evento: Sparkles, casamento: Heart } as const;
+const TIPO_ICON = {
+  mesa: Utensils,
+  aniversario: Cake,
+  evento: Sparkles,
+  casamento: Heart,
+} as const;
 
-function todayISO() { return new Date().toISOString().slice(0, 10); }
-function tomorrowISO() { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().slice(0, 10); }
-function endOfWeekISO() { const d = new Date(); d.setDate(d.getDate() + 7); return d.toISOString().slice(0, 10); }
-function endOfMonthISO() { const d = new Date(); d.setDate(d.getDate() + 30); return d.toISOString().slice(0, 10); }
+function todayISO() {
+  return new Date().toISOString().slice(0, 10);
+}
+function tomorrowISO() {
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  return d.toISOString().slice(0, 10);
+}
+function endOfWeekISO() {
+  const d = new Date();
+  d.setDate(d.getDate() + 7);
+  return d.toISOString().slice(0, 10);
+}
+function endOfMonthISO() {
+  const d = new Date();
+  d.setDate(d.getDate() + 30);
+  return d.toISOString().slice(0, 10);
+}
 
 function AdminDashboard() {
   const { slug } = useParams({ from: "/$slug/admin/" });
@@ -102,7 +161,6 @@ function AdminDashboard() {
   const [pushBusy, setPushBusy] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-
   useEffect(() => {
     registerServiceWorker();
     initInstallPrompt(() => setInstallReady(true));
@@ -114,7 +172,14 @@ function AdminDashboard() {
     if (!ready || !tenantId) return;
     const channel = supabase
       .channel(`reservas-admin-${tenantId}`)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "reservas", filter: `tenant_id=eq.${tenantId}` },
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "reservas",
+          filter: `tenant_id=eq.${tenantId}`,
+        },
         (payload) => {
           const r = payload.new as Reserva;
           qc.invalidateQueries({ queryKey: ["reservas", tenantId] });
@@ -123,21 +188,36 @@ function AdminDashboard() {
           const line = `${TIPO_SHORT[r.tipo]} • ${r.quantidade ?? "?"} pessoas • ${formatData(r.data)}${r.horario ? ` às ${formatHorario(r.horario)}` : ""}`;
           toast.success(`Nova reserva — ${r.nome}`, { description: line });
           showNotification(`Nova reserva — ${r.nome}`, line);
-        })
-      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "reservas", filter: `tenant_id=eq.${tenantId}` },
+        },
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "reservas",
+          filter: `tenant_id=eq.${tenantId}`,
+        },
         () => {
           qc.invalidateQueries({ queryKey: ["reservas", tenantId] });
           qc.invalidateQueries({ queryKey: ["reservas-stats", tenantId] });
-        })
+        },
+      )
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [ready, tenantId, qc]);
 
   const stats = useQuery({
     enabled: ready && !!tenantId,
     queryKey: ["reservas-stats", tenantId],
     queryFn: async () => {
-      const base = () => supabase.from("reservas").select("id", { count: "exact", head: true }).eq("tenant_id", tenantId!);
+      const base = () =>
+        supabase
+          .from("reservas")
+          .select("id", { count: "exact", head: true })
+          .eq("tenant_id", tenantId!);
       const [hoje, pendentes, semana, eventos] = await Promise.all([
         base().eq("data", todayISO()),
         base().eq("status", "pendente"),
@@ -156,16 +236,23 @@ function AdminDashboard() {
   // Filtros de data/busca compartilhados entre a lista e a contagem de finalizadas.
   function aplicarFiltrosBase<T>(q: T): T {
     let out = q as never as {
-      eq: (c: string, v: string) => unknown; gte: (c: string, v: string) => unknown;
-      lte: (c: string, v: string) => unknown; or: (f: string) => unknown;
+      eq: (c: string, v: string) => unknown;
+      gte: (c: string, v: string) => unknown;
+      lte: (c: string, v: string) => unknown;
+      or: (f: string) => unknown;
     };
     if (filtroData === "hoje") out = out.eq("data", todayISO()) as typeof out;
     else if (filtroData === "amanha") out = out.eq("data", tomorrowISO()) as typeof out;
-    else if (filtroData === "semana") out = (out.gte("data", todayISO()) as typeof out).lte("data", endOfWeekISO()) as typeof out;
-    else if (filtroData === "mes") out = (out.gte("data", todayISO()) as typeof out).lte("data", endOfMonthISO()) as typeof out;
+    else if (filtroData === "semana")
+      out = (out.gte("data", todayISO()) as typeof out).lte("data", endOfWeekISO()) as typeof out;
+    else if (filtroData === "mes")
+      out = (out.gte("data", todayISO()) as typeof out).lte("data", endOfMonthISO()) as typeof out;
 
     const term = busca.trim();
-    if (term) out = out.or(`nome.ilike.%${term}%,telefone.ilike.%${term}%,codigo_acompanhamento.ilike.%${term.toUpperCase()}%`) as typeof out;
+    if (term)
+      out = out.or(
+        `nome.ilike.%${term}%,telefone.ilike.%${term}%,codigo_acompanhamento.ilike.%${term.toUpperCase()}%`,
+      ) as typeof out;
     return out as never as T;
   }
 
@@ -173,7 +260,10 @@ function AdminDashboard() {
     enabled: ready && !!tenantId,
     queryKey: ["reservas", tenantId, filtroData, filtroStatus, busca, mostrarFinalizadas],
     queryFn: async () => {
-      let q = supabase.from("reservas").select("*").eq("tenant_id", tenantId!)
+      let q = supabase
+        .from("reservas")
+        .select("*")
+        .eq("tenant_id", tenantId!)
         .order("data", { ascending: true, nullsFirst: false })
         .order("horario", { ascending: true })
         .order("created_at", { ascending: false });
@@ -194,16 +284,17 @@ function AdminDashboard() {
     enabled: ready && !!tenantId && filtroStatus === "todos" && !mostrarFinalizadas,
     queryKey: ["reservas-finalizadas-count", tenantId, filtroData, busca],
     queryFn: async () => {
-      let q = supabase.from("reservas").select("id", { count: "exact", head: true })
-        .eq("tenant_id", tenantId!).eq("status", "finalizada");
+      let q = supabase
+        .from("reservas")
+        .select("id", { count: "exact", head: true })
+        .eq("tenant_id", tenantId!)
+        .eq("status", "finalizada");
       q = aplicarFiltrosBase(q);
       const { count, error } = await q;
       if (error) throw error;
       return count ?? 0;
     },
   });
-
-
 
   const updateReserva = useMutation({
     mutationFn: async ({ id, patch }: { id: string; patch: ReservaUpdate }) => {
@@ -213,7 +304,7 @@ function AdminDashboard() {
     onSuccess: (_data, vars) => {
       qc.invalidateQueries({ queryKey: ["reservas", tenantId] });
       qc.invalidateQueries({ queryKey: ["reservas-stats", tenantId] });
-      setSelected((s) => (s && s.id === vars.id ? { ...s, ...vars.patch } as Reserva : s));
+      setSelected((s) => (s && s.id === vars.id ? ({ ...s, ...vars.patch } as Reserva) : s));
     },
     onError: () => toast.error("Não foi possível atualizar."),
   });
@@ -240,7 +331,7 @@ function AdminDashboard() {
     onSuccess: (_data, id) => {
       qc.invalidateQueries({ queryKey: ["reservas", tenantId] });
       qc.invalidateQueries({ queryKey: ["reservas-stats", tenantId] });
-      setSelected((s) => (s && s.id === id ? { ...s, status: "confirmada" } as Reserva : s));
+      setSelected((s) => (s && s.id === id ? ({ ...s, status: "confirmada" } as Reserva) : s));
       toast.success("Reserva confirmada sem avisar o cliente.");
     },
     onError: () => toast.error("Não foi possível confirmar."),
@@ -259,7 +350,10 @@ function AdminDashboard() {
   }
 
   async function handleReconfirm(r: Reserva) {
-    await updateReserva.mutateAsync({ id: r.id, patch: { reconfirmada_em: new Date().toISOString() } });
+    await updateReserva.mutateAsync({
+      id: r.id,
+      patch: { reconfirmada_em: new Date().toISOString() },
+    });
     toast.success("Reconfirmação enviada.");
     const tenant = await getTenantBySlug(slug);
     const numero = telefoneToWhatsApp(r.telefone);
@@ -286,7 +380,6 @@ function AdminDashboard() {
     toast.success("Reserva cancelada. O cliente recebe o aviso automaticamente.");
   }
 
-
   async function handleEnablePush() {
     if (!tenantId) return;
     setPushBusy(true);
@@ -298,19 +391,30 @@ function AdminDashboard() {
         return;
       }
       const sub = await subscribeToPush();
-      if (!sub) { toast.error("Não foi possível ativar push neste dispositivo."); return; }
+      if (!sub) {
+        toast.error("Não foi possível ativar push neste dispositivo.");
+        return;
+      }
       const { data: sess } = await supabase.auth.getSession();
-      const { error } = await supabase
-        .from("push_subscriptions")
-        .upsert(
-          { tenant_id: tenantId, user_id: sess.session?.user.id ?? null,
-            endpoint: sub.endpoint, p256dh: sub.p256dh, auth: sub.auth },
-          { onConflict: "endpoint" },
-        );
-      if (error) { toast.error("Falha ao registrar dispositivo: " + error.message); return; }
+      const { error } = await supabase.from("push_subscriptions").upsert(
+        {
+          tenant_id: tenantId,
+          user_id: sess.session?.user.id ?? null,
+          endpoint: sub.endpoint,
+          p256dh: sub.p256dh,
+          auth: sub.auth,
+        },
+        { onConflict: "endpoint" },
+      );
+      if (error) {
+        toast.error("Falha ao registrar dispositivo: " + error.message);
+        return;
+      }
       setPushEndpoint(sub.endpoint);
       toast.success("Notificações push ativadas.");
-    } finally { setPushBusy(false); }
+    } finally {
+      setPushBusy(false);
+    }
   }
 
   async function handleDisablePush() {
@@ -322,12 +426,17 @@ function AdminDashboard() {
       if (ep) await supabase.from("push_subscriptions").delete().eq("endpoint", ep);
       setPushEndpoint(null);
       toast.success("Notificações push desativadas.");
-    } finally { setPushBusy(false); }
+    } finally {
+      setPushBusy(false);
+    }
   }
 
   async function handleInstall() {
     const r = await triggerInstallPrompt();
-    if (r === "accepted") { toast.success("Aplicativo instalado."); setInstallReady(false); }
+    if (r === "accepted") {
+      toast.success("Aplicativo instalado.");
+      setInstallReady(false);
+    }
   }
 
   async function signOut() {
@@ -347,57 +456,100 @@ function AdminDashboard() {
   const canUsePush = pushSupported();
   const pushActive = !!pushEndpoint;
   const showPushCTA = canUsePush && !pushActive && notifPerm !== "unsupported";
-  const showLegacyNotifCTA = !canUsePush && canNotify() && notifPerm !== "granted" && notifPerm !== "unsupported";
+  const showLegacyNotifCTA =
+    !canUsePush && canNotify() && notifPerm !== "granted" && notifPerm !== "unsupported";
 
   return (
     <AdminShell slug={slug} tenantNome={tenantNome} active="reservas">
-
-
-
       <div className="mx-auto max-w-4xl px-5 pt-6">
         <NovasReservasBanner tenantId={tenantId} />
         <div className="mb-5 flex flex-wrap gap-2 animate-fade">
           <MensagemDoDiaButton tenantId={tenantId} />
 
-            {showPushCTA && (
-              <button disabled={pushBusy} onClick={handleEnablePush} className="inline-flex items-center gap-2 rounded-full border border-terracotta/30 bg-terracotta/5 px-3.5 py-1.5 text-xs font-medium text-terracotta transition-colors hover:bg-terracotta/10 disabled:opacity-50">
-                <Bell className="h-3.5 w-3.5" /> {pushBusy ? "Ativando…" : "Ativar notificações push"}
-              </button>
-            )}
-            {pushActive && (
-              <button disabled={pushBusy} onClick={handleDisablePush} className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent">
-                <Bell className="h-3.5 w-3.5 text-terracotta" /> Push ativo — desativar
-              </button>
-            )}
-            {showLegacyNotifCTA && (
-              <button onClick={handleEnablePush} className="inline-flex items-center gap-2 rounded-full border border-terracotta/30 bg-terracotta/5 px-3.5 py-1.5 text-xs font-medium text-terracotta transition-colors hover:bg-terracotta/10">
-                <Bell className="h-3.5 w-3.5" /> Ativar notificações
-              </button>
-            )}
-            {showInstall && (
-              <button onClick={handleInstall} className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-accent">
-                <Download className="h-3.5 w-3.5" /> Instalar aplicativo
-              </button>
-            )}
-          </div>
-
+          {showPushCTA && (
+            <button
+              disabled={pushBusy}
+              onClick={handleEnablePush}
+              className="inline-flex items-center gap-2 rounded-full border border-terracotta/30 bg-terracotta/5 px-3.5 py-1.5 text-xs font-medium text-terracotta transition-colors hover:bg-terracotta/10 disabled:opacity-50"
+            >
+              <Bell className="h-3.5 w-3.5" /> {pushBusy ? "Ativando…" : "Ativar notificações push"}
+            </button>
+          )}
+          {pushActive && (
+            <button
+              disabled={pushBusy}
+              onClick={handleDisablePush}
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent"
+            >
+              <Bell className="h-3.5 w-3.5 text-terracotta" /> Push ativo — desativar
+            </button>
+          )}
+          {showLegacyNotifCTA && (
+            <button
+              onClick={handleEnablePush}
+              className="inline-flex items-center gap-2 rounded-full border border-terracotta/30 bg-terracotta/5 px-3.5 py-1.5 text-xs font-medium text-terracotta transition-colors hover:bg-terracotta/10"
+            >
+              <Bell className="h-3.5 w-3.5" /> Ativar notificações
+            </button>
+          )}
+          {showInstall && (
+            <button
+              onClick={handleInstall}
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-accent"
+            >
+              <Download className="h-3.5 w-3.5" /> Instalar aplicativo
+            </button>
+          )}
+        </div>
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <StatCard icon={CalendarDays} label="Hoje"          value={stats.data?.hoje}      loading={stats.isLoading} />
-          <StatCard icon={Bell}         label="Pendentes"     value={stats.data?.pendentes} loading={stats.isLoading} accent />
-          <StatCard icon={Calendar}     label="Próx. 7 dias"  value={stats.data?.semana}    loading={stats.isLoading} />
-          <StatCard icon={PartyPopper}  label="Eventos"       value={stats.data?.eventos}   loading={stats.isLoading} />
+          <StatCard
+            icon={CalendarDays}
+            label="Hoje"
+            value={stats.data?.hoje}
+            loading={stats.isLoading}
+          />
+          <StatCard
+            icon={Bell}
+            label="Pendentes"
+            value={stats.data?.pendentes}
+            loading={stats.isLoading}
+            accent
+          />
+          <StatCard
+            icon={Calendar}
+            label="Próx. 7 dias"
+            value={stats.data?.semana}
+            loading={stats.isLoading}
+          />
+          <StatCard
+            icon={PartyPopper}
+            label="Eventos"
+            value={stats.data?.eventos}
+            loading={stats.isLoading}
+          />
         </div>
 
         <div className="mt-6 relative">
           <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Nome, telefone ou código…" className="h-11 rounded-xl pl-10" />
+          <Input
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            placeholder="Nome, telefone ou código…"
+            className="h-11 rounded-xl pl-10"
+          />
         </div>
 
         <div className="mt-4 -mx-5 overflow-x-auto px-5 pb-1 scrollbar-none">
           <div className="flex gap-1.5">
             {FILTROS_DATA.map((f) => (
-              <FilterChip key={f.id} active={filtroData === f.id} onClick={() => setFiltroData(f.id)}>{f.label}</FilterChip>
+              <FilterChip
+                key={f.id}
+                active={filtroData === f.id}
+                onClick={() => setFiltroData(f.id)}
+              >
+                {f.label}
+              </FilterChip>
             ))}
           </div>
         </div>
@@ -405,16 +557,27 @@ function AdminDashboard() {
         <div className="mt-2 -mx-5 overflow-x-auto px-5 pb-1 scrollbar-none">
           <div className="flex gap-1.5">
             {FILTROS_STATUS.map((f) => (
-              <FilterChip key={f.id} active={filtroStatus === f.id} onClick={() => setFiltroStatus(f.id)} variant="status">{f.label}</FilterChip>
+              <FilterChip
+                key={f.id}
+                active={filtroStatus === f.id}
+                onClick={() => setFiltroStatus(f.id)}
+                variant="status"
+              >
+                {f.label}
+              </FilterChip>
             ))}
           </div>
         </div>
 
         <div className="mt-5 space-y-2.5">
           {listaQ.isLoading ? (
-            Array.from({ length: 4 }).map((_, i) => (<Skeleton key={i} className="h-[88px] w-full rounded-2xl" />))
+            Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-[88px] w-full rounded-2xl" />
+            ))
           ) : listaQ.data && listaQ.data.length > 0 ? (
-            listaQ.data.map((r, i) => (<ReservaCard key={r.id} r={r} onClick={() => setSelected(r)} delay={i * 30} />))
+            listaQ.data.map((r, i) => (
+              <ReservaCard key={r.id} r={r} onClick={() => setSelected(r)} delay={i * 30} />
+            ))
           ) : (
             <EmptyState />
           )}
@@ -437,7 +600,6 @@ function AdminDashboard() {
             </button>
           )}
         </div>
-
       </div>
 
       <ReservaDialog
@@ -446,11 +608,17 @@ function AdminDashboard() {
         onConfirm={() => selected && handleConfirm(selected)}
         onConfirmSemNotificar={() => selected && handleConfirmSemNotificar(selected)}
         onReconfirm={() => selected && handleReconfirm(selected)}
-        onSetStatus={(status) => selected && updateReserva.mutate({ id: selected.id, patch: { status } })}
-        onSave={(patch) => selected ? updateReserva.mutateAsync({ id: selected.id, patch }) : Promise.resolve()}
-        onCancel={(motivo) => selected ? handleCancel(selected, motivo) : Promise.resolve()}
+        onSetStatus={(status) =>
+          selected && updateReserva.mutate({ id: selected.id, patch: { status } })
+        }
+        onSave={(patch) =>
+          selected ? updateReserva.mutateAsync({ id: selected.id, patch }) : Promise.resolve()
+        }
+        onCancel={(motivo) => (selected ? handleCancel(selected, motivo) : Promise.resolve())}
         onDelete={() => selected && deleteReserva.mutate(selected.id)}
-        pending={updateReserva.isPending || deleteReserva.isPending || confirmarSemNotificar.isPending}
+        pending={
+          updateReserva.isPending || deleteReserva.isPending || confirmarSemNotificar.isPending
+        }
       />
 
       <audio ref={audioRef} preload="auto" />
@@ -458,21 +626,53 @@ function AdminDashboard() {
   );
 }
 
-function FilterChip({ active, onClick, children, variant }: { active: boolean; onClick: () => void; children: React.ReactNode; variant?: "status" }) {
-  const activeCls = variant === "status" ? "bg-terracotta/15 text-terracotta shadow-[var(--shadow-sm)]" : "bg-primary text-primary-foreground shadow-[var(--shadow-sm)]";
+function FilterChip({
+  active,
+  onClick,
+  children,
+  variant,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+  variant?: "status";
+}) {
+  const activeCls =
+    variant === "status"
+      ? "bg-terracotta/15 text-terracotta shadow-[var(--shadow-sm)]"
+      : "bg-primary text-primary-foreground shadow-[var(--shadow-sm)]";
   return (
-    <button onClick={onClick} className={`h-9 shrink-0 rounded-full px-4 text-xs font-medium transition-all ${active ? activeCls : "bg-muted text-muted-foreground hover:bg-accent hover:text-foreground"}`}>
+    <button
+      onClick={onClick}
+      className={`h-9 shrink-0 rounded-full px-4 text-xs font-medium transition-all ${active ? activeCls : "bg-muted text-muted-foreground hover:bg-accent hover:text-foreground"}`}
+    >
       {children}
     </button>
   );
 }
 
-function StatCard({ icon: Icon, label, value, loading, accent }: { icon: React.ComponentType<{ className?: string }>; label: string; value?: number; loading?: boolean; accent?: boolean }) {
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+  loading,
+  accent,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value?: number;
+  loading?: boolean;
+  accent?: boolean;
+}) {
   return (
-    <div className={`rounded-2xl border border-border bg-card p-4 transition-colors ${accent ? "bg-cream" : ""}`}>
+    <div
+      className={`rounded-2xl border border-border bg-card p-4 transition-colors ${accent ? "bg-cream" : ""}`}
+    >
       <div className="flex items-center gap-2">
         <Icon className={`h-3.5 w-3.5 ${accent ? "text-terracotta" : "text-muted-foreground"}`} />
-        <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
+        <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+          {label}
+        </p>
       </div>
       <p className="mt-2.5 font-serif text-3xl tabular-nums text-foreground">
         {loading ? <span className="inline-block h-7 w-8 rounded shimmer" /> : (value ?? 0)}
@@ -483,13 +683,15 @@ function StatCard({ icon: Icon, label, value, loading, accent }: { icon: React.C
 
 function StatusPill({ status }: { status: ReservaStatus }) {
   const styles: Record<ReservaStatus, string> = {
-    pendente:   "bg-warning/15 text-[oklch(0.45_0.11_65)]",
+    pendente: "bg-warning/15 text-[oklch(0.45_0.11_65)]",
     confirmada: "bg-success/15 text-[oklch(0.4_0.12_150)]",
-    cancelada:  "bg-destructive/12 text-destructive",
+    cancelada: "bg-destructive/12 text-destructive",
     finalizada: "bg-muted text-muted-foreground",
   };
   return (
-    <span className={`inline-flex h-6 items-center rounded-full px-2.5 text-[11px] font-medium ${styles[status]}`}>
+    <span
+      className={`inline-flex h-6 items-center rounded-full px-2.5 text-[11px] font-medium ${styles[status]}`}
+    >
       {STATUS_LABEL[status]}
     </span>
   );
@@ -498,8 +700,11 @@ function StatusPill({ status }: { status: ReservaStatus }) {
 function ReservaCard({ r, onClick, delay }: { r: Reserva; onClick: () => void; delay: number }) {
   const Icon = TIPO_ICON[r.tipo as ReservaTipo] ?? Utensils;
   return (
-    <button onClick={onClick} style={{ animationDelay: `${delay}ms` }}
-      className="w-full rounded-2xl border border-border bg-card p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-terracotta/40 hover:shadow-[var(--shadow-md)] active:scale-[0.995] animate-in-up">
+    <button
+      onClick={onClick}
+      style={{ animationDelay: `${delay}ms` }}
+      className="w-full rounded-2xl border border-border bg-card p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-terracotta/40 hover:shadow-[var(--shadow-md)] active:scale-[0.995] animate-in-up"
+    >
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
         <div className="flex min-w-0 items-start gap-3">
           <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cream text-terracotta">
@@ -513,7 +718,9 @@ function ReservaCard({ r, onClick, delay }: { r: Reserva; onClick: () => void; d
               {r.data ? ` • ${formatData(r.data)}` : ""}
               {r.horario ? ` às ${formatHorario(r.horario)}` : ""}
             </p>
-            <p className="mt-0.5 truncate text-[11px] font-mono text-muted-foreground/70">{r.codigo_acompanhamento}</p>
+            <p className="mt-0.5 truncate text-[11px] font-mono text-muted-foreground/70">
+              {r.codigo_acompanhamento}
+            </p>
           </div>
         </div>
         <StatusPill status={r.status} />
@@ -523,7 +730,16 @@ function ReservaCard({ r, onClick, delay }: { r: Reserva; onClick: () => void; d
 }
 
 function ReservaDialog({
-  reserva, onClose, onConfirm, onConfirmSemNotificar, onReconfirm, onSetStatus, onSave, onCancel, onDelete, pending,
+  reserva,
+  onClose,
+  onConfirm,
+  onConfirmSemNotificar,
+  onReconfirm,
+  onSetStatus,
+  onSave,
+  onCancel,
+  onDelete,
+  pending,
 }: {
   reserva: Reserva | null;
   onClose: () => void;
@@ -555,9 +771,18 @@ function ReservaDialog({
   function startEdit() {
     if (!r) return;
     setForm({
-      nome: r.nome, telefone: r.telefone, quantidade: r.quantidade, data: r.data, horario: r.horario,
-      area: r.area, tipo: r.tipo, tipo_evento: r.tipo_evento, observacoes: r.observacoes,
-      leva_bolo: r.leva_bolo, comandas: r.comandas, status: r.status,
+      nome: r.nome,
+      telefone: r.telefone,
+      quantidade: r.quantidade,
+      data: r.data,
+      horario: r.horario,
+      area: r.area,
+      tipo: r.tipo,
+      tipo_evento: r.tipo_evento,
+      observacoes: r.observacoes,
+      leva_bolo: r.leva_bolo,
+      comandas: r.comandas,
+      status: r.status,
     });
     setEditing(true);
   }
@@ -582,7 +807,8 @@ function ReservaDialog({
 
   function confirmDelete() {
     if (!r) return;
-    if (window.confirm(`Excluir a reserva de ${r.nome}? Esta ação não pode ser desfeita.`)) onDelete();
+    if (window.confirm(`Excluir a reserva de ${r.nome}? Esta ação não pode ser desfeita.`))
+      onDelete();
   }
 
   return (
@@ -593,9 +819,12 @@ function ReservaDialog({
             <DialogHeader className="border-b border-border/70 p-5 text-left">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <DialogTitle className="truncate font-serif text-2xl font-normal tracking-tight">{r.nome}</DialogTitle>
+                  <DialogTitle className="truncate font-serif text-2xl font-normal tracking-tight">
+                    {r.nome}
+                  </DialogTitle>
                   <DialogDescription className="mt-1 text-[13px] text-muted-foreground">
-                    {TIPO_LABEL[r.tipo as ReservaTipo]} · <span className="font-mono">{r.codigo_acompanhamento}</span>
+                    {TIPO_LABEL[r.tipo as ReservaTipo]} ·{" "}
+                    <span className="font-mono">{r.codigo_acompanhamento}</span>
                   </DialogDescription>
                 </div>
                 <StatusPill status={r.status} />
@@ -615,17 +844,40 @@ function ReservaDialog({
                 <EditFields r={r} form={form} setForm={setForm} />
               ) : (
                 <div className="space-y-3.5 text-sm">
-                  <DetailRow icon={Phone} label="Telefone" value={r.telefone} link={`tel:${telefoneToWhatsApp(r.telefone)}`} />
-                  {r.quantidade != null && <DetailRow icon={User} label="Pessoas" value={String(r.quantidade)} />}
-                  {r.data && <DetailRow icon={CalendarDays} label="Data" value={formatData(r.data)} />}
-                  {r.horario && <DetailRow icon={Calendar} label="Horário" value={formatHorario(r.horario)} />}
+                  <DetailRow
+                    icon={Phone}
+                    label="Telefone"
+                    value={r.telefone}
+                    link={`tel:${telefoneToWhatsApp(r.telefone)}`}
+                  />
+                  {r.quantidade != null && (
+                    <DetailRow icon={User} label="Pessoas" value={String(r.quantidade)} />
+                  )}
+                  {r.data && (
+                    <DetailRow icon={CalendarDays} label="Data" value={formatData(r.data)} />
+                  )}
+                  {r.horario && (
+                    <DetailRow icon={Calendar} label="Horário" value={formatHorario(r.horario)} />
+                  )}
                   {r.area && <DetailRow icon={Utensils} label="Área" value={AREA_LABEL[r.area]} />}
-                  {r.tipo_evento && <DetailRow icon={Sparkles} label="Tipo do evento" value={r.tipo_evento} />}
-                  {r.leva_bolo !== null && r.tipo === "aniversario" && (<DetailRow icon={Cake} label="Leva bolo" value={r.leva_bolo ? "Sim" : "Não"} />)}
-                  {r.comandas !== null && r.tipo === "aniversario" && (<DetailRow icon={Check} label="Comandas individuais" value={r.comandas ? "Sim" : "Não"} />)}
+                  {r.tipo_evento && (
+                    <DetailRow icon={Sparkles} label="Tipo do evento" value={r.tipo_evento} />
+                  )}
+                  {r.leva_bolo !== null && r.tipo === "aniversario" && (
+                    <DetailRow icon={Cake} label="Leva bolo" value={r.leva_bolo ? "Sim" : "Não"} />
+                  )}
+                  {r.comandas !== null && r.tipo === "aniversario" && (
+                    <DetailRow
+                      icon={Check}
+                      label="Comandas individuais"
+                      value={r.comandas ? "Sim" : "Não"}
+                    />
+                  )}
                   {r.observacoes && (
                     <div className="rounded-xl bg-muted p-3.5">
-                      <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Observações</p>
+                      <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                        Observações
+                      </p>
                       <p className="leading-relaxed text-foreground">{r.observacoes}</p>
                     </div>
                   )}
@@ -636,19 +888,41 @@ function ReservaDialog({
             <DialogFooter className="border-t border-border/70 bg-muted/40 p-4 flex-col gap-2 sm:flex-col sm:space-x-0">
               {cancelando ? (
                 <div className="grid w-full grid-cols-2 gap-2">
-                  <ActionBtn onClick={() => setCancelando(false)} icon={X}>Voltar</ActionBtn>
-                  <ActionBtn onClick={confirmarCancelamento} disabled={pending} variant="danger" icon={X}>Confirmar cancelamento</ActionBtn>
+                  <ActionBtn onClick={() => setCancelando(false)} icon={X}>
+                    Voltar
+                  </ActionBtn>
+                  <ActionBtn
+                    onClick={confirmarCancelamento}
+                    disabled={pending}
+                    variant="danger"
+                    icon={X}
+                  >
+                    Confirmar cancelamento
+                  </ActionBtn>
                 </div>
               ) : editing ? (
                 <div className="grid w-full grid-cols-2 gap-2">
-                  <ActionBtn onClick={() => setEditing(false)} icon={X}>Cancelar</ActionBtn>
-                  <ActionBtn onClick={saveEdit} disabled={pending} variant="primary" icon={Save}>Salvar</ActionBtn>
+                  <ActionBtn onClick={() => setEditing(false)} icon={X}>
+                    Cancelar
+                  </ActionBtn>
+                  <ActionBtn onClick={saveEdit} disabled={pending} variant="primary" icon={Save}>
+                    Salvar
+                  </ActionBtn>
                 </div>
               ) : (
                 <>
                   <div className="grid w-full grid-cols-2 gap-2">
-                    <ActionBtn disabled={pending || r.status === "confirmada"} onClick={onConfirm} variant="primary" icon={MessageCircle}>Confirmar + WhatsApp</ActionBtn>
-                    <ActionBtn onClick={startEdit} icon={Pencil}>Editar</ActionBtn>
+                    <ActionBtn
+                      disabled={pending || r.status === "confirmada"}
+                      onClick={onConfirm}
+                      variant="primary"
+                      icon={MessageCircle}
+                    >
+                      Confirmar + WhatsApp
+                    </ActionBtn>
+                    <ActionBtn onClick={startEdit} icon={Pencil}>
+                      Editar
+                    </ActionBtn>
                   </div>
                   {r.status !== "confirmada" && (
                     <button
@@ -663,18 +937,41 @@ function ReservaDialog({
                   )}
                   {r.status === "confirmada" && (
                     <div className="grid w-full grid-cols-1 gap-1.5">
-                      <ActionBtn disabled={pending} onClick={onReconfirm} icon={BellRing}>Reconfirmar + WhatsApp</ActionBtn>
+                      <ActionBtn disabled={pending} onClick={onReconfirm} icon={BellRing}>
+                        Reconfirmar + WhatsApp
+                      </ActionBtn>
                       {r.reconfirmada_em && (
                         <p className="text-center text-[11px] text-muted-foreground">
-                          Última reconfirmação enviada em {new Date(r.reconfirmada_em).toLocaleString("pt-BR")}
+                          Última reconfirmação enviada em{" "}
+                          {new Date(r.reconfirmada_em).toLocaleString("pt-BR")}
                         </p>
                       )}
                     </div>
                   )}
                   <div className="grid w-full grid-cols-3 gap-2">
-                    <ActionBtn disabled={pending || r.status === "finalizada"} onClick={() => onSetStatus("finalizada")} icon={CheckCircle2}>Finalizar</ActionBtn>
-                    <ActionBtn disabled={pending || r.status === "cancelada"} onClick={() => setCancelando(true)} variant="danger" icon={X}>Cancelar</ActionBtn>
-                    <ActionBtn disabled={pending} onClick={confirmDelete} variant="danger" icon={Trash2}>Excluir</ActionBtn>
+                    <ActionBtn
+                      disabled={pending || r.status === "finalizada"}
+                      onClick={() => onSetStatus("finalizada")}
+                      icon={CheckCircle2}
+                    >
+                      Finalizar
+                    </ActionBtn>
+                    <ActionBtn
+                      disabled={pending || r.status === "cancelada"}
+                      onClick={() => setCancelando(true)}
+                      variant="danger"
+                      icon={X}
+                    >
+                      Cancelar
+                    </ActionBtn>
+                    <ActionBtn
+                      disabled={pending}
+                      onClick={confirmDelete}
+                      variant="danger"
+                      icon={Trash2}
+                    >
+                      Excluir
+                    </ActionBtn>
                   </div>
                 </>
               )}
@@ -686,28 +983,87 @@ function ReservaDialog({
   );
 }
 
-function EditFields({ r, form, setForm }: { r: Reserva; form: ReservaUpdate; setForm: (f: ReservaUpdate) => void }) {
-  function set<K extends keyof ReservaUpdate>(key: K, value: ReservaUpdate[K]) { setForm({ ...form, [key]: value }); }
+function EditFields({
+  r,
+  form,
+  setForm,
+}: {
+  r: Reserva;
+  form: ReservaUpdate;
+  setForm: (f: ReservaUpdate) => void;
+}) {
+  function set<K extends keyof ReservaUpdate>(key: K, value: ReservaUpdate[K]) {
+    setForm({ ...form, [key]: value });
+  }
   return (
     <div className="space-y-4 text-sm">
-      <FieldRow label="Nome"><Input value={form.nome ?? ""} onChange={(e) => set("nome", e.target.value)} className="h-10 rounded-lg" /></FieldRow>
-      <FieldRow label="Telefone"><Input value={form.telefone ?? ""} onChange={(e) => set("telefone", e.target.value)} className="h-10 rounded-lg" /></FieldRow>
+      <FieldRow label="Nome">
+        <Input
+          value={form.nome ?? ""}
+          onChange={(e) => set("nome", e.target.value)}
+          className="h-10 rounded-lg"
+        />
+      </FieldRow>
+      <FieldRow label="Telefone">
+        <Input
+          value={form.telefone ?? ""}
+          onChange={(e) => set("telefone", e.target.value)}
+          className="h-10 rounded-lg"
+        />
+      </FieldRow>
       <div className="grid grid-cols-2 gap-3">
-        <FieldRow label="Data"><Input type="date" value={form.data ?? ""} onChange={(e) => set("data", e.target.value || null)} className="h-10 rounded-lg" /></FieldRow>
-        <FieldRow label="Horário"><Input type="time" value={form.horario ?? ""} onChange={(e) => set("horario", e.target.value || null)} className="h-10 rounded-lg" /></FieldRow>
+        <FieldRow label="Data">
+          <Input
+            type="date"
+            value={form.data ?? ""}
+            onChange={(e) => set("data", e.target.value || null)}
+            className="h-10 rounded-lg"
+          />
+        </FieldRow>
+        <FieldRow label="Horário">
+          <Input
+            type="time"
+            value={form.horario ?? ""}
+            onChange={(e) => set("horario", e.target.value || null)}
+            className="h-10 rounded-lg"
+          />
+        </FieldRow>
       </div>
       <div className="grid grid-cols-2 gap-3">
-        <FieldRow label="Quantidade"><Input type="number" min={1} value={form.quantidade ?? ""} onChange={(e) => set("quantidade", e.target.value ? parseInt(e.target.value, 10) : null)} className="h-10 rounded-lg" /></FieldRow>
+        <FieldRow label="Quantidade">
+          <Input
+            type="number"
+            min={1}
+            value={form.quantidade ?? ""}
+            onChange={(e) =>
+              set("quantidade", e.target.value ? parseInt(e.target.value, 10) : null)
+            }
+            className="h-10 rounded-lg"
+          />
+        </FieldRow>
         <FieldRow label="Status">
-          <Select value={form.status ?? r.status} onValueChange={(v) => set("status", v as ReservaStatus)}>
-            <SelectTrigger className="h-10 rounded-lg"><SelectValue /></SelectTrigger>
-            <SelectContent>{STATUS_LIST.map((s) => <SelectItem key={s} value={s}>{STATUS_LABEL[s]}</SelectItem>)}</SelectContent>
+          <Select
+            value={form.status ?? r.status}
+            onValueChange={(v) => set("status", v as ReservaStatus)}
+          >
+            <SelectTrigger className="h-10 rounded-lg">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {STATUS_LIST.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {STATUS_LABEL[s]}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
         </FieldRow>
       </div>
       <FieldRow label="Tipo">
         <Select value={form.tipo ?? r.tipo} onValueChange={(v) => set("tipo", v as ReservaTipo)}>
-          <SelectTrigger className="h-10 rounded-lg"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="h-10 rounded-lg">
+            <SelectValue />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="mesa">Mesa</SelectItem>
             <SelectItem value="aniversario">Aniversário</SelectItem>
@@ -718,8 +1074,13 @@ function EditFields({ r, form, setForm }: { r: Reserva; form: ReservaUpdate; set
       </FieldRow>
       {(form.tipo ?? r.tipo) === "mesa" && (
         <FieldRow label="Área">
-          <Select value={form.area ?? "sem_preferencia"} onValueChange={(v) => set("area", v as ReservaArea)}>
-            <SelectTrigger className="h-10 rounded-lg"><SelectValue /></SelectTrigger>
+          <Select
+            value={form.area ?? "sem_preferencia"}
+            onValueChange={(v) => set("area", v as ReservaArea)}
+          >
+            <SelectTrigger className="h-10 rounded-lg">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="salao">Salão</SelectItem>
               <SelectItem value="fundos">Fundos</SelectItem>
@@ -731,15 +1092,31 @@ function EditFields({ r, form, setForm }: { r: Reserva; form: ReservaUpdate; set
         </FieldRow>
       )}
       {(form.tipo ?? r.tipo) === "evento" && (
-        <FieldRow label="Tipo do evento"><Input value={form.tipo_evento ?? ""} onChange={(e) => set("tipo_evento", e.target.value)} className="h-10 rounded-lg" /></FieldRow>
+        <FieldRow label="Tipo do evento">
+          <Input
+            value={form.tipo_evento ?? ""}
+            onChange={(e) => set("tipo_evento", e.target.value)}
+            className="h-10 rounded-lg"
+          />
+        </FieldRow>
       )}
-      <FieldRow label="Observações"><Textarea value={form.observacoes ?? ""} onChange={(e) => set("observacoes", e.target.value)} className="min-h-20 rounded-lg" /></FieldRow>
+      <FieldRow label="Observações">
+        <Textarea
+          value={form.observacoes ?? ""}
+          onChange={(e) => set("observacoes", e.target.value)}
+          className="min-h-20 rounded-lg"
+        />
+      </FieldRow>
     </div>
   );
 }
 
 function CancelFields({
-  motivo, setMotivo, motivoDetalhe, setMotivoDetalhe, onRemarcar,
+  motivo,
+  setMotivo,
+  motivoDetalhe,
+  setMotivoDetalhe,
+  onRemarcar,
 }: {
   motivo: string;
   setMotivo: (v: string) => void;
@@ -755,19 +1132,27 @@ function CancelFields({
       >
         <p className="font-medium text-terracotta">Remarcar em vez de cancelar</p>
         <p className="mt-1 text-xs text-muted-foreground">
-          Altere a data ou o horário e mantenha a reserva — o cliente não precisa fazer tudo de novo.
+          Altere a data ou o horário e mantenha a reserva — o cliente não precisa fazer tudo de
+          novo.
         </p>
       </button>
 
       <div className="flex items-center gap-3 text-xs text-muted-foreground">
-        <div className="h-px flex-1 bg-border" /> ou cancele mesmo assim <div className="h-px flex-1 bg-border" />
+        <div className="h-px flex-1 bg-border" /> ou cancele mesmo assim{" "}
+        <div className="h-px flex-1 bg-border" />
       </div>
 
       <FieldRow label="Motivo do cancelamento">
         <Select value={motivo} onValueChange={setMotivo}>
-          <SelectTrigger className="h-10 rounded-lg"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="h-10 rounded-lg">
+            <SelectValue />
+          </SelectTrigger>
           <SelectContent>
-            {MOTIVO_CANCELAMENTO_OPCOES.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+            {MOTIVO_CANCELAMENTO_OPCOES.map((m) => (
+              <SelectItem key={m} value={m}>
+                {m}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </FieldRow>
@@ -784,7 +1169,8 @@ function CancelFields({
       )}
 
       <p className="text-xs text-muted-foreground">
-        Ao confirmar, o cliente recebe um aviso no WhatsApp com o motivo e um link para fazer uma nova reserva quando quiser.
+        Ao confirmar, o cliente recebe um aviso no WhatsApp com o motivo e um link para fazer uma
+        nova reserva quando quiser.
       </p>
     </div>
   );
@@ -799,7 +1185,17 @@ function FieldRow({ label, children }: { label: string; children: React.ReactNod
   );
 }
 
-function DetailRow({ icon: Icon, label, value, link }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string; link?: string }) {
+function DetailRow({
+  icon: Icon,
+  label,
+  value,
+  link,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+  link?: string;
+}) {
   const content = <span className="font-medium text-foreground">{value}</span>;
   return (
     <div className="flex items-center justify-between gap-3">
@@ -807,19 +1203,42 @@ function DetailRow({ icon: Icon, label, value, link }: { icon: React.ComponentTy
         <Icon className="h-3.5 w-3.5" />
         <span className="text-[13px]">{label}</span>
       </div>
-      {link ? <a href={link} className="text-right underline-offset-2 hover:underline">{content}</a> : content}
+      {link ? (
+        <a href={link} className="text-right underline-offset-2 hover:underline">
+          {content}
+        </a>
+      ) : (
+        content
+      )}
     </div>
   );
 }
 
-function ActionBtn({ children, onClick, disabled, variant, icon: Icon }: { children: React.ReactNode; onClick: () => void; disabled?: boolean; variant?: "primary" | "danger"; icon: React.ComponentType<{ className?: string }>; }) {
-  const base = "flex h-11 items-center justify-center gap-1.5 rounded-xl text-xs font-medium transition-all active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none";
-  const styles = variant === "primary" ? "bg-primary text-primary-foreground hover:bg-primary/90"
-    : variant === "danger" ? "bg-background text-destructive border border-border hover:bg-destructive/5"
-    : "bg-background text-foreground border border-border hover:bg-accent";
+function ActionBtn({
+  children,
+  onClick,
+  disabled,
+  variant,
+  icon: Icon,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  disabled?: boolean;
+  variant?: "primary" | "danger";
+  icon: React.ComponentType<{ className?: string }>;
+}) {
+  const base =
+    "flex h-11 items-center justify-center gap-1.5 rounded-xl text-xs font-medium transition-all active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none";
+  const styles =
+    variant === "primary"
+      ? "bg-primary text-primary-foreground hover:bg-primary/90"
+      : variant === "danger"
+        ? "bg-background text-destructive border border-border hover:bg-destructive/5"
+        : "bg-background text-foreground border border-border hover:bg-accent";
   return (
     <button onClick={onClick} disabled={disabled} className={`${base} ${styles}`}>
-      <Icon className="h-3.5 w-3.5" />{children}
+      <Icon className="h-3.5 w-3.5" />
+      {children}
     </button>
   );
 }

@@ -112,9 +112,7 @@ function DesktopMockup() {
         <span className="h-2.5 w-2.5 rounded-full bg-terracotta/50" />
         <span className="h-2.5 w-2.5 rounded-full bg-warning/50" />
         <span className="h-2.5 w-2.5 rounded-full bg-success/50" />
-        <span className="ml-3 truncate text-[11px] text-muted-foreground">
-          reservalab / painel
-        </span>
+        <span className="ml-3 truncate text-[11px] text-muted-foreground">reservalab / painel</span>
       </div>
       <div className="p-4 sm:p-5">
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -125,9 +123,7 @@ function DesktopMockup() {
             ["Pessoas", "46"],
           ].map(([k, v]) => (
             <div key={k} className="rounded-xl border border-border bg-background p-3">
-              <p className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
-                {k}
-              </p>
+              <p className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">{k}</p>
               <p className="mt-1 font-serif text-2xl">{v}</p>
             </div>
           ))}
@@ -138,9 +134,7 @@ function DesktopMockup() {
             <span
               key={c}
               className={`rounded-full px-3 py-1 text-[11px] ${
-                i === 0
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground"
+                i === 0 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
               }`}
             >
               {c}
@@ -185,9 +179,7 @@ function MobileMockup() {
         <span className="h-1 w-12 rounded-full bg-background/40" />
       </div>
       <div className="space-y-3 p-4">
-        <p className="text-[9px] uppercase tracking-[0.2em] text-terracotta">
-          Nova reserva
-        </p>
+        <p className="text-[9px] uppercase tracking-[0.2em] text-terracotta">Nova reserva</p>
         <p className="font-serif text-xl leading-tight">Reserve sua mesa</p>
         <div className="space-y-2">
           {["Nome completo", "WhatsApp", "Data"].map((f) => (
@@ -383,10 +375,30 @@ function Landing() {
             <span className="font-serif text-xl tracking-tight">ReservaLab</span>
           </a>
           <nav aria-label="Navegação principal" className="hidden items-center gap-6 md:flex">
-            <a href="#como-funciona" className="text-sm text-muted-foreground transition hover:text-foreground">Como funciona</a>
-            <a href="#recursos" className="text-sm text-muted-foreground transition hover:text-foreground">Recursos</a>
-            <a href="#segmentos" className="text-sm text-muted-foreground transition hover:text-foreground">Segmentos</a>
-            <a href="#faq" className="text-sm text-muted-foreground transition hover:text-foreground">Dúvidas</a>
+            <a
+              href="#como-funciona"
+              className="text-sm text-muted-foreground transition hover:text-foreground"
+            >
+              Como funciona
+            </a>
+            <a
+              href="#recursos"
+              className="text-sm text-muted-foreground transition hover:text-foreground"
+            >
+              Recursos
+            </a>
+            <a
+              href="#segmentos"
+              className="text-sm text-muted-foreground transition hover:text-foreground"
+            >
+              Segmentos
+            </a>
+            <a
+              href="#faq"
+              className="text-sm text-muted-foreground transition hover:text-foreground"
+            >
+              Dúvidas
+            </a>
           </nav>
           <a
             href={WHATSAPP}
@@ -411,10 +423,12 @@ function Landing() {
               <Reveal>
                 <SectionTag>Reservas e agendamentos</SectionTag>
                 <h1 className="mt-5 font-serif text-[2.6rem] leading-[1.05] tracking-tight sm:text-6xl lg:text-[4.1rem]">
-                  Sua empresa recebe reservas.<br className="hidden sm:block" /> O ReservaLab cuida do resto.
+                  Sua empresa recebe reservas.
+                  <br className="hidden sm:block" /> O ReservaLab cuida do resto.
                 </h1>
                 <p className="mt-6 max-w-xl text-[15px] leading-relaxed text-muted-foreground sm:text-lg">
-                  Centralize reservas, horários e clientes em um sistema simples e profissional — sem depender de conversas perdidas no WhatsApp.
+                  Centralize reservas, horários e clientes em um sistema simples e profissional —
+                  sem depender de conversas perdidas no WhatsApp.
                 </p>
               </Reveal>
               <Reveal delay={120}>
@@ -442,7 +456,6 @@ function Landing() {
                 </div>
               </div>
               <div className="mt-10 xl:hidden">
-
                 <MobileMockup />
               </div>
             </Reveal>
@@ -485,7 +498,9 @@ function Landing() {
                 Um só lugar para tudo que envolve reserva.
               </h2>
               <p className="mt-5 max-w-xl leading-relaxed text-muted-foreground">
-                O cliente reserva pelo seu link. Você recebe, confirma e avisa pelo WhatsApp sem sair do painel. Os horários, bloqueios e o histórico ficam organizados automaticamente.
+                O cliente reserva pelo seu link. Você recebe, confirma e avisa pelo WhatsApp sem
+                sair do painel. Os horários, bloqueios e o histórico ficam organizados
+                automaticamente.
               </p>
               <ul className="mt-7 space-y-3">
                 {[
@@ -494,7 +509,10 @@ function Landing() {
                   "Horários e bloqueios controlados pelo sistema",
                 ].map((li) => (
                   <li key={li} className="flex gap-3 text-sm">
-                    <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-terracotta" aria-hidden="true" />
+                    <Sparkles
+                      className="mt-0.5 h-4 w-4 shrink-0 text-terracotta"
+                      aria-hidden="true"
+                    />
                     <span className="text-muted-foreground">{li}</span>
                   </li>
                 ))}
@@ -507,7 +525,10 @@ function Landing() {
         </section>
 
         {/* COMO FUNCIONA */}
-        <section id="como-funciona" className="scroll-mt-20 border-b border-border/60 py-20 sm:py-24">
+        <section
+          id="como-funciona"
+          className="scroll-mt-20 border-b border-border/60 py-20 sm:py-24"
+        >
           <div className="mx-auto max-w-6xl px-5">
             <Reveal>
               <SectionTag>Como funciona</SectionTag>
@@ -518,9 +539,21 @@ function Landing() {
 
             <div className="mt-10 grid gap-3 md:grid-cols-3">
               {[
-                ["01", "Configure sua empresa", "Nome, logo, contatos, endereço, horários e os tipos de reserva que você aceita."],
-                ["02", "Divulgue seu link", "Compartilhe reserva.bauerlab.com.br/suaempresa nas redes, no perfil e no WhatsApp."],
-                ["03", "Gerencie pelo painel", "Receba, confirme, edite, bloqueie a agenda e acompanhe os relatórios."],
+                [
+                  "01",
+                  "Configure sua empresa",
+                  "Nome, logo, contatos, endereço, horários e os tipos de reserva que você aceita.",
+                ],
+                [
+                  "02",
+                  "Divulgue seu link",
+                  "Compartilhe reserva.bauerlab.com.br/suaempresa nas redes, no perfil e no WhatsApp.",
+                ],
+                [
+                  "03",
+                  "Gerencie pelo painel",
+                  "Receba, confirme, edite, bloqueie a agenda e acompanhe os relatórios.",
+                ],
               ].map(([n, t, d], i) => (
                 <Reveal key={n} delay={i * 90}>
                   <div className="h-full rounded-2xl border border-border bg-card p-6 transition-all motion-safe:hover:-translate-y-1 hover:shadow-[var(--shadow-md)]">
@@ -573,17 +606,21 @@ function Landing() {
                     Do celular do cliente ao seu painel.
                   </h3>
                   <p className="mt-3 max-w-lg text-sm leading-relaxed text-muted-foreground">
-                    A página de reserva é feita para o celular e pode ser instalada como aplicativo. O painel funciona igualmente bem no computador do balcão.
+                    A página de reserva é feita para o celular e pode ser instalada como aplicativo.
+                    O painel funciona igualmente bem no computador do balcão.
                   </p>
                   <div className="mt-6 flex flex-wrap gap-4 text-xs text-muted-foreground">
                     <span className="inline-flex items-center gap-1.5">
-                      <Smartphone className="h-3.5 w-3.5 text-terracotta" aria-hidden="true" /> Mobile-first
+                      <Smartphone className="h-3.5 w-3.5 text-terracotta" aria-hidden="true" />{" "}
+                      Mobile-first
                     </span>
                     <span className="inline-flex items-center gap-1.5">
-                      <Store className="h-3.5 w-3.5 text-terracotta" aria-hidden="true" /> Multiempresa
+                      <Store className="h-3.5 w-3.5 text-terracotta" aria-hidden="true" />{" "}
+                      Multiempresa
                     </span>
                     <span className="inline-flex items-center gap-1.5">
-                      <ShieldCheck className="h-3.5 w-3.5 text-terracotta" aria-hidden="true" /> Acesso restrito por empresa
+                      <ShieldCheck className="h-3.5 w-3.5 text-terracotta" aria-hidden="true" />{" "}
+                      Acesso restrito por empresa
                     </span>
                   </div>
                 </div>
@@ -696,16 +733,52 @@ function Landing() {
           </div>
           <div className="grid grid-cols-2 gap-6 text-sm sm:justify-items-end">
             <nav aria-label="Links da página" className="space-y-2">
-              <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/70">Página</p>
-              <a href="#como-funciona" className="block text-muted-foreground transition hover:text-foreground">Como funciona</a>
-              <a href="#recursos" className="block text-muted-foreground transition hover:text-foreground">Recursos</a>
-              <a href="#faq" className="block text-muted-foreground transition hover:text-foreground">Dúvidas</a>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/70">
+                Página
+              </p>
+              <a
+                href="#como-funciona"
+                className="block text-muted-foreground transition hover:text-foreground"
+              >
+                Como funciona
+              </a>
+              <a
+                href="#recursos"
+                className="block text-muted-foreground transition hover:text-foreground"
+              >
+                Recursos
+              </a>
+              <a
+                href="#faq"
+                className="block text-muted-foreground transition hover:text-foreground"
+              >
+                Dúvidas
+              </a>
             </nav>
             <nav aria-label="Contato e acesso" className="space-y-2">
-              <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/70">Contato</p>
-              <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="block text-muted-foreground transition hover:text-foreground">WhatsApp</a>
-              <a href="mailto:contato.bauerlab@gmail.com" className="block text-muted-foreground transition hover:text-foreground">E-mail</a>
-              <Link to="/master/login" className="block text-muted-foreground transition hover:text-foreground">Área administrativa</Link>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/70">
+                Contato
+              </p>
+              <a
+                href={WHATSAPP}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-muted-foreground transition hover:text-foreground"
+              >
+                WhatsApp
+              </a>
+              <a
+                href="mailto:contato.bauerlab@gmail.com"
+                className="block text-muted-foreground transition hover:text-foreground"
+              >
+                E-mail
+              </a>
+              <Link
+                to="/master/login"
+                className="block text-muted-foreground transition hover:text-foreground"
+              >
+                Área administrativa
+              </Link>
             </nav>
           </div>
         </div>

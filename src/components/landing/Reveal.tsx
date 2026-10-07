@@ -43,7 +43,6 @@ export function Reveal({
 
   return (
     <Component
-
       ref={ref as never}
       style={{ transitionDelay: `${delay}ms` }}
       className={`reveal ${shown ? "reveal-in" : ""} ${className}`}

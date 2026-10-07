@@ -51,19 +51,26 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => null);
     if (!body || typeof body !== "object") return json({ error: "Payload inválido" }, 400);
 
-    const slug = String(body.slug ?? "").toLowerCase().trim().replace(/[^a-z0-9-]/g, "-");
+    const slug = String(body.slug ?? "")
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9-]/g, "-");
     const nome = String(body.nome ?? "").trim();
-    const email_admin = String(body.email_admin ?? "").toLowerCase().trim();
+    const email_admin = String(body.email_admin ?? "")
+      .toLowerCase()
+      .trim();
     const senha_admin = String(body.senha_admin ?? "");
 
     if (!/^[a-z0-9][a-z0-9-]{1,40}$/.test(slug)) return json({ error: "Slug inválido" }, 400);
     if (nome.length < 2) return json({ error: "Nome inválido" }, 400);
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email_admin)) return json({ error: "E-mail inválido" }, 400);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email_admin))
+      return json({ error: "E-mail inválido" }, 400);
     if (senha_admin.length < 6) return json({ error: "Senha muito curta" }, 400);
 
-    const tipos = Array.isArray(body.tipos_aceitos) && body.tipos_aceitos.length
-      ? body.tipos_aceitos
-      : ["mesa", "aniversario", "evento", "casamento"];
+    const tipos =
+      Array.isArray(body.tipos_aceitos) && body.tipos_aceitos.length
+        ? body.tipos_aceitos
+        : ["mesa", "aniversario", "evento", "casamento"];
 
     // 4) Cria o tenant
     const { data: tenant, error: tErr } = await admin
@@ -99,7 +106,8 @@ Deno.serve(async (req) => {
         email_confirm: true,
         user_metadata: { must_change_password: true },
       });
-      if (cErr || !created.user) return json({ error: cErr?.message ?? "Falha ao criar usuário" }, 400);
+      if (cErr || !created.user)
+        return json({ error: cErr?.message ?? "Falha ao criar usuário" }, 400);
       adminUserId = created.user.id;
     }
 

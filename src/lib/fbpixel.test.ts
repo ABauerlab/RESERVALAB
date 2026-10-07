@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
-import { CLICK_RESERVA_EVENT, initFacebookPixel, trackFacebookCustomEvent, trackFacebookEvent } from "@/lib/fbpixel";
+import {
+  CLICK_RESERVA_EVENT,
+  initFacebookPixel,
+  trackFacebookCustomEvent,
+  trackFacebookEvent,
+} from "@/lib/fbpixel";
 
 describe("CLICK_RESERVA_EVENT", () => {
   it("mapeia cada tipo de reserva para o nome de evento esperado", () => {

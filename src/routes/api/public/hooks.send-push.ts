@@ -81,7 +81,7 @@ export const Route = createFileRoute("/api/public/hooks/send-push")({
             } catch (e) {
               console.error("[push] error", e);
             }
-          })
+          }),
         );
 
         if (toRemove.length) {

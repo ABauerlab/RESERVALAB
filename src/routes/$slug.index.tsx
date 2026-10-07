@@ -1,7 +1,16 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { ArrowRight, UtensilsCrossed, Cake, Sparkles, Heart, Search, Loader2, PartyPopper } from "lucide-react";
+import {
+  ArrowRight,
+  UtensilsCrossed,
+  Cake,
+  Sparkles,
+  Heart,
+  Search,
+  Loader2,
+  PartyPopper,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { TIPO_CARDS, formatData, formatHorario, type ReservaTipo } from "@/lib/reservations";
 import { getTenantBySlug } from "@/lib/tenant";
@@ -89,7 +98,8 @@ function TenantHome() {
             Como podemos te receber?
           </h1>
           <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-muted-foreground sm:text-base">
-            Escolha o tipo de reserva. Levamos poucos segundos, e nossa equipe confirma com você em seguida.
+            Escolha o tipo de reserva. Levamos poucos segundos, e nossa equipe confirma com você em
+            seguida.
           </p>
         </header>
 
@@ -106,13 +116,17 @@ function TenantHome() {
               <p className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.18em] text-terracotta">
                 <PartyPopper className="h-3.5 w-3.5" /> Evento em destaque
               </p>
-              <p className="mt-2 font-serif text-2xl leading-snug text-foreground">{eventoQ.data.titulo}</p>
+              <p className="mt-2 font-serif text-2xl leading-snug text-foreground">
+                {eventoQ.data.titulo}
+              </p>
               <p className="mt-1 text-sm font-medium text-terracotta">
                 {formatData(eventoQ.data.data)}
                 {eventoQ.data.horario ? ` às ${formatHorario(eventoQ.data.horario)}` : ""}
               </p>
               {eventoQ.data.descricao && (
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{eventoQ.data.descricao}</p>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {eventoQ.data.descricao}
+                </p>
               )}
             </div>
           </div>
@@ -126,7 +140,9 @@ function TenantHome() {
                 key={card.tipo}
                 to="/$slug/reservar/$tipo"
                 params={{ slug, tipo: card.tipo }}
-                onClick={() => trackFacebookCustomEvent(tenant.pixel_facebook_id, CLICK_RESERVA_EVENT[card.tipo])}
+                onClick={() =>
+                  trackFacebookCustomEvent(tenant.pixel_facebook_id, CLICK_RESERVA_EVENT[card.tipo])
+                }
                 className="group relative flex items-center gap-4 rounded-2xl border border-border bg-card px-5 py-4 shadow-[var(--shadow-sm)] transition-all duration-200 hover:-translate-y-0.5 hover:border-terracotta/40 hover:shadow-[var(--shadow-md)] active:scale-[0.99] animate-in-up"
                 style={{ animationDelay: `${60 + i * 50}ms` }}
               >
@@ -135,7 +151,9 @@ function TenantHome() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="font-medium text-foreground">{card.titulo}</p>
-                  <p className="mt-0.5 line-clamp-1 text-sm text-muted-foreground">{card.descricao}</p>
+                  <p className="mt-0.5 line-clamp-1 text-sm text-muted-foreground">
+                    {card.descricao}
+                  </p>
                 </div>
                 <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-terracotta" />
               </Link>

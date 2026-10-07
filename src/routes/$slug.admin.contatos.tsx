@@ -14,10 +14,7 @@ import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/$slug/admin/contatos")({
   head: ({ params }) => ({
-    meta: [
-      { title: "Contatos — ReservaLab" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Contatos — ReservaLab" }, { name: "robots", content: "noindex" }],
     links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),
   }),
   ssr: false,
@@ -101,21 +98,42 @@ function ContatosPage() {
         </header>
 
         <div className="mt-6 flex flex-wrap gap-1.5 animate-in-up">
-          <PresetChip active={preset === "todas"} onClick={() => setPreset("todas")}>Todas até hoje</PresetChip>
-          <PresetChip active={preset === "30"} onClick={() => setPreset("30")}>Últimos 30 dias</PresetChip>
-          <PresetChip active={preset === "90"} onClick={() => setPreset("90")}>Últimos 90 dias</PresetChip>
-          <PresetChip active={preset === "personalizado"} onClick={() => setPreset("personalizado")}>Período personalizado</PresetChip>
+          <PresetChip active={preset === "todas"} onClick={() => setPreset("todas")}>
+            Todas até hoje
+          </PresetChip>
+          <PresetChip active={preset === "30"} onClick={() => setPreset("30")}>
+            Últimos 30 dias
+          </PresetChip>
+          <PresetChip active={preset === "90"} onClick={() => setPreset("90")}>
+            Últimos 90 dias
+          </PresetChip>
+          <PresetChip
+            active={preset === "personalizado"}
+            onClick={() => setPreset("personalizado")}
+          >
+            Período personalizado
+          </PresetChip>
         </div>
 
         {preset === "personalizado" && (
           <div className="mt-3 grid grid-cols-2 gap-3 animate-in-up sm:max-w-sm">
             <div className="space-y-1.5">
               <Label className="text-[12px] text-muted-foreground">De</Label>
-              <Input type="date" value={de} onChange={(e) => setDe(e.target.value)} className="h-10 rounded-lg" />
+              <Input
+                type="date"
+                value={de}
+                onChange={(e) => setDe(e.target.value)}
+                className="h-10 rounded-lg"
+              />
             </div>
             <div className="space-y-1.5">
               <Label className="text-[12px] text-muted-foreground">Até</Label>
-              <Input type="date" value={ate} onChange={(e) => setAte(e.target.value)} className="h-10 rounded-lg" />
+              <Input
+                type="date"
+                value={ate}
+                onChange={(e) => setAte(e.target.value)}
+                className="h-10 rounded-lg"
+              />
             </div>
           </div>
         )}
@@ -141,11 +159,15 @@ function ContatosPage() {
 
         <div className="mt-5">
           {reservasQ.isLoading ? (
-            <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
+            <div className="flex justify-center py-10">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
           ) : contatos.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-border bg-card/50 py-14 text-center">
               <p className="font-serif text-2xl text-foreground">Nenhum contato</p>
-              <p className="mt-1 text-sm text-muted-foreground">Ninguém reservou nesse período ainda.</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Ninguém reservou nesse período ainda.
+              </p>
             </div>
           ) : (
             <div className="overflow-hidden rounded-2xl border border-border bg-card">
@@ -165,13 +187,17 @@ function ContatosPage() {
                       <tr key={c.telefoneWhatsapp} className="border-t border-border/60">
                         <td className="px-4 py-2.5 font-medium">{c.nome}</td>
                         <td className="px-4 py-2.5 text-muted-foreground">{c.telefone}</td>
-                        <td className="px-4 py-2.5 tabular-nums text-muted-foreground">{c.reservas}</td>
+                        <td className="px-4 py-2.5 tabular-nums text-muted-foreground">
+                          {c.reservas}
+                        </td>
                         <td className="px-4 py-2.5 text-muted-foreground">
                           {c.ultimaData
                             ? new Date(c.ultimaData + "T00:00:00").toLocaleDateString("pt-BR")
                             : "—"}
                         </td>
-                        <td className="px-4 py-2.5 text-muted-foreground">{STATUS_LABEL[c.ultimoStatus]}</td>
+                        <td className="px-4 py-2.5 text-muted-foreground">
+                          {STATUS_LABEL[c.ultimoStatus]}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -185,12 +211,22 @@ function ContatosPage() {
   );
 }
 
-function PresetChip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+function PresetChip({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
   return (
     <button
       onClick={onClick}
       className={`h-9 shrink-0 rounded-full px-4 text-xs font-medium transition-all ${
-        active ? "bg-primary text-primary-foreground shadow-[var(--shadow-sm)]" : "bg-muted text-muted-foreground hover:bg-accent hover:text-foreground"
+        active
+          ? "bg-primary text-primary-foreground shadow-[var(--shadow-sm)]"
+          : "bg-muted text-muted-foreground hover:bg-accent hover:text-foreground"
       }`}
     >
       {children}

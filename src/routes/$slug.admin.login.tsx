@@ -13,10 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 export const Route = createFileRoute("/$slug/admin/login")({
   head: ({ params }) => ({
-    meta: [
-      { title: "Admin — ReservaLab" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Admin — ReservaLab" }, { name: "robots", content: "noindex" }],
     links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),
   }),
   ssr: false,
@@ -44,7 +41,8 @@ function AdminLogin() {
       return;
     }
     const { data: allowed, error } = await supabase.rpc("has_tenant_role", {
-      _user_id: userId, _tenant_id: tenant.id,
+      _user_id: userId,
+      _tenant_id: tenant.id,
     });
     if (error) {
       // Erro de verificação (ex.: Supabase mal configurado) NÃO é a mesma
@@ -98,7 +96,9 @@ function AdminLogin() {
     <main className="flex min-h-screen items-center justify-center bg-background px-5 safe-top safe-bottom">
       <div className="w-full max-w-sm animate-in-up">
         <Link to="/$slug" params={{ slug }} className="mb-10 block text-center">
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-terracotta">ReservaLab</p>
+          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-terracotta">
+            ReservaLab
+          </p>
           <p className="mt-1 text-xs text-muted-foreground">Painel administrativo</p>
         </Link>
 
@@ -109,11 +109,27 @@ function AdminLogin() {
           <form onSubmit={onSubmit} className="mt-6 space-y-4">
             <div className="space-y-2">
               <Label className="text-[13px]">E-mail</Label>
-              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="voce@empresa.com" autoComplete="email" required className="h-12 rounded-xl" />
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="voce@empresa.com"
+                autoComplete="email"
+                required
+                className="h-12 rounded-xl"
+              />
             </div>
             <div className="space-y-2">
               <Label className="text-[13px]">Senha</Label>
-              <Input type="password" value={senha} onChange={(e) => setSenha(e.target.value)} autoComplete="current-password" required minLength={6} className="h-12 rounded-xl" />
+              <Input
+                type="password"
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+                autoComplete="current-password"
+                required
+                minLength={6}
+                className="h-12 rounded-xl"
+              />
             </div>
 
             <label className="flex items-center gap-2.5 text-sm text-muted-foreground">
@@ -121,7 +137,11 @@ function AdminLogin() {
               Manter conectado neste dispositivo
             </label>
 
-            <Button type="submit" disabled={loading} className="h-12 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button
+              type="submit"
+              disabled={loading}
+              className="h-12 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+            >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Entrar"}
             </Button>
           </form>
