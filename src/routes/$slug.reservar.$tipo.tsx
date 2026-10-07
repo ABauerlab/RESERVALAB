@@ -1,3 +1,4 @@
+import { comMarca } from "@/components/public/MarcaScope";
 import { createFileRoute, Link, useNavigate, useParams, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -66,7 +67,7 @@ export const Route = createFileRoute("/$slug/reservar/$tipo")({
       <p className="text-sm text-muted-foreground">Não foi possível carregar esta página.</p>
     </main>
   ),
-  component: ReservarPage,
+  component: comMarca(ReservarPage),
 });
 
 function ReservarPage() {

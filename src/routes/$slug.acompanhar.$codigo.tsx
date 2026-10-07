@@ -1,3 +1,4 @@
+import { comMarca } from "@/components/public/MarcaScope";
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -45,7 +46,7 @@ export const Route = createFileRoute("/$slug/acompanhar/$codigo")({
     meta: [{ title: "Sua reserva | Teggly" }, { name: "robots", content: "noindex" }],
   }),
   ssr: false,
-  component: AcompanharDetalhes,
+  component: comMarca(AcompanharDetalhes),
 });
 
 function AcompanharDetalhes() {

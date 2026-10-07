@@ -1,3 +1,4 @@
+import { comMarca } from "@/components/public/MarcaScope";
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
@@ -13,7 +14,7 @@ export const Route = createFileRoute("/$slug/cardapio")({
       { name: "description", content: "Veja o cardápio e reserve sua mesa." },
     ],
   }),
-  component: CardapioPublicoPage,
+  component: comMarca(CardapioPublicoPage),
 });
 
 function CardapioPublicoPage() {
