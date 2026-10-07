@@ -393,7 +393,7 @@ function ReservarPage() {
             </Field>
           )}
 
-          <Button type="submit" disabled={!podeEnviar || enviando} className="mt-2 w-full rounded-lg bg-terracotta text-terracotta-foreground hover:bg-terracotta/90 disabled:opacity-50" style={{ height: 52 }}>
+          <Button type="submit" disabled={!podeEnviar || enviando} className="mt-2 w-full rounded-lg bg-terracotta text-terracotta-foreground hover:bg-blue-700 disabled:opacity-50" style={{ height: 52 }}>
             {enviando ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Enviando…</>) : "Enviar reserva"}
           </Button>
         </form>

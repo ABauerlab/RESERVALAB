@@ -190,7 +190,7 @@ function AgendaPage() {
             <Input value={motivo} onChange={(e) => setMotivo(e.target.value)} placeholder="Ex.: Evento fechado" className="h-11 rounded-md" />
           </div>
 
-          <Button onClick={() => criar.mutate()} disabled={!podeCriar} className="mt-5 h-11 w-full rounded-md bg-primary text-primary-foreground hover:bg-primary/90 sm:w-auto sm:px-6">
+          <Button onClick={() => criar.mutate()} disabled={!podeCriar} className="mt-5 h-11 w-full rounded-md bg-primary text-primary-foreground hover:bg-blue-700 sm:w-auto sm:px-6">
             {criar.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
             Bloquear
           </Button>
@@ -252,7 +252,7 @@ function AgendaPage() {
               <Input value={feriadoMotivo} onChange={(e) => setFeriadoMotivo(e.target.value)} placeholder="Ex.: Independência do Brasil" className="h-11 rounded-md" />
             </div>
           </div>
-          <Button onClick={() => criarFeriado.mutate()} disabled={!podeCriarFeriado} className="mt-5 h-11 w-full rounded-md bg-primary text-primary-foreground hover:bg-primary/90 sm:w-auto sm:px-6">
+          <Button onClick={() => criarFeriado.mutate()} disabled={!podeCriarFeriado} className="mt-5 h-11 w-full rounded-md bg-primary text-primary-foreground hover:bg-blue-700 sm:w-auto sm:px-6">
             {criarFeriado.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
             Adicionar feriado
           </Button>

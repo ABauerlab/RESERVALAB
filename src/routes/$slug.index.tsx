@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { ArrowRight, UtensilsCrossed, Cake, Sparkles, Heart, Search, Loader2, PartyPopper } from "lucide-react";
+import { ArrowRight, UtensilsCrossed, Cake, Heart, Search, Loader2, PartyPopper } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { TIPO_CARDS, formatData, formatHorario, type ReservaTipo } from "@/lib/reservations";
 import { getTenantBySlug } from "@/lib/tenant";
@@ -20,7 +20,7 @@ export const Route = createFileRoute("/$slug/")({
 const ICONS = {
   mesa: UtensilsCrossed,
   aniversario: Cake,
-  evento: Sparkles,
+  evento: PartyPopper,
   casamento: Heart,
 } as const;
 

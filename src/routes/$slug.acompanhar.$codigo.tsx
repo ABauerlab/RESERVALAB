@@ -186,7 +186,7 @@ function ReservaEdit({ reserva, onUpdated }: { reserva: Reserva; onUpdated: (r: 
             </div>
           </div>
 
-          <Button onClick={() => salvar.mutate()} disabled={salvar.isPending} className="h-12 w-full rounded-md bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button onClick={() => salvar.mutate()} disabled={salvar.isPending} className="h-12 w-full rounded-md bg-primary text-primary-foreground hover:bg-blue-700">
             {salvar.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             Salvar alterações
           </Button>

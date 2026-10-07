@@ -98,7 +98,7 @@ function TrocarSenha() {
               )}
             </div>
 
-            <Button type="submit" disabled={!podeSalvar} className="h-12 w-full rounded-md bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button type="submit" disabled={!podeSalvar} className="h-12 w-full rounded-md bg-primary text-primary-foreground hover:bg-blue-700">
               {salvando ? <Loader2 className="h-4 w-4 animate-spin" /> : "Salvar nova senha"}
             </Button>
           </form>

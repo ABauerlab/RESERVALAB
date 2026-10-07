@@ -157,7 +157,7 @@ function MasterPanel() {
             <h2 className="font-serif text-3xl tracking-tight">Empresas</h2>
             <p className="text-sm text-muted-foreground">{tenantsQ.data?.length ?? 0} cadastradas</p>
           </div>
-          <Button onClick={() => setOpenNew(true)} className="h-11 rounded-md bg-terracotta text-terracotta-foreground hover:bg-terracotta/90">
+          <Button onClick={() => setOpenNew(true)} className="h-11 rounded-md bg-terracotta text-terracotta-foreground hover:bg-blue-700">
             <Plus className="mr-1.5 h-4 w-4" /> Nova empresa
           </Button>
         </div>
@@ -286,7 +286,7 @@ function NovoTenantDialog({ open, onClose, onSubmit, pending }: {
 
           <DialogFooter className="pt-2">
             <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button type="submit" disabled={pending} className="bg-terracotta text-terracotta-foreground hover:bg-terracotta/90">
+            <Button type="submit" disabled={pending} className="bg-terracotta text-terracotta-foreground hover:bg-blue-700">
               {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Criar"}
             </Button>
           </DialogFooter>
@@ -389,7 +389,7 @@ function MasterFeedbacks() {
                   />
                   <Button
                     onClick={() => atualizar.mutate({ id: f.id, resposta_master: respostas[f.id] ?? "" })}
-                    className="h-10 rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
+                    className="h-10 rounded-md bg-primary text-primary-foreground hover:bg-blue-700"
                   >
                     Responder
                   </Button>
@@ -500,7 +500,7 @@ function AcessosDialog({ tenant, onClose }: { tenant: { id: string; nome: string
           <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@empresa.com" required className="h-11 rounded-md" />
           <Input type="text" value={senha} onChange={(e) => setSenha(e.target.value)} placeholder="Senha inicial (mín. 6)" required minLength={6} className="h-11 rounded-md" />
           <DialogFooter>
-            <Button type="submit" disabled={criarM.isPending} className="bg-terracotta text-terracotta-foreground hover:bg-terracotta/90">
+            <Button type="submit" disabled={criarM.isPending} className="bg-terracotta text-terracotta-foreground hover:bg-blue-700">
               {criarM.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Adicionar"}
             </Button>
           </DialogFooter>

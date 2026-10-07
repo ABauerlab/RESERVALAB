@@ -69,7 +69,7 @@ function AcompanharPage() {
             <Input value={codigo} onChange={(e) => setCodigo(normalizeCodigo(e.target.value))} placeholder="RL-XXXXXX" autoCapitalize="characters" autoComplete="off" className="h-12 rounded-md font-mono tracking-wider" required />
           </div>
 
-          <Button type="submit" className="h-12 w-full rounded-md bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button type="submit" className="h-12 w-full rounded-md bg-primary text-primary-foreground hover:bg-blue-700">
             <Search className="mr-2 h-4 w-4" /> Consultar
           </Button>
         </form>

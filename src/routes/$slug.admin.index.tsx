@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Bell, BellRing, Calendar, CalendarDays, Download, LogOut, PartyPopper, Search,
-  Sparkles, User, Loader2, Check, X, CheckCircle2, Phone, Utensils, Heart, Cake,
+  User, Loader2, Check, X, CheckCircle2, Phone, Utensils, Heart, Cake,
   MessageCircle, Pencil, Trash2, Save,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -72,7 +72,7 @@ const FILTROS_STATUS: Array<{ id: FiltroStatus; label: string }> = [
   ...STATUS_LIST.map((s) => ({ id: s as FiltroStatus, label: STATUS_LABEL[s] })),
 ];
 
-const TIPO_ICON = { mesa: Utensils, aniversario: Cake, evento: Sparkles, casamento: Heart } as const;
+const TIPO_ICON = { mesa: Utensils, aniversario: Cake, evento: PartyPopper, casamento: Heart } as const;
 
 function todayISO() { return new Date().toISOString().slice(0, 10); }
 function tomorrowISO() { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().slice(0, 10); }
@@ -620,7 +620,7 @@ function ReservaDialog({
                   {r.data && <DetailRow icon={CalendarDays} label="Data" value={formatData(r.data)} />}
                   {r.horario && <DetailRow icon={Calendar} label="Horário" value={formatHorario(r.horario)} />}
                   {r.area && <DetailRow icon={Utensils} label="Área" value={AREA_LABEL[r.area]} />}
-                  {r.tipo_evento && <DetailRow icon={Sparkles} label="Tipo do evento" value={r.tipo_evento} />}
+                  {r.tipo_evento && <DetailRow icon={PartyPopper} label="Tipo do evento" value={r.tipo_evento} />}
                   {r.leva_bolo !== null && r.tipo === "aniversario" && (<DetailRow icon={Cake} label="Leva bolo" value={r.leva_bolo ? "Sim" : "Não"} />)}
                   {r.comandas !== null && r.tipo === "aniversario" && (<DetailRow icon={Check} label="Comandas individuais" value={r.comandas ? "Sim" : "Não"} />)}
                   {r.observacoes && (
@@ -814,7 +814,7 @@ function DetailRow({ icon: Icon, label, value, link }: { icon: React.ComponentTy
 
 function ActionBtn({ children, onClick, disabled, variant, icon: Icon }: { children: React.ReactNode; onClick: () => void; disabled?: boolean; variant?: "primary" | "danger"; icon: React.ComponentType<{ className?: string }>; }) {
   const base = "flex h-11 items-center justify-center gap-1.5 rounded-md text-xs font-medium transition-all active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none";
-  const styles = variant === "primary" ? "bg-primary text-primary-foreground hover:bg-primary/90"
+  const styles = variant === "primary" ? "bg-primary text-primary-foreground hover:bg-blue-700"
     : variant === "danger" ? "bg-background text-destructive border border-border hover:bg-destructive/5"
     : "bg-background text-foreground border border-border hover:bg-accent";
   return (

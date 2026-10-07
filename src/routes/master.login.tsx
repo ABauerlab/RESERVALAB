@@ -104,7 +104,7 @@ function MasterLogin() {
               <Input type="password" value={senha} onChange={(e) => setSenha(e.target.value)} required minLength={6} className="h-12 rounded-md" />
             </div>
 
-            <Button type="submit" disabled={loading || booting} className="h-12 w-full rounded-md bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button type="submit" disabled={loading || booting} className="h-12 w-full rounded-md bg-primary text-primary-foreground hover:bg-blue-700">
               {loading || booting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Entrar"}
             </Button>
           </form>

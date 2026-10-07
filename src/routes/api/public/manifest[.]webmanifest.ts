@@ -14,12 +14,14 @@ export const Route = createFileRoute("/api/public/manifest.webmanifest")({
         const raw = url.searchParams.get("start") ?? "/";
         // Aceita apenas caminhos internos simples.
         const start = /^\/[A-Za-z0-9\-_/]*$/.test(raw) ? raw : "/";
-        const name = url.searchParams.get("name")?.slice(0, 40) || "Teggly";
+        const rawName = url.searchParams.get("name")?.slice(0, 40) || "Teggly";
+        // App instalado sempre leva a marca: "Teggly Admin", "Teggly Master".
+        const name = rawName === "Teggly" ? rawName : `Teggly ${rawName}`.slice(0, 40);
 
         const manifest = {
           id: start,
           name,
-          short_name: name.slice(0, 12),
+          short_name: name.length <= 12 ? name : "Teggly",
           description: "Painel de reservas Teggly.",
           start_url: start,
           scope: "/",

@@ -76,6 +76,9 @@
   /* Alias historico: "serif" era a fonte de titulos. No Teggly so existe Manrope. */
   --font-serif: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
+  /* Brand System: nunca outra fonte. "mono" e alias de Manrope com numeros tabulares. */
+  --font-mono: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
   --radius-xs: 6px;
   --radius-sm: 8px;
   --radius-md: 10px;
@@ -209,6 +212,10 @@
   /* O sistema usa 400, 500, 600 e 800: nunca 700. */
   b, strong {
     font-weight: 600;
+  }
+
+  .font-mono {
+    font-variant-numeric: tabular-nums;
   }
 
   /* Titulos e numeros de destaque: Manrope ExtraBold com tracking negativo.

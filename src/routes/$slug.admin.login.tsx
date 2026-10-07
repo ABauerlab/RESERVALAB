@@ -121,7 +121,7 @@ function AdminLogin() {
               Manter conectado neste dispositivo
             </label>
 
-            <Button type="submit" disabled={loading} className="h-12 w-full rounded-md bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button type="submit" disabled={loading} className="h-12 w-full rounded-md bg-primary text-primary-foreground hover:bg-blue-700">
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Entrar"}
             </Button>
           </form>
