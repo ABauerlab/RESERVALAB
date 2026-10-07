@@ -27,6 +27,7 @@ import {
   type ReservaTipo,
 } from "@/lib/reservations";
 import { getTenantBySlug } from "@/lib/tenant";
+import { todayISO } from "@/lib/datetime";
 import { initFacebookPixel, trackFacebookEvent } from "@/lib/fbpixel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -120,7 +121,7 @@ function ReservarPage() {
   const isCasa = tipo === "casamento";
   const precisaHorario = isMesa || isAniv;
 
-  const hoje = useMemo(() => new Date().toISOString().slice(0, 10), []);
+  const hoje = useMemo(() => todayISO(), []);
 
   const ehFeriado = useMemo(
     () => (feriadosQ.data ?? []).some((f: { data: string }) => f.data === data),

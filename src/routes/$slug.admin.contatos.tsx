@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { agruparContatos, contatosToCsv } from "@/lib/contatos";
+import { addDaysISO, todayISO } from "@/lib/datetime";
 import { STATUS_LABEL, type Reserva } from "@/lib/reservations";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,10 +21,6 @@ export const Route = createFileRoute("/$slug/admin/contatos")({
   ssr: false,
   component: ContatosPage,
 });
-
-function todayISO() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 type Preset = "todas" | "30" | "90" | "personalizado";
 
@@ -40,9 +37,7 @@ function ContatosPage() {
     if (preset === "todas") return { de: "", ate: todayISO() };
     if (preset === "30" || preset === "90") {
       const dias = preset === "30" ? 30 : 90;
-      const d = new Date();
-      d.setDate(d.getDate() - dias);
-      return { de: d.toISOString().slice(0, 10), ate: todayISO() };
+      return { de: addDaysISO(todayISO(), -dias), ate: todayISO() };
     }
     return { de, ate: ate || todayISO() };
   }, [preset, de, ate]);

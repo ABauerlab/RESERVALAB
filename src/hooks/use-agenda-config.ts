@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
+import { todayISO } from "@/lib/datetime";
 
 /**
  * Gestão de bloqueios e feriados da Agenda. Código movido sem alteração de regra da página
@@ -26,7 +27,7 @@ export function useAgendaConfig(tenantId: string | null) {
         .from("agenda_bloqueios")
         .select("*")
         .eq("tenant_id", tenantId!)
-        .gte("data", new Date().toISOString().slice(0, 10))
+        .gte("data", todayISO())
         .order("data", { ascending: true });
       if (error) throw error;
       return data;
@@ -84,7 +85,7 @@ export function useAgendaConfig(tenantId: string | null) {
         .from("feriados")
         .select("*")
         .eq("tenant_id", tenantId!)
-        .gte("data", new Date().toISOString().slice(0, 10))
+        .gte("data", todayISO())
         .order("data", { ascending: true });
       if (error) throw error;
       return data;

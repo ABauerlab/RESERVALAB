@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { formatData, formatHorario } from "@/lib/reservations";
+import { todayISO } from "@/lib/datetime";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -96,7 +97,7 @@ function EventosPage() {
 
   const podeCriar = titulo.trim().length > 0 && !!data && !criar.isPending;
 
-  const hoje = new Date().toISOString().slice(0, 10);
+  const hoje = todayISO();
   const eventos = eventosQ.data ?? [];
   const futuros = eventos.filter((e: EventoRow) => e.data >= hoje);
   const passados = eventos.filter((e: EventoRow) => e.data < hoje);
