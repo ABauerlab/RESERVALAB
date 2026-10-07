@@ -15,10 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 export const Route = createFileRoute("/$slug/admin/sugestoes")({
   head: ({ params }) => ({
-    meta: [
-      { title: "Sugestões | Teggly" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Sugestões | Teggly" }, { name: "robots", content: "noindex" }],
     links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),
   }),
   ssr: false,
@@ -75,7 +72,8 @@ function SugestoesPage() {
     },
     onSuccess: () => {
       toast.success("Sugestão enviada. Obrigado!");
-      setTitulo(""); setDescricao("");
+      setTitulo("");
+      setDescricao("");
       qc.invalidateQueries({ queryKey: ["feedbacks", tenantId] });
     },
     onError: () => toast.error("Não foi possível enviar a sugestão."),
@@ -89,7 +87,8 @@ function SugestoesPage() {
     );
   }
 
-  const podeEnviar = titulo.trim().length >= 3 && descricao.trim().length >= 10 && !enviar.isPending;
+  const podeEnviar =
+    titulo.trim().length >= 3 && descricao.trim().length >= 10 && !enviar.isPending;
 
   return (
     <AdminShell slug={slug} tenantNome={admin.tenant?.nome ?? ""} active="sugestoes">
@@ -104,22 +103,44 @@ function SugestoesPage() {
         <section className="mt-6 rounded-lg border border-border bg-card p-5 space-y-4 animate-in-up">
           <div className="space-y-2">
             <Label className="text-[13px]">Título</Label>
-            <Input value={titulo} onChange={(e) => setTitulo(e.target.value)} placeholder="Ex.: Exportar reservas em planilha" className="h-11 rounded-md" />
+            <Input
+              value={titulo}
+              onChange={(e) => setTitulo(e.target.value)}
+              placeholder="Ex.: Exportar reservas em planilha"
+              className="h-11 rounded-md"
+            />
           </div>
           <div className="space-y-2">
             <Label className="text-[13px]">Descrição</Label>
-            <Textarea value={descricao} onChange={(e) => setDescricao(e.target.value)} placeholder="Explique como isso ajudaria no dia a dia." className="min-h-32 rounded-md" />
+            <Textarea
+              value={descricao}
+              onChange={(e) => setDescricao(e.target.value)}
+              placeholder="Explique como isso ajudaria no dia a dia."
+              className="min-h-32 rounded-md"
+            />
           </div>
-          <Button onClick={() => enviar.mutate()} disabled={!podeEnviar} className="h-11 w-full rounded-md bg-primary text-primary-foreground hover:bg-blue-700 sm:w-auto sm:px-6">
-            {enviar.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
+          <Button
+            onClick={() => enviar.mutate()}
+            disabled={!podeEnviar}
+            className="h-11 w-full rounded-md bg-primary text-primary-foreground hover:bg-blue-700 sm:w-auto sm:px-6"
+          >
+            {enviar.isPending ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="mr-2 h-4 w-4" />
+            )}
             Enviar sugestão
           </Button>
         </section>
 
         <section className="mt-8">
-          <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Enviadas</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+            Enviadas
+          </h3>
           {listaQ.isLoading ? (
-            <div className="mt-6 flex justify-center"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
+            <div className="mt-6 flex justify-center">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
           ) : (listaQ.data?.length ?? 0) === 0 ? (
             <div className="mt-4 rounded-lg border border-dashed border-border bg-card/50 py-12 text-center">
               <Lightbulb className="mx-auto h-6 w-6 text-muted-foreground" />
@@ -131,14 +152,19 @@ function SugestoesPage() {
                 <li key={f.id} className="rounded-lg border border-border bg-card p-4">
                   <div className="flex items-start justify-between gap-3">
                     <p className="font-medium">{f.titulo}</p>
-                    <span className={`inline-flex h-[26px] shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 text-xs font-semibold before:size-[7px] before:rounded-full before:content-[''] ${STATUS_TONE[f.status] ?? "bg-muted text-muted-foreground before:bg-slate-400"}`}>
+                    <span
+                      className={`inline-flex h-[26px] shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 text-xs font-semibold before:size-[7px] before:rounded-full before:content-[''] ${STATUS_TONE[f.status] ?? "bg-muted text-muted-foreground before:bg-slate-400"}`}
+                    >
                       {STATUS_TXT[f.status] ?? f.status}
                     </span>
                   </div>
-                  <p className="mt-1.5 whitespace-pre-wrap text-sm text-muted-foreground">{f.descricao}</p>
+                  <p className="mt-1.5 whitespace-pre-wrap text-sm text-muted-foreground">
+                    {f.descricao}
+                  </p>
                   {f.resposta_master && (
                     <p className="mt-3 rounded-lg bg-cream/60 p-3 text-sm">
-                      <span className="font-medium">Resposta Teggly: </span>{f.resposta_master}
+                      <span className="font-medium">Resposta Teggly: </span>
+                      {f.resposta_master}
                     </p>
                   )}
                 </li>

@@ -384,7 +384,7 @@ function Landing() {
       {/* Header */}
       <header className="sticky top-0 z-30 border-b border-border bg-card/85 backdrop-blur-md safe-top">
         <div className="mx-auto flex max-w-6xl items-center gap-4 px-5 py-3.5">
-          <a href="#hero" className="min-w-0 flex-1">
+          <a href="#hero" className="flex min-h-11 min-w-0 flex-1 items-center">
             <img
               src="/brand/Teggly_Logo_Primary.svg"
               alt="Teggly"
@@ -394,10 +394,10 @@ function Landing() {
             />
           </a>
           <nav aria-label="Navegação principal" className="hidden items-center gap-6 md:flex">
-            <a href="#como-funciona" className="text-sm text-muted-foreground transition hover:text-foreground">Como funciona</a>
-            <a href="#recursos" className="text-sm text-muted-foreground transition hover:text-foreground">Recursos</a>
-            <a href="#segmentos" className="text-sm text-muted-foreground transition hover:text-foreground">Segmentos</a>
-            <a href="#faq" className="text-sm text-muted-foreground transition hover:text-foreground">Dúvidas</a>
+            <a href="#como-funciona" className="inline-flex min-h-11 items-center text-sm text-muted-foreground transition hover:text-foreground">Como funciona</a>
+            <a href="#recursos" className="inline-flex min-h-11 items-center text-sm text-muted-foreground transition hover:text-foreground">Recursos</a>
+            <a href="#segmentos" className="inline-flex min-h-11 items-center text-sm text-muted-foreground transition hover:text-foreground">Segmentos</a>
+            <a href="#faq" className="inline-flex min-h-11 items-center text-sm text-muted-foreground transition hover:text-foreground">Dúvidas</a>
           </nav>
           <a
             href={WHATSAPP}
@@ -717,15 +717,15 @@ function Landing() {
           <div className="grid grid-cols-2 gap-6 text-sm sm:justify-items-end">
             <nav aria-label="Links da página" className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Página</p>
-              <a href="#como-funciona" className="block text-muted-foreground transition hover:text-foreground">Como funciona</a>
-              <a href="#recursos" className="block text-muted-foreground transition hover:text-foreground">Recursos</a>
-              <a href="#faq" className="block text-muted-foreground transition hover:text-foreground">Dúvidas</a>
+              <a href="#como-funciona" className="flex min-h-11 items-center text-muted-foreground transition hover:text-foreground">Como funciona</a>
+              <a href="#recursos" className="flex min-h-11 items-center text-muted-foreground transition hover:text-foreground">Recursos</a>
+              <a href="#faq" className="flex min-h-11 items-center text-muted-foreground transition hover:text-foreground">Dúvidas</a>
             </nav>
             <nav aria-label="Contato e acesso" className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Contato</p>
-              <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="block text-muted-foreground transition hover:text-foreground">WhatsApp</a>
-              <a href="mailto:contato.bauerlab@gmail.com" className="block text-muted-foreground transition hover:text-foreground">E-mail</a>
-              <Link to="/master/login" className="block text-muted-foreground transition hover:text-foreground">Área administrativa</Link>
+              <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="flex min-h-11 items-center text-muted-foreground transition hover:text-foreground">WhatsApp</a>
+              <a href="mailto:contato.bauerlab@gmail.com" className="flex min-h-11 items-center text-muted-foreground transition hover:text-foreground">E-mail</a>
+              <Link to="/master/login" className="flex min-h-11 items-center text-muted-foreground transition hover:text-foreground">Área administrativa</Link>
             </nav>
           </div>
         </div>
@@ -736,7 +736,7 @@ function Landing() {
               href="https://bauerlab.com.br"
               target="_blank"
               rel="noopener noreferrer"
-              className="transition hover:text-foreground"
+              className="inline-flex min-h-11 items-center transition hover:text-foreground"
             >
               bauerlab.com.br
             </a>

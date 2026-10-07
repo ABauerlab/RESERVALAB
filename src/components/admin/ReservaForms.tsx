@@ -37,14 +37,14 @@ export function EditFields({
         <Input
           value={form.nome ?? ""}
           onChange={(e) => set("nome", e.target.value)}
-          className="h-10 rounded-md"
+          className="h-11 rounded-md"
         />
       </FieldRow>
       <FieldRow label="Telefone">
         <Input
           value={form.telefone ?? ""}
           onChange={(e) => set("telefone", e.target.value)}
-          className="h-10 rounded-md"
+          className="h-11 rounded-md"
         />
       </FieldRow>
       <div className="grid grid-cols-2 gap-3">
@@ -53,7 +53,7 @@ export function EditFields({
             type="date"
             value={form.data ?? ""}
             onChange={(e) => set("data", e.target.value || null)}
-            className="h-10 rounded-md"
+            className="h-11 rounded-md"
           />
         </FieldRow>
         <FieldRow label="Horário">
@@ -61,7 +61,7 @@ export function EditFields({
             type="time"
             value={form.horario ?? ""}
             onChange={(e) => set("horario", e.target.value || null)}
-            className="h-10 rounded-md"
+            className="h-11 rounded-md"
           />
         </FieldRow>
       </div>
@@ -74,7 +74,7 @@ export function EditFields({
             onChange={(e) =>
               set("quantidade", e.target.value ? parseInt(e.target.value, 10) : null)
             }
-            className="h-10 rounded-md"
+            className="h-11 rounded-md"
           />
         </FieldRow>
         <FieldRow label="Status">
@@ -82,7 +82,7 @@ export function EditFields({
             value={form.status ?? r.status}
             onValueChange={(v) => set("status", v as ReservaStatus)}
           >
-            <SelectTrigger className="h-10 rounded-md">
+            <SelectTrigger className="h-11 rounded-md">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -97,7 +97,7 @@ export function EditFields({
       </div>
       <FieldRow label="Tipo">
         <Select value={form.tipo ?? r.tipo} onValueChange={(v) => set("tipo", v as ReservaTipo)}>
-          <SelectTrigger className="h-10 rounded-md">
+          <SelectTrigger className="h-11 rounded-md">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -114,7 +114,7 @@ export function EditFields({
             value={form.area ?? "sem_preferencia"}
             onValueChange={(v) => set("area", v as ReservaArea)}
           >
-            <SelectTrigger className="h-10 rounded-md">
+            <SelectTrigger className="h-11 rounded-md">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -132,7 +132,7 @@ export function EditFields({
           <Input
             value={form.tipo_evento ?? ""}
             onChange={(e) => set("tipo_evento", e.target.value)}
-            className="h-10 rounded-md"
+            className="h-11 rounded-md"
           />
         </FieldRow>
       )}
@@ -180,7 +180,7 @@ export function CancelFields({
 
       <FieldRow label="Motivo do cancelamento">
         <Select value={motivo} onValueChange={setMotivo}>
-          <SelectTrigger className="h-10 rounded-md">
+          <SelectTrigger className="h-11 rounded-md">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

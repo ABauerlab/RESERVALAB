@@ -300,7 +300,7 @@ export function ReservaDetail({
         subtitle={
           <>
             {TIPO_LABEL[r.tipo as ReservaTipo]} ·{" "}
-            <span className="font-mono">{r.codigo_acompanhamento}</span>
+            <span className="break-all font-mono">{r.codigo_acompanhamento}</span>
           </>
         }
         footer={footer}
@@ -359,7 +359,9 @@ export function ReservaDetail({
                 <p className="mb-1 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
                   Observações
                 </p>
-                <p className="leading-relaxed text-foreground">{r.observacoes}</p>
+                <p className="break-words leading-relaxed text-foreground [overflow-wrap:anywhere]">
+                  {r.observacoes}
+                </p>
               </div>
             )}
             {r.status === "confirmada" && r.reconfirmada_em && (

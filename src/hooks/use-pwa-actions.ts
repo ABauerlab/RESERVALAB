@@ -49,18 +49,16 @@ export function usePwaActions(tenantId: string | null) {
         return;
       }
       const { data: sess } = await supabase.auth.getSession();
-      const { error } = await supabase
-        .from("push_subscriptions")
-        .upsert(
-          {
-            tenant_id: tenantId,
-            user_id: sess.session?.user.id ?? null,
-            endpoint: sub.endpoint,
-            p256dh: sub.p256dh,
-            auth: sub.auth,
-          },
-          { onConflict: "endpoint" },
-        );
+      const { error } = await supabase.from("push_subscriptions").upsert(
+        {
+          tenant_id: tenantId,
+          user_id: sess.session?.user.id ?? null,
+          endpoint: sub.endpoint,
+          p256dh: sub.p256dh,
+          auth: sub.auth,
+        },
+        { onConflict: "endpoint" },
+      );
       if (error) {
         toast.error("Falha ao registrar dispositivo: " + error.message);
         return;

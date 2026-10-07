@@ -93,11 +93,11 @@ export function SidePanel({
             </button>
           )}
           <div className="min-w-0 flex-1 pt-0.5">
-            <h2 className="truncate text-xl font-extrabold tracking-tight text-foreground">
+            <h2 className="line-clamp-2 break-words text-xl font-extrabold tracking-tight text-foreground">
               {title}
             </h2>
             {subtitle && (
-              <div className="mt-0.5 truncate text-[13px] text-muted-foreground">{subtitle}</div>
+              <div className="mt-0.5 break-all text-[13px] text-muted-foreground">{subtitle}</div>
             )}
           </div>
           {mode !== "full" && (

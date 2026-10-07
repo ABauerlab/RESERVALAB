@@ -145,7 +145,7 @@ export function MensagemDoDiaButton({ tenantId }: { tenantId: string | null }) {
                 <button
                   key={v}
                   onClick={() => setModo(v)}
-                  className={`rounded-lg px-3 py-2 text-xs font-medium transition-colors ${
+                  className={`min-h-11 rounded-lg px-3 py-2 text-xs font-medium transition-colors ${
                     modo === v ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >

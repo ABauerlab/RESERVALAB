@@ -127,7 +127,7 @@ function MasterPanel() {
             <img src="/brand/Teggly_Logo_Primary.svg" alt="Teggly" width={101} height={24} className="h-6 w-auto" />
             <h1 className="truncate text-lg font-medium">Painel master</h1>
           </div>
-          <button onClick={signOut} className="flex h-10 w-10 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground" aria-label="Sair">
+          <button onClick={signOut} className="flex h-11 w-11 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground" aria-label="Sair">
             <LogOut className="h-4 w-4" />
           </button>
         </div>
@@ -139,7 +139,7 @@ function MasterPanel() {
             <button
               key={id}
               onClick={() => setAba(id)}
-              className={`h-9 rounded-full px-4 text-xs font-medium transition-all ${
+              className={`h-11 rounded-full xl:h-9 px-4 text-xs font-medium transition-all ${
                 aba === id ? "bg-primary text-primary-foreground shadow-[var(--shadow-sm)]" : "bg-muted text-muted-foreground hover:bg-accent"
               }`}
             >
@@ -197,18 +197,18 @@ function MasterPanel() {
                     <span className={`inline-flex h-[26px] items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 text-xs font-semibold before:size-[7px] before:rounded-full before:content-[''] ${t.ativo ? "bg-success-50 text-success-700 before:bg-success-500" : "bg-muted text-muted-foreground before:bg-slate-400"}`}>
                       {t.ativo ? "Ativa" : "Inativa"}
                     </span>
-                    <Link to="/$slug" params={{ slug: t.slug }} className="inline-flex h-9 items-center gap-1 rounded-md border border-border bg-background px-3 text-xs font-medium hover:bg-accent" target="_blank">
+                    <Link to="/$slug" params={{ slug: t.slug }} className="inline-flex h-11 xl:h-9 items-center gap-1 rounded-md border border-border bg-background px-3 text-xs font-medium hover:bg-accent" target="_blank">
                       <ExternalLink className="h-3.5 w-3.5" /> Abrir
                     </Link>
                     <button
                       onClick={() => setAcessosDe({ id: t.id, nome: t.nome })}
-                      className="inline-flex h-9 items-center gap-1 rounded-md border border-border bg-background px-3 text-xs font-medium hover:bg-accent"
+                      className="inline-flex h-11 xl:h-9 items-center gap-1 rounded-md border border-border bg-background px-3 text-xs font-medium hover:bg-accent"
                     >
                       <KeyRound className="h-3.5 w-3.5" /> Logins
                     </button>
                     <button
                       onClick={() => toggleM.mutate({ id: t.id, ativo: !t.ativo })}
-                      className="inline-flex h-9 items-center gap-1 rounded-md border border-border bg-background px-3 text-xs font-medium hover:bg-accent"
+                      className="inline-flex h-11 xl:h-9 items-center gap-1 rounded-md border border-border bg-background px-3 text-xs font-medium hover:bg-accent"
                     >
                       <Power className="h-3.5 w-3.5" /> {t.ativo ? "Desativar" : "Ativar"}
                     </button>

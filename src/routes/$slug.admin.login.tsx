@@ -116,7 +116,7 @@ function AdminLogin() {
               <Input type="password" value={senha} onChange={(e) => setSenha(e.target.value)} autoComplete="current-password" required minLength={6} className="h-12 rounded-md" />
             </div>
 
-            <label className="flex items-center gap-2.5 text-sm text-muted-foreground">
+            <label className="flex min-h-11 cursor-pointer items-center gap-2.5 text-sm text-muted-foreground">
               <Checkbox checked={manter} onCheckedChange={(v) => setManter(v === true)} />
               Manter conectado neste dispositivo
             </label>

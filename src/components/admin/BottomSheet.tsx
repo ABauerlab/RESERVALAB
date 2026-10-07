@@ -34,7 +34,7 @@ export function BottomSheet({
             <DrawerDescription className="sr-only">{title}</DrawerDescription>
           )}
         </DrawerHeader>
-        <div className="overflow-y-auto px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
           {children}
         </div>
       </DrawerContent>

@@ -82,17 +82,17 @@ export function ReservationRow({
   const narrow = (
     <div
       className={cn(
-        "grid grid-cols-[3.25rem_minmax(0,1fr)] items-center gap-x-3",
+        "grid grid-cols-[3rem_minmax(0,1fr)] items-center gap-x-2.5 sm:grid-cols-[3.25rem_minmax(0,1fr)] sm:gap-x-3",
         compact ? "" : "md:hidden",
       )}
     >
       {time}
       <span className="min-w-0">
         <span className="block truncate text-[15px] font-semibold text-foreground">{r.nome}</span>
-        <span className="mt-1 flex min-w-0 items-center gap-2 text-[13px] text-muted-foreground">
+        <span className="mt-1 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 text-[13px] text-muted-foreground">
           <ReservationStatus status={r.status} className="h-[22px] shrink-0 px-2 text-[11px]" />
           <span className="inline-flex shrink-0 items-center gap-1 tabular-nums">
-            {compact ? (
+            {compact || action ? (
               <>
                 <Users className="h-3.5 w-3.5" aria-label="pessoas" />
                 {pessoas}
@@ -101,7 +101,7 @@ export function ReservationRow({
               <>{pessoas} pess.</>
             )}
           </span>
-          {area && (
+          {area && !compact && (
             <span className={cn("truncate", action && "hidden sm:inline", compact && "hidden")}>
               · {area}
             </span>
@@ -146,7 +146,7 @@ export function ReservationRow({
         aria-label={`Abrir reserva de ${r.nome}`}
         aria-current={selected ? "true" : undefined}
         className={cn(
-          "min-w-0 flex-1 overflow-hidden px-4 py-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring",
+          "min-w-0 flex-1 overflow-hidden px-3 py-3 text-left sm:px-4 outline-none focus-visible:ring-2 focus-visible:ring-ring",
           dim && "opacity-70",
         )}
       >
@@ -156,7 +156,10 @@ export function ReservationRow({
 
       {action !== undefined && (
         <div
-          className={cn("shrink-0 pr-3 md:pr-4", !compact && "md:flex md:w-[124px] md:justify-end")}
+          className={cn(
+            "shrink-0 pr-2.5 sm:pr-3 md:pr-4",
+            !compact && "md:flex md:w-[124px] md:justify-end",
+          )}
         >
           {action}
         </div>

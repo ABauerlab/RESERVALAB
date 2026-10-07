@@ -14,10 +14,7 @@ import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/$slug/admin/contatos")({
   head: ({ params }) => ({
-    meta: [
-      { title: "Contatos | Teggly" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Contatos | Teggly" }, { name: "robots", content: "noindex" }],
     links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),
   }),
   ssr: false,
@@ -101,28 +98,49 @@ function ContatosPage() {
         </header>
 
         <div className="mt-6 flex flex-wrap gap-1.5 animate-in-up">
-          <PresetChip active={preset === "todas"} onClick={() => setPreset("todas")}>Todas até hoje</PresetChip>
-          <PresetChip active={preset === "30"} onClick={() => setPreset("30")}>Últimos 30 dias</PresetChip>
-          <PresetChip active={preset === "90"} onClick={() => setPreset("90")}>Últimos 90 dias</PresetChip>
-          <PresetChip active={preset === "personalizado"} onClick={() => setPreset("personalizado")}>Período personalizado</PresetChip>
+          <PresetChip active={preset === "todas"} onClick={() => setPreset("todas")}>
+            Todas até hoje
+          </PresetChip>
+          <PresetChip active={preset === "30"} onClick={() => setPreset("30")}>
+            Últimos 30 dias
+          </PresetChip>
+          <PresetChip active={preset === "90"} onClick={() => setPreset("90")}>
+            Últimos 90 dias
+          </PresetChip>
+          <PresetChip
+            active={preset === "personalizado"}
+            onClick={() => setPreset("personalizado")}
+          >
+            Período personalizado
+          </PresetChip>
         </div>
 
         {preset === "personalizado" && (
           <div className="mt-3 grid grid-cols-2 gap-3 animate-in-up sm:max-w-sm">
             <div className="space-y-1.5">
               <Label className="text-[12px] text-muted-foreground">De</Label>
-              <Input type="date" value={de} onChange={(e) => setDe(e.target.value)} className="h-11 rounded-md" />
+              <Input
+                type="date"
+                value={de}
+                onChange={(e) => setDe(e.target.value)}
+                className="h-11 rounded-md"
+              />
             </div>
             <div className="space-y-1.5">
               <Label className="text-[12px] text-muted-foreground">Até</Label>
-              <Input type="date" value={ate} onChange={(e) => setAte(e.target.value)} className="h-11 rounded-md" />
+              <Input
+                type="date"
+                value={ate}
+                onChange={(e) => setAte(e.target.value)}
+                className="h-11 rounded-md"
+              />
             </div>
           </div>
         )}
 
         <div className="mt-5 flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-4">
-          <div className="flex items-center gap-2.5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-md bg-cream text-terracotta">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-cream text-terracotta">
               <Users className="h-4 w-4" />
             </span>
             <div>
@@ -133,7 +151,7 @@ function ContatosPage() {
           <button
             onClick={baixarCsv}
             disabled={contatos.length === 0}
-            className="inline-flex h-11 items-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:bg-blue-700 disabled:opacity-40 disabled:pointer-events-none"
+            className="inline-flex h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:bg-blue-700 disabled:opacity-40 disabled:pointer-events-none"
           >
             <Download className="h-4 w-4" /> Baixar CSV
           </button>
@@ -141,15 +159,34 @@ function ContatosPage() {
 
         <div className="mt-5">
           {reservasQ.isLoading ? (
-            <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
+            <div className="flex justify-center py-10">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
           ) : contatos.length === 0 ? (
             <div className="rounded-lg border border-dashed border-border bg-card/50 py-14 text-center">
               <p className="font-serif font-semibold text-2xl text-foreground">Nenhum contato</p>
-              <p className="mt-1 text-sm text-muted-foreground">Ninguém reservou nesse período ainda.</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Ninguém reservou nesse período ainda.
+              </p>
             </div>
           ) : (
             <div className="overflow-hidden rounded-lg border border-border bg-card">
-              <div className="max-h-[520px] overflow-y-auto">
+              <ul className="max-h-[520px] divide-y divide-border/60 overflow-y-auto sm:hidden">
+                {contatos.map((c) => (
+                  <li key={c.telefoneWhatsapp} className="px-4 py-3">
+                    <p className="break-words font-medium">{c.nome}</p>
+                    <p className="text-sm text-muted-foreground">{c.telefone}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {c.reservas} {c.reservas === 1 ? "reserva" : "reservas"} · última{" "}
+                      {c.ultimaData
+                        ? new Date(c.ultimaData + "T00:00:00").toLocaleDateString("pt-BR")
+                        : "—"}{" "}
+                      · {STATUS_LABEL[c.ultimoStatus]}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+              <div className="hidden max-h-[520px] overflow-auto sm:block">
                 <table className="w-full text-sm">
                   <thead className="sticky top-0 bg-muted/70 backdrop-blur-sm">
                     <tr className="text-left text-xs uppercase tracking-[0.08em] text-muted-foreground">
@@ -165,13 +202,17 @@ function ContatosPage() {
                       <tr key={c.telefoneWhatsapp} className="border-t border-border/60">
                         <td className="px-4 py-2.5 font-medium">{c.nome}</td>
                         <td className="px-4 py-2.5 text-muted-foreground">{c.telefone}</td>
-                        <td className="px-4 py-2.5 tabular-nums text-muted-foreground">{c.reservas}</td>
+                        <td className="px-4 py-2.5 tabular-nums text-muted-foreground">
+                          {c.reservas}
+                        </td>
                         <td className="px-4 py-2.5 text-muted-foreground">
                           {c.ultimaData
                             ? new Date(c.ultimaData + "T00:00:00").toLocaleDateString("pt-BR")
                             : "—"}
                         </td>
-                        <td className="px-4 py-2.5 text-muted-foreground">{STATUS_LABEL[c.ultimoStatus]}</td>
+                        <td className="px-4 py-2.5 text-muted-foreground">
+                          {STATUS_LABEL[c.ultimoStatus]}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -185,12 +226,22 @@ function ContatosPage() {
   );
 }
 
-function PresetChip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+function PresetChip({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
   return (
     <button
       onClick={onClick}
       className={`h-11 xl:h-9 shrink-0 rounded-full px-4 text-xs font-medium transition-all ${
-        active ? "bg-primary text-primary-foreground shadow-[var(--shadow-sm)]" : "bg-muted text-muted-foreground hover:bg-accent hover:text-foreground"
+        active
+          ? "bg-primary text-primary-foreground shadow-[var(--shadow-sm)]"
+          : "bg-muted text-muted-foreground hover:bg-accent hover:text-foreground"
       }`}
     >
       {children}
