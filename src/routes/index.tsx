@@ -5,6 +5,7 @@ import {
   CalendarCheck,
   CalendarX2,
   BarChart3,
+  Check,
   ClipboardList,
   Filter,
   Link2,
@@ -13,7 +14,6 @@ import {
   Search,
   ShieldCheck,
   Smartphone,
-  Sparkles,
   Store,
 } from "lucide-react";
 
@@ -25,6 +25,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
+// Texto da mensagem mantido como esta: chega ao WhatsApp da equipe e pode ser lido por
+// automacoes fora deste repositorio. Revisar junto com o atendimento (pendencia do rebranding).
 const WHATSAPP =
   "https://wa.me/5531998021169?text=" +
   encodeURIComponent("Ola! Quero usar o ReservaLab na minha empresa.");
@@ -32,7 +34,7 @@ const WHATSAPP =
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "ReservaLab | Sistema de Reservas e Agendamentos para Empresas" },
+      { title: "Teggly | Mais reservas. Menos trabalho." },
       {
         name: "description",
         content:
@@ -40,7 +42,7 @@ export const Route = createFileRoute("/")({
       },
       {
         property: "og:title",
-        content: "ReservaLab | Sistema de Reservas e Agendamentos para Empresas",
+        content: "Teggly | Mais reservas. Menos trabalho.",
       },
       {
         property: "og:description",
@@ -62,7 +64,7 @@ export const Route = createFileRoute("/")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "SoftwareApplication",
-          name: "ReservaLab",
+          name: "Teggly",
           applicationCategory: "BusinessApplication",
           operatingSystem: "Web",
           description:
@@ -76,23 +78,26 @@ export const Route = createFileRoute("/")({
 
 /* ---------------------------------- UI ---------------------------------- */
 
-function CTAPrimary({ className = "" }: { className?: string }) {
+function CTAPrimary({ className = "", onDark = false }: { className?: string; onDark?: boolean }) {
+  const tone = onDark
+    ? "bg-white text-slate-900 hover:bg-slate-100"
+    : "bg-primary text-primary-foreground shadow-blue hover:bg-blue-700";
   return (
     <a
       href={WHATSAPP}
       target="_blank"
       rel="noopener noreferrer"
-      className={`group inline-flex h-12 items-center justify-center gap-2 rounded-md bg-terracotta px-6 text-sm font-medium text-terracotta-foreground shadow-[var(--shadow-md)] transition-all hover:bg-terracotta/90 hover:shadow-[var(--shadow-lg)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring motion-safe:hover:-translate-y-0.5 ${className}`}
+      className={`group inline-flex h-[52px] items-center justify-center gap-2 rounded-[12px] px-6 text-base font-semibold transition duration-200 ease-teggly focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/30 motion-safe:hover:-translate-y-0.5 ${tone} ${className}`}
     >
-      Quero usar o ReservaLab
-      <ArrowRight className="h-4 w-4 transition-transform motion-safe:group-hover:translate-x-0.5" />
+      Começar agora
+      <ArrowRight className="h-5 w-5 transition-transform motion-safe:group-hover:translate-x-0.5" />
     </a>
   );
 }
 
 function SectionTag({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[11px] font-medium uppercase tracking-[0.24em] text-terracotta">
+    <p className="text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">
       {children}
     </p>
   );
@@ -113,7 +118,7 @@ function DesktopMockup() {
         <span className="h-2.5 w-2.5 rounded-full bg-warning/50" />
         <span className="h-2.5 w-2.5 rounded-full bg-success/50" />
         <span className="ml-3 truncate text-[11px] text-muted-foreground">
-          reservalab / painel
+          teggly / painel
         </span>
       </div>
       <div className="p-4 sm:p-5">
@@ -163,8 +168,8 @@ function DesktopMockup() {
               <span
                 className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium ${
                   r.s === "Confirmada"
-                    ? "bg-success/15 text-success"
-                    : "bg-warning/20 text-muted-foreground"
+                    ? "bg-success-50 text-success-700"
+                    : "bg-warning-50 text-warning-700"
                 }`}
               >
                 {r.s}
@@ -253,11 +258,11 @@ function Fluxograma() {
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-cream text-terracotta">
                 <s.icon className="h-4 w-4" aria-hidden="true" />
               </span>
-              <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              <span className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
                 Etapa {i + 1}
               </span>
             </div>
-            <p className="mt-3 text-sm font-medium">{s.t}</p>
+            <p className="mt-3 text-sm font-semibold">{s.t}</p>
             <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{s.d}</p>
           </div>
           {i < steps.length - 1 && (
@@ -366,7 +371,7 @@ function Landing() {
     },
     {
       q: "Serve para o meu tipo de negócio?",
-      a: "O ReservaLab atende negócios que trabalham com reservas e agendamentos, como restaurantes, bares, estúdios, clínicas, barbearias, salões, coworkings, espaços esportivos e eventos.",
+      a: "A Teggly atende negócios que trabalham com reservas e agendamentos, como restaurantes, bares, estúdios, clínicas, barbearias, salões, coworkings, espaços esportivos e eventos.",
     },
     {
       q: "Como começo a usar?",
@@ -377,10 +382,16 @@ function Landing() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-border/60 bg-background/80 backdrop-blur-md safe-top">
+      <header className="sticky top-0 z-30 border-b border-border bg-card/85 backdrop-blur-md safe-top">
         <div className="mx-auto flex max-w-6xl items-center gap-4 px-5 py-3.5">
           <a href="#hero" className="min-w-0 flex-1">
-            <span className="font-serif text-xl tracking-tight">ReservaLab</span>
+            <img
+              src="/brand/Teggly_Logo_Primary.svg"
+              alt="Teggly"
+              width={118}
+              height={28}
+              className="h-7 w-auto"
+            />
           </a>
           <nav aria-label="Navegação principal" className="hidden items-center gap-6 md:flex">
             <a href="#como-funciona" className="text-sm text-muted-foreground transition hover:text-foreground">Como funciona</a>
@@ -392,7 +403,7 @@ function Landing() {
             href={WHATSAPP}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex h-10 shrink-0 items-center rounded-md bg-terracotta px-4 text-xs font-medium text-terracotta-foreground transition hover:bg-terracotta/90 sm:text-sm"
+            className="inline-flex h-11 shrink-0 items-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-blue transition duration-200 ease-teggly hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/30"
           >
             Falar com a gente
           </a>
@@ -410,11 +421,11 @@ function Landing() {
             <div>
               <Reveal>
                 <SectionTag>Reservas e agendamentos</SectionTag>
-                <h1 className="mt-5 font-serif text-[2.6rem] leading-[1.05] tracking-tight sm:text-6xl lg:text-[4.1rem]">
-                  Sua empresa recebe reservas.<br className="hidden sm:block" /> O ReservaLab cuida do resto.
+                <h1 className="mt-5 font-serif text-[2.6rem] leading-[1.05] tracking-tight sm:text-6xl lg:text-[3.6rem]">
+                  Mais reservas.<br className="hidden sm:block" /> Menos trabalho.
                 </h1>
-                <p className="mt-6 max-w-xl text-[15px] leading-relaxed text-muted-foreground sm:text-lg">
-                  Centralize reservas, horários e clientes em um sistema simples e profissional — sem depender de conversas perdidas no WhatsApp.
+                <p className="mt-6 max-w-xl text-[15px] leading-relaxed text-muted-foreground sm:text-lg xl:max-w-md">
+                  A Teggly cuida das reservas da sua empresa. Centralize reservas, horários e clientes em um só lugar, sem depender de conversas perdidas no WhatsApp.
                 </p>
               </Reveal>
               <Reveal delay={120}>
@@ -422,7 +433,7 @@ function Landing() {
                   <CTAPrimary />
                   <a
                     href="#como-funciona"
-                    className="inline-flex h-12 items-center justify-center rounded-md border border-border bg-card px-6 text-sm font-medium transition hover:bg-accent motion-safe:hover:-translate-y-0.5"
+                    className="inline-flex h-[52px] items-center justify-center rounded-[12px] border border-border bg-card px-6 text-base font-semibold shadow-xs transition duration-200 ease-teggly hover:border-slate-300 hover:bg-slate-50 motion-safe:hover:-translate-y-0.5"
                   >
                     Ver como funciona
                   </a>
@@ -467,7 +478,7 @@ function Landing() {
               ].map(([t, d], i) => (
                 <Reveal key={t} delay={i * 70}>
                   <div className="h-full rounded-lg border border-border bg-card p-5">
-                    <p className="font-medium">{t}</p>
+                    <p className="font-semibold">{t}</p>
                     <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{d}</p>
                   </div>
                 </Reveal>
@@ -494,7 +505,7 @@ function Landing() {
                   "Horários e bloqueios controlados pelo sistema",
                 ].map((li) => (
                   <li key={li} className="flex gap-3 text-sm">
-                    <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-terracotta" aria-hidden="true" />
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-terracotta" aria-hidden="true" />
                     <span className="text-muted-foreground">{li}</span>
                   </li>
                 ))}
@@ -525,7 +536,7 @@ function Landing() {
                 <Reveal key={n} delay={i * 90}>
                   <div className="h-full rounded-lg border border-border bg-card p-6 transition-all motion-safe:hover:-translate-y-1 hover:shadow-[var(--shadow-md)]">
                     <p className="font-serif text-4xl text-terracotta">{n}</p>
-                    <p className="mt-4 font-medium">{t}</p>
+                    <p className="mt-4 font-semibold">{t}</p>
                     <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{d}</p>
                   </div>
                 </Reveal>
@@ -533,7 +544,7 @@ function Landing() {
             </div>
 
             <Reveal delay={80}>
-              <h3 className="mt-16 text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              <h3 className="mt-16 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
                 O fluxo completo da reserva
               </h3>
             </Reveal>
@@ -559,7 +570,7 @@ function Landing() {
                     <span className="flex h-10 w-10 items-center justify-center rounded-md bg-cream text-terracotta">
                       <r.icon className="h-4 w-4" aria-hidden="true" />
                     </span>
-                    <h3 className="mt-4 font-medium">{r.t}</h3>
+                    <h3 className="mt-4 font-semibold">{r.t}</h3>
                     <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{r.d}</p>
                   </article>
                 </Reveal>
@@ -627,7 +638,7 @@ function Landing() {
               {beneficios.map((b, i) => (
                 <Reveal key={b.t} delay={(i % 3) * 70}>
                   <div className="h-full rounded-lg border border-border bg-card p-5">
-                    <p className="font-medium">{b.t}</p>
+                    <p className="font-semibold">{b.t}</p>
                     <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{b.d}</p>
                   </div>
                 </Reveal>
@@ -670,14 +681,14 @@ function Landing() {
                 <h2 className="mx-auto max-w-2xl font-serif text-3xl leading-tight sm:text-5xl">
                   Pronto para organizar as reservas da sua empresa?
                 </h2>
-                <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-primary-foreground/70 sm:text-base">
-                  Fale com a nossa equipe e receba o acesso da sua empresa no ReservaLab.
+                <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-primary-foreground/90 sm:text-base">
+                  Fale com a nossa equipe e receba o acesso da sua empresa na Teggly.
                 </p>
                 <div className="mt-9 flex justify-center">
-                  <CTAPrimary />
+                  <CTAPrimary onDark />
                 </div>
-                <p className="mt-4 text-xs text-primary-foreground/60">
-                  Sem compromisso — é só uma conversa pra ver se faz sentido pra sua empresa.
+                <p className="mt-4 text-xs text-primary-foreground/90">
+                  Sem compromisso. É só uma conversa para ver se faz sentido para a sua empresa.
                 </p>
               </div>
             </Reveal>
@@ -689,20 +700,29 @@ function Landing() {
       <footer className="border-t border-border bg-card safe-bottom">
         <div className="mx-auto grid max-w-6xl gap-8 px-5 py-12 sm:grid-cols-2">
           <div>
-            <p className="font-serif text-xl">ReservaLab</p>
-            <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-              Sistema de reservas e agendamentos para empresas. Um produto bauerlab.
+            <img
+              src="/brand/Teggly_Logo_Primary.svg"
+              alt="Teggly"
+              width={118}
+              height={28}
+              className="h-7 w-auto"
+            />
+            <p className="mt-3 max-w-sm text-sm text-muted-foreground">
+              Teggly, uma solução BauerLab.
+            </p>
+            <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+              Sistema de reservas e agendamentos para empresas.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-6 text-sm sm:justify-items-end">
             <nav aria-label="Links da página" className="space-y-2">
-              <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Página</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Página</p>
               <a href="#como-funciona" className="block text-muted-foreground transition hover:text-foreground">Como funciona</a>
               <a href="#recursos" className="block text-muted-foreground transition hover:text-foreground">Recursos</a>
               <a href="#faq" className="block text-muted-foreground transition hover:text-foreground">Dúvidas</a>
             </nav>
             <nav aria-label="Contato e acesso" className="space-y-2">
-              <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Contato</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Contato</p>
               <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="block text-muted-foreground transition hover:text-foreground">WhatsApp</a>
               <a href="mailto:contato.bauerlab@gmail.com" className="block text-muted-foreground transition hover:text-foreground">E-mail</a>
               <Link to="/master/login" className="block text-muted-foreground transition hover:text-foreground">Área administrativa</Link>
@@ -710,7 +730,7 @@ function Landing() {
           </div>
         </div>
         <div className="border-t border-border">
-          <p className="mx-auto max-w-6xl px-5 py-5 text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+          <p className="mx-auto max-w-6xl px-5 py-5 text-xs text-muted-foreground">
             © {new Date().getFullYear()} BauerLab. Todos os direitos reservados. ·{" "}
             <a
               href="https://bauerlab.com.br"

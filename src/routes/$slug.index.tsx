@@ -154,10 +154,15 @@ function TenantHome() {
           </Link>
         </div>
 
-        <div className="mt-auto pt-16 text-center">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-            ReservaLab
-          </p>
+        <div className="mt-auto flex flex-col items-center gap-1.5 pt-16 text-center">
+          <p className="text-xs text-muted-foreground">powered by</p>
+          <img
+            src="/brand/Teggly_Logo_Primary.svg"
+            alt="Teggly"
+            width={96}
+            height={23}
+            className="h-[23px] w-24"
+          />
         </div>
       </div>
     </main>
