@@ -1,6 +1,6 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearch } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { supabase } from "@/integrations/supabase/client";
 import { addDaysISO, todayISO } from "@/lib/admin-dates";
@@ -18,6 +18,7 @@ import {
   fetchFeriadosIntervalo,
   fetchReservasIntervalo,
 } from "@/lib/agenda-queries";
+import { deletedIdIsInCache } from "@/lib/agenda-realtime";
 
 const ROUTE = "/$slug/admin/agenda" as const;
 
@@ -128,4 +129,41 @@ export function useAgenda(slug: string, ready: boolean, tenantId: string | null)
       eventosQ.refetch();
     },
   };
+}
+
+/**
+ * Realtime de exclusões para a Agenda. O Realtime não aplica o filtro por empresa
+ * a DELETE e só envia o `id`; por isso a assinatura é sem filtro e o evento só
+ * dispara refetch quando o id já está nos dados desta empresa em cache. O evento
+ * nunca é usado para autorização nem para exibir dados. INSERT/UPDATE seguem em
+ * `useReservasRealtime`.
+ */
+export function useAgendaDeleteRealtime(
+  ready: boolean,
+  tenantId: string | null,
+  onDeleted?: (id: string) => void,
+) {
+  const qc = useQueryClient();
+  const cb = useRef(onDeleted);
+  cb.current = onDeleted;
+  useEffect(() => {
+    if (!ready || !tenantId) return;
+    const channel = supabase
+      .channel(`reservas-agenda-delete-${tenantId}`)
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "reservas" },
+        (payload) => {
+          const id = (payload.old as { id?: unknown } | null)?.id;
+          if (!deletedIdIsInCache(qc, tenantId, id)) return;
+          qc.invalidateQueries({ queryKey: ["reservas", tenantId] });
+          qc.invalidateQueries({ queryKey: ["reservas-stats", tenantId] });
+          cb.current?.(id as string);
+        },
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [ready, tenantId, qc]);
 }

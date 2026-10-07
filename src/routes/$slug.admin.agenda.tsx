@@ -8,7 +8,7 @@ import { todayISO, weekdayLabel } from "@/lib/admin-dates";
 import { parseDiaParam } from "@/lib/agenda";
 import { cn } from "@/lib/utils";
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
-import { useAgenda } from "@/hooks/use-agenda";
+import { useAgenda, useAgendaDeleteRealtime } from "@/hooks/use-agenda";
 import { useReservaActions, useReservasRealtime } from "@/hooks/use-reservas-admin";
 import { useDetailMode, useMediaQuery } from "@/hooks/use-media-query";
 
@@ -101,6 +101,9 @@ function AgendaPage() {
 
   // Realtime: o hook existente da F1 (invalida o prefixo ["reservas", tenantId]).
   useReservasRealtime(ready, tenantId);
+  useAgendaDeleteRealtime(ready, tenantId, (id) =>
+    setSelected((s) => (s && s.id === id ? null : s)),
+  );
   const actions = useReservaActions(slug, tenantId, {
     onPatched: (id, patch) =>
       setSelected((s) => (s && s.id === id ? ({ ...s, ...patch } as Reserva) : s)),
