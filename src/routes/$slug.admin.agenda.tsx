@@ -1,7 +1,7 @@
 import { pwaHeadLinks } from "@/lib/pwa-manifest";
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useState } from "react";
-import { CalendarX2, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { CalendarX2, ChevronLeft, ChevronRight, Loader2, SlidersHorizontal } from "lucide-react";
 
 import { formatData, type Reserva } from "@/lib/reservations";
 import { todayISO, weekdayLabel } from "@/lib/admin-dates";
@@ -10,9 +10,10 @@ import { cn } from "@/lib/utils";
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
 import { useAgenda } from "@/hooks/use-agenda";
 import { useReservaActions, useReservasRealtime } from "@/hooks/use-reservas-admin";
-import { useDetailMode } from "@/hooks/use-media-query";
+import { useDetailMode, useMediaQuery } from "@/hooks/use-media-query";
 
 import { AdminShell } from "@/components/admin/AdminShell";
+import { BottomSheet } from "@/components/admin/BottomSheet";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { ReservaDetail } from "@/components/admin/ReservaDetail";
 import { useRowAction } from "@/components/admin/RowAction";
@@ -92,6 +93,9 @@ function AgendaPage() {
   const dock = useDetailMode() === "dock";
   const [selected, setSelected] = useState<Reserva | null>(null);
   const [gestaoOpen, setGestaoOpen] = useState(false);
+  const [filtrosOpen, setFiltrosOpen] = useState(false);
+  // Abaixo de 1024 (trilho de ícones) e com o detalhe acoplado, a faixa da semana abrevia.
+  const wide = useMediaQuery("(min-width: 1024px)");
 
   // Realtime: o hook existente da F1 (invalida o prefixo ["reservas", tenantId]).
   useReservasRealtime(ready, tenantId);
@@ -135,27 +139,85 @@ function AgendaPage() {
       >
         <PageHeader
           title="Agenda"
-          description="Visualize o movimento das reservas ao longo da semana."
+          description={
+            <span className="hidden md:inline">
+              Visualize o movimento das reservas ao longo da semana.
+            </span>
+          }
           actions={
             <Button
               variant="outline"
               onClick={() => setGestaoOpen(true)}
-              className="h-11 gap-2 rounded-md xl:h-9"
+              aria-label="Bloqueios e feriados"
+              className="h-11 w-11 gap-2 rounded-md p-0 md:w-auto md:px-4 xl:h-9"
             >
-              <CalendarX2 className="h-4 w-4" aria-hidden="true" /> Bloqueios e feriados
+              <CalendarX2 className="h-4 w-4" aria-hidden="true" />
+              <span className="hidden md:inline">Bloqueios e feriados</span>
             </Button>
           }
         />
 
-        <div className="mt-4 flex flex-wrap items-center gap-2">
-          <button type="button" className={navBtn} onClick={() => ag.shiftWeek(-1)}>
-            <ChevronLeft className="h-4 w-4" aria-hidden="true" /> Semana anterior
+        {/* Mobile: dia a dia, com seletor de data. */}
+        <div className="mt-3 flex items-center gap-2 md:hidden">
+          <button
+            type="button"
+            className={cn(navBtn, "w-11 justify-center px-0")}
+            onClick={() => ag.shiftDay(-1)}
+            aria-label="Dia anterior"
+          >
+            <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+          </button>
+          <label className="relative flex h-11 min-w-0 flex-1 items-center justify-center rounded-md border border-border bg-card px-3 text-sm font-semibold text-foreground">
+            <span className="truncate">
+              <span className="capitalize">{weekdayLabel(selectedDay, true)}</span>,{" "}
+              {formatData(selectedDay)}
+            </span>
+            <input
+              type="date"
+              value={selectedDay}
+              onChange={(e) => {
+                const v = parseDiaParam(e.target.value);
+                if (v) ag.selectDay(v);
+              }}
+              aria-label="Ir para a data"
+              className="absolute -inset-px h-[calc(100%+2px)] w-[calc(100%+2px)] cursor-pointer opacity-0"
+            />
+          </label>
+          <button
+            type="button"
+            className={cn(navBtn, "w-11 justify-center px-0")}
+            onClick={() => ag.shiftDay(1)}
+            aria-label="Próximo dia"
+          >
+            <ChevronRight className="h-4 w-4" aria-hidden="true" />
           </button>
           <button type="button" className={navBtn} onClick={ag.goToday} disabled={isToday}>
             Hoje
           </button>
-          <button type="button" className={navBtn} onClick={() => ag.shiftWeek(1)}>
-            Próxima semana <ChevronRight className="h-4 w-4" aria-hidden="true" />
+        </div>
+
+        {/* Tablet e desktop: semana a semana. */}
+        <div className="mt-4 hidden flex-wrap items-center gap-2 md:flex">
+          <button
+            type="button"
+            className={navBtn}
+            onClick={() => ag.shiftWeek(-1)}
+            aria-label="Semana anterior"
+          >
+            <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+            <span className="hidden lg:inline">Semana anterior</span>
+          </button>
+          <button type="button" className={navBtn} onClick={ag.goToday} disabled={isToday}>
+            Hoje
+          </button>
+          <button
+            type="button"
+            className={navBtn}
+            onClick={() => ag.shiftWeek(1)}
+            aria-label="Próxima semana"
+          >
+            <span className="hidden lg:inline">Próxima semana</span>
+            <ChevronRight className="h-4 w-4" aria-hidden="true" />
           </button>
           <span className="ml-1 text-sm text-muted-foreground">
             {formatData(range.weekStart).slice(0, 5)} a {formatData(range.weekEnd)}
@@ -183,7 +245,11 @@ function AgendaPage() {
               ))}
             </div>
           ) : (
-            <WeekStrip days={ag.semana} onSelect={ag.selectDay} compact={dock && !!selected} />
+            <WeekStrip
+              days={ag.semana}
+              onSelect={ag.selectDay}
+              compact={!wide || (dock && !!selected)}
+            />
           )}
         </div>
 
@@ -209,7 +275,8 @@ function AgendaPage() {
               <p className="mt-0.5 text-sm text-muted-foreground">{frase}</p>
             )}
           </div>
-          <div className="flex flex-wrap gap-2">
+          {/* Tablet e desktop: os dois filtros à vista. */}
+          <div className="hidden flex-wrap gap-2 md:flex">
             <FilterToggle
               active={filtros.soAtencao}
               onChange={ag.setSoAtencao}
@@ -224,6 +291,29 @@ function AgendaPage() {
             >
               Mostrar canceladas
             </FilterToggle>
+          </div>
+          {/* Mobile: atenção à vista; o resto em folha. */}
+          <div className="flex w-full items-center gap-2 md:hidden">
+            <FilterToggle
+              active={filtros.soAtencao}
+              onChange={ag.setSoAtencao}
+              count={resumo.atencao}
+            >
+              Precisa de atenção
+            </FilterToggle>
+            <button
+              type="button"
+              onClick={() => setFiltrosOpen(true)}
+              aria-label="Filtros"
+              className={cn(
+                "relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full",
+                filtros.mostrarCanceladas
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground",
+              )}
+            >
+              <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
+            </button>
           </div>
         </div>
 
@@ -268,6 +358,28 @@ function AgendaPage() {
           )}
         </div>
       </div>
+
+      <BottomSheet open={filtrosOpen} onOpenChange={setFiltrosOpen} title="Filtros">
+        <div className="space-y-2 pb-2">
+          <FilterToggle
+            active={filtros.soAtencao}
+            onChange={ag.setSoAtencao}
+            count={resumo.atencao}
+          >
+            Precisa de atenção
+          </FilterToggle>
+          <FilterToggle
+            active={filtros.mostrarCanceladas}
+            onChange={ag.setMostrarCanceladas}
+            count={resumo.canceladas}
+          >
+            Mostrar canceladas
+          </FilterToggle>
+          <p className="pt-1 text-xs text-muted-foreground">
+            Tipo, área e busca por nome, telefone ou código ficam em Reservas.
+          </p>
+        </div>
+      </BottomSheet>
 
       <Dialog open={gestaoOpen} onOpenChange={setGestaoOpen}>
         <DialogContent className="max-w-2xl">
