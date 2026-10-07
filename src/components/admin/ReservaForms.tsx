@@ -125,7 +125,7 @@ export function DetailRow({ icon: Icon, label, value, link }: { icon: React.Comp
         <Icon className="h-3.5 w-3.5" />
         <span className="text-[13px]">{label}</span>
       </div>
-      {link ? <a href={link} className="text-right underline-offset-2 hover:underline">{content}</a> : content}
+      {link ? <a href={link} className="inline-flex min-h-11 items-center text-right underline-offset-2 hover:underline">{content}</a> : content}
     </div>
   );
 }

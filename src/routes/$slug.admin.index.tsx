@@ -5,7 +5,6 @@ import { Bell, BellRing, ChevronLeft, ChevronRight, Download, Loader2 } from "lu
 
 import { formatData, type Reserva } from "@/lib/reservations";
 import { addDaysISO, todayISO, weekdayLabel } from "@/lib/admin-dates";
-import { rowMainAction } from "@/lib/reservation-actions";
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
 import { useReservaActions, useReservasRealtime } from "@/hooks/use-reservas-admin";
 import { useHojeData } from "@/hooks/use-hoje";
@@ -16,8 +15,8 @@ import { AdminShell } from "@/components/admin/AdminShell";
 import { BottomSheet } from "@/components/admin/BottomSheet";
 import { MensagemDoDiaButton } from "@/components/admin/MensagemDoDia";
 import { PageHeader } from "@/components/admin/PageHeader";
-import { QuickAction } from "@/components/admin/QuickAction";
-import { ReservaDialog } from "@/components/admin/ReservaDialog";
+import { useRowAction } from "@/components/admin/RowAction";
+import { ReservaDetail } from "@/components/admin/ReservaDetail";
 import { NeedsYou } from "@/components/admin/hoje/NeedsYou";
 import { ServiceLine } from "@/components/admin/hoje/ServiceLine";
 import { UpcomingDays, type DayInfo } from "@/components/admin/hoje/UpcomingDays";
@@ -48,7 +47,6 @@ function AdminHoje() {
   const [dia, setDia] = useState(hoje);
   const [selected, setSelected] = useState<Reserva | null>(null);
   const [needsOpen, setNeedsOpen] = useState(false);
-  const [busyId, setBusyId] = useState<string | null>(null);
 
   useReservasRealtime(ready, tenantId);
   const pwa = usePwaActions(tenantId);
@@ -58,7 +56,7 @@ function AdminHoje() {
   });
   const { diaQ, pendentesQ, reconfirmarQ, proximosQ, bloqueiosQ, feriadosQ, eventosQ } = useHojeData(ready, tenantId, dia);
 
-  const reservasDia = diaQ.data ?? [];
+  const reservasDia = useMemo(() => diaQ.data ?? [], [diaQ.data]);
   const resumo = useMemo(() => {
     const ativas = reservasDia.filter((r) => r.status !== "cancelada");
     return {
@@ -83,21 +81,7 @@ function AdminHoje() {
   const reconfirmar = reconfirmarQ.data ?? [];
   const needsTotal = pendentes.length + reconfirmar.length;
 
-  async function run(r: Reserva, fn: (r: Reserva) => Promise<void>) {
-    setBusyId(r.id);
-    try { await fn(r); } catch { /* o toast de erro já é disparado pela mutação */ } finally { setBusyId(null); }
-  }
-
-  function renderAction(r: Reserva) {
-    const main = rowMainAction(r);
-    if (main === "confirmar") {
-      return <QuickAction busy={busyId === r.id} onClick={() => run(r, actions.handleConfirm)}>Confirmar</QuickAction>;
-    }
-    if (main === "reconfirmar") {
-      return <QuickAction busy={busyId === r.id} variant="secondary" onClick={() => run(r, actions.handleReconfirm)}>Reconfirmar</QuickAction>;
-    }
-    return null;
-  }
+  const renderAction = useRowAction(actions);
 
   if (!ready) {
     return (
@@ -113,7 +97,7 @@ function AdminHoje() {
     : `${resumo.reservas} ${resumo.reservas === 1 ? "reserva" : "reservas"}, ${resumo.pessoas} pessoas, ${resumo.pendentes} ${resumo.pendentes === 1 ? "pendente" : "pendentes"}`;
 
   const navBtn = "flex h-11 w-11 items-center justify-center rounded-md border border-border bg-card text-foreground transition-colors hover:bg-muted lg:h-9 lg:w-9";
-  const chip = "inline-flex h-9 items-center gap-2 rounded-full px-3.5 text-xs font-semibold transition-colors disabled:opacity-50";
+  const chip = "inline-flex h-11 items-center gap-2 rounded-full px-3.5 lg:h-9 text-xs font-semibold transition-colors disabled:opacity-50";
 
   return (
     <AdminShell slug={slug} tenantNome={tenantNome} active="hoje">
@@ -164,7 +148,7 @@ function AdminHoje() {
                 <p className="mt-1 text-sm text-muted-foreground">Nada marcado para este dia.</p>
               </div>
             ) : (
-              <ServiceLine reservas={reservasDia} dia={dia} selectedId={selected?.id} onOpen={setSelected} renderAction={renderAction} />
+              <ServiceLine reservas={reservasDia} dia={dia} selectedId={selected?.id} onOpen={setSelected} renderAction={renderAction} compact={!!selected} />
             )}
             {resumo.canceladas > 0 && (
               <p className="mt-2 text-xs text-muted-foreground">{resumo.canceladas} {resumo.canceladas === 1 ? "cancelada" : "canceladas"} neste dia</p>
@@ -228,7 +212,7 @@ function AdminHoje() {
         />
       </BottomSheet>
 
-      <ReservaDialog
+      <ReservaDetail
         reserva={selected}
         onClose={() => setSelected(null)}
         onConfirm={() => selected && actions.handleConfirm(selected)}

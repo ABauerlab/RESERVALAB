@@ -28,13 +28,14 @@ function NowMarker({ time }: { time: string }) {
  * (gota) no ponto certo quando o dia é hoje.
  */
 export function ServiceLine({
-  reservas, dia, selectedId, onOpen, renderAction,
+  reservas, dia, selectedId, onOpen, renderAction, compact,
 }: {
   reservas: Reserva[];
   dia: string;
   selectedId?: string | null;
   onOpen: (r: Reserva) => void;
   renderAction: (r: Reserva) => React.ReactNode;
+  compact?: boolean;
 }) {
   const [now, setNow] = useState(() => localHHMM());
   useEffect(() => {
@@ -78,6 +79,7 @@ export function ServiceLine({
           reserva={r}
           onOpen={() => onOpen(r)}
           selected={selectedId === r.id}
+          compact={compact}
           action={renderAction(r)}
         />,
       );

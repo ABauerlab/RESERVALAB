@@ -98,7 +98,7 @@ export function ReservationRow({
         {wide}
       </button>
 
-      {action && <div className="shrink-0 pr-3 lg:pr-4">{action}</div>}
+      {action !== undefined && <div className={cn("shrink-0 pr-3 lg:pr-4", !compact && "lg:flex lg:w-[132px] lg:justify-end")}>{action}</div>}
     </div>
   );
 }
