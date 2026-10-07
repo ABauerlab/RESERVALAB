@@ -32,3 +32,13 @@ export function weekdayLabel(iso: string, short = false): string {
   const i = new Date(Date.UTC(y, m - 1, d)).getUTCDay();
   return short ? SEMANA_CURTO[i] : SEMANA[i];
 }
+
+/** Data e hora locais do navegador (usadas só para a marca "agora"). */
+export function localISO(d = new Date()) {
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+export function localHHMM(d = new Date()) {
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${p(d.getHours())}:${p(d.getMinutes())}`;
+}

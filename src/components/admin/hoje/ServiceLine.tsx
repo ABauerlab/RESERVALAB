@@ -2,32 +2,8 @@ import { useEffect, useState } from "react";
 
 import type { Reserva } from "@/lib/reservations";
 import { ReservationRow } from "../ReservationRow";
-import { Drop } from "../Drop";
-
-function localISO(d = new Date()) {
-  const p = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
-}
-function localHHMM(d = new Date()) {
-  const p = (n: number) => String(n).padStart(2, "0");
-  return `${p(d.getHours())}:${p(d.getMinutes())}`;
-}
-
-function NowMarker({ time }: { time: string }) {
-  return (
-    <div
-      className="flex items-center gap-2 bg-card px-4 py-1.5"
-      role="separator"
-      aria-label={`Agora, ${time}`}
-    >
-      <Drop animate />
-      <span className="text-xs font-extrabold uppercase tracking-[0.08em] text-primary">
-        Agora · {time}
-      </span>
-      <span className="h-px flex-1 bg-primary/40" />
-    </div>
-  );
-}
+import { NowMarker } from "../NowMarker";
+import { localHHMM, localISO } from "@/lib/admin-dates";
 
 /**
  * Linha do serviço: reservas do dia agrupadas por hora, com a linha "agora"

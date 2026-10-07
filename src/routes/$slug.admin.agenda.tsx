@@ -1,146 +1,120 @@
 import { pwaHeadLinks } from "@/lib/pwa-manifest";
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CalendarHeart, CalendarX2, Loader2, Plus, Trash2 } from "lucide-react";
-import { toast } from "sonner";
+import { CalendarX2, ChevronLeft, ChevronRight, Loader2, SlidersHorizontal } from "lucide-react";
 
-import { supabase } from "@/integrations/supabase/client";
+import { formatData, type Reserva } from "@/lib/reservations";
+import { todayISO, weekdayLabel } from "@/lib/admin-dates";
+import { parseDiaParam } from "@/lib/agenda";
+import { cn } from "@/lib/utils";
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
+import { useAgenda, useAgendaDeleteRealtime } from "@/hooks/use-agenda";
+import { useReservaActions, useReservasRealtime } from "@/hooks/use-reservas-admin";
+import { useDetailMode, useMediaQuery } from "@/hooks/use-media-query";
+
 import { AdminShell } from "@/components/admin/AdminShell";
-import { formatData, formatHorario } from "@/lib/reservations";
+import { BottomSheet } from "@/components/admin/BottomSheet";
+import { PageHeader } from "@/components/admin/PageHeader";
+import { ReservaDetail } from "@/components/admin/ReservaDetail";
+import { useRowAction } from "@/components/admin/RowAction";
+import { AgendaGestao } from "@/components/admin/agenda/AgendaGestao";
+import { AgendaTimeline } from "@/components/admin/agenda/AgendaTimeline";
+import { DayContext } from "@/components/admin/agenda/DayContext";
+import { WeekStrip } from "@/components/admin/agenda/WeekStrip";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Link } from "@tanstack/react-router";
+import { AgendaEstado } from "@/components/admin/agenda/AgendaEstado";
 
 export const Route = createFileRoute("/$slug/admin/agenda")({
   head: ({ params }) => ({
     meta: [{ title: "Agenda | Teggly" }, { name: "robots", content: "noindex" }],
     links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),
   }),
+  // `?dia=YYYY-MM-DD`: dia selecionado da Agenda. Inválido ou ausente = hoje.
+  validateSearch: (search: Record<string, unknown>): { dia?: string } => {
+    const dia = parseDiaParam(search.dia);
+    return dia ? { dia } : {};
+  },
   ssr: false,
   component: AgendaPage,
 });
 
+function FilterToggle({
+  active,
+  onChange,
+  count,
+  children,
+}: {
+  active: boolean;
+  onChange: (v: boolean) => void;
+  count?: number;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={active}
+      onClick={() => onChange(!active)}
+      className={cn(
+        "inline-flex h-11 shrink-0 items-center gap-2 rounded-full px-4 text-[13px] font-semibold transition-colors xl:h-9",
+        active
+          ? "bg-primary text-primary-foreground shadow-sm"
+          : "bg-muted text-muted-foreground hover:bg-accent hover:text-foreground",
+      )}
+    >
+      {children}
+      {count !== undefined && count > 0 && (
+        <span
+          className={cn(
+            "rounded-full px-1.5 text-[11px] tabular-nums",
+            active ? "bg-primary-foreground/20" : "bg-card text-foreground",
+          )}
+        >
+          {count}
+        </span>
+      )}
+    </button>
+  );
+}
+
 function AgendaPage() {
   const { slug } = useParams({ from: "/$slug/admin/agenda" });
   const admin = useTenantAdmin(slug);
+  const ready = admin.ready;
   const tenantId = admin.tenant?.id ?? null;
-  const qc = useQueryClient();
 
-  const [data, setData] = useState("");
-  const [diaTodo, setDiaTodo] = useState(true);
-  const [horaInicio, setHoraInicio] = useState("");
-  const [horaFim, setHoraFim] = useState("");
-  const [motivo, setMotivo] = useState("");
+  const dock = useDetailMode() === "dock";
+  const [selected, setSelected] = useState<Reserva | null>(null);
+  const [gestaoOpen, setGestaoOpen] = useState(false);
+  const [filtrosOpen, setFiltrosOpen] = useState(false);
+  // Abaixo de 1024 (trilho de ícones) e com o detalhe acoplado, a faixa da semana abrevia.
+  const wide = useMediaQuery("(min-width: 1024px)");
 
-  const bloqueiosQ = useQuery({
-    enabled: !!tenantId,
-    queryKey: ["bloqueios-admin", tenantId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("agenda_bloqueios")
-        .select("*")
-        .eq("tenant_id", tenantId!)
-        .gte("data", new Date().toISOString().slice(0, 10))
-        .order("data", { ascending: true });
-      if (error) throw error;
-      return data;
-    },
+  // Realtime: o hook existente da F1 (invalida o prefixo ["reservas", tenantId]).
+  useReservasRealtime(ready, tenantId);
+  useAgendaDeleteRealtime(ready, tenantId, (id) =>
+    setSelected((s) => (s && s.id === id ? null : s)),
+  );
+  const actions = useReservaActions(slug, tenantId, {
+    onPatched: (id, patch) =>
+      setSelected((s) => (s && s.id === id ? ({ ...s, ...patch } as Reserva) : s)),
+    onDeleted: () => setSelected(null),
   });
+  const renderAction = useRowAction(actions);
 
-  const criar = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase.from("agenda_bloqueios").insert({
-        tenant_id: tenantId!,
-        data,
-        hora_inicio: diaTodo ? null : horaInicio || null,
-        hora_fim: diaTodo ? null : horaFim || null,
-        motivo: motivo.trim() || null,
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Bloqueio adicionado.");
-      setData("");
-      setHoraInicio("");
-      setHoraFim("");
-      setMotivo("");
-      setDiaTodo(true);
-      qc.invalidateQueries({ queryKey: ["bloqueios-admin", tenantId] });
-    },
-    onError: () => toast.error("Não foi possível adicionar o bloqueio."),
-  });
+  const ag = useAgenda(slug, ready, tenantId);
+  const { agendaDia, filtros, selectedDay, range } = ag;
 
-  const remover = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("agenda_bloqueios").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Bloqueio removido.");
-      qc.invalidateQueries({ queryKey: ["bloqueios-admin", tenantId] });
-    },
-    onError: () => toast.error("Não foi possível remover."),
-  });
-
-  const podeCriar =
-    !!data && (diaTodo || (!!horaInicio && (!horaFim || horaFim > horaInicio))) && !criar.isPending;
-
-  const [feriadoData, setFeriadoData] = useState("");
-  const [feriadoMotivo, setFeriadoMotivo] = useState("");
-
-  const feriadosQ = useQuery({
-    enabled: !!tenantId,
-    queryKey: ["feriados-admin", tenantId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("feriados")
-        .select("*")
-        .eq("tenant_id", tenantId!)
-        .gte("data", new Date().toISOString().slice(0, 10))
-        .order("data", { ascending: true });
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const criarFeriado = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase.from("feriados").insert({
-        tenant_id: tenantId!,
-        data: feriadoData,
-        motivo: feriadoMotivo.trim() || null,
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Feriado adicionado.");
-      setFeriadoData("");
-      setFeriadoMotivo("");
-      qc.invalidateQueries({ queryKey: ["feriados-admin", tenantId] });
-    },
-    onError: (err: { code?: string }) => {
-      if (err?.code === "23505") toast.error("Essa data já está marcada como feriado.");
-      else toast.error("Não foi possível adicionar o feriado.");
-    },
-  });
-
-  const removerFeriado = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("feriados").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Feriado removido.");
-      qc.invalidateQueries({ queryKey: ["feriados-admin", tenantId] });
-    },
-    onError: () => toast.error("Não foi possível remover."),
-  });
-
-  const podeCriarFeriado = !!feriadoData && !criarFeriado.isPending;
-
-  if (!admin.ready) {
+  if (!ready) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
@@ -148,228 +122,358 @@ function AgendaPage() {
     );
   }
 
+  const hoje = todayISO();
+  const isToday = selectedDay === hoje;
+  const { resumo } = agendaDia;
+  const temVisiveis = agendaDia.horas.length > 0 || agendaDia.semHorario.length > 0;
+  const frase =
+    resumo.reservas === 0
+      ? "Nenhuma reserva neste dia"
+      : `${resumo.reservas} ${resumo.reservas === 1 ? "reserva" : "reservas"}, ${resumo.pessoas} pessoas, ${resumo.pendentes} ${resumo.pendentes === 1 ? "pendente" : "pendentes"}`;
+
+  const semanaVazia = ag.semana.every((d) => d.reservas === 0);
+  const linkReservas = (
+    <Link
+      to="/$slug/admin/reservas"
+      params={{ slug }}
+      className="inline-flex h-11 items-center rounded-md border border-border bg-card px-4 text-[13px] font-semibold text-foreground hover:bg-muted xl:h-9"
+    >
+      Ver em Reservas
+    </Link>
+  );
+  const btnAcao =
+    "inline-flex h-11 items-center rounded-md bg-primary px-4 text-[13px] font-semibold text-primary-foreground hover:bg-blue-700 xl:h-9";
+
+  const navBtn =
+    "inline-flex h-11 min-w-12 items-center justify-center gap-1 rounded-md border border-border bg-card px-3 text-[13px] font-semibold text-foreground transition-colors hover:bg-muted disabled:text-muted-foreground xl:h-9";
+
   return (
     <AdminShell slug={slug} tenantNome={admin.tenant?.nome ?? ""} active="agenda">
-      <div className="mx-auto max-w-4xl px-5 pt-6">
-        <header className="animate-fade">
-          <h2 className="font-serif text-3xl tracking-tight">Bloqueios de agenda</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Dias ou horários bloqueados não aceitam novas reservas dos clientes.
-          </p>
-        </header>
+      <div
+        className={cn(
+          "mx-auto max-w-[1180px] px-4 pb-6 pt-1 md:px-8 md:pt-8",
+          selected && dock && "xl:pr-[452px]",
+        )}
+      >
+        <PageHeader
+          title="Agenda"
+          description={
+            <span className="hidden md:inline">
+              Visualize o movimento das reservas ao longo da semana.
+            </span>
+          }
+          actions={
+            <Button
+              variant="outline"
+              onClick={() => setGestaoOpen(true)}
+              aria-label="Bloqueios e feriados"
+              className="h-11 w-11 gap-2 rounded-md p-0 md:w-auto md:px-4 xl:h-9"
+            >
+              <CalendarX2 className="h-4 w-4" aria-hidden="true" />
+              <span className="hidden md:inline">Bloqueios e feriados</span>
+            </Button>
+          }
+        />
 
-        <section className="mt-6 rounded-lg border border-border bg-card p-5 animate-in-up">
-          <h3 className="font-semibold">Novo bloqueio</h3>
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label className="text-[13px]">Data</Label>
-              <Input
-                type="date"
-                min={new Date().toISOString().slice(0, 10)}
-                value={data}
-                onChange={(e) => setData(e.target.value)}
-                className="h-11 rounded-md"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-[13px]">Abrangência</Label>
-              <div className="flex gap-1.5 rounded-[12px] bg-muted p-1">
-                <button
-                  type="button"
-                  onClick={() => setDiaTodo(true)}
-                  className={`h-11 flex-1 xl:h-9 rounded-md text-xs font-medium transition-all ${diaTodo ? "bg-background shadow-[var(--shadow-sm)]" : "text-muted-foreground"}`}
-                >
-                  Dia inteiro
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDiaTodo(false)}
-                  className={`h-11 flex-1 xl:h-9 rounded-md text-xs font-medium transition-all ${!diaTodo ? "bg-background shadow-[var(--shadow-sm)]" : "text-muted-foreground"}`}
-                >
-                  Faixa de horário
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {!diaTodo && (
-            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label className="text-[13px]">Das</Label>
-                <Input
-                  type="time"
-                  value={horaInicio}
-                  onChange={(e) => setHoraInicio(e.target.value)}
-                  className="h-11 rounded-md"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[13px]">Até</Label>
-                <Input
-                  type="time"
-                  value={horaFim}
-                  onChange={(e) => setHoraFim(e.target.value)}
-                  className="h-11 rounded-md"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Deixe em branco para bloquear até o fim do dia.
-                </p>
-              </div>
-            </div>
-          )}
-
-          <div className="mt-4 space-y-2">
-            <Label className="text-[13px]">Motivo (opcional, visível ao cliente)</Label>
-            <Input
-              value={motivo}
-              onChange={(e) => setMotivo(e.target.value)}
-              placeholder="Ex.: Evento fechado"
-              className="h-11 rounded-md"
+        {/* Mobile: dia a dia, com seletor de data. */}
+        <div className="mt-3 flex items-center gap-2 md:hidden">
+          <button
+            type="button"
+            className={cn(navBtn, "w-11 justify-center px-0")}
+            onClick={() => ag.shiftDay(-1)}
+            aria-label="Dia anterior"
+          >
+            <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+          </button>
+          <label className="relative flex h-11 min-w-0 flex-1 items-center justify-center rounded-md border border-border bg-card px-3 text-sm font-semibold text-foreground">
+            <span className="truncate">
+              <span className="capitalize">{weekdayLabel(selectedDay, true)}</span>,{" "}
+              {formatData(selectedDay)}
+            </span>
+            <input
+              type="date"
+              value={selectedDay}
+              onChange={(e) => {
+                const v = parseDiaParam(e.target.value);
+                if (v) ag.selectDay(v);
+              }}
+              aria-label="Ir para a data"
+              className="absolute -inset-px h-[calc(100%+2px)] w-[calc(100%+2px)] cursor-pointer opacity-0"
             />
-          </div>
-
-          <Button
-            onClick={() => criar.mutate()}
-            disabled={!podeCriar}
-            className="mt-5 h-11 w-full rounded-md bg-primary text-primary-foreground hover:bg-blue-700 sm:w-auto sm:px-6"
+          </label>
+          <button
+            type="button"
+            className={cn(navBtn, "w-11 justify-center px-0")}
+            onClick={() => ag.shiftDay(1)}
+            aria-label="Próximo dia"
           >
-            {criar.isPending ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Plus className="mr-2 h-4 w-4" />
-            )}
-            Bloquear
-          </Button>
-        </section>
+            <ChevronRight className="h-4 w-4" aria-hidden="true" />
+          </button>
+          <button type="button" className={navBtn} onClick={ag.goToday} disabled={isToday}>
+            Hoje
+          </button>
+        </div>
 
-        <section className="mt-8">
-          <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-            Bloqueios ativos
-          </h3>
-          {bloqueiosQ.isLoading ? (
-            <div className="mt-6 flex justify-center">
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-            </div>
-          ) : (bloqueiosQ.data?.length ?? 0) === 0 ? (
-            <div className="mt-4 rounded-lg border border-dashed border-border bg-card/50 py-12 text-center">
-              <CalendarX2 className="mx-auto h-6 w-6 text-muted-foreground" />
-              <p className="mt-3 font-serif font-semibold text-2xl">Nenhum bloqueio</p>
-              <p className="mt-1 text-sm text-muted-foreground">A agenda está totalmente aberta.</p>
+        {/* Tablet e desktop: semana a semana. */}
+        <div className="mt-4 hidden flex-wrap items-center gap-2 md:flex">
+          <button
+            type="button"
+            className={navBtn}
+            onClick={() => ag.shiftWeek(-1)}
+            aria-label="Semana anterior"
+          >
+            <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+            <span className="hidden lg:inline">Semana anterior</span>
+          </button>
+          <button type="button" className={navBtn} onClick={ag.goToday} disabled={isToday}>
+            Hoje
+          </button>
+          <button
+            type="button"
+            className={navBtn}
+            onClick={() => ag.shiftWeek(1)}
+            aria-label="Próxima semana"
+          >
+            <span className="hidden lg:inline">Próxima semana</span>
+            <ChevronRight className="h-4 w-4" aria-hidden="true" />
+          </button>
+          <span className="ml-1 text-sm text-muted-foreground">
+            {formatData(range.weekStart).slice(0, 5)} a {formatData(range.weekEnd)}
+          </span>
+          <label className="ml-auto flex items-center gap-2 text-xs text-muted-foreground">
+            <span className="sr-only xl:not-sr-only">Ir para</span>
+            <Input
+              type="date"
+              value={selectedDay}
+              onChange={(e) => {
+                const v = parseDiaParam(e.target.value);
+                if (v) ag.selectDay(v);
+              }}
+              aria-label="Ir para a data"
+              className="h-11 w-[11.5rem] rounded-md xl:h-9"
+            />
+          </label>
+        </div>
+
+        <div className="mt-4">
+          {ag.error ? null : ag.loading ? (
+            <div className="grid grid-cols-7 gap-2">
+              {Array.from({ length: 7 }).map((_, i) => (
+                <Skeleton key={i} className="h-[96px] rounded-lg" />
+              ))}
             </div>
           ) : (
-            <ul className="mt-4 space-y-2.5">
-              {bloqueiosQ.data!.map((b) => (
-                <li
-                  key={b.id}
-                  className="flex items-center gap-3 rounded-lg border border-border bg-card p-4"
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium">{formatData(b.data)}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {b.hora_inicio && b.hora_fim
-                        ? `Das ${formatHorario(b.hora_inicio)} às ${formatHorario(b.hora_fim)}`
-                        : b.hora_inicio
-                          ? `A partir das ${formatHorario(b.hora_inicio)}`
-                          : b.hora_fim
-                            ? `Até as ${formatHorario(b.hora_fim)}`
-                            : "Dia inteiro"}
-                      {b.motivo ? ` · ${b.motivo}` : ""}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => remover.mutate(b.id)}
-                    className="flex h-11 w-11 xl:h-9 xl:w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                    aria-label="Remover bloqueio"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </li>
-              ))}
-            </ul>
+            <WeekStrip
+              days={ag.semana}
+              onSelect={ag.selectDay}
+              compact={!wide || (dock && !!selected)}
+            />
           )}
-        </section>
+        </div>
 
-        <section className="mt-10 rounded-lg border border-border bg-card p-5 animate-in-up">
-          <h3 className="font-semibold">Feriados</h3>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Uma data marcada como feriado passa a usar os horários de fim de semana (janela e
-            horário-limite), mesmo caindo num dia de semana.
+        {ag.truncado && (
+          <p className="mt-2 text-xs text-muted-foreground">
+            Esta semana tem 500 reservas ou mais. Mostramos as 500 primeiras e as contagens podem
+            estar incompletas. Veja todas em{" "}
+            <Link
+              to="/$slug/admin/reservas"
+              params={{ slug }}
+              className="font-semibold text-primary hover:underline"
+            >
+              Reservas
+            </Link>
+            .
           </p>
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label className="text-[13px]">Data</Label>
-              <Input
-                type="date"
-                min={new Date().toISOString().slice(0, 10)}
-                value={feriadoData}
-                onChange={(e) => setFeriadoData(e.target.value)}
-                className="h-11 rounded-md"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-[13px]">Motivo (opcional)</Label>
-              <Input
-                value={feriadoMotivo}
-                onChange={(e) => setFeriadoMotivo(e.target.value)}
-                placeholder="Ex.: Independência do Brasil"
-                className="h-11 rounded-md"
-              />
-            </div>
-          </div>
-          <Button
-            onClick={() => criarFeriado.mutate()}
-            disabled={!podeCriarFeriado}
-            className="mt-5 h-11 w-full rounded-md bg-primary text-primary-foreground hover:bg-blue-700 sm:w-auto sm:px-6"
-          >
-            {criarFeriado.isPending ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Plus className="mr-2 h-4 w-4" />
-            )}
-            Adicionar feriado
-          </Button>
-        </section>
+        )}
 
-        <section className="mt-6">
-          <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-            Próximos feriados
-          </h3>
-          {feriadosQ.isLoading ? (
-            <div className="mt-6 flex justify-center">
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-            </div>
-          ) : (feriadosQ.data?.length ?? 0) === 0 ? (
-            <div className="mt-4 rounded-lg border border-dashed border-border bg-card/50 py-12 text-center">
-              <CalendarHeart className="mx-auto h-6 w-6 text-muted-foreground" />
-              <p className="mt-3 font-serif font-semibold text-2xl">Nenhum feriado cadastrado</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Todos os dias seguem o horário normal da semana.
-              </p>
-            </div>
-          ) : (
-            <ul className="mt-4 space-y-2.5">
-              {feriadosQ.data!.map((f: { id: string; data: string; motivo: string | null }) => (
-                <li
-                  key={f.id}
-                  className="flex items-center gap-3 rounded-lg border border-border bg-card p-4"
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium">{formatData(f.data)}</p>
-                    {f.motivo && <p className="text-sm text-muted-foreground">{f.motivo}</p>}
-                  </div>
-                  <button
-                    onClick={() => removerFeriado.mutate(f.id)}
-                    className="flex h-11 w-11 xl:h-9 xl:w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                    aria-label="Remover feriado"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </li>
+        <div className="mt-5 flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
+          <div>
+            <h2 className="text-xl font-extrabold tracking-tight text-foreground">
+              <span className="capitalize">{weekdayLabel(selectedDay)}</span>,{" "}
+              {formatData(selectedDay)}
+              {isToday && (
+                <span className="ml-2 align-middle text-xs font-semibold uppercase tracking-[0.08em] text-primary">
+                  Hoje
+                </span>
+              )}
+            </h2>
+            {!ag.error && !ag.loading && (
+              <p className="mt-0.5 text-sm text-muted-foreground">{frase}</p>
+            )}
+          </div>
+          {/* Tablet e desktop: os dois filtros à vista. */}
+          <div className="hidden flex-wrap gap-2 md:flex">
+            <FilterToggle
+              active={filtros.soAtencao}
+              onChange={ag.setSoAtencao}
+              count={resumo.atencao}
+            >
+              Precisa de atenção
+            </FilterToggle>
+            <FilterToggle
+              active={filtros.mostrarCanceladas}
+              onChange={ag.setMostrarCanceladas}
+              count={resumo.canceladas}
+            >
+              Mostrar canceladas
+            </FilterToggle>
+          </div>
+          {/* Mobile: atenção à vista; o resto em folha. */}
+          <div className="flex w-full items-center gap-2 md:hidden">
+            <FilterToggle
+              active={filtros.soAtencao}
+              onChange={ag.setSoAtencao}
+              count={resumo.atencao}
+            >
+              Precisa de atenção
+            </FilterToggle>
+            <button
+              type="button"
+              onClick={() => setFiltrosOpen(true)}
+              aria-label="Filtros"
+              className={cn(
+                "relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full",
+                filtros.mostrarCanceladas
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground",
+              )}
+            >
+              <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-4 space-y-5">
+          <DayContext contexto={agendaDia.contexto} slug={slug} />
+
+          {ag.error ? (
+            <AgendaEstado
+              alert
+              titulo="Não foi possível carregar a agenda"
+              texto="A conexão pode ter falhado. Suas reservas não foram alteradas. Tente novamente em instantes."
+              acoes={
+                <Button className="h-11 rounded-md xl:h-9" onClick={ag.refetch}>
+                  Tentar novamente
+                </Button>
+              }
+            />
+          ) : ag.loading ? (
+            <div className="space-y-2" aria-busy="true" aria-label="Carregando a agenda">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-[64px] w-full rounded-lg" />
               ))}
-            </ul>
+            </div>
+          ) : !temVisiveis ? (
+            filtros.soAtencao && resumo.reservas > 0 ? (
+              <AgendaEstado
+                titulo="Nada precisa de atenção neste dia"
+                texto={`As ${resumo.reservas} ${resumo.reservas === 1 ? "reserva" : "reservas"} deste dia já estão em ordem: nenhuma está pendente, esperando reconfirmação ou dentro de um bloqueio.`}
+                acoes={
+                  <button type="button" className={btnAcao} onClick={() => ag.setSoAtencao(false)}>
+                    Mostrar todas
+                  </button>
+                }
+              />
+            ) : !filtros.mostrarCanceladas && resumo.canceladas > 0 && resumo.reservas === 0 ? (
+              <AgendaEstado
+                titulo="Só há reservas canceladas neste dia"
+                texto={`${resumo.canceladas} ${resumo.canceladas === 1 ? "reserva foi cancelada" : "reservas foram canceladas"} e ficam ocultas por padrão. Nenhuma reserva ativa neste dia.`}
+                acoes={
+                  <button
+                    type="button"
+                    className={btnAcao}
+                    onClick={() => ag.setMostrarCanceladas(true)}
+                  >
+                    Mostrar canceladas
+                  </button>
+                }
+              />
+            ) : semanaVazia ? (
+              <AgendaEstado
+                titulo="Nenhuma reserva nesta semana"
+                texto="Quando uma reserva for feita, ela aparece aqui sem precisar recarregar. Você pode olhar outra semana ou conferir tudo em Reservas."
+                acoes={
+                  <>
+                    <button type="button" className={btnAcao} onClick={() => ag.shiftWeek(1)}>
+                      Próxima semana
+                    </button>
+                    {linkReservas}
+                  </>
+                }
+              />
+            ) : (
+              <AgendaEstado
+                titulo="Nenhuma reserva neste dia"
+                texto="Escolha outro dia da semana na faixa acima ou consulte todas as reservas."
+                acoes={linkReservas}
+              />
+            )
+          ) : (
+            <AgendaTimeline
+              dia={agendaDia}
+              slug={slug}
+              selectedId={selected?.id}
+              onOpen={setSelected}
+              renderAction={renderAction}
+              compact={dock && !!selected}
+            />
           )}
-        </section>
+        </div>
       </div>
+
+      <BottomSheet open={filtrosOpen} onOpenChange={setFiltrosOpen} title="Filtros">
+        <div className="space-y-2 pb-2">
+          <FilterToggle
+            active={filtros.soAtencao}
+            onChange={ag.setSoAtencao}
+            count={resumo.atencao}
+          >
+            Precisa de atenção
+          </FilterToggle>
+          <FilterToggle
+            active={filtros.mostrarCanceladas}
+            onChange={ag.setMostrarCanceladas}
+            count={resumo.canceladas}
+          >
+            Mostrar canceladas
+          </FilterToggle>
+          <p className="pt-1 text-xs text-muted-foreground">
+            Tipo, área e busca por nome, telefone ou código ficam em Reservas.
+          </p>
+        </div>
+      </BottomSheet>
+
+      <Dialog open={gestaoOpen} onOpenChange={setGestaoOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader className="text-left">
+            <DialogTitle>Bloqueios e feriados</DialogTitle>
+            <DialogDescription>
+              Dias ou horários bloqueados não aceitam novas reservas dos clientes. Feriados usam os
+              horários de fim de semana.
+            </DialogDescription>
+          </DialogHeader>
+          <AgendaGestao tenantId={tenantId} />
+        </DialogContent>
+      </Dialog>
+
+      <ReservaDetail
+        reserva={selected}
+        onClose={() => setSelected(null)}
+        onConfirm={() => selected && actions.handleConfirm(selected)}
+        onConfirmSemNotificar={() => selected && actions.handleConfirmSemNotificar(selected)}
+        onReconfirm={() => selected && actions.handleReconfirm(selected)}
+        onSetStatus={(status) => selected && actions.handleSetStatus(selected, status)}
+        onSave={(patch) =>
+          selected
+            ? actions.updateReserva.mutateAsync({ id: selected.id, patch })
+            : Promise.resolve()
+        }
+        onCancel={(motivo) =>
+          selected ? actions.handleCancel(selected, motivo) : Promise.resolve()
+        }
+        onDelete={() => selected && actions.handleDelete(selected)}
+        pending={actions.pending}
+      />
     </AdminShell>
   );
 }
