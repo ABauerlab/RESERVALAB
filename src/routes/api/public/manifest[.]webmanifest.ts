@@ -14,23 +14,23 @@ export const Route = createFileRoute("/api/public/manifest.webmanifest")({
         const raw = url.searchParams.get("start") ?? "/";
         // Aceita apenas caminhos internos simples.
         const start = /^\/[A-Za-z0-9\-_/]*$/.test(raw) ? raw : "/";
-        const name = url.searchParams.get("name")?.slice(0, 40) || "ReservaLab";
+        const name = url.searchParams.get("name")?.slice(0, 40) || "Teggly";
 
         const manifest = {
           id: start,
           name,
           short_name: name.slice(0, 12),
-          description: "Painel de reservas ReservaLab.",
+          description: "Painel de reservas Teggly.",
           start_url: start,
           scope: "/",
           display: "standalone",
           orientation: "portrait",
-          background_color: "#f7f8fc",
-          theme_color: "#10131f",
+          background_color: "#f8fafc",
+          theme_color: "#2563eb",
           icons: [
             { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
             { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
-            { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+            { src: "/icons/icon-maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
           ],
         };
 
