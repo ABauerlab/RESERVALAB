@@ -49,7 +49,7 @@ export function NovasReservasBanner({ tenantId }: { tenantId: string | null }) {
   if (!tenantId || dispensado) return null;
   if (q.isLoading) {
     return (
-      <div className="mb-5 flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
+      <div className="flex items-center gap-2 px-1 py-2 text-sm text-muted-foreground">
         <Loader2 className="h-4 w-4 animate-spin" /> Verificando novas reservas…
       </div>
     );
@@ -66,23 +66,23 @@ export function NovasReservasBanner({ tenantId }: { tenantId: string | null }) {
   }
 
   return (
-    <section className="mb-5 rounded-lg border border-terracotta/30 bg-terracotta/5 p-4 animate-in-up">
+    <section className="rounded-lg border border-primary/20 bg-accent p-3.5 animate-in-up">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="flex items-center gap-2 text-sm font-medium text-terracotta">
+        <p className="flex items-center gap-2 text-sm font-semibold text-accent-foreground">
           <BellRing className="h-4 w-4" />
           {novas.length === 1 ? "1 nova reserva desde sua última visita" : `${novas.length} novas reservas desde sua última visita`}
         </p>
         <button
           onClick={marcarVistas}
-          className="inline-flex items-center gap-1.5 rounded-full border border-terracotta/30 bg-card px-3 py-1.5 text-xs font-medium text-terracotta transition-colors hover:bg-terracotta/10"
+          className="inline-flex h-9 items-center gap-1.5 rounded-full border border-primary/25 bg-card px-3 text-xs font-semibold text-accent-foreground transition-colors hover:bg-muted"
         >
           <Check className="h-3.5 w-3.5" /> Marcar como vistas
         </button>
       </div>
 
-      <ul className="mt-3 space-y-1.5">
+      <ul className="mt-3 max-h-44 space-y-1.5 overflow-y-auto">
         {novas.map((r) => (
-          <li key={r.id} className="rounded-lg bg-card px-3 py-2 text-sm">
+          <li key={r.id} className="rounded-md bg-card px-3 py-2 text-[13px]">
             <span className="font-medium">{r.nome}</span>
             <span className="text-muted-foreground">
               {" — "}{TIPO_SHORT[r.tipo]} • {r.quantidade ?? "?"} pessoas • {formatData(r.data)}

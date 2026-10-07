@@ -1,4 +1,4 @@
-import { Cake, MessageSquareText, Receipt } from "lucide-react";
+import { Cake, MessageSquareText, Receipt, Users } from "lucide-react";
 
 import { AREA_LABEL, TIPO_SHORT, formatHorario, type Reserva } from "@/lib/reservations";
 import { cn } from "@/lib/utils";
@@ -20,7 +20,7 @@ function Chip({ icon: Icon, children }: { icon?: React.ComponentType<{ className
  * Mobile: duas linhas. Desktop: colunas alinhadas.
  */
 export function ReservationRow({
-  reserva: r, onOpen, action, selected, now, showDate,
+  reserva: r, onOpen, action, selected, now, showDate, compact,
 }: {
   reserva: Reserva;
   onOpen: () => void;
@@ -29,8 +29,10 @@ export function ReservationRow({
   selected?: boolean;
   /** Marca a linha como "agora" (gota). */
   now?: boolean;
-  /** Mostra a data antes do horário (listas que cruzam dias). */
+  /** Mostra a data no lugar do horário (listas que cruzam dias). */
   showDate?: React.ReactNode;
+  /** Força o layout de duas linhas (colunas estreitas). */
+  compact?: boolean;
 }) {
   const chips: React.ReactNode[] = [];
   if (r.tipo !== "mesa") chips.push(<Chip key="tipo">{TIPO_SHORT[r.tipo]}</Chip>);
@@ -42,6 +44,41 @@ export function ReservationRow({
   const pessoas = r.quantidade != null ? `${r.quantidade}` : "—";
   const area = r.area ? AREA_LABEL[r.area] : null;
   const dim = r.status === "cancelada" || r.status === "finalizada";
+  const time = (
+    <span className="flex items-center gap-1.5 text-[15px] font-extrabold tabular-nums text-foreground">
+      {now && <Drop animate />}
+      {showDate ?? horario}
+    </span>
+  );
+
+  // Duas linhas: horário | nome / status · pessoas · área.
+  const narrow = (
+    <div className={cn("grid grid-cols-[3.25rem_minmax(0,1fr)] items-center gap-x-3", compact ? "" : "lg:hidden")}>
+      {time}
+      <span className="min-w-0">
+        <span className="block truncate text-[15px] font-semibold text-foreground">{r.nome}</span>
+        <span className="mt-1 flex min-w-0 items-center gap-2 text-[13px] text-muted-foreground">
+          <ReservationStatus status={r.status} className="h-[22px] shrink-0 px-2 text-[11px]" />
+          <span className="inline-flex shrink-0 items-center gap-1 tabular-nums">{compact ? <><Users className="h-3.5 w-3.5" aria-label="pessoas" />{pessoas}</> : <>{pessoas} pess.</>}</span>
+          {area && <span className={cn("truncate", action && "hidden sm:inline", compact && "hidden")}>· {area}</span>}
+        </span>
+      </span>
+    </div>
+  );
+
+  // Colunas alinhadas (desktop).
+  const wide = compact ? null : (
+    <div className="hidden grid-cols-[3.75rem_minmax(0,1fr)_3.25rem_5rem_7.5rem] items-center gap-x-3 lg:grid">
+      {time}
+      <span className="min-w-0">
+        <span className="block truncate text-[15px] font-semibold text-foreground">{r.nome}</span>
+        {chips.length > 0 && <span className="mt-1 flex flex-wrap gap-1">{chips}</span>}
+      </span>
+      <span className="text-right text-sm tabular-nums text-muted-foreground">{pessoas} <span className="text-xs">pess.</span></span>
+      <span className="truncate text-sm text-muted-foreground">{area ?? ""}</span>
+      <span><ReservationStatus status={r.status} /></span>
+    </div>
+  );
 
   return (
     <div
@@ -55,33 +92,10 @@ export function ReservationRow({
         onClick={onOpen}
         aria-label={`Abrir reserva de ${r.nome}`}
         aria-current={selected ? "true" : undefined}
-        className={cn(
-          "grid min-w-0 flex-1 items-center gap-x-3 gap-y-0.5 px-4 py-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring",
-          // mobile: horário | nome + pessoas / status ; desktop: colunas alinhadas
-          "grid-cols-[3.25rem_minmax(0,1fr)_auto] lg:grid-cols-[4rem_minmax(0,1fr)_3.5rem_7rem_8.5rem]",
-          dim && "opacity-70",
-        )}
+        className={cn("min-w-0 flex-1 overflow-hidden px-4 py-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring", dim && "opacity-70")}
       >
-        <span className="row-span-2 flex items-center gap-1.5 text-[15px] font-extrabold tabular-nums text-foreground lg:row-span-1">
-          {now && <Drop animate />}
-          {showDate ?? horario}
-        </span>
-
-        <span className="min-w-0">
-          <span className="block truncate text-[15px] font-semibold text-foreground">{r.nome}</span>
-          {chips.length > 0 && <span className="mt-1 hidden flex-wrap gap-1 lg:flex">{chips}</span>}
-        </span>
-
-        <span className="hidden text-right text-sm tabular-nums text-muted-foreground lg:block">{pessoas} <span className="text-xs">pess.</span></span>
-        <span className="hidden truncate text-sm text-muted-foreground lg:block">{area ?? ""}</span>
-
-        <span className="justify-self-end lg:justify-self-start"><ReservationStatus status={r.status} /></span>
-
-        <span className="col-start-2 col-end-4 flex min-w-0 items-center gap-x-2 text-[13px] text-muted-foreground lg:hidden">
-          <span className="shrink-0 tabular-nums">{pessoas} pess.</span>
-          {area && <span className="truncate">· {area}</span>}
-          {chips.length > 0 && <span className="flex gap-1">{chips.slice(0, 2)}</span>}
-        </span>
+        {narrow}
+        {wide}
       </button>
 
       {action && <div className="shrink-0 pr-3 lg:pr-4">{action}</div>}
