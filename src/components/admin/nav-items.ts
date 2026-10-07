@@ -4,8 +4,10 @@ import {
   CalendarDays,
   ClipboardList,
   Lightbulb,
+  Link2,
   Music,
   Settings,
+  UtensilsCrossed,
   Users,
 } from "lucide-react";
 
@@ -13,6 +15,8 @@ export type AdminTab =
   | "hoje"
   | "reservas"
   | "agenda"
+  | "cardapio"
+  | "links"
   | "eventos"
   | "relatorios"
   | "contatos"
@@ -51,6 +55,18 @@ export const NAV_EVENTOS: NavItem = {
   icon: Music,
   to: "/$slug/admin/eventos",
 };
+export const NAV_CARDAPIO: NavItem = {
+  id: "cardapio",
+  label: "Cardápio",
+  icon: UtensilsCrossed,
+  to: "/$slug/admin/cardapio",
+};
+export const NAV_LINKS: NavItem = {
+  id: "links",
+  label: "Link Hub",
+  icon: Link2,
+  to: "/$slug/admin/links",
+};
 export const NAV_CLIENTES: NavItem = {
   id: "contatos",
   label: "Clientes",
@@ -79,6 +95,7 @@ export const NAV_AJUSTES: NavItem = {
 /** Desktop: todos os destinos, nada deixa de ser alcançável. */
 export const SIDEBAR_GROUPS: NavItem[][] = [
   [NAV_HOJE, NAV_RESERVAS, NAV_AGENDA, NAV_EVENTOS],
+  [NAV_CARDAPIO, NAV_LINKS],
   [NAV_CLIENTES, NAV_RELATORIOS],
 ];
 export const SIDEBAR_FOOTER: NavItem[] = [NAV_SUGESTOES, NAV_AJUSTES];
@@ -87,6 +104,8 @@ export const SIDEBAR_FOOTER: NavItem[] = [NAV_SUGESTOES, NAV_AJUSTES];
 export const BOTTOM_ITEMS: NavItem[] = [NAV_HOJE, NAV_RESERVAS, NAV_AGENDA];
 export const MORE_ITEMS: NavItem[] = [
   NAV_EVENTOS,
+  NAV_CARDAPIO,
+  NAV_LINKS,
   NAV_CLIENTES,
   NAV_RELATORIOS,
   NAV_SUGESTOES,

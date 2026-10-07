@@ -26,6 +26,7 @@ import {
   type ReservaArea,
   type ReservaTipo,
 } from "@/lib/reservations";
+import { fetchHub } from "@/lib/hub";
 import { getTenantBySlug } from "@/lib/tenant";
 import { todayISO } from "@/lib/datetime";
 import { initFacebookPixel, trackFacebookEvent } from "@/lib/fbpixel";
@@ -74,6 +75,11 @@ function ReservarPage() {
     tipo: ReservaTipo;
   };
   const navigate = useNavigate();
+  const hubQ = useQuery({
+    queryKey: ["hub-publico", slug],
+    queryFn: () => fetchHub(slug),
+    staleTime: 60_000,
+  });
   const tenantQ = useQuery({
     queryKey: ["tenant", slug],
     queryFn: () => getTenantBySlug(slug),
@@ -255,6 +261,16 @@ function ReservarPage() {
           <p className="mt-2 text-sm text-muted-foreground">
             Preencha e nossa equipe confirmará em seguida.
           </p>
+          {hubQ.data?.cardapio_publicado && (
+            <a
+              href={`/${slug}/cardapio`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-flex min-h-11 items-center text-sm font-medium text-primary underline-offset-4 hover:underline"
+            >
+              Ver cardápio
+            </a>
+          )}
         </header>
 
         {isAniv && (

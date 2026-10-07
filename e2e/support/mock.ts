@@ -87,8 +87,65 @@ export function reserva(
   };
 }
 
-function fixtures(): { reservas: Row[]; bloqueios: Row[]; feriados: Row[]; eventos: Row[] } {
+type Fixtures = {
+  reservas: Row[];
+  bloqueios: Row[];
+  feriados: Row[];
+  eventos: Row[];
+  categorias: Row[];
+  itens: Row[];
+  perfil: Row[];
+  hubLinks: Row[];
+};
+
+function fixtures(): Fixtures {
   return {
+    categorias: [
+      { id: "c1", tenant_id: TENANT_ID, nome: "Pratos", descricao: null, ordem: 0, ativo: true },
+      { id: "c2", tenant_id: TENANT_ID, nome: "Bebidas", descricao: null, ordem: 1, ativo: true },
+    ],
+    itens: [
+      {
+        id: "i1",
+        tenant_id: TENANT_ID,
+        categoria_id: "c1",
+        nome: "Feijoada",
+        descricao: "Feijoada completa",
+        preco_centavos: 4590,
+        imagem_url: null,
+        ordem: 0,
+        ativo: true,
+      },
+      {
+        id: "i2",
+        tenant_id: TENANT_ID,
+        categoria_id: "c2",
+        nome: "Suco de laranja",
+        descricao: null,
+        preco_centavos: 1200,
+        imagem_url: null,
+        ordem: 0,
+        ativo: true,
+      },
+    ],
+    perfil: [
+      {
+        tenant_id: TENANT_ID,
+        instagram: "iracemabh",
+        cardapio_publicado: true,
+        hub_publicado: true,
+      },
+    ],
+    hubLinks: [
+      {
+        id: "h1",
+        tenant_id: TENANT_ID,
+        titulo: "Playlist",
+        url: "https://example.com/p",
+        ordem: 0,
+        ativo: true,
+      },
+    ],
     reservas: [
       reserva(1, "Marina Alves", "pendente", 0, "11:30:00", 4),
       reserva(2, "Rafael Lima", "confirmada", 0, "12:00:00", 2),
@@ -151,7 +208,7 @@ function sessionJson() {
 }
 
 export type Mock = {
-  state: ReturnType<typeof fixtures>;
+  state: Fixtures;
   mode: Mode;
   /** Chamadas de escrita (PATCH/POST/DELETE) e RPCs recebidas. */
   writes: Array<{ method: string; url: string; body: unknown }>;
@@ -167,7 +224,8 @@ function applyFilters(rows: Row[], url: URL): Row[] {
   let out = rows;
   for (const [k, v] of url.searchParams.entries()) {
     const m = v.match(/^(eq|neq|gte|lte|is)\.(.*)$/);
-    if (!m || !["data", "status", "tenant_id", "id", "reconfirmada_em"].includes(k)) continue;
+    if (!m || !["data", "status", "tenant_id", "id", "reconfirmada_em", "categoria_id"].includes(k))
+      continue;
     const [, op, val] = m;
     out = out.filter((r) => {
       const x = r[k];
@@ -257,6 +315,43 @@ export async function installMock(context: BrowserContext, initial: Mode = "data
         if (name === "has_role") return json(route, false);
         if (name === "criar_reserva") return json(route, "RL-TESTE1");
         if (name === "confirmar_reserva_sem_notificar") return json(route, mock.state.reservas[0]);
+        if (name === "cardapio_do_tenant") {
+          const perfil = mock.state.perfil[0];
+          if (mock.mode === "empty" || !perfil?.cardapio_publicado) return json(route, null);
+          const categorias = mock.state.categorias
+            .filter((c) => c.ativo)
+            .map((c) => ({
+              id: c.id,
+              nome: c.nome,
+              descricao: c.descricao,
+              itens: mock.state.itens
+                .filter((i) => i.categoria_id === c.id && i.ativo)
+                .map((i) => ({
+                  id: i.id,
+                  nome: i.nome,
+                  descricao: i.descricao,
+                  preco_centavos: i.preco_centavos,
+                  imagem_url: i.imagem_url,
+                })),
+            }));
+          return json(route, { nome: "Iracema", categorias });
+        }
+        if (name === "hub_do_tenant") {
+          const perfil = mock.state.perfil[0];
+          if (!perfil?.hub_publicado) return json(route, null);
+          return json(route, {
+            nome: "Iracema",
+            endereco: tenant.endereco,
+            whatsapp: tenant.whatsapp,
+            telefone: tenant.telefone_contato,
+            instagram: perfil.instagram,
+            cardapio_publicado: perfil.cardapio_publicado,
+            tipos_aceitos: tenant.tipos_aceitos,
+            links: mock.state.hubLinks
+              .filter((l) => l.ativo)
+              .map((l) => ({ id: l.id, titulo: l.titulo, url: l.url })),
+          });
+        }
         if (name === "bloqueios_do_tenant") return json(route, []);
         if (name === "feriados_do_tenant") return json(route, []);
         if (name === "proximo_evento_do_tenant") return json(route, []);
@@ -280,6 +375,32 @@ export async function installMock(context: BrowserContext, initial: Mode = "data
           for (const r of alvo) Object.assign(r, body as Row);
           return json(route, alvo, 200, { "content-range": `0-${alvo.length}/*` });
         }
+        const novas: Record<string, Row[]> = {
+          cardapio_categorias: mock.state.categorias,
+          cardapio_itens: mock.state.itens,
+          tenant_perfil: mock.state.perfil,
+          hub_links: mock.state.hubLinks,
+        };
+        const lista = novas[table];
+        if (lista) {
+          if (method === "POST") {
+            const b = body as Row;
+            const novo =
+              table === "tenant_perfil"
+                ? b
+                : { id: `n${lista.length + 1}${Date.now() % 1000}`, ativo: true, ...b };
+            if (table === "tenant_perfil" && lista[0]) Object.assign(lista[0], novo);
+            else lista.push(novo);
+          } else if (method === "PATCH") {
+            for (const r of applyFilters(lista, url)) Object.assign(r, body as Row);
+          } else if (method === "DELETE") {
+            const ids = new Set(applyFilters(lista, url).map((r) => r.id));
+            const restante = lista.filter((r) => !ids.has(r.id));
+            lista.length = 0;
+            lista.push(...restante);
+          }
+          return json(route, [], 201);
+        }
         if (table === "reservas" && method === "DELETE") {
           const ids = new Set(applyFilters(mock.state.reservas, url).map((r) => r.id));
           mock.state.reservas = mock.state.reservas.filter((r) => !ids.has(r.id));
@@ -301,6 +422,10 @@ export async function installMock(context: BrowserContext, initial: Mode = "data
             agenda_bloqueios: vazio ? [] : applyFilters(mock.state.bloqueios, url),
             feriados: vazio ? [] : applyFilters(mock.state.feriados, url),
             eventos_destaque: vazio ? [] : applyFilters(mock.state.eventos, url),
+            cardapio_categorias: applyFilters(mock.state.categorias, url),
+            cardapio_itens: applyFilters(mock.state.itens, url),
+            tenant_perfil: applyFilters(mock.state.perfil, url),
+            hub_links: applyFilters(mock.state.hubLinks, url),
           } as Record<string, Row[]>
         )[table] ?? [];
 
