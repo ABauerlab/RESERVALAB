@@ -66,3 +66,32 @@ export function contatosToCsv(contatos: Contato[]): string {
   ]);
   return [header, ...linhas].map((linha) => linha.map(csvCell).join(",")).join("\r\n");
 }
+
+export type OrdemContatos = "recentes" | "frequentes" | "nome";
+
+/** Filtra por nome ou telefone (só dígitos) e ordena. Não altera a lista original. */
+export function filtrarOrdenarContatos(
+  contatos: Contato[],
+  termo: string,
+  ordem: OrdemContatos,
+): Contato[] {
+  const t = termo.trim().toLowerCase();
+  const digitos = t.replace(/\D/g, "");
+  const lista = t
+    ? contatos.filter(
+        (c) =>
+          c.nome.toLowerCase().includes(t) ||
+          (digitos.length >= 3 && c.telefoneWhatsapp.includes(digitos)),
+      )
+    : [...contatos];
+  if (ordem === "frequentes") {
+    lista.sort(
+      (a, b) => b.reservas - a.reservas || (b.ultimaData ?? "").localeCompare(a.ultimaData ?? ""),
+    );
+  } else if (ordem === "nome") {
+    lista.sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+  } else {
+    lista.sort((a, b) => (b.ultimaData ?? "").localeCompare(a.ultimaData ?? ""));
+  }
+  return lista;
+}
