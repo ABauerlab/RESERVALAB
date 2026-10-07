@@ -131,7 +131,7 @@ function ConfiguracoesPage() {
 
         <section className="mt-6 space-y-5 animate-in-up">
           <div className="rounded-lg border border-border bg-card p-5 space-y-4">
-            <h3 className="font-medium">Identidade</h3>
+            <h3 className="font-semibold">Identidade</h3>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label className="text-[13px]">Nome do estabelecimento</Label>
@@ -155,7 +155,7 @@ function ConfiguracoesPage() {
           </div>
 
           <div className="rounded-lg border border-border bg-card p-5 space-y-4">
-            <h3 className="font-medium">Contato</h3>
+            <h3 className="font-semibold">Contato</h3>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label className="text-[13px]">Endereço</Label>
@@ -177,7 +177,7 @@ function ConfiguracoesPage() {
           </div>
 
           <div className="rounded-lg border border-border bg-card p-5">
-            <h3 className="font-medium">Tipos de reserva aceitos</h3>
+            <h3 className="font-semibold">Tipos de reserva aceitos</h3>
             <p className="mt-1 text-sm text-muted-foreground">Somente os selecionados aparecem para o cliente.</p>
             <div className="mt-4 flex flex-wrap gap-2">
               {TODOS_TIPOS.map((t) => {
@@ -200,7 +200,7 @@ function ConfiguracoesPage() {
 
           <div className="rounded-lg border border-border bg-card p-5 space-y-3">
             <div>
-              <h3 className="font-medium">Observação sobre áreas (reserva de mesa)</h3>
+              <h3 className="font-semibold">Observação sobre áreas (reserva de mesa)</h3>
               <p className="mt-1 text-sm text-muted-foreground">
                 Aparece na tela de reserva de mesa, junto ao campo "Área desejada". Use para listar as áreas da casa
                 e avisar que a escolhida não é garantida. Deixe em branco para não mostrar nada.
@@ -216,7 +216,7 @@ function ConfiguracoesPage() {
 
           <div className="rounded-lg border border-border bg-card p-5 space-y-4">
             <div>
-              <h3 className="font-medium">Horário-limite para reservas</h3>
+              <h3 className="font-semibold">Horário-limite para reservas</h3>
               <p className="mt-1 text-sm text-muted-foreground">
                 Último horário aceito para mesa/aniversário (capacidade normal, até 30 pessoas). Deixe em branco para não aplicar corte, além do horário de fechamento padrão.
               </p>
@@ -235,7 +235,7 @@ function ConfiguracoesPage() {
 
           <div className="rounded-lg border border-border bg-card p-5 space-y-3">
             <div>
-              <h3 className="font-medium">Pixel do Meta (Facebook/Instagram Ads)</h3>
+              <h3 className="font-semibold">Pixel do Meta (Facebook/Instagram Ads)</h3>
               <p className="mt-1 text-sm text-muted-foreground">
                 ID do pixel para medir conversões dos anúncios. Quando preenchido, a página desta empresa passa a
                 registrar PageView, um clique por tipo de reserva (Click_Reserva_Mesa, Click_Reserva_Aniversario,
@@ -253,7 +253,7 @@ function ConfiguracoesPage() {
           </div>
 
           <div className="rounded-lg border border-border bg-card p-5 space-y-3">
-            <h3 className="font-medium">Mensagem de confirmação (WhatsApp)</h3>
+            <h3 className="font-semibold">Mensagem de confirmação (WhatsApp)</h3>
             <p className="text-sm text-muted-foreground">
               Texto enviado ao cliente ao confirmar a reserva. Sem emoji, apenas texto.
             </p>
@@ -265,7 +265,7 @@ function ConfiguracoesPage() {
                   type="button"
                   onClick={() => setMensagem((m) => `${m}${p.token}`)}
                   title={p.descricao}
-                  className="rounded-md bg-muted px-2 py-1 font-mono text-[11px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  className="rounded-md bg-muted px-2 py-1 font-mono text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                 >
                   {p.token}
                 </button>
@@ -281,7 +281,7 @@ function ConfiguracoesPage() {
           </div>
 
           <div className="rounded-lg border border-border bg-card p-5 space-y-3">
-            <h3 className="font-medium">Mensagem de cancelamento (WhatsApp)</h3>
+            <h3 className="font-semibold">Mensagem de cancelamento (WhatsApp)</h3>
             <p className="text-sm text-muted-foreground">
               Texto enviado ao cliente quando uma reserva é cancelada pelo painel. Sempre inclui um link para o cliente fazer uma nova reserva.
             </p>
@@ -293,7 +293,7 @@ function ConfiguracoesPage() {
                   type="button"
                   onClick={() => setMensagemCancelamento((m) => `${m}${p.token}`)}
                   title={p.descricao}
-                  className="rounded-md bg-muted px-2 py-1 font-mono text-[11px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  className="rounded-md bg-muted px-2 py-1 font-mono text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                 >
                   {p.token}
                 </button>
@@ -310,7 +310,7 @@ function ConfiguracoesPage() {
 
           <div className="rounded-lg border border-border bg-card p-5 space-y-3">
             <div>
-              <h3 className="font-medium">Mensagem de reconfirmação (WhatsApp)</h3>
+              <h3 className="font-semibold">Mensagem de reconfirmação (WhatsApp)</h3>
               <p className="text-sm text-muted-foreground">
                 Texto enviado ao clicar em "Reconfirmar + WhatsApp" numa reserva já confirmada — use perto do dia do
                 evento para reduzir faltas, pedindo que o cliente confirme presença de novo.
@@ -324,7 +324,7 @@ function ConfiguracoesPage() {
                   type="button"
                   onClick={() => setMensagemReconfirmacao((m) => `${m}${p.token}`)}
                   title={p.descricao}
-                  className="rounded-md bg-muted px-2 py-1 font-mono text-[11px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  className="rounded-md bg-muted px-2 py-1 font-mono text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                 >
                   {p.token}
                 </button>
@@ -340,7 +340,7 @@ function ConfiguracoesPage() {
           </div>
 
           <div className="rounded-lg border border-border bg-card p-5">
-            <h3 className="font-medium">Segurança</h3>
+            <h3 className="font-semibold">Segurança</h3>
             <p className="mt-1 text-sm text-muted-foreground">Altere a senha de acesso a este painel.</p>
             <Link
               to="/$slug/admin/trocar-senha"

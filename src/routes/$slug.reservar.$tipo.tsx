@@ -242,7 +242,7 @@ function ReservarPage() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="rounded-lg bg-card p-4">
-                <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-terracotta">
+                <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">
                   <UtensilsCrossed className="h-3.5 w-3.5" /> Petiscos
                 </p>
                 <ul className="mt-2.5 space-y-1 text-sm text-muted-foreground">
@@ -256,7 +256,7 @@ function ReservarPage() {
               </div>
 
               <div className="rounded-lg bg-card p-4">
-                <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-terracotta">
+                <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">
                   <Beer className="h-3.5 w-3.5" /> Bebidas
                 </p>
                 <ul className="mt-2.5 space-y-1 text-sm text-muted-foreground">
@@ -269,7 +269,7 @@ function ReservarPage() {
             </div>
 
             <div className="rounded-lg bg-card p-4">
-              <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-terracotta">
+              <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">
                 <Receipt className="h-3.5 w-3.5" /> Valores (5 horas de evento)
               </p>
               <ul className="mt-2.5 space-y-1.5 text-sm">
@@ -407,7 +407,7 @@ function Field({ label, children, hint }: { label: string; children: React.React
     <div className="space-y-2">
       <Label className="text-[13px] font-medium text-foreground">{label}</Label>
       {children}
-      {hint && <p className="text-[11px] text-muted-foreground">{hint}</p>}
+      {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
     </div>
   );
 }

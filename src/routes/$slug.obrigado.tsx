@@ -55,7 +55,7 @@ function Obrigado() {
 
         {codigo && (
           <div className="mt-8 rounded-lg border border-border bg-card p-5 text-left">
-            <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
               Código de acompanhamento
             </p>
             <div className="mt-2 flex items-center justify-between gap-3">

@@ -109,7 +109,7 @@ function SugestoesPage() {
         </section>
 
         <section className="mt-8">
-          <h3 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Enviadas</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Enviadas</h3>
           {listaQ.isLoading ? (
             <div className="mt-6 flex justify-center"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
           ) : (listaQ.data?.length ?? 0) === 0 ? (
@@ -123,7 +123,7 @@ function SugestoesPage() {
                 <li key={f.id} className="rounded-lg border border-border bg-card p-4">
                   <div className="flex items-start justify-between gap-3">
                     <p className="font-medium">{f.titulo}</p>
-                    <span className="shrink-0 rounded-full bg-muted px-2.5 py-1 text-[11px] text-muted-foreground">
+                    <span className="shrink-0 rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">
                       {STATUS_TXT[f.status] ?? f.status}
                     </span>
                   </div>

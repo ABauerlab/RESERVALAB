@@ -472,7 +472,7 @@ function StatCard({ icon: Icon, label, value, loading, accent }: { icon: React.C
     <div className={`rounded-lg border border-border bg-card p-4 transition-colors ${accent ? "bg-cream" : ""}`}>
       <div className="flex items-center gap-2">
         <Icon className={`h-3.5 w-3.5 ${accent ? "text-terracotta" : "text-muted-foreground"}`} />
-        <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">{label}</p>
       </div>
       <p className="mt-2.5 font-serif text-3xl tabular-nums text-foreground">
         {loading ? <span className="inline-block h-7 w-8 rounded shimmer" /> : (value ?? 0)}
@@ -513,7 +513,7 @@ function ReservaCard({ r, onClick, delay }: { r: Reserva; onClick: () => void; d
               {r.data ? ` • ${formatData(r.data)}` : ""}
               {r.horario ? ` às ${formatHorario(r.horario)}` : ""}
             </p>
-            <p className="mt-0.5 truncate text-[11px] font-mono text-muted-foreground">{r.codigo_acompanhamento}</p>
+            <p className="mt-0.5 truncate text-xs font-mono text-muted-foreground">{r.codigo_acompanhamento}</p>
           </div>
         </div>
         <StatusPill status={r.status} />
@@ -591,7 +591,7 @@ function ReservaDialog({
         {r && (
           <>
             <DialogHeader className="border-b border-border/70 p-5 text-left">
-              <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start justify-between gap-3 pr-8">
                 <div className="min-w-0">
                   <DialogTitle className="truncate font-serif font-semibold text-2xl tracking-tight">{r.nome}</DialogTitle>
                   <DialogDescription className="mt-1 text-[13px] text-muted-foreground">
@@ -625,7 +625,7 @@ function ReservaDialog({
                   {r.comandas !== null && r.tipo === "aniversario" && (<DetailRow icon={Check} label="Comandas individuais" value={r.comandas ? "Sim" : "Não"} />)}
                   {r.observacoes && (
                     <div className="rounded-lg bg-muted p-3.5">
-                      <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Observações</p>
+                      <p className="mb-1 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Observações</p>
                       <p className="leading-relaxed text-foreground">{r.observacoes}</p>
                     </div>
                   )}
@@ -665,7 +665,7 @@ function ReservaDialog({
                     <div className="grid w-full grid-cols-1 gap-1.5">
                       <ActionBtn disabled={pending} onClick={onReconfirm} icon={BellRing}>Reconfirmar + WhatsApp</ActionBtn>
                       {r.reconfirmada_em && (
-                        <p className="text-center text-[11px] text-muted-foreground">
+                        <p className="text-center text-xs text-muted-foreground">
                           Última reconfirmação enviada em {new Date(r.reconfirmada_em).toLocaleString("pt-BR")}
                         </p>
                       )}

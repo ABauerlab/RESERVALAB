@@ -368,7 +368,7 @@ function MasterFeedbacks() {
                       <button
                         key={s}
                         onClick={() => atualizar.mutate({ id: f.id, status: s })}
-                        className={`h-8 rounded-full px-3 text-[11px] font-medium transition-all ${
+                        className={`h-8 rounded-full px-3 text-xs font-medium transition-all ${
                           f.status === s ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-accent"
                         }`}
                       >
@@ -463,7 +463,7 @@ function AcessosDialog({ tenant, onClose }: { tenant: { id: string; nome: string
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium">{a.email}</p>
-                    <p className="mt-0.5 text-[11px] text-muted-foreground">
+                    <p className="mt-0.5 text-xs text-muted-foreground">
                       {a.must_change_password ? "Senha provisória" : "Senha definida"} ·{" "}
                       {a.last_sign_in_at ? `último acesso ${new Date(a.last_sign_in_at).toLocaleDateString("pt-BR")}` : "nunca acessou"}
                     </p>
@@ -475,13 +475,13 @@ function AcessosDialog({ tenant, onClose }: { tenant: { id: string; nome: string
                         if (nova && nova.length >= 6) redefinirM.mutate({ user_id: a.user_id, senha: nova });
                         else if (nova) toast.error("Senha muito curta.");
                       }}
-                      className="inline-flex h-8 items-center gap-1 rounded-md border border-border bg-background px-2.5 text-[11px] font-medium hover:bg-accent"
+                      className="inline-flex h-8 items-center gap-1 rounded-md border border-border bg-background px-2.5 text-xs font-medium hover:bg-accent"
                     >
                       <KeyRound className="h-3.5 w-3.5" /> Senha
                     </button>
                     <button
                       onClick={() => { if (window.confirm(`Remover o acesso de ${a.email}?`)) removerM.mutate(a.role_id); }}
-                      className="inline-flex h-8 items-center gap-1 rounded-md border border-border bg-background px-2.5 text-[11px] font-medium text-destructive hover:bg-destructive/10"
+                      className="inline-flex h-8 items-center gap-1 rounded-md border border-border bg-background px-2.5 text-xs font-medium text-destructive hover:bg-destructive/10"
                     >
                       <Trash2 className="h-3.5 w-3.5" /> Remover
                     </button>

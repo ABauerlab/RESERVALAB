@@ -128,7 +128,7 @@ function ReservaEdit({ reserva, onUpdated }: { reserva: Reserva; onUpdated: (r: 
       <div className="rounded-lg border border-border bg-card p-5">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{TIPO_LABEL[reserva.tipo]}</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">{TIPO_LABEL[reserva.tipo]}</p>
             <p className="mt-1 font-serif font-semibold text-2xl text-foreground">{reserva.nome}</p>
           </div>
           <StatusPill status={reserva.status} />
@@ -148,7 +148,7 @@ function ReservaEdit({ reserva, onUpdated }: { reserva: Reserva; onUpdated: (r: 
       ) : (
         <>
           <div className="rounded-lg border border-border bg-card p-5 space-y-4">
-            <h2 className="font-medium">Alterar dados</h2>
+            <h2 className="font-semibold">Alterar dados</h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label className="text-[13px]">Data</Label>

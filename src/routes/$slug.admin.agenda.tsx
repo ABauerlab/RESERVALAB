@@ -156,7 +156,7 @@ function AgendaPage() {
         </header>
 
         <section className="mt-6 rounded-lg border border-border bg-card p-5 animate-in-up">
-          <h3 className="font-medium">Novo bloqueio</h3>
+          <h3 className="font-semibold">Novo bloqueio</h3>
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label className="text-[13px]">Data</Label>
@@ -180,7 +180,7 @@ function AgendaPage() {
               <div className="space-y-2">
                 <Label className="text-[13px]">Até</Label>
                 <Input type="time" value={horaFim} onChange={(e) => setHoraFim(e.target.value)} className="h-11 rounded-md" />
-                <p className="text-[11px] text-muted-foreground">Deixe em branco para bloquear até o fim do dia.</p>
+                <p className="text-xs text-muted-foreground">Deixe em branco para bloquear até o fim do dia.</p>
               </div>
             </div>
           )}
@@ -197,7 +197,7 @@ function AgendaPage() {
         </section>
 
         <section className="mt-8">
-          <h3 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Bloqueios ativos</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Bloqueios ativos</h3>
           {bloqueiosQ.isLoading ? (
             <div className="mt-6 flex justify-center"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
           ) : (bloqueiosQ.data?.length ?? 0) === 0 ? (
@@ -237,7 +237,7 @@ function AgendaPage() {
         </section>
 
         <section className="mt-10 rounded-lg border border-border bg-card p-5 animate-in-up">
-          <h3 className="font-medium">Feriados</h3>
+          <h3 className="font-semibold">Feriados</h3>
           <p className="mt-1 text-sm text-muted-foreground">
             Uma data marcada como feriado passa a usar os horários de fim de semana (janela e horário-limite),
             mesmo caindo num dia de semana.
@@ -259,7 +259,7 @@ function AgendaPage() {
         </section>
 
         <section className="mt-6">
-          <h3 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Próximos feriados</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Próximos feriados</h3>
           {feriadosQ.isLoading ? (
             <div className="mt-6 flex justify-center"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
           ) : (feriadosQ.data?.length ?? 0) === 0 ? (

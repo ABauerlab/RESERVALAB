@@ -152,7 +152,7 @@ function ContatosPage() {
               <div className="max-h-[520px] overflow-y-auto">
                 <table className="w-full text-sm">
                   <thead className="sticky top-0 bg-muted/70 backdrop-blur-sm">
-                    <tr className="text-left text-[11px] uppercase tracking-wider text-muted-foreground">
+                    <tr className="text-left text-xs uppercase tracking-[0.08em] text-muted-foreground">
                       <th className="px-4 py-2.5 font-medium">Nome</th>
                       <th className="px-4 py-2.5 font-medium">Telefone</th>
                       <th className="px-4 py-2.5 font-medium">Reservas</th>

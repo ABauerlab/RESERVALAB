@@ -126,7 +126,7 @@ function AdminLogin() {
             </Button>
           </form>
 
-          <p className="mt-5 text-center text-[11px] text-muted-foreground">
+          <p className="mt-5 text-center text-xs text-muted-foreground">
             Precisa de acesso? Fale com o administrador master.
           </p>
         </div>

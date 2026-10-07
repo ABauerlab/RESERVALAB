@@ -86,7 +86,7 @@ function TrocarSenha() {
             <div className="space-y-2">
               <Label className="text-[13px]">Nova senha</Label>
               <Input type="password" value={nova} onChange={(e) => setNova(e.target.value)} autoComplete="new-password" required minLength={6} className="h-12 rounded-md" />
-              <p className={`text-[11px] ${forte ? "text-muted-foreground" : "text-muted-foreground"}`}>
+              <p className={`text-xs ${forte ? "text-muted-foreground" : "text-muted-foreground"}`}>
                 Mínimo de 6 caracteres. Recomendado: 8+, com letras e números.
               </p>
             </div>
@@ -94,7 +94,7 @@ function TrocarSenha() {
               <Label className="text-[13px]">Confirmar nova senha</Label>
               <Input type="password" value={confirma} onChange={(e) => setConfirma(e.target.value)} autoComplete="new-password" required minLength={6} className="h-12 rounded-md" />
               {confirma.length > 0 && confirma !== nova && (
-                <p className="text-[11px] text-destructive">As senhas não conferem.</p>
+                <p className="text-xs text-destructive">As senhas não conferem.</p>
               )}
             </div>
 

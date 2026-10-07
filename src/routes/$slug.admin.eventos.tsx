@@ -119,7 +119,7 @@ function EventosPage() {
         </header>
 
         <section className="mt-6 rounded-lg border border-border bg-card p-5 animate-in-up">
-          <h3 className="font-medium">Novo evento</h3>
+          <h3 className="font-semibold">Novo evento</h3>
           <div className="mt-4 space-y-4">
             <div className="space-y-2">
               <Label className="text-[13px]">Título</Label>
@@ -154,7 +154,7 @@ function EventosPage() {
         </section>
 
         <section className="mt-8">
-          <h3 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Próximos eventos</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Próximos eventos</h3>
           {eventosQ.isLoading ? (
             <div className="mt-6 flex justify-center"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
           ) : futuros.length === 0 ? (
@@ -171,7 +171,7 @@ function EventosPage() {
                     <div className="flex items-center gap-2">
                       <p className="font-medium">{e.titulo}</p>
                       {i === 0 && (
-                        <span className="rounded-full bg-terracotta/15 px-2 py-0.5 text-[10px] font-medium text-terracotta">No ar agora</span>
+                        <span className="rounded-full bg-terracotta/15 px-2 py-0.5 text-xs font-medium text-terracotta">No ar agora</span>
                       )}
                     </div>
                     <p className="text-sm text-muted-foreground">
@@ -193,7 +193,7 @@ function EventosPage() {
 
         {passados.length > 0 && (
           <section className="mt-8">
-            <h3 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Já realizados</h3>
+            <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Já realizados</h3>
             <ul className="mt-4 space-y-2.5">
               {passados.map((e: EventoRow) => (
                 <li key={e.id} className="flex items-center gap-3 rounded-lg border border-border bg-card/60 p-4 opacity-70">
