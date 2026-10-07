@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { AREA_LABEL, formatHorario, type Reserva, type ReservaArea } from "@/lib/reservations";
+import { todayISO } from "@/lib/datetime";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,11 +27,6 @@ const DIAS = [
   "SEXTA-FEIRA",
   "SÁBADO",
 ];
-
-function todayISO() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
 
 function parseISO(iso: string) {
   const [y, m, d] = iso.split("-").map(Number);

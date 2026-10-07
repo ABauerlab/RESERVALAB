@@ -2,6 +2,7 @@ import { CalendarHeart, CalendarX2, Loader2, Plus, Trash2 } from "lucide-react";
 
 import { useAgendaConfig } from "@/hooks/use-agenda-config";
 import { formatData, formatHorario } from "@/lib/reservations";
+import { todayISO } from "@/lib/datetime";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -45,7 +46,7 @@ export function AgendaGestao({ tenantId }: { tenantId: string | null }) {
             <Label className="text-[13px]">Data</Label>
             <Input
               type="date"
-              min={new Date().toISOString().slice(0, 10)}
+              min={todayISO()}
               value={data}
               onChange={(e) => setData(e.target.value)}
               className="h-11 rounded-md"
@@ -180,7 +181,7 @@ export function AgendaGestao({ tenantId }: { tenantId: string | null }) {
             <Label className="text-[13px]">Data</Label>
             <Input
               type="date"
-              min={new Date().toISOString().slice(0, 10)}
+              min={todayISO()}
               value={feriadoData}
               onChange={(e) => setFeriadoData(e.target.value)}
               className="h-11 rounded-md"

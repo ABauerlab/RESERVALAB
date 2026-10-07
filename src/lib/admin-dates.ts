@@ -1,44 +1,31 @@
-// Mesmos helpers de data que o painel já usava (ISO yyyy-mm-dd). Mantidos como estavam
-// para que filtros e contagens sigam exatamente iguais.
-export function todayISO() {
-  return new Date().toISOString().slice(0, 10);
-}
+import { addDaysISO, agoraHHMM, todayISO, weekdayIndexISO } from "@/lib/datetime";
+
+// Datas do painel (ISO yyyy-mm-dd). "Hoje" e "agora" vem de `datetime.ts`
+// (America/Sao_Paulo), a fonte unica; aqui ficam so os atalhos usados pelas telas.
+export { addDaysISO, todayISO };
+
 export function tomorrowISO() {
   return addDaysISO(todayISO(), 1);
 }
 export function endOfWeekISO() {
-  const d = new Date();
-  d.setDate(d.getDate() + 7);
-  return d.toISOString().slice(0, 10);
+  return addDaysISO(todayISO(), 7);
 }
 export function endOfMonthISO() {
-  const d = new Date();
-  d.setDate(d.getDate() + 30);
-  return d.toISOString().slice(0, 10);
-}
-
-/** Soma dias a uma data ISO sem depender de fuso. */
-export function addDaysISO(iso: string, days: number): string {
-  const [y, m, d] = iso.split("-").map(Number);
-  const dt = new Date(Date.UTC(y, m - 1, d + days));
-  return dt.toISOString().slice(0, 10);
+  return addDaysISO(todayISO(), 30);
 }
 
 const SEMANA = ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"];
 const SEMANA_CURTO = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
 
 export function weekdayLabel(iso: string, short = false): string {
-  const [y, m, d] = iso.split("-").map(Number);
-  const i = new Date(Date.UTC(y, m - 1, d)).getUTCDay();
+  const i = weekdayIndexISO(iso);
   return short ? SEMANA_CURTO[i] : SEMANA[i];
 }
 
-/** Data e hora locais do navegador (usadas só para a marca "agora"). */
-export function localISO(d = new Date()) {
-  const p = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+/** Data e hora de agora no fuso do produto (marca "agora" da linha do servico e da Agenda). */
+export function localISO() {
+  return todayISO();
 }
-export function localHHMM(d = new Date()) {
-  const p = (n: number) => String(n).padStart(2, "0");
-  return `${p(d.getHours())}:${p(d.getMinutes())}`;
+export function localHHMM() {
+  return agoraHHMM();
 }

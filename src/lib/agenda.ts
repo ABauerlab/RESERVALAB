@@ -49,7 +49,7 @@ export function weekRange(selectedDay: string): WeekRange {
 
 /**
  * Dia selecionado a partir do `?dia=`. Sem parâmetro (ou inválido), usa `fallback`.
- * `fallback` padrão é `todayISO()`, mantido como está (UTC) até a correção central.
+ * `fallback` padrão é `todayISO()` (America/Sao_Paulo).
  */
 export function resolveSelectedDay(dia: unknown, fallback: string = todayISO()): string {
   return parseDiaParam(dia) ?? fallback;
