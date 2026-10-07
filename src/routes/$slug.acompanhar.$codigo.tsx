@@ -41,7 +41,7 @@ import {
 
 export const Route = createFileRoute("/$slug/acompanhar/$codigo")({
   head: () => ({
-    meta: [{ title: "Sua reserva — ReservaLab" }, { name: "robots", content: "noindex" }],
+    meta: [{ title: "Sua reserva | Teggly" }, { name: "robots", content: "noindex" }],
   }),
   ssr: false,
   component: AcompanharDetalhes,
@@ -67,13 +67,13 @@ function AcompanharDetalhes() {
         <Link
           to="/$slug/acompanhar"
           params={{ slug }}
-          className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          className="inline-flex min-h-11 items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           <ChevronLeft className="h-4 w-4" /> Outra consulta
         </Link>
 
         <header className="mt-6 animate-fade">
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-terracotta">
+          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">
             Acompanhar
           </p>
           <h1 className="mt-3 font-serif text-4xl leading-tight tracking-tight">
@@ -86,8 +86,8 @@ function AcompanharDetalhes() {
             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
           </div>
         ) : !reservaQ.data ? (
-          <div className="mt-8 rounded-2xl border border-dashed border-border bg-card/50 py-14 text-center">
-            <p className="font-serif text-2xl text-foreground">Não encontramos</p>
+          <div className="mt-8 rounded-lg border border-dashed border-border bg-card/50 py-14 text-center">
+            <p className="font-serif font-semibold text-2xl text-foreground">Não encontramos</p>
             <p className="mt-1 text-sm text-muted-foreground">Confira o código digitado.</p>
           </div>
         ) : (
@@ -166,13 +166,13 @@ function ReservaEdit({
 
   return (
     <div className="mt-6 space-y-5 animate-in-up">
-      <div className="rounded-2xl border border-border bg-card p-5">
+      <div className="rounded-lg border border-border bg-card p-5">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
               {TIPO_LABEL[reserva.tipo]}
             </p>
-            <p className="mt-1 font-serif text-2xl text-foreground">{reserva.nome}</p>
+            <p className="mt-1 font-serif font-semibold text-2xl text-foreground">{reserva.nome}</p>
           </div>
           <StatusPill status={reserva.status} />
         </div>
@@ -199,14 +199,14 @@ function ReservaEdit({
       </div>
 
       {bloqueada ? (
-        <p className="rounded-xl border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
+        <p className="rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
           Esta reserva está {STATUS_LABEL[reserva.status].toLowerCase()} e não pode mais ser
           alterada. Para uma nova solicitação, faça uma reserva.
         </p>
       ) : (
         <>
-          <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
-            <h2 className="font-medium">Alterar dados</h2>
+          <div className="rounded-lg border border-border bg-card p-5 space-y-4">
+            <h2 className="font-semibold">Alterar dados</h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label className="text-[13px]">Data</Label>
@@ -214,7 +214,7 @@ function ReservaEdit({
                   type="date"
                   value={data}
                   onChange={(e) => setData(e.target.value)}
-                  className="h-11 rounded-xl"
+                  className="h-11 rounded-md"
                 />
               </div>
               <div className="space-y-2">
@@ -223,7 +223,7 @@ function ReservaEdit({
                   type="time"
                   value={horario}
                   onChange={(e) => setHorario(e.target.value)}
-                  className="h-11 rounded-xl"
+                  className="h-11 rounded-md"
                 />
               </div>
             </div>
@@ -236,7 +236,7 @@ function ReservaEdit({
                   max={5000}
                   value={quantidade}
                   onChange={(e) => setQuantidade(e.target.value.replace(/\D/g, ""))}
-                  className="h-11 rounded-xl"
+                  className="h-11 rounded-md"
                 />
               </div>
               {reserva.tipo === "mesa" && (
@@ -246,7 +246,7 @@ function ReservaEdit({
                     value={area || undefined}
                     onValueChange={(v) => setArea(v as ReservaArea)}
                   >
-                    <SelectTrigger className="h-11 rounded-xl">
+                    <SelectTrigger className="h-11 rounded-md">
                       <SelectValue placeholder="Sem preferência" />
                     </SelectTrigger>
                     <SelectContent>
@@ -273,7 +273,7 @@ function ReservaEdit({
               <Textarea
                 value={observacoes}
                 onChange={(e) => setObservacoes(e.target.value)}
-                className="min-h-24 rounded-xl"
+                className="min-h-24 rounded-md"
               />
             </div>
           </div>
@@ -281,7 +281,7 @@ function ReservaEdit({
           <Button
             onClick={() => salvar.mutate()}
             disabled={salvar.isPending}
-            className="h-12 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+            className="h-12 w-full rounded-md bg-primary text-primary-foreground hover:bg-blue-700"
           >
             {salvar.isPending ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -296,7 +296,7 @@ function ReservaEdit({
               <Button
                 variant="outline"
                 disabled={cancelar.isPending}
-                className="h-12 w-full rounded-xl border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                className="h-12 w-full rounded-md border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive"
               >
                 {cancelar.isPending ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -333,14 +333,14 @@ function ReservaEdit({
 
 function StatusPill({ status }: { status: ReservaStatus }) {
   const styles: Record<ReservaStatus, string> = {
-    pendente: "bg-warning/15 text-[oklch(0.45_0.11_65)]",
-    confirmada: "bg-success/15 text-[oklch(0.4_0.12_150)]",
-    cancelada: "bg-destructive/12 text-destructive",
-    finalizada: "bg-muted text-muted-foreground",
+    pendente: "bg-warning-50 text-warning-700 before:bg-warning-500",
+    confirmada: "bg-success-50 text-success-700 before:bg-success-500",
+    cancelada: "bg-error-50 text-error-700 before:bg-error-500",
+    finalizada: "bg-muted text-muted-foreground before:bg-slate-400",
   };
   return (
     <span
-      className={`inline-flex h-6 items-center rounded-full px-2.5 text-[11px] font-medium ${styles[status]}`}
+      className={`inline-flex h-[26px] items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 text-xs font-semibold before:size-[7px] before:rounded-full before:content-[''] ${styles[status]}`}
     >
       {STATUS_LABEL[status]}
     </span>

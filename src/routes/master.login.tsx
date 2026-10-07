@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/master/login")({
   head: () => ({
-    meta: [{ title: "Master — ReservaLab" }, { name: "robots", content: "noindex" }],
+    meta: [{ title: "Master | Teggly" }, { name: "robots", content: "noindex" }],
     links: pwaHeadLinks("/master", "Master"),
   }),
   ssr: false,
@@ -86,13 +86,17 @@ function MasterLogin() {
     <main className="flex min-h-screen items-center justify-center bg-background px-5 safe-top safe-bottom">
       <div className="w-full max-w-sm animate-in-up">
         <Link to="/" className="mb-10 block text-center">
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-terracotta">
-            ReservaLab
-          </p>
+          <img
+            src="/brand/Teggly_Logo_Primary.svg"
+            alt="Teggly"
+            width={134}
+            height={32}
+            className="mx-auto h-8 w-auto"
+          />
           <p className="mt-1 text-xs text-muted-foreground">Painel master</p>
         </Link>
 
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-md)]">
+        <div className="rounded-lg border border-border bg-card p-6 shadow-[var(--shadow-md)]">
           <h1 className="font-serif text-3xl tracking-tight">Master</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Acesso restrito ao administrador da plataforma.
@@ -106,7 +110,7 @@ function MasterLogin() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="h-12 rounded-xl"
+                className="h-12 rounded-md"
               />
             </div>
             <div className="space-y-2">
@@ -117,14 +121,14 @@ function MasterLogin() {
                 onChange={(e) => setSenha(e.target.value)}
                 required
                 minLength={6}
-                className="h-12 rounded-xl"
+                className="h-12 rounded-md"
               />
             </div>
 
             <Button
               type="submit"
               disabled={loading || booting}
-              className="h-12 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+              className="h-12 w-full rounded-md bg-primary text-primary-foreground hover:bg-blue-700"
             >
               {loading || booting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Entrar"}
             </Button>

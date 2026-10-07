@@ -144,7 +144,7 @@ export function MensagemDoDiaButton({ tenantId }: { tenantId: string | null }) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-accent"
+        className="inline-flex h-11 items-center gap-2 rounded-full border border-border bg-card px-3.5 text-xs font-semibold text-foreground transition-colors hover:bg-accent xl:h-9"
       >
         <MessageSquareText className="h-3.5 w-3.5 text-terracotta" /> Gerar mensagem do dia
       </button>
@@ -157,7 +157,7 @@ export function MensagemDoDiaButton({ tenantId }: { tenantId: string | null }) {
           </DialogHeader>
 
           <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-1 rounded-xl bg-muted p-1">
+            <div className="grid grid-cols-2 gap-1 rounded-[12px] bg-muted p-1">
               {(
                 [
                   ["dia", "Somente o dia"],
@@ -167,7 +167,7 @@ export function MensagemDoDiaButton({ tenantId }: { tenantId: string | null }) {
                 <button
                   key={v}
                   onClick={() => setModo(v)}
-                  className={`rounded-lg px-3 py-2 text-xs font-medium transition-colors ${
+                  className={`min-h-11 rounded-lg px-3 py-2 text-xs font-medium transition-colors ${
                     modo === v
                       ? "bg-card text-foreground shadow-sm"
                       : "text-muted-foreground hover:text-foreground"
@@ -200,7 +200,7 @@ export function MensagemDoDiaButton({ tenantId }: { tenantId: string | null }) {
                 </Button>
               </>
             ) : (
-              <p className="rounded-xl bg-muted px-4 py-6 text-center text-sm text-muted-foreground">
+              <p className="rounded-lg bg-muted px-4 py-6 text-center text-sm text-muted-foreground">
                 Nenhuma reserva encontrada para esse período
               </p>
             )}

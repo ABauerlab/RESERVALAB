@@ -15,7 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 export const Route = createFileRoute("/$slug/admin/sugestoes")({
   head: ({ params }) => ({
-    meta: [{ title: "Sugestões — ReservaLab" }, { name: "robots", content: "noindex" }],
+    meta: [{ title: "Sugestões | Teggly" }, { name: "robots", content: "noindex" }],
     links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),
   }),
   ssr: false,
@@ -27,6 +27,14 @@ const STATUS_TXT: Record<string, string> = {
   em_analise: "Em análise",
   feito: "Implementada",
   recusado: "Não será feita",
+};
+
+// Pilulas de status no padrao Teggly: fundo 50, ponto 500, texto 700.
+const STATUS_TONE: Record<string, string> = {
+  novo: "bg-accent text-accent-foreground before:bg-blue-500",
+  em_analise: "bg-warning-50 text-warning-700 before:bg-warning-500",
+  feito: "bg-success-50 text-success-700 before:bg-success-500",
+  recusado: "bg-error-50 text-error-700 before:bg-error-500",
 };
 
 function SugestoesPage() {
@@ -88,18 +96,18 @@ function SugestoesPage() {
         <header className="animate-fade">
           <h2 className="font-serif text-3xl tracking-tight">Sugestões de melhoria</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Conte o que falta ou o que poderia funcionar melhor. A equipe ReservaLab recebe direto.
+            Conte o que falta ou o que poderia funcionar melhor. A equipe Teggly recebe direto.
           </p>
         </header>
 
-        <section className="mt-6 rounded-2xl border border-border bg-card p-5 space-y-4 animate-in-up">
+        <section className="mt-6 rounded-lg border border-border bg-card p-5 space-y-4 animate-in-up">
           <div className="space-y-2">
             <Label className="text-[13px]">Título</Label>
             <Input
               value={titulo}
               onChange={(e) => setTitulo(e.target.value)}
               placeholder="Ex.: Exportar reservas em planilha"
-              className="h-11 rounded-xl"
+              className="h-11 rounded-md"
             />
           </div>
           <div className="space-y-2">
@@ -108,13 +116,13 @@ function SugestoesPage() {
               value={descricao}
               onChange={(e) => setDescricao(e.target.value)}
               placeholder="Explique como isso ajudaria no dia a dia."
-              className="min-h-32 rounded-xl"
+              className="min-h-32 rounded-md"
             />
           </div>
           <Button
             onClick={() => enviar.mutate()}
             disabled={!podeEnviar}
-            className="h-11 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 sm:w-auto sm:px-6"
+            className="h-11 w-full rounded-md bg-primary text-primary-foreground hover:bg-blue-700 sm:w-auto sm:px-6"
           >
             {enviar.isPending ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -126,7 +134,7 @@ function SugestoesPage() {
         </section>
 
         <section className="mt-8">
-          <h3 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+          <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
             Enviadas
           </h3>
           {listaQ.isLoading ? (
@@ -134,17 +142,19 @@ function SugestoesPage() {
               <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
             </div>
           ) : (listaQ.data?.length ?? 0) === 0 ? (
-            <div className="mt-4 rounded-2xl border border-dashed border-border bg-card/50 py-12 text-center">
-              <Lightbulb className="mx-auto h-6 w-6 text-muted-foreground/60" />
-              <p className="mt-3 font-serif text-2xl">Nenhuma sugestão ainda</p>
+            <div className="mt-4 rounded-lg border border-dashed border-border bg-card/50 py-12 text-center">
+              <Lightbulb className="mx-auto h-6 w-6 text-muted-foreground" />
+              <p className="mt-3 font-serif font-semibold text-2xl">Nenhuma sugestão ainda</p>
             </div>
           ) : (
             <ul className="mt-4 space-y-2.5">
               {listaQ.data!.map((f) => (
-                <li key={f.id} className="rounded-xl border border-border bg-card p-4">
+                <li key={f.id} className="rounded-lg border border-border bg-card p-4">
                   <div className="flex items-start justify-between gap-3">
                     <p className="font-medium">{f.titulo}</p>
-                    <span className="shrink-0 rounded-full bg-muted px-2.5 py-1 text-[11px] text-muted-foreground">
+                    <span
+                      className={`inline-flex h-[26px] shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 text-xs font-semibold before:size-[7px] before:rounded-full before:content-[''] ${STATUS_TONE[f.status] ?? "bg-muted text-muted-foreground before:bg-slate-400"}`}
+                    >
                       {STATUS_TXT[f.status] ?? f.status}
                     </span>
                   </div>
@@ -153,7 +163,7 @@ function SugestoesPage() {
                   </p>
                   {f.resposta_master && (
                     <p className="mt-3 rounded-lg bg-cream/60 p-3 text-sm">
-                      <span className="font-medium">Resposta ReservaLab: </span>
+                      <span className="font-medium">Resposta Teggly: </span>
                       {f.resposta_master}
                     </p>
                   )}

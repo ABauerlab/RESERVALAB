@@ -5,7 +5,6 @@ import {
   ArrowRight,
   UtensilsCrossed,
   Cake,
-  Sparkles,
   Heart,
   Search,
   Loader2,
@@ -29,7 +28,7 @@ export const Route = createFileRoute("/$slug/")({
 const ICONS = {
   mesa: UtensilsCrossed,
   aniversario: Cake,
-  evento: Sparkles,
+  evento: PartyPopper,
   casamento: Heart,
 } as const;
 
@@ -74,9 +73,9 @@ function TenantHome() {
           </p>
           <Link
             to="/"
-            className="mt-6 inline-flex h-11 items-center justify-center rounded-xl border border-border bg-card px-5 text-sm font-medium hover:bg-accent"
+            className="mt-6 inline-flex h-11 items-center justify-center rounded-md border border-border bg-card px-5 text-sm font-medium hover:bg-accent"
           >
-            Ir para ReservaLab
+            Ir para Teggly
           </Link>
         </div>
       </main>
@@ -91,7 +90,7 @@ function TenantHome() {
     <main className="relative min-h-screen bg-background">
       <div className="mx-auto flex min-h-screen max-w-2xl flex-col px-5 pt-14 pb-10 safe-top safe-bottom sm:pt-20">
         <header className="animate-fade">
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-terracotta">
+          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">
             {tenant.nome}
           </p>
           <h1 className="mt-6 font-serif text-[44px] leading-[1.05] tracking-tight text-foreground sm:text-6xl">
@@ -104,7 +103,7 @@ function TenantHome() {
         </header>
 
         {eventoQ.data && (
-          <div className="mt-8 overflow-hidden rounded-2xl border border-terracotta/25 bg-terracotta/5 animate-in-up">
+          <div className="mt-8 overflow-hidden rounded-lg border border-terracotta/25 bg-terracotta/5 animate-in-up">
             {eventoQ.data.imagem_url && (
               <img
                 src={eventoQ.data.imagem_url}
@@ -113,10 +112,10 @@ function TenantHome() {
               />
             )}
             <div className="p-5">
-              <p className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.18em] text-terracotta">
+              <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">
                 <PartyPopper className="h-3.5 w-3.5" /> Evento em destaque
               </p>
-              <p className="mt-2 font-serif text-2xl leading-snug text-foreground">
+              <p className="mt-2 font-serif font-semibold text-2xl leading-snug text-foreground">
                 {eventoQ.data.titulo}
               </p>
               <p className="mt-1 text-sm font-medium text-terracotta">
@@ -143,10 +142,10 @@ function TenantHome() {
                 onClick={() =>
                   trackFacebookCustomEvent(tenant.pixel_facebook_id, CLICK_RESERVA_EVENT[card.tipo])
                 }
-                className="group relative flex items-center gap-4 rounded-2xl border border-border bg-card px-5 py-4 shadow-[var(--shadow-sm)] transition-all duration-200 hover:-translate-y-0.5 hover:border-terracotta/40 hover:shadow-[var(--shadow-md)] active:scale-[0.99] animate-in-up"
+                className="group relative flex items-center gap-4 rounded-lg border border-border bg-card px-5 py-4 shadow-[var(--shadow-sm)] transition-all duration-200 hover:-translate-y-0.5 hover:border-terracotta/40 hover:shadow-[var(--shadow-md)] active:scale-[0.99] animate-in-up"
                 style={{ animationDelay: `${60 + i * 50}ms` }}
               >
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-cream text-terracotta transition-colors group-hover:bg-terracotta group-hover:text-terracotta-foreground">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-cream text-terracotta transition-colors group-hover:bg-terracotta group-hover:text-terracotta-foreground">
                   <Icon className="h-5 w-5" strokeWidth={1.75} />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -165,17 +164,22 @@ function TenantHome() {
           <Link
             to="/$slug/acompanhar"
             params={{ slug }}
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-card min-h-11 px-4 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
           >
             <Search className="h-3.5 w-3.5" />
             Acompanhar reserva pelo código
           </Link>
         </div>
 
-        <div className="mt-auto pt-16 text-center">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/60">
-            ReservaLab
-          </p>
+        <div className="mt-auto flex flex-col items-center gap-1.5 pt-16 text-center">
+          <p className="text-xs text-muted-foreground">powered by</p>
+          <img
+            src="/brand/Teggly_Logo_Primary.svg"
+            alt="Teggly"
+            width={96}
+            height={23}
+            className="h-[23px] w-24"
+          />
         </div>
       </div>
     </main>

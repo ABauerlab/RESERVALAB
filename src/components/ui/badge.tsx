@@ -3,17 +3,18 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
+// Badge Teggly: pilula com ponto, fundo tom 50, ponto tom 500 e texto tom 700.
 const badgeVariants = cva(
-  "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex h-[26px] items-center gap-1.5 whitespace-nowrap rounded-full border border-transparent px-2.5 text-xs font-semibold transition-colors before:size-[7px] before:rounded-full before:bg-current before:content-[''] focus:outline-none focus-visible:ring-4 focus-visible:ring-ring/30",
   {
     variants: {
       variant: {
-        default: "border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80",
-        secondary:
-          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        destructive:
-          "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
-        outline: "text-foreground",
+        default: "bg-accent text-accent-foreground before:bg-blue-500",
+        secondary: "bg-muted text-muted-foreground before:bg-slate-400",
+        success: "bg-success-50 text-success-700 before:bg-success-500",
+        warning: "bg-warning-50 text-warning-700 before:bg-warning-500",
+        destructive: "bg-error-50 text-error-700 before:bg-error-500",
+        outline: "border-border text-foreground before:hidden",
       },
     },
     defaultVariants: {

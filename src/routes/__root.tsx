@@ -18,14 +18,14 @@ function NotFoundComponent() {
     <div className="flex min-h-screen items-center justify-center bg-background px-6">
       <div className="max-w-md text-center animate-in-up">
         <p className="font-serif text-7xl text-terracotta">404</p>
-        <h2 className="mt-4 text-xl font-medium">Página não encontrada</h2>
+        <h2 className="mt-4 text-xl font-semibold">Página não encontrada</h2>
         <p className="mt-2 text-sm text-muted-foreground">
           O que você procura não existe ou foi movido.
         </p>
         <div className="mt-8">
           <Link
             to="/"
-            className="inline-flex h-11 items-center justify-center rounded-xl bg-primary px-5 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+            className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-5 text-[15px] font-semibold text-primary-foreground shadow-blue transition-colors hover:bg-blue-700"
           >
             Voltar ao início
           </Link>
@@ -45,7 +45,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-6">
       <div className="max-w-md text-center animate-in-up">
-        <h1 className="text-xl font-medium">Algo não saiu como esperado</h1>
+        <h1 className="text-xl font-semibold">Algo não saiu como esperado</h1>
         <p className="mt-2 text-sm text-muted-foreground">Tente novamente ou volte ao início.</p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -53,13 +53,13 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
               router.invalidate();
               reset();
             }}
-            className="inline-flex h-11 items-center justify-center rounded-xl bg-primary px-5 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+            className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-5 text-[15px] font-semibold text-primary-foreground shadow-blue transition-colors hover:bg-blue-700"
           >
             Tentar novamente
           </button>
           <a
             href="/"
-            className="inline-flex h-11 items-center justify-center rounded-xl border border-border bg-background px-5 text-sm font-medium transition hover:bg-accent"
+            className="inline-flex h-11 items-center justify-center rounded-md border border-border bg-card px-5 text-[15px] font-semibold shadow-xs transition-colors hover:border-slate-300 hover:bg-slate-50"
           >
             Início
           </a>
@@ -77,23 +77,23 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         name: "viewport",
         content: "width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1",
       },
-      { title: "ReservaLab — Reservas simples e modernas" },
+      { title: "Teggly | Mais reservas. Menos trabalho." },
       {
         name: "description",
         content:
-          "ReservaLab: sistema de reservas para restaurantes e eventos. Simples para o cliente, poderoso para o gestor.",
+          "Teggly é a plataforma de reservas e atendimento inteligente para restaurantes e bares. Mais reservas. Menos trabalho.",
       },
-      { name: "theme-color", content: "#10131f" },
+      { name: "theme-color", content: "#2563eb" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
-      { name: "apple-mobile-web-app-title", content: "ReservaLab" },
+      { name: "apple-mobile-web-app-title", content: "Teggly" },
       { name: "mobile-web-app-capable", content: "yes" },
       { name: "author", content: "BauerLab" },
-      { property: "og:site_name", content: "ReservaLab" },
-      { property: "og:title", content: "ReservaLab" },
+      { property: "og:site_name", content: "Teggly" },
+      { property: "og:title", content: "Teggly | Mais reservas. Menos trabalho." },
       {
         property: "og:description",
-        content: "Sistema de reservas moderno para restaurantes e eventos.",
+        content: "Reservas e atendimento inteligente para restaurantes, direto no WhatsApp.",
       },
       { property: "og:type", content: "website" },
       { property: "og:image", content: "https://reserva.bauerlab.com.br/og-image.png" },
@@ -101,23 +101,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:image:height", content: "630" },
       { property: "og:locale", content: "pt_BR" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "ReservaLab" },
+      { name: "twitter:title", content: "Teggly | Mais reservas. Menos trabalho." },
       {
         name: "twitter:description",
-        content: "Sistema de reservas moderno para restaurantes e eventos.",
+        content: "Reservas e atendimento inteligente para restaurantes, direto no WhatsApp.",
       },
       { name: "twitter:image", content: "https://reserva.bauerlab.com.br/og-image.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.png", type: "image/png" },
-      { rel: "apple-touch-icon", href: "/icons/icon-192.png" },
+      { rel: "icon", href: "/favicon.ico", sizes: "48x48" },
+      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
 
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;800&display=swap",
       },
     ],
   }),

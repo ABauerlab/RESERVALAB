@@ -18,7 +18,7 @@ import {
 
 export const Route = createFileRoute("/$slug/admin/relatorios")({
   head: ({ params }) => ({
-    meta: [{ title: "Relatórios — ReservaLab" }, { name: "robots", content: "noindex" }],
+    meta: [{ title: "Relatórios | Teggly" }, { name: "robots", content: "noindex" }],
     links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),
   }),
   ssr: false,
@@ -102,8 +102,8 @@ function RelatoriosPage() {
               <Metric label="Taxa de confirmação" value={`${resumo.taxa}%`} />
             </div>
 
-            <section className="mt-8 rounded-2xl border border-border bg-card p-5">
-              <h3 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+            <section className="mt-8 rounded-lg border border-border bg-card p-5">
+              <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
                 Por tipo
               </h3>
               <ul className="mt-4 space-y-3">
@@ -126,13 +126,13 @@ function RelatoriosPage() {
               </ul>
             </section>
 
-            <section className="mt-4 rounded-2xl border border-border bg-card p-5">
-              <h3 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+            <section className="mt-4 rounded-lg border border-border bg-card p-5">
+              <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
                 Por status
               </h3>
               <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {STATUS_LIST.map((s) => (
-                  <li key={s} className="rounded-xl bg-muted/50 p-3">
+                  <li key={s} className="rounded-lg bg-muted/50 p-3">
                     <p className="text-2xl font-medium tabular-nums">{resumo.porStatus[s]}</p>
                     <p className="mt-0.5 text-xs text-muted-foreground">{STATUS_LABEL[s]}</p>
                   </li>
@@ -148,9 +148,9 @@ function RelatoriosPage() {
 
 function Metric({ label, value }: { label: string; value: number | string }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-4">
+    <div className="rounded-lg border border-border bg-card p-4">
       <p className="font-serif text-3xl tabular-nums">{value}</p>
-      <p className="mt-1 text-[11px] uppercase tracking-wider text-muted-foreground">{label}</p>
+      <p className="mt-1 text-xs uppercase tracking-[0.08em] text-muted-foreground">{label}</p>
     </div>
   );
 }

@@ -25,7 +25,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 export const Route = createFileRoute("/$slug/admin/configuracoes")({
   head: ({ params }) => ({
-    meta: [{ title: "Configurações — ReservaLab" }, { name: "robots", content: "noindex" }],
+    meta: [{ title: "Configurações | Teggly" }, { name: "robots", content: "noindex" }],
     links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),
   }),
   ssr: false,
@@ -131,15 +131,15 @@ function ConfiguracoesPage() {
         </header>
 
         <section className="mt-6 space-y-5 animate-in-up">
-          <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
-            <h3 className="font-medium">Identidade</h3>
+          <div className="rounded-lg border border-border bg-card p-5 space-y-4">
+            <h3 className="font-semibold">Identidade</h3>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label className="text-[13px]">Nome do estabelecimento</Label>
                 <Input
                   value={nome}
                   onChange={(e) => setNome(e.target.value)}
-                  className="h-11 rounded-xl"
+                  className="h-11 rounded-md"
                 />
               </div>
               <div className="space-y-2">
@@ -149,12 +149,12 @@ function ConfiguracoesPage() {
                     type="color"
                     value={cor}
                     onChange={(e) => setCor(e.target.value)}
-                    className="h-11 w-14 cursor-pointer rounded-xl border border-border bg-card p-1"
+                    className="h-11 w-14 cursor-pointer rounded-md border border-border bg-card p-1"
                   />
                   <Input
                     value={cor}
                     onChange={(e) => setCor(e.target.value)}
-                    className="h-11 flex-1 rounded-xl font-mono text-sm"
+                    className="h-11 flex-1 rounded-md font-mono text-sm"
                   />
                 </div>
               </div>
@@ -165,7 +165,7 @@ function ConfiguracoesPage() {
                 value={logoUrl}
                 onChange={(e) => setLogoUrl(e.target.value)}
                 placeholder="https://..."
-                className="h-11 rounded-xl"
+                className="h-11 rounded-md"
               />
               {logoUrl.trim() && (
                 <img
@@ -177,15 +177,15 @@ function ConfiguracoesPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
-            <h3 className="font-medium">Contato</h3>
+          <div className="rounded-lg border border-border bg-card p-5 space-y-4">
+            <h3 className="font-semibold">Contato</h3>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label className="text-[13px]">Endereço</Label>
                 <Input
                   value={endereco}
                   onChange={(e) => setEndereco(e.target.value)}
-                  className="h-11 rounded-xl"
+                  className="h-11 rounded-md"
                 />
               </div>
               <div className="space-y-2">
@@ -193,7 +193,7 @@ function ConfiguracoesPage() {
                 <Input
                   value={telefone}
                   onChange={(e) => setTelefone(e.target.value)}
-                  className="h-11 rounded-xl"
+                  className="h-11 rounded-md"
                 />
               </div>
               <div className="space-y-2">
@@ -202,7 +202,7 @@ function ConfiguracoesPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="h-11 rounded-xl"
+                  className="h-11 rounded-md"
                 />
               </div>
               <div className="space-y-2">
@@ -210,14 +210,14 @@ function ConfiguracoesPage() {
                 <Input
                   value={whatsapp}
                   onChange={(e) => setWhatsapp(e.target.value)}
-                  className="h-11 rounded-xl"
+                  className="h-11 rounded-md"
                 />
               </div>
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-5">
-            <h3 className="font-medium">Tipos de reserva aceitos</h3>
+          <div className="rounded-lg border border-border bg-card p-5">
+            <h3 className="font-semibold">Tipos de reserva aceitos</h3>
             <p className="mt-1 text-sm text-muted-foreground">
               Somente os selecionados aparecem para o cliente.
             </p>
@@ -229,7 +229,7 @@ function ConfiguracoesPage() {
                     key={t}
                     type="button"
                     onClick={() => toggleTipo(t)}
-                    className={`h-9 rounded-full px-4 text-xs font-medium transition-all ${
+                    className={`h-11 xl:h-9 rounded-full px-4 text-xs font-medium transition-all ${
                       on
                         ? "bg-primary text-primary-foreground shadow-[var(--shadow-sm)]"
                         : "bg-muted text-muted-foreground hover:bg-accent"
@@ -242,9 +242,9 @@ function ConfiguracoesPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
+          <div className="rounded-lg border border-border bg-card p-5 space-y-3">
             <div>
-              <h3 className="font-medium">Observação sobre áreas (reserva de mesa)</h3>
+              <h3 className="font-semibold">Observação sobre áreas (reserva de mesa)</h3>
               <p className="mt-1 text-sm text-muted-foreground">
                 Aparece na tela de reserva de mesa, junto ao campo "Área desejada". Use para listar
                 as áreas da casa e avisar que a escolhida não é garantida. Deixe em branco para não
@@ -255,13 +255,13 @@ function ConfiguracoesPage() {
               value={observacaoArea}
               onChange={(e) => setObservacaoArea(e.target.value)}
               placeholder="Ex: Trabalhamos com as áreas Salão, Fundos, Corredor e Varanda. Não garantimos o local de preferência — isso depende da quantidade de reservas na data escolhida."
-              className="min-h-24 rounded-xl text-sm leading-relaxed"
+              className="min-h-24 rounded-md text-sm leading-relaxed"
             />
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
+          <div className="rounded-lg border border-border bg-card p-5 space-y-4">
             <div>
-              <h3 className="font-medium">Horário-limite para reservas</h3>
+              <h3 className="font-semibold">Horário-limite para reservas</h3>
               <p className="mt-1 text-sm text-muted-foreground">
                 Último horário aceito para mesa/aniversário (capacidade normal, até 30 pessoas).
                 Deixe em branco para não aplicar corte, além do horário de fechamento padrão.
@@ -274,7 +274,7 @@ function ConfiguracoesPage() {
                   type="time"
                   value={limiteSemana}
                   onChange={(e) => setLimiteSemana(e.target.value)}
-                  className="h-11 rounded-xl"
+                  className="h-11 rounded-md"
                 />
               </div>
               <div className="space-y-2">
@@ -283,15 +283,15 @@ function ConfiguracoesPage() {
                   type="time"
                   value={limiteFimDeSemana}
                   onChange={(e) => setLimiteFimDeSemana(e.target.value)}
-                  className="h-11 rounded-xl"
+                  className="h-11 rounded-md"
                 />
               </div>
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
+          <div className="rounded-lg border border-border bg-card p-5 space-y-3">
             <div>
-              <h3 className="font-medium">Pixel do Meta (Facebook/Instagram Ads)</h3>
+              <h3 className="font-semibold">Pixel do Meta (Facebook/Instagram Ads)</h3>
               <p className="mt-1 text-sm text-muted-foreground">
                 ID do pixel para medir conversões dos anúncios. Quando preenchido, a página desta
                 empresa passa a registrar PageView, um clique por tipo de reserva
@@ -305,19 +305,19 @@ function ConfiguracoesPage() {
               onChange={(e) => setPixelFacebook(e.target.value.replace(/\D/g, ""))}
               placeholder="Ex: 831333738696755"
               inputMode="numeric"
-              className="h-11 rounded-xl font-mono"
+              className="h-11 rounded-md font-mono"
             />
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
-            <h3 className="font-medium">Mensagem de confirmação (WhatsApp)</h3>
+          <div className="rounded-lg border border-border bg-card p-5 space-y-3">
+            <h3 className="font-semibold">Mensagem de confirmação (WhatsApp)</h3>
             <p className="text-sm text-muted-foreground">
               Texto enviado ao cliente ao confirmar a reserva. Sem emoji, apenas texto.
             </p>
             <Textarea
               value={mensagem}
               onChange={(e) => setMensagem(e.target.value)}
-              className="min-h-56 rounded-xl font-mono text-[13px] leading-relaxed"
+              className="min-h-56 rounded-md font-mono text-[13px] leading-relaxed"
             />
             <div className="flex flex-wrap gap-1.5">
               {PLACEHOLDERS.map((p) => (
@@ -326,7 +326,7 @@ function ConfiguracoesPage() {
                   type="button"
                   onClick={() => setMensagem((m) => `${m}${p.token}`)}
                   title={p.descricao}
-                  className="rounded-md bg-muted px-2 py-1 font-mono text-[11px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  className="inline-flex min-h-11 items-center rounded-md bg-muted px-3 font-mono text-xs text-muted-foreground lg:min-h-0 lg:px-2 lg:py-1 transition-colors hover:bg-accent hover:text-foreground"
                 >
                   {p.token}
                 </button>
@@ -335,14 +335,14 @@ function ConfiguracoesPage() {
             <button
               type="button"
               onClick={() => setMensagem(DEFAULT_MENSAGEM_CONFIRMACAO)}
-              className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              className="inline-flex min-h-11 items-center text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline lg:min-h-0"
             >
               Restaurar mensagem padrão
             </button>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
-            <h3 className="font-medium">Mensagem de cancelamento (WhatsApp)</h3>
+          <div className="rounded-lg border border-border bg-card p-5 space-y-3">
+            <h3 className="font-semibold">Mensagem de cancelamento (WhatsApp)</h3>
             <p className="text-sm text-muted-foreground">
               Texto enviado ao cliente quando uma reserva é cancelada pelo painel. Sempre inclui um
               link para o cliente fazer uma nova reserva.
@@ -350,7 +350,7 @@ function ConfiguracoesPage() {
             <Textarea
               value={mensagemCancelamento}
               onChange={(e) => setMensagemCancelamento(e.target.value)}
-              className="min-h-56 rounded-xl font-mono text-[13px] leading-relaxed"
+              className="min-h-56 rounded-md font-mono text-[13px] leading-relaxed"
             />
             <div className="flex flex-wrap gap-1.5">
               {PLACEHOLDERS_CANCELAMENTO.map((p) => (
@@ -359,7 +359,7 @@ function ConfiguracoesPage() {
                   type="button"
                   onClick={() => setMensagemCancelamento((m) => `${m}${p.token}`)}
                   title={p.descricao}
-                  className="rounded-md bg-muted px-2 py-1 font-mono text-[11px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  className="inline-flex min-h-11 items-center rounded-md bg-muted px-3 font-mono text-xs text-muted-foreground lg:min-h-0 lg:px-2 lg:py-1 transition-colors hover:bg-accent hover:text-foreground"
                 >
                   {p.token}
                 </button>
@@ -368,15 +368,15 @@ function ConfiguracoesPage() {
             <button
               type="button"
               onClick={() => setMensagemCancelamento(DEFAULT_MENSAGEM_CANCELAMENTO)}
-              className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              className="inline-flex min-h-11 items-center text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline lg:min-h-0"
             >
               Restaurar mensagem padrão
             </button>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
+          <div className="rounded-lg border border-border bg-card p-5 space-y-3">
             <div>
-              <h3 className="font-medium">Mensagem de reconfirmação (WhatsApp)</h3>
+              <h3 className="font-semibold">Mensagem de reconfirmação (WhatsApp)</h3>
               <p className="text-sm text-muted-foreground">
                 Texto enviado ao clicar em "Reconfirmar + WhatsApp" numa reserva já confirmada — use
                 perto do dia do evento para reduzir faltas, pedindo que o cliente confirme presença
@@ -386,7 +386,7 @@ function ConfiguracoesPage() {
             <Textarea
               value={mensagemReconfirmacao}
               onChange={(e) => setMensagemReconfirmacao(e.target.value)}
-              className="min-h-56 rounded-xl font-mono text-[13px] leading-relaxed"
+              className="min-h-56 rounded-md font-mono text-[13px] leading-relaxed"
             />
             <div className="flex flex-wrap gap-1.5">
               {PLACEHOLDERS.map((p) => (
@@ -395,7 +395,7 @@ function ConfiguracoesPage() {
                   type="button"
                   onClick={() => setMensagemReconfirmacao((m) => `${m}${p.token}`)}
                   title={p.descricao}
-                  className="rounded-md bg-muted px-2 py-1 font-mono text-[11px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  className="inline-flex min-h-11 items-center rounded-md bg-muted px-3 font-mono text-xs text-muted-foreground lg:min-h-0 lg:px-2 lg:py-1 transition-colors hover:bg-accent hover:text-foreground"
                 >
                   {p.token}
                 </button>
@@ -404,21 +404,21 @@ function ConfiguracoesPage() {
             <button
               type="button"
               onClick={() => setMensagemReconfirmacao(DEFAULT_MENSAGEM_RECONFIRMACAO)}
-              className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              className="inline-flex min-h-11 items-center text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline lg:min-h-0"
             >
               Restaurar mensagem padrão
             </button>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-5">
-            <h3 className="font-medium">Segurança</h3>
+          <div className="rounded-lg border border-border bg-card p-5">
+            <h3 className="font-semibold">Segurança</h3>
             <p className="mt-1 text-sm text-muted-foreground">
               Altere a senha de acesso a este painel.
             </p>
             <Link
               to="/$slug/admin/trocar-senha"
               params={{ slug }}
-              className="mt-4 inline-flex h-10 items-center gap-2 rounded-xl border border-border px-4 text-sm font-medium transition-colors hover:bg-accent"
+              className="mt-4 inline-flex h-11 items-center gap-2 rounded-md border border-border px-4 text-sm font-medium transition-colors hover:bg-accent"
             >
               <KeyRound className="h-4 w-4" /> Alterar senha
             </Link>
@@ -427,7 +427,7 @@ function ConfiguracoesPage() {
           <Button
             onClick={() => salvar.mutate()}
             disabled={salvar.isPending || nome.trim().length < 2}
-            className="h-12 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+            className="h-12 w-full rounded-md bg-primary text-primary-foreground hover:bg-blue-700"
           >
             {salvar.isPending ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

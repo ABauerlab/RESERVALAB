@@ -45,7 +45,7 @@ const TIPOS_VALIDOS: ReservaTipo[] = ["mesa", "aniversario", "evento", "casament
 export const Route = createFileRoute("/$slug/reservar/$tipo")({
   head: ({ params }) => ({
     meta: [
-      { title: `${TIPO_LABEL[params.tipo as ReservaTipo] ?? "Reserva"} — ReservaLab` },
+      { title: `${TIPO_LABEL[params.tipo as ReservaTipo] ?? "Reserva"} | Teggly` },
       { name: "description", content: "Envie sua solicitação de reserva em poucos toques." },
       { name: "robots", content: "noindex" },
     ],
@@ -239,13 +239,13 @@ function ReservarPage() {
         <Link
           to="/$slug"
           params={{ slug }}
-          className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          className="inline-flex min-h-11 items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           <ChevronLeft className="h-4 w-4" /> Voltar
         </Link>
 
         <header className="mt-6 animate-fade">
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-terracotta">
+          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">
             {tenantQ.data?.nome ?? "Reserva"}
           </p>
           <h1 className="mt-3 font-serif text-4xl leading-tight tracking-tight sm:text-5xl">
@@ -257,8 +257,8 @@ function ReservarPage() {
         </header>
 
         {isAniv && (
-          <section className="mt-6 rounded-2xl border border-terracotta/25 bg-terracotta/5 p-5 animate-in-up">
-            <p className="font-serif text-xl leading-snug sm:text-2xl">
+          <section className="mt-6 rounded-lg border border-terracotta/25 bg-terracotta/5 p-5 animate-in-up">
+            <p className="font-serif font-semibold text-xl leading-snug sm:text-2xl">
               Vai ser um prazer comemorar seu aniversário no {tenantQ.data?.nome ?? "Iracema"}!
             </p>
             <ul className="mt-4 space-y-3 text-sm leading-relaxed text-muted-foreground">
@@ -283,9 +283,9 @@ function ReservarPage() {
           </section>
         )}
         {isEvento && (
-          <section className="mt-6 space-y-4 rounded-2xl border border-terracotta/25 bg-terracotta/5 p-5 animate-in-up">
+          <section className="mt-6 space-y-4 rounded-lg border border-terracotta/25 bg-terracotta/5 p-5 animate-in-up">
             <div>
-              <p className="font-serif text-xl leading-snug sm:text-2xl">
+              <p className="font-serif font-semibold text-xl leading-snug sm:text-2xl">
                 Orçamento — eventos particulares
               </p>
               <p className="mt-1.5 text-sm text-muted-foreground">
@@ -294,8 +294,8 @@ function ReservarPage() {
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="rounded-xl bg-card p-4">
-                <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-terracotta">
+              <div className="rounded-lg bg-card p-4">
+                <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">
                   <UtensilsCrossed className="h-3.5 w-3.5" /> Petiscos
                 </p>
                 <ul className="mt-2.5 space-y-1 text-sm text-muted-foreground">
@@ -308,8 +308,8 @@ function ReservarPage() {
                 </ul>
               </div>
 
-              <div className="rounded-xl bg-card p-4">
-                <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-terracotta">
+              <div className="rounded-lg bg-card p-4">
+                <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">
                   <Beer className="h-3.5 w-3.5" /> Bebidas
                 </p>
                 <ul className="mt-2.5 space-y-1 text-sm text-muted-foreground">
@@ -321,8 +321,8 @@ function ReservarPage() {
               </div>
             </div>
 
-            <div className="rounded-xl bg-card p-4">
-              <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-terracotta">
+            <div className="rounded-lg bg-card p-4">
+              <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">
                 <Receipt className="h-3.5 w-3.5" /> Valores (5 horas de evento)
               </p>
               <ul className="mt-2.5 space-y-1.5 text-sm">
@@ -362,7 +362,7 @@ function ReservarPage() {
               onChange={(e) => setNome(e.target.value)}
               placeholder="Seu nome completo"
               autoComplete="name"
-              className="h-12 rounded-xl"
+              className="h-12 rounded-md"
               required
             />
           </Field>
@@ -377,7 +377,7 @@ function ReservarPage() {
               placeholder="(11) 91234-5678 ou +1 555 1234"
               inputMode="tel"
               autoComplete="tel"
-              className="h-12 rounded-xl"
+              className="h-12 rounded-md"
               required
             />
           </Field>
@@ -393,14 +393,14 @@ function ReservarPage() {
                 min={hoje}
                 value={data}
                 onChange={(e) => setData(e.target.value)}
-                className="h-12 rounded-xl"
+                className="h-12 rounded-md"
                 required
               />
             </Field>
             {precisaHorario && (
               <Field label="Horário">
                 <Select value={horario} onValueChange={setHorario} disabled={!data}>
-                  <SelectTrigger className="h-12 rounded-xl">
+                  <SelectTrigger className="h-12 rounded-md">
                     <SelectValue placeholder={data ? "Selecione" : "Escolha a data"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -423,7 +423,7 @@ function ReservarPage() {
           )}
 
           {bloqueio && (
-            <div className="flex items-start gap-3 rounded-xl border border-destructive/25 bg-destructive/5 p-4">
+            <div className="flex items-start gap-3 rounded-lg border border-destructive/25 bg-destructive/5 p-4">
               <CalendarX2 className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
               <div className="text-sm">
                 <p className="font-medium text-destructive">
@@ -441,7 +441,7 @@ function ReservarPage() {
           {isMesa && (
             <Field label="Área desejada">
               <Select value={area} onValueChange={(v) => setArea(v as ReservaArea)}>
-                <SelectTrigger className="h-12 rounded-xl">
+                <SelectTrigger className="h-12 rounded-md">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -499,7 +499,7 @@ function ReservarPage() {
                 value={tipoEvento}
                 onChange={(e) => setTipoEvento(e.target.value)}
                 placeholder="Ex: confraternização de empresa"
-                className="h-12 rounded-xl"
+                className="h-12 rounded-md"
                 required
               />
             </Field>
@@ -511,7 +511,7 @@ function ReservarPage() {
                 value={mensagem}
                 onChange={(e) => setMensagem(e.target.value)}
                 placeholder="Conte um pouco sobre o que você imagina."
-                className="min-h-28 rounded-xl"
+                className="min-h-28 rounded-md"
               />
             </Field>
           ) : (
@@ -520,7 +520,7 @@ function ReservarPage() {
                 value={observacoes}
                 onChange={(e) => setObservacoes(e.target.value)}
                 placeholder="Alguma preferência ou informação adicional?"
-                className="min-h-24 rounded-xl"
+                className="min-h-24 rounded-md"
               />
             </Field>
           )}
@@ -528,7 +528,7 @@ function ReservarPage() {
           <Button
             type="submit"
             disabled={!podeEnviar || enviando}
-            className="mt-2 w-full rounded-xl bg-terracotta text-terracotta-foreground hover:bg-terracotta/90 disabled:opacity-50"
+            className="mt-2 w-full rounded-lg bg-terracotta text-terracotta-foreground hover:bg-blue-700 disabled:opacity-50"
             style={{ height: 52 }}
           >
             {enviando ? (
@@ -558,7 +558,7 @@ function Field({
     <div className="space-y-2">
       <Label className="text-[13px] font-medium text-foreground">{label}</Label>
       {children}
-      {hint && <p className="text-[11px] text-muted-foreground">{hint}</p>}
+      {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
     </div>
   );
 }
@@ -581,11 +581,11 @@ function QuantityInput({
     setText(String(clamped));
   }
   return (
-    <div className="flex h-12 items-center justify-between rounded-xl border border-input bg-background px-2">
+    <div className="flex h-12 items-center justify-between rounded-md border border-input bg-background px-1">
       <button
         type="button"
         onClick={() => commit(value - 1)}
-        className="flex h-10 w-10 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-accent active:scale-95 disabled:opacity-40"
+        className="flex h-11 w-11 items-center justify-center rounded-md text-foreground transition-colors hover:bg-accent active:scale-95 disabled:opacity-40"
         disabled={value <= min}
         aria-label="Diminuir"
       >
@@ -605,13 +605,13 @@ function QuantityInput({
           if (text === "") commit(min);
           else commit(parseInt(text, 10));
         }}
-        className="w-16 bg-transparent text-center text-lg font-medium tabular-nums outline-none"
+        className="h-11 w-16 bg-transparent text-center text-lg font-medium tabular-nums outline-none"
         aria-label="Quantidade"
       />
       <button
         type="button"
         onClick={() => commit(value + 1)}
-        className="flex h-10 w-10 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-accent active:scale-95 disabled:opacity-40"
+        className="flex h-11 w-11 items-center justify-center rounded-md text-foreground transition-colors hover:bg-accent active:scale-95 disabled:opacity-40"
         disabled={value >= max}
         aria-label="Aumentar"
       >
@@ -631,13 +631,13 @@ function SegmentedButtons<T extends string>({
   options: Array<{ value: T; label: string }>;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-2 rounded-xl bg-muted p-1">
+    <div className="grid grid-cols-2 gap-2 rounded-[12px] bg-muted p-1">
       {options.map((o) => (
         <button
           key={o.value}
           type="button"
           onClick={() => onChange(o.value)}
-          className={`h-10 rounded-lg text-sm font-medium transition-all ${value === o.value ? "bg-background text-foreground shadow-[var(--shadow-sm)]" : "text-muted-foreground hover:text-foreground"}`}
+          className={`h-11 rounded-md text-sm font-medium transition-all ${value === o.value ? "bg-background text-foreground shadow-[var(--shadow-sm)]" : "text-muted-foreground hover:text-foreground"}`}
         >
           {o.label}
         </button>

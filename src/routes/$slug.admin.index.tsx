@@ -1,147 +1,39 @@
 import { pwaHeadLinks } from "@/lib/pwa-manifest";
-import { createFileRoute, useNavigate, useParams } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  Bell,
-  BellRing,
-  Calendar,
-  CalendarDays,
-  Download,
-  LogOut,
-  PartyPopper,
-  Search,
-  Sparkles,
-  User,
-  Loader2,
-  Check,
-  X,
-  CheckCircle2,
-  Phone,
-  Utensils,
-  Heart,
-  Cake,
-  MessageCircle,
-  Pencil,
-  Trash2,
-  Save,
-} from "lucide-react";
-import { toast } from "sonner";
+import { createFileRoute, useParams } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+import { Bell, BellRing, ChevronLeft, ChevronRight, Download, Loader2 } from "lucide-react";
 
-import { supabase } from "@/integrations/supabase/client";
-import {
-  AREA_LABEL,
-  MOTIVO_CANCELAMENTO_OPCOES,
-  STATUS_LABEL,
-  STATUS_LIST,
-  TIPO_LABEL,
-  TIPO_SHORT,
-  formatData,
-  formatHorario,
-  telefoneToWhatsApp,
-  type Reserva,
-  type ReservaArea,
-  type ReservaStatus,
-  type ReservaTipo,
-  type ReservaUpdate,
-} from "@/lib/reservations";
-import { getTenantBySlug } from "@/lib/tenant";
-import { buildMensagemReconfirmacao, whatsappUrl } from "@/lib/confirmacao";
+import { formatData, type Reserva } from "@/lib/reservations";
+import { addDaysISO, todayISO, weekdayLabel } from "@/lib/admin-dates";
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
+import { useDetailMode } from "@/hooks/use-media-query";
+import { useReservaActions, useReservasRealtime } from "@/hooks/use-reservas-admin";
+import { useHojeData } from "@/hooks/use-hoje";
+import { usePwaActions } from "@/hooks/use-pwa-actions";
+import { cn } from "@/lib/utils";
+
 import { AdminShell } from "@/components/admin/AdminShell";
+import { BottomSheet } from "@/components/admin/BottomSheet";
 import { MensagemDoDiaButton } from "@/components/admin/MensagemDoDia";
-import { NovasReservasBanner } from "@/components/admin/NovasReservas";
-
-import {
-  canNotify,
-  initInstallPrompt,
-  isStandalone,
-  notificationPermission,
-  registerServiceWorker,
-  requestNotificationPermission,
-  showNotification,
-  triggerInstallPrompt,
-  pushSupported,
-  subscribeToPush,
-  unsubscribeFromPush,
-  currentPushEndpoint,
-} from "@/lib/pwa";
-
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { PageHeader } from "@/components/admin/PageHeader";
+import { useRowAction } from "@/components/admin/RowAction";
+import { ReservaDetail } from "@/components/admin/ReservaDetail";
+import { NeedsYou } from "@/components/admin/hoje/NeedsYou";
+import { ServiceLine } from "@/components/admin/hoje/ServiceLine";
+import { UpcomingDays, type DayInfo } from "@/components/admin/hoje/UpcomingDays";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 export const Route = createFileRoute("/$slug/admin/")({
   head: ({ params }) => ({
-    meta: [{ title: "Painel — ReservaLab" }, { name: "robots", content: "noindex" }],
+    meta: [{ title: "Hoje | Teggly" }, { name: "robots", content: "noindex" }],
     links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),
   }),
   ssr: false,
-  component: AdminDashboard,
+  component: AdminHoje,
 });
 
-type FiltroData = "hoje" | "amanha" | "semana" | "mes" | "todos";
-const FILTROS_DATA: Array<{ id: FiltroData; label: string }> = [
-  { id: "hoje", label: "Hoje" },
-  { id: "amanha", label: "Amanhã" },
-  { id: "semana", label: "Semana" },
-  { id: "mes", label: "Mês" },
-  { id: "todos", label: "Todos" },
-];
-
-type FiltroStatus = "todos" | ReservaStatus;
-const FILTROS_STATUS: Array<{ id: FiltroStatus; label: string }> = [
-  { id: "todos", label: "Todos" },
-  ...STATUS_LIST.map((s) => ({ id: s as FiltroStatus, label: STATUS_LABEL[s] })),
-];
-
-const TIPO_ICON = {
-  mesa: Utensils,
-  aniversario: Cake,
-  evento: Sparkles,
-  casamento: Heart,
-} as const;
-
-function todayISO() {
-  return new Date().toISOString().slice(0, 10);
-}
-function tomorrowISO() {
-  const d = new Date();
-  d.setDate(d.getDate() + 1);
-  return d.toISOString().slice(0, 10);
-}
-function endOfWeekISO() {
-  const d = new Date();
-  d.setDate(d.getDate() + 7);
-  return d.toISOString().slice(0, 10);
-}
-function endOfMonthISO() {
-  const d = new Date();
-  d.setDate(d.getDate() + 30);
-  return d.toISOString().slice(0, 10);
-}
-
-function AdminDashboard() {
+function AdminHoje() {
   const { slug } = useParams({ from: "/$slug/admin/" });
-  const navigate = useNavigate();
-  const qc = useQueryClient();
 
   // Guarda única: sessão, vínculo com a empresa e troca de senha obrigatória.
   const admin = useTenantAdmin(slug);
@@ -149,300 +41,54 @@ function AdminDashboard() {
   const tenantId = admin.tenant?.id ?? null;
   const tenantNome = admin.tenant?.nome ?? "";
 
-  const [filtroData, setFiltroData] = useState<FiltroData>("hoje");
-  const [filtroStatus, setFiltroStatus] = useState<FiltroStatus>("todos");
-  const [busca, setBusca] = useState("");
-  const [mostrarFinalizadas, setMostrarFinalizadas] = useState(false);
-
+  const dock = useDetailMode() === "dock";
+  const hoje = todayISO();
+  const [dia, setDia] = useState(hoje);
   const [selected, setSelected] = useState<Reserva | null>(null);
-  const [notifPerm, setNotifPerm] = useState<string>("default");
-  const [installReady, setInstallReady] = useState(false);
-  const [pushEndpoint, setPushEndpoint] = useState<string | null>(null);
-  const [pushBusy, setPushBusy] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [needsOpen, setNeedsOpen] = useState(false);
 
-  useEffect(() => {
-    registerServiceWorker();
-    initInstallPrompt(() => setInstallReady(true));
-    if (canNotify()) setNotifPerm(notificationPermission());
-    currentPushEndpoint().then((ep) => setPushEndpoint(ep));
-  }, []);
+  useReservasRealtime(ready, tenantId);
+  const pwa = usePwaActions(tenantId);
+  const actions = useReservaActions(slug, tenantId, {
+    onPatched: (id, patch) =>
+      setSelected((s) => (s && s.id === id ? ({ ...s, ...patch } as Reserva) : s)),
+    onDeleted: () => setSelected(null),
+  });
+  const { diaQ, pendentesQ, reconfirmarQ, proximosQ, bloqueiosQ, feriadosQ, eventosQ } =
+    useHojeData(ready, tenantId, dia);
 
-  useEffect(() => {
-    if (!ready || !tenantId) return;
-    const channel = supabase
-      .channel(`reservas-admin-${tenantId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "reservas",
-          filter: `tenant_id=eq.${tenantId}`,
-        },
-        (payload) => {
-          const r = payload.new as Reserva;
-          qc.invalidateQueries({ queryKey: ["reservas", tenantId] });
-          qc.invalidateQueries({ queryKey: ["reservas-stats", tenantId] });
-          qc.invalidateQueries({ queryKey: ["novas-reservas", tenantId] });
-          const line = `${TIPO_SHORT[r.tipo]} • ${r.quantidade ?? "?"} pessoas • ${formatData(r.data)}${r.horario ? ` às ${formatHorario(r.horario)}` : ""}`;
-          toast.success(`Nova reserva — ${r.nome}`, { description: line });
-          showNotification(`Nova reserva — ${r.nome}`, line);
-        },
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "reservas",
-          filter: `tenant_id=eq.${tenantId}`,
-        },
-        () => {
-          qc.invalidateQueries({ queryKey: ["reservas", tenantId] });
-          qc.invalidateQueries({ queryKey: ["reservas-stats", tenantId] });
-        },
-      )
-      .subscribe();
-    return () => {
-      supabase.removeChannel(channel);
+  const reservasDia = useMemo(() => diaQ.data ?? [], [diaQ.data]);
+  const resumo = useMemo(() => {
+    const ativas = reservasDia.filter((r) => r.status !== "cancelada");
+    return {
+      reservas: ativas.length,
+      pessoas: ativas.reduce((n, r) => n + (r.quantidade ?? 0), 0),
+      pendentes: ativas.filter((r) => r.status === "pendente").length,
+      canceladas: reservasDia.length - ativas.length,
     };
-  }, [ready, tenantId, qc]);
+  }, [reservasDia]);
 
-  const stats = useQuery({
-    enabled: ready && !!tenantId,
-    queryKey: ["reservas-stats", tenantId],
-    queryFn: async () => {
-      const base = () =>
-        supabase
-          .from("reservas")
-          .select("id", { count: "exact", head: true })
-          .eq("tenant_id", tenantId!);
-      const [hoje, pendentes, semana, eventos] = await Promise.all([
-        base().eq("data", todayISO()),
-        base().eq("status", "pendente"),
-        base().gte("data", todayISO()).lte("data", endOfWeekISO()),
-        base().in("tipo", ["evento", "casamento", "aniversario"]).gte("data", todayISO()),
-      ]);
-      return {
-        hoje: hoje.count ?? 0,
-        pendentes: pendentes.count ?? 0,
-        semana: semana.count ?? 0,
-        eventos: eventos.count ?? 0,
-      };
-    },
-  });
-
-  // Filtros de data/busca compartilhados entre a lista e a contagem de finalizadas.
-  function aplicarFiltrosBase<T>(q: T): T {
-    let out = q as never as {
-      eq: (c: string, v: string) => unknown;
-      gte: (c: string, v: string) => unknown;
-      lte: (c: string, v: string) => unknown;
-      or: (f: string) => unknown;
-    };
-    if (filtroData === "hoje") out = out.eq("data", todayISO()) as typeof out;
-    else if (filtroData === "amanha") out = out.eq("data", tomorrowISO()) as typeof out;
-    else if (filtroData === "semana")
-      out = (out.gte("data", todayISO()) as typeof out).lte("data", endOfWeekISO()) as typeof out;
-    else if (filtroData === "mes")
-      out = (out.gte("data", todayISO()) as typeof out).lte("data", endOfMonthISO()) as typeof out;
-
-    const term = busca.trim();
-    if (term)
-      out = out.or(
-        `nome.ilike.%${term}%,telefone.ilike.%${term}%,codigo_acompanhamento.ilike.%${term.toUpperCase()}%`,
-      ) as typeof out;
-    return out as never as T;
-  }
-
-  const listaQ = useQuery({
-    enabled: ready && !!tenantId,
-    queryKey: ["reservas", tenantId, filtroData, filtroStatus, busca, mostrarFinalizadas],
-    queryFn: async () => {
-      let q = supabase
-        .from("reservas")
-        .select("*")
-        .eq("tenant_id", tenantId!)
-        .order("data", { ascending: true, nullsFirst: false })
-        .order("horario", { ascending: true })
-        .order("created_at", { ascending: false });
-
-      q = aplicarFiltrosBase(q);
-
-      if (filtroStatus !== "todos") q = q.eq("status", filtroStatus);
-      // Finalizadas ficam escondidas por padrão para não poluir a lista atual.
-      else if (!mostrarFinalizadas) q = q.neq("status", "finalizada");
-
-      const { data, error } = await q.limit(200);
-      if (error) throw error;
-      return data as Reserva[];
-    },
-  });
-
-  const finalizadasCountQ = useQuery({
-    enabled: ready && !!tenantId && filtroStatus === "todos" && !mostrarFinalizadas,
-    queryKey: ["reservas-finalizadas-count", tenantId, filtroData, busca],
-    queryFn: async () => {
-      let q = supabase
-        .from("reservas")
-        .select("id", { count: "exact", head: true })
-        .eq("tenant_id", tenantId!)
-        .eq("status", "finalizada");
-      q = aplicarFiltrosBase(q);
-      const { count, error } = await q;
-      if (error) throw error;
-      return count ?? 0;
-    },
-  });
-
-  const updateReserva = useMutation({
-    mutationFn: async ({ id, patch }: { id: string; patch: ReservaUpdate }) => {
-      const { error } = await supabase.from("reservas").update(patch).eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: (_data, vars) => {
-      qc.invalidateQueries({ queryKey: ["reservas", tenantId] });
-      qc.invalidateQueries({ queryKey: ["reservas-stats", tenantId] });
-      setSelected((s) => (s && s.id === vars.id ? ({ ...s, ...vars.patch } as Reserva) : s));
-    },
-    onError: () => toast.error("Não foi possível atualizar."),
-  });
-
-  const deleteReserva = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("reservas").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Reserva excluída.");
-      qc.invalidateQueries({ queryKey: ["reservas", tenantId] });
-      qc.invalidateQueries({ queryKey: ["reservas-stats", tenantId] });
-      setSelected(null);
-    },
-    onError: () => toast.error("Não foi possível excluir."),
-  });
-
-  const confirmarSemNotificar = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.rpc("confirmar_reserva_sem_notificar", { _id: id });
-      if (error) throw error;
-    },
-    onSuccess: (_data, id) => {
-      qc.invalidateQueries({ queryKey: ["reservas", tenantId] });
-      qc.invalidateQueries({ queryKey: ["reservas-stats", tenantId] });
-      setSelected((s) => (s && s.id === id ? ({ ...s, status: "confirmada" } as Reserva) : s));
-      toast.success("Reserva confirmada sem avisar o cliente.");
-    },
-    onError: () => toast.error("Não foi possível confirmar."),
-  });
-
-  async function handleConfirm(r: Reserva) {
-    // A confirmação no WhatsApp agora é enviada automaticamente pelo backend
-    // (trigger no banco) assim que o status muda para "confirmada" — não
-    // abrimos mais o WhatsApp manualmente aqui, pra não duplicar a mensagem.
-    await updateReserva.mutateAsync({ id: r.id, patch: { status: "confirmada" } });
-    toast.success("Reserva confirmada. O cliente recebe a confirmação automaticamente.");
-  }
-
-  async function handleConfirmSemNotificar(r: Reserva) {
-    await confirmarSemNotificar.mutateAsync(r.id);
-  }
-
-  async function handleReconfirm(r: Reserva) {
-    await updateReserva.mutateAsync({
-      id: r.id,
-      patch: { reconfirmada_em: new Date().toISOString() },
-    });
-    toast.success("Reconfirmação enviada.");
-    const tenant = await getTenantBySlug(slug);
-    const numero = telefoneToWhatsApp(r.telefone);
-    if (!numero) return;
-    const msg = buildMensagemReconfirmacao(tenant?.mensagem_reconfirmacao, {
-      reserva: r,
-      empresaNome: tenant?.nome ?? "",
-      endereco: tenant?.endereco,
-      telefoneEmpresa: tenant?.telefone_contato,
-      linkAcompanhar: `${window.location.origin}/${slug}/acompanhar/${r.codigo_acompanhamento}`,
-    });
-    window.open(whatsappUrl(numero, msg), "_blank", "noopener");
-  }
-
-  async function handleCancel(r: Reserva, motivo: string) {
-    // A mensagem de cancelamento no WhatsApp agora é enviada automaticamente
-    // pelo backend (trigger no banco) assim que o status muda para
-    // "cancelada" — não abrimos mais o WhatsApp manualmente aqui, pra não
-    // duplicar a mensagem.
-    await updateReserva.mutateAsync({
-      id: r.id,
-      patch: { status: "cancelada", motivo_cancelamento: motivo || null },
-    });
-    toast.success("Reserva cancelada. O cliente recebe o aviso automaticamente.");
-  }
-
-  async function handleEnablePush() {
-    if (!tenantId) return;
-    setPushBusy(true);
-    try {
-      const p = await requestNotificationPermission();
-      setNotifPerm(p);
-      if (p !== "granted") {
-        if (p === "denied") toast.error("Permissão negada nas configurações do navegador.");
-        return;
+  const proximos = useMemo(() => {
+    const out: Record<string, DayInfo> = {};
+    const get = (iso: string) =>
+      (out[iso] ??= { reservas: 0, pessoas: 0, bloqueio: false, feriado: false, evento: false });
+    for (const r of proximosQ.data ?? [])
+      if (r.data) {
+        const d = get(r.data);
+        d.reservas += 1;
+        d.pessoas += r.quantidade ?? 0;
       }
-      const sub = await subscribeToPush();
-      if (!sub) {
-        toast.error("Não foi possível ativar push neste dispositivo.");
-        return;
-      }
-      const { data: sess } = await supabase.auth.getSession();
-      const { error } = await supabase.from("push_subscriptions").upsert(
-        {
-          tenant_id: tenantId,
-          user_id: sess.session?.user.id ?? null,
-          endpoint: sub.endpoint,
-          p256dh: sub.p256dh,
-          auth: sub.auth,
-        },
-        { onConflict: "endpoint" },
-      );
-      if (error) {
-        toast.error("Falha ao registrar dispositivo: " + error.message);
-        return;
-      }
-      setPushEndpoint(sub.endpoint);
-      toast.success("Notificações push ativadas.");
-    } finally {
-      setPushBusy(false);
-    }
-  }
+    for (const b of bloqueiosQ.data ?? []) if (b.data) get(b.data).bloqueio = true;
+    for (const f of feriadosQ.data ?? []) if (f.data) get(f.data).feriado = true;
+    for (const e of eventosQ.data ?? []) if (e.data) get(e.data).evento = true;
+    return out;
+  }, [proximosQ.data, bloqueiosQ.data, feriadosQ.data, eventosQ.data]);
 
-  async function handleDisablePush() {
-    setPushBusy(true);
-    try {
-      const endpoint = pushEndpoint ?? (await currentPushEndpoint());
-      const removed = await unsubscribeFromPush();
-      const ep = endpoint ?? removed;
-      if (ep) await supabase.from("push_subscriptions").delete().eq("endpoint", ep);
-      setPushEndpoint(null);
-      toast.success("Notificações push desativadas.");
-    } finally {
-      setPushBusy(false);
-    }
-  }
+  const pendentes = pendentesQ.data ?? [];
+  const reconfirmar = reconfirmarQ.data ?? [];
+  const needsTotal = pendentes.length + reconfirmar.length;
 
-  async function handleInstall() {
-    const r = await triggerInstallPrompt();
-    if (r === "accepted") {
-      toast.success("Aplicativo instalado.");
-      setInstallReady(false);
-    }
-  }
-
-  async function signOut() {
-    await supabase.auth.signOut();
-    navigate({ to: "/$slug/admin/login", params: { slug } });
-  }
+  const renderAction = useRowAction(actions);
 
   if (!ready) {
     return (
@@ -452,802 +98,220 @@ function AdminDashboard() {
     );
   }
 
-  const showInstall = installReady && !isStandalone();
-  const canUsePush = pushSupported();
-  const pushActive = !!pushEndpoint;
-  const showPushCTA = canUsePush && !pushActive && notifPerm !== "unsupported";
-  const showLegacyNotifCTA =
-    !canUsePush && canNotify() && notifPerm !== "granted" && notifPerm !== "unsupported";
+  const isToday = dia === hoje;
+  const sentence =
+    resumo.reservas === 0
+      ? "Nenhuma reserva neste dia"
+      : `${resumo.reservas} ${resumo.reservas === 1 ? "reserva" : "reservas"}, ${resumo.pessoas} pessoas, ${resumo.pendentes} ${resumo.pendentes === 1 ? "pendente" : "pendentes"}`;
+
+  const navBtn =
+    "flex h-11 w-11 items-center justify-center rounded-md border border-border bg-card text-foreground transition-colors hover:bg-muted xl:h-9 xl:w-9";
+  const chip =
+    "inline-flex h-11 items-center gap-2 rounded-full px-3.5 xl:h-9 text-xs font-semibold transition-colors disabled:opacity-50";
 
   return (
-    <AdminShell slug={slug} tenantNome={tenantNome} active="reservas">
-      <div className="mx-auto max-w-4xl px-5 pt-6">
-        <NovasReservasBanner tenantId={tenantId} />
-        <div className="mb-5 flex flex-wrap gap-2 animate-fade">
-          <MensagemDoDiaButton tenantId={tenantId} />
+    <AdminShell slug={slug} tenantNome={tenantNome} active="hoje">
+      <div
+        className={cn(
+          "mx-auto max-w-[1180px] px-4 pb-6 pt-1 md:px-8 md:pt-8",
+          selected && dock && "xl:pr-[452px]",
+        )}
+      >
+        <PageHeader
+          eyebrow={isToday ? "Hoje" : undefined}
+          title={
+            <>
+              <span className="capitalize">{weekdayLabel(dia)}</span>, {formatData(dia)}
+            </>
+          }
+          description={`${isToday ? "Hoje: " : ""}${sentence}`}
+          actions={<MensagemDoDiaButton tenantId={tenantId} />}
+        />
 
-          {showPushCTA && (
-            <button
-              disabled={pushBusy}
-              onClick={handleEnablePush}
-              className="inline-flex items-center gap-2 rounded-full border border-terracotta/30 bg-terracotta/5 px-3.5 py-1.5 text-xs font-medium text-terracotta transition-colors hover:bg-terracotta/10 disabled:opacity-50"
-            >
-              <Bell className="h-3.5 w-3.5" /> {pushBusy ? "Ativando…" : "Ativar notificações push"}
-            </button>
-          )}
-          {pushActive && (
-            <button
-              disabled={pushBusy}
-              onClick={handleDisablePush}
-              className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent"
-            >
-              <Bell className="h-3.5 w-3.5 text-terracotta" /> Push ativo — desativar
-            </button>
-          )}
-          {showLegacyNotifCTA && (
-            <button
-              onClick={handleEnablePush}
-              className="inline-flex items-center gap-2 rounded-full border border-terracotta/30 bg-terracotta/5 px-3.5 py-1.5 text-xs font-medium text-terracotta transition-colors hover:bg-terracotta/10"
-            >
-              <Bell className="h-3.5 w-3.5" /> Ativar notificações
-            </button>
-          )}
-          {showInstall && (
-            <button
-              onClick={handleInstall}
-              className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-accent"
-            >
-              <Download className="h-3.5 w-3.5" /> Instalar aplicativo
-            </button>
-          )}
+        <div className="mt-3 flex items-center gap-2">
+          <button
+            type="button"
+            className={navBtn}
+            onClick={() => setDia((d) => addDaysISO(d, -1))}
+            aria-label="Dia anterior"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setDia(hoje)}
+            disabled={isToday}
+            className="h-11 rounded-md border border-border bg-card px-4 text-[13px] font-semibold text-foreground transition-colors hover:bg-muted disabled:text-muted-foreground xl:h-9"
+          >
+            Hoje
+          </button>
+          <button
+            type="button"
+            className={navBtn}
+            onClick={() => setDia((d) => addDaysISO(d, 1))}
+            aria-label="Próximo dia"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <StatCard
-            icon={CalendarDays}
-            label="Hoje"
-            value={stats.data?.hoje}
-            loading={stats.isLoading}
-          />
-          <StatCard
-            icon={Bell}
-            label="Pendentes"
-            value={stats.data?.pendentes}
-            loading={stats.isLoading}
-            accent
-          />
-          <StatCard
-            icon={Calendar}
-            label="Próx. 7 dias"
-            value={stats.data?.semana}
-            loading={stats.isLoading}
-          />
-          <StatCard
-            icon={PartyPopper}
-            label="Eventos"
-            value={stats.data?.eventos}
-            loading={stats.isLoading}
-          />
+        {needsTotal > 0 && (
+          <button
+            type="button"
+            onClick={() => setNeedsOpen(true)}
+            className="mt-3 flex h-11 w-full items-center justify-between rounded-lg border border-warning-500/30 bg-warning-50 px-4 text-left text-[13px] font-semibold text-warning-700 xl:hidden"
+          >
+            <span>
+              Precisa de você · {pendentes.length}{" "}
+              {pendentes.length === 1 ? "pendente" : "pendentes"}
+              {reconfirmar.length > 0 ? `, ${reconfirmar.length} a reconfirmar` : ""}
+            </span>
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        )}
+
+        <div
+          className={cn(
+            "mt-4 grid gap-6",
+            selected && dock ? "xl:grid-cols-1" : "xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]",
+          )}
+        >
+          <section aria-label="Linha do serviço" className="min-w-0">
+            <h2 className="mb-2 hidden text-xs font-extrabold uppercase tracking-[0.08em] text-muted-foreground xl:block">
+              Linha do serviço
+            </h2>
+            {diaQ.isLoading ? (
+              <div className="space-y-2">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <Skeleton key={i} className="h-[64px] w-full rounded-lg" />
+                ))}
+              </div>
+            ) : diaQ.isError ? (
+              <p className="rounded-lg border border-dashed border-border px-4 py-10 text-center text-sm text-muted-foreground">
+                Não foi possível carregar as reservas. Tente novamente em instantes.
+              </p>
+            ) : resumo.reservas === 0 ? (
+              <div className="rounded-lg border border-dashed border-border bg-card/50 px-4 py-12 text-center">
+                <p className="text-xl font-extrabold tracking-tight text-foreground">
+                  Nenhuma reserva
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">Nada marcado para este dia.</p>
+              </div>
+            ) : (
+              <ServiceLine
+                reservas={reservasDia}
+                dia={dia}
+                selectedId={selected?.id}
+                onOpen={setSelected}
+                renderAction={renderAction}
+                compact={dock && !!selected}
+              />
+            )}
+            {resumo.canceladas > 0 && (
+              <p className="mt-2 text-xs text-muted-foreground">
+                {resumo.canceladas} {resumo.canceladas === 1 ? "cancelada" : "canceladas"} neste dia
+              </p>
+            )}
+          </section>
+
+          <section
+            aria-label="Precisa de você"
+            className={cn("min-w-0", selected && dock ? "" : "hidden xl:block")}
+          >
+            <h2 className="mb-2 hidden text-xs font-extrabold uppercase tracking-[0.08em] text-muted-foreground xl:block">
+              Precisa de você
+            </h2>
+            <div className="hidden xl:block">
+              <NeedsYou
+                tenantId={tenantId}
+                pendentes={pendentes}
+                reconfirmar={reconfirmar}
+                selectedId={selected?.id}
+                onOpen={setSelected}
+                renderAction={renderAction}
+                loading={pendentesQ.isLoading || reconfirmarQ.isLoading}
+              />
+            </div>
+          </section>
         </div>
 
-        <div className="mt-6 relative">
-          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={busca}
-            onChange={(e) => setBusca(e.target.value)}
-            placeholder="Nome, telefone ou código…"
-            className="h-11 rounded-xl pl-10"
-          />
+        <div className="mt-8">
+          <UpcomingDays dia={dia} info={proximos} onPick={setDia} />
         </div>
 
-        <div className="mt-4 -mx-5 overflow-x-auto px-5 pb-1 scrollbar-none">
-          <div className="flex gap-1.5">
-            {FILTROS_DATA.map((f) => (
-              <FilterChip
-                key={f.id}
-                active={filtroData === f.id}
-                onClick={() => setFiltroData(f.id)}
+        {(pwa.showPushCTA || pwa.pushActive || pwa.showLegacyNotifCTA || pwa.showInstall) && (
+          <div className="mt-8 flex flex-wrap gap-2 border-t border-border pt-4">
+            {pwa.showPushCTA && (
+              <button
+                disabled={pwa.pushBusy}
+                onClick={pwa.handleEnablePush}
+                className={`${chip} border border-primary/25 bg-accent text-accent-foreground hover:bg-muted`}
               >
-                {f.label}
-              </FilterChip>
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-2 -mx-5 overflow-x-auto px-5 pb-1 scrollbar-none">
-          <div className="flex gap-1.5">
-            {FILTROS_STATUS.map((f) => (
-              <FilterChip
-                key={f.id}
-                active={filtroStatus === f.id}
-                onClick={() => setFiltroStatus(f.id)}
-                variant="status"
+                <Bell className="h-3.5 w-3.5" />{" "}
+                {pwa.pushBusy ? "Ativando…" : "Ativar notificações push"}
+              </button>
+            )}
+            {pwa.pushActive && (
+              <button
+                disabled={pwa.pushBusy}
+                onClick={pwa.handleDisablePush}
+                className={`${chip} border border-border bg-card text-muted-foreground hover:bg-accent`}
               >
-                {f.label}
-              </FilterChip>
-            ))}
+                <BellRing className="h-3.5 w-3.5 text-primary" /> Push ativo, desativar
+              </button>
+            )}
+            {pwa.showLegacyNotifCTA && (
+              <button
+                onClick={pwa.handleEnablePush}
+                className={`${chip} border border-primary/25 bg-accent text-accent-foreground hover:bg-muted`}
+              >
+                <Bell className="h-3.5 w-3.5" /> Ativar notificações
+              </button>
+            )}
+            {pwa.showInstall && (
+              <button
+                onClick={pwa.handleInstall}
+                className={`${chip} border border-border bg-card text-foreground hover:bg-accent`}
+              >
+                <Download className="h-3.5 w-3.5" /> Instalar aplicativo
+              </button>
+            )}
           </div>
-        </div>
-
-        <div className="mt-5 space-y-2.5">
-          {listaQ.isLoading ? (
-            Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="h-[88px] w-full rounded-2xl" />
-            ))
-          ) : listaQ.data && listaQ.data.length > 0 ? (
-            listaQ.data.map((r, i) => (
-              <ReservaCard key={r.id} r={r} onClick={() => setSelected(r)} delay={i * 30} />
-            ))
-          ) : (
-            <EmptyState />
-          )}
-
-          {filtroStatus === "todos" && !mostrarFinalizadas && (finalizadasCountQ.data ?? 0) > 0 && (
-            <button
-              onClick={() => setMostrarFinalizadas(true)}
-              className="w-full rounded-2xl border border-dashed border-border bg-card/60 px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-            >
-              Ver mais {finalizadasCountQ.data} finalizada{finalizadasCountQ.data === 1 ? "" : "s"}
-            </button>
-          )}
-
-          {filtroStatus === "todos" && mostrarFinalizadas && (
-            <button
-              onClick={() => setMostrarFinalizadas(false)}
-              className="w-full rounded-2xl border border-dashed border-border bg-card/60 px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-            >
-              Ocultar finalizadas
-            </button>
-          )}
-        </div>
+        )}
       </div>
 
-      <ReservaDialog
+      <BottomSheet open={needsOpen} onOpenChange={setNeedsOpen} title="Precisa de você">
+        <NeedsYou
+          tenantId={tenantId}
+          pendentes={pendentes}
+          reconfirmar={reconfirmar}
+          onOpen={(r) => {
+            setNeedsOpen(false);
+            setSelected(r);
+          }}
+          renderAction={renderAction}
+          loading={pendentesQ.isLoading || reconfirmarQ.isLoading}
+        />
+      </BottomSheet>
+
+      <ReservaDetail
         reserva={selected}
         onClose={() => setSelected(null)}
-        onConfirm={() => selected && handleConfirm(selected)}
-        onConfirmSemNotificar={() => selected && handleConfirmSemNotificar(selected)}
-        onReconfirm={() => selected && handleReconfirm(selected)}
-        onSetStatus={(status) =>
-          selected && updateReserva.mutate({ id: selected.id, patch: { status } })
-        }
+        onConfirm={() => selected && actions.handleConfirm(selected)}
+        onConfirmSemNotificar={() => selected && actions.handleConfirmSemNotificar(selected)}
+        onReconfirm={() => selected && actions.handleReconfirm(selected)}
+        onSetStatus={(status) => selected && actions.handleSetStatus(selected, status)}
         onSave={(patch) =>
-          selected ? updateReserva.mutateAsync({ id: selected.id, patch }) : Promise.resolve()
+          selected
+            ? actions.updateReserva.mutateAsync({ id: selected.id, patch })
+            : Promise.resolve()
         }
-        onCancel={(motivo) => (selected ? handleCancel(selected, motivo) : Promise.resolve())}
-        onDelete={() => selected && deleteReserva.mutate(selected.id)}
-        pending={
-          updateReserva.isPending || deleteReserva.isPending || confirmarSemNotificar.isPending
+        onCancel={(motivo) =>
+          selected ? actions.handleCancel(selected, motivo) : Promise.resolve()
         }
+        onDelete={() => selected && actions.handleDelete(selected)}
+        pending={actions.pending}
       />
-
-      <audio ref={audioRef} preload="auto" />
     </AdminShell>
-  );
-}
-
-function FilterChip({
-  active,
-  onClick,
-  children,
-  variant,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-  variant?: "status";
-}) {
-  const activeCls =
-    variant === "status"
-      ? "bg-terracotta/15 text-terracotta shadow-[var(--shadow-sm)]"
-      : "bg-primary text-primary-foreground shadow-[var(--shadow-sm)]";
-  return (
-    <button
-      onClick={onClick}
-      className={`h-9 shrink-0 rounded-full px-4 text-xs font-medium transition-all ${active ? activeCls : "bg-muted text-muted-foreground hover:bg-accent hover:text-foreground"}`}
-    >
-      {children}
-    </button>
-  );
-}
-
-function StatCard({
-  icon: Icon,
-  label,
-  value,
-  loading,
-  accent,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-  value?: number;
-  loading?: boolean;
-  accent?: boolean;
-}) {
-  return (
-    <div
-      className={`rounded-2xl border border-border bg-card p-4 transition-colors ${accent ? "bg-cream" : ""}`}
-    >
-      <div className="flex items-center gap-2">
-        <Icon className={`h-3.5 w-3.5 ${accent ? "text-terracotta" : "text-muted-foreground"}`} />
-        <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-          {label}
-        </p>
-      </div>
-      <p className="mt-2.5 font-serif text-3xl tabular-nums text-foreground">
-        {loading ? <span className="inline-block h-7 w-8 rounded shimmer" /> : (value ?? 0)}
-      </p>
-    </div>
-  );
-}
-
-function StatusPill({ status }: { status: ReservaStatus }) {
-  const styles: Record<ReservaStatus, string> = {
-    pendente: "bg-warning/15 text-[oklch(0.45_0.11_65)]",
-    confirmada: "bg-success/15 text-[oklch(0.4_0.12_150)]",
-    cancelada: "bg-destructive/12 text-destructive",
-    finalizada: "bg-muted text-muted-foreground",
-  };
-  return (
-    <span
-      className={`inline-flex h-6 items-center rounded-full px-2.5 text-[11px] font-medium ${styles[status]}`}
-    >
-      {STATUS_LABEL[status]}
-    </span>
-  );
-}
-
-function ReservaCard({ r, onClick, delay }: { r: Reserva; onClick: () => void; delay: number }) {
-  const Icon = TIPO_ICON[r.tipo as ReservaTipo] ?? Utensils;
-  return (
-    <button
-      onClick={onClick}
-      style={{ animationDelay: `${delay}ms` }}
-      className="w-full rounded-2xl border border-border bg-card p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-terracotta/40 hover:shadow-[var(--shadow-md)] active:scale-[0.995] animate-in-up"
-    >
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
-        <div className="flex min-w-0 items-start gap-3">
-          <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cream text-terracotta">
-            <Icon className="h-4 w-4" />
-          </div>
-          <div className="min-w-0">
-            <p className="truncate font-medium text-foreground">{r.nome}</p>
-            <p className="mt-0.5 truncate text-[13px] text-muted-foreground">
-              {TIPO_SHORT[r.tipo as ReservaTipo]}
-              {r.quantidade ? ` • ${r.quantidade} pessoas` : ""}
-              {r.data ? ` • ${formatData(r.data)}` : ""}
-              {r.horario ? ` às ${formatHorario(r.horario)}` : ""}
-            </p>
-            <p className="mt-0.5 truncate text-[11px] font-mono text-muted-foreground/70">
-              {r.codigo_acompanhamento}
-            </p>
-          </div>
-        </div>
-        <StatusPill status={r.status} />
-      </div>
-    </button>
-  );
-}
-
-function ReservaDialog({
-  reserva,
-  onClose,
-  onConfirm,
-  onConfirmSemNotificar,
-  onReconfirm,
-  onSetStatus,
-  onSave,
-  onCancel,
-  onDelete,
-  pending,
-}: {
-  reserva: Reserva | null;
-  onClose: () => void;
-  onConfirm: () => void;
-  onConfirmSemNotificar: () => void;
-  onReconfirm: () => void;
-  onSetStatus: (s: ReservaStatus) => void;
-  onSave: (patch: ReservaUpdate) => Promise<void>;
-  onCancel: (motivo: string) => Promise<void>;
-  onDelete: () => void;
-  pending: boolean;
-}) {
-  const [editing, setEditing] = useState(false);
-  const [cancelando, setCancelando] = useState(false);
-  const [motivo, setMotivo] = useState<string>(MOTIVO_CANCELAMENTO_OPCOES[0]);
-  const [motivoDetalhe, setMotivoDetalhe] = useState("");
-  const [form, setForm] = useState<ReservaUpdate>({});
-
-  useEffect(() => {
-    setEditing(false);
-    setCancelando(false);
-    setMotivo(MOTIVO_CANCELAMENTO_OPCOES[0]);
-    setMotivoDetalhe("");
-    setForm({});
-  }, [reserva?.id]);
-
-  const r = reserva;
-
-  function startEdit() {
-    if (!r) return;
-    setForm({
-      nome: r.nome,
-      telefone: r.telefone,
-      quantidade: r.quantidade,
-      data: r.data,
-      horario: r.horario,
-      area: r.area,
-      tipo: r.tipo,
-      tipo_evento: r.tipo_evento,
-      observacoes: r.observacoes,
-      leva_bolo: r.leva_bolo,
-      comandas: r.comandas,
-      status: r.status,
-    });
-    setEditing(true);
-  }
-
-  function startRemarcar() {
-    setCancelando(false);
-    startEdit();
-  }
-
-  async function confirmarCancelamento() {
-    const motivoFinal = motivo === "Outro" && motivoDetalhe.trim() ? motivoDetalhe.trim() : motivo;
-    await onCancel(motivoFinal);
-    setCancelando(false);
-  }
-
-  async function saveEdit() {
-    if (!r) return;
-    await onSave(form);
-    toast.success("Reserva atualizada.");
-    setEditing(false);
-  }
-
-  function confirmDelete() {
-    if (!r) return;
-    if (window.confirm(`Excluir a reserva de ${r.nome}? Esta ação não pode ser desfeita.`))
-      onDelete();
-  }
-
-  return (
-    <Dialog open={!!r} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-md rounded-2xl p-0 overflow-hidden">
-        {r && (
-          <>
-            <DialogHeader className="border-b border-border/70 p-5 text-left">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <DialogTitle className="truncate font-serif text-2xl font-normal tracking-tight">
-                    {r.nome}
-                  </DialogTitle>
-                  <DialogDescription className="mt-1 text-[13px] text-muted-foreground">
-                    {TIPO_LABEL[r.tipo as ReservaTipo]} ·{" "}
-                    <span className="font-mono">{r.codigo_acompanhamento}</span>
-                  </DialogDescription>
-                </div>
-                <StatusPill status={r.status} />
-              </div>
-            </DialogHeader>
-
-            <div className="max-h-[55vh] overflow-y-auto p-5">
-              {cancelando ? (
-                <CancelFields
-                  motivo={motivo}
-                  setMotivo={setMotivo}
-                  motivoDetalhe={motivoDetalhe}
-                  setMotivoDetalhe={setMotivoDetalhe}
-                  onRemarcar={startRemarcar}
-                />
-              ) : editing ? (
-                <EditFields r={r} form={form} setForm={setForm} />
-              ) : (
-                <div className="space-y-3.5 text-sm">
-                  <DetailRow
-                    icon={Phone}
-                    label="Telefone"
-                    value={r.telefone}
-                    link={`tel:${telefoneToWhatsApp(r.telefone)}`}
-                  />
-                  {r.quantidade != null && (
-                    <DetailRow icon={User} label="Pessoas" value={String(r.quantidade)} />
-                  )}
-                  {r.data && (
-                    <DetailRow icon={CalendarDays} label="Data" value={formatData(r.data)} />
-                  )}
-                  {r.horario && (
-                    <DetailRow icon={Calendar} label="Horário" value={formatHorario(r.horario)} />
-                  )}
-                  {r.area && <DetailRow icon={Utensils} label="Área" value={AREA_LABEL[r.area]} />}
-                  {r.tipo_evento && (
-                    <DetailRow icon={Sparkles} label="Tipo do evento" value={r.tipo_evento} />
-                  )}
-                  {r.leva_bolo !== null && r.tipo === "aniversario" && (
-                    <DetailRow icon={Cake} label="Leva bolo" value={r.leva_bolo ? "Sim" : "Não"} />
-                  )}
-                  {r.comandas !== null && r.tipo === "aniversario" && (
-                    <DetailRow
-                      icon={Check}
-                      label="Comandas individuais"
-                      value={r.comandas ? "Sim" : "Não"}
-                    />
-                  )}
-                  {r.observacoes && (
-                    <div className="rounded-xl bg-muted p-3.5">
-                      <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                        Observações
-                      </p>
-                      <p className="leading-relaxed text-foreground">{r.observacoes}</p>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            <DialogFooter className="border-t border-border/70 bg-muted/40 p-4 flex-col gap-2 sm:flex-col sm:space-x-0">
-              {cancelando ? (
-                <div className="grid w-full grid-cols-2 gap-2">
-                  <ActionBtn onClick={() => setCancelando(false)} icon={X}>
-                    Voltar
-                  </ActionBtn>
-                  <ActionBtn
-                    onClick={confirmarCancelamento}
-                    disabled={pending}
-                    variant="danger"
-                    icon={X}
-                  >
-                    Confirmar cancelamento
-                  </ActionBtn>
-                </div>
-              ) : editing ? (
-                <div className="grid w-full grid-cols-2 gap-2">
-                  <ActionBtn onClick={() => setEditing(false)} icon={X}>
-                    Cancelar
-                  </ActionBtn>
-                  <ActionBtn onClick={saveEdit} disabled={pending} variant="primary" icon={Save}>
-                    Salvar
-                  </ActionBtn>
-                </div>
-              ) : (
-                <>
-                  <div className="grid w-full grid-cols-2 gap-2">
-                    <ActionBtn
-                      disabled={pending || r.status === "confirmada"}
-                      onClick={onConfirm}
-                      variant="primary"
-                      icon={MessageCircle}
-                    >
-                      Confirmar + WhatsApp
-                    </ActionBtn>
-                    <ActionBtn onClick={startEdit} icon={Pencil}>
-                      Editar
-                    </ActionBtn>
-                  </div>
-                  {r.status !== "confirmada" && (
-                    <button
-                      type="button"
-                      disabled={pending}
-                      onClick={onConfirmSemNotificar}
-                      className="flex w-full items-center justify-center gap-1.5 text-[12px] text-muted-foreground underline-offset-2 transition-colors hover:text-foreground hover:underline disabled:opacity-50"
-                    >
-                      <CheckCircle2 className="h-3.5 w-3.5" />
-                      Confirmar sem avisar o cliente
-                    </button>
-                  )}
-                  {r.status === "confirmada" && (
-                    <div className="grid w-full grid-cols-1 gap-1.5">
-                      <ActionBtn disabled={pending} onClick={onReconfirm} icon={BellRing}>
-                        Reconfirmar + WhatsApp
-                      </ActionBtn>
-                      {r.reconfirmada_em && (
-                        <p className="text-center text-[11px] text-muted-foreground">
-                          Última reconfirmação enviada em{" "}
-                          {new Date(r.reconfirmada_em).toLocaleString("pt-BR")}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                  <div className="grid w-full grid-cols-3 gap-2">
-                    <ActionBtn
-                      disabled={pending || r.status === "finalizada"}
-                      onClick={() => onSetStatus("finalizada")}
-                      icon={CheckCircle2}
-                    >
-                      Finalizar
-                    </ActionBtn>
-                    <ActionBtn
-                      disabled={pending || r.status === "cancelada"}
-                      onClick={() => setCancelando(true)}
-                      variant="danger"
-                      icon={X}
-                    >
-                      Cancelar
-                    </ActionBtn>
-                    <ActionBtn
-                      disabled={pending}
-                      onClick={confirmDelete}
-                      variant="danger"
-                      icon={Trash2}
-                    >
-                      Excluir
-                    </ActionBtn>
-                  </div>
-                </>
-              )}
-            </DialogFooter>
-          </>
-        )}
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-function EditFields({
-  r,
-  form,
-  setForm,
-}: {
-  r: Reserva;
-  form: ReservaUpdate;
-  setForm: (f: ReservaUpdate) => void;
-}) {
-  function set<K extends keyof ReservaUpdate>(key: K, value: ReservaUpdate[K]) {
-    setForm({ ...form, [key]: value });
-  }
-  return (
-    <div className="space-y-4 text-sm">
-      <FieldRow label="Nome">
-        <Input
-          value={form.nome ?? ""}
-          onChange={(e) => set("nome", e.target.value)}
-          className="h-10 rounded-lg"
-        />
-      </FieldRow>
-      <FieldRow label="Telefone">
-        <Input
-          value={form.telefone ?? ""}
-          onChange={(e) => set("telefone", e.target.value)}
-          className="h-10 rounded-lg"
-        />
-      </FieldRow>
-      <div className="grid grid-cols-2 gap-3">
-        <FieldRow label="Data">
-          <Input
-            type="date"
-            value={form.data ?? ""}
-            onChange={(e) => set("data", e.target.value || null)}
-            className="h-10 rounded-lg"
-          />
-        </FieldRow>
-        <FieldRow label="Horário">
-          <Input
-            type="time"
-            value={form.horario ?? ""}
-            onChange={(e) => set("horario", e.target.value || null)}
-            className="h-10 rounded-lg"
-          />
-        </FieldRow>
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <FieldRow label="Quantidade">
-          <Input
-            type="number"
-            min={1}
-            value={form.quantidade ?? ""}
-            onChange={(e) =>
-              set("quantidade", e.target.value ? parseInt(e.target.value, 10) : null)
-            }
-            className="h-10 rounded-lg"
-          />
-        </FieldRow>
-        <FieldRow label="Status">
-          <Select
-            value={form.status ?? r.status}
-            onValueChange={(v) => set("status", v as ReservaStatus)}
-          >
-            <SelectTrigger className="h-10 rounded-lg">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {STATUS_LIST.map((s) => (
-                <SelectItem key={s} value={s}>
-                  {STATUS_LABEL[s]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </FieldRow>
-      </div>
-      <FieldRow label="Tipo">
-        <Select value={form.tipo ?? r.tipo} onValueChange={(v) => set("tipo", v as ReservaTipo)}>
-          <SelectTrigger className="h-10 rounded-lg">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="mesa">Mesa</SelectItem>
-            <SelectItem value="aniversario">Aniversário</SelectItem>
-            <SelectItem value="evento">Evento</SelectItem>
-            <SelectItem value="casamento">Casamento</SelectItem>
-          </SelectContent>
-        </Select>
-      </FieldRow>
-      {(form.tipo ?? r.tipo) === "mesa" && (
-        <FieldRow label="Área">
-          <Select
-            value={form.area ?? "sem_preferencia"}
-            onValueChange={(v) => set("area", v as ReservaArea)}
-          >
-            <SelectTrigger className="h-10 rounded-lg">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="salao">Salão</SelectItem>
-              <SelectItem value="fundos">Fundos</SelectItem>
-              <SelectItem value="corredor">Corredor</SelectItem>
-              <SelectItem value="varanda">Varanda</SelectItem>
-              <SelectItem value="sem_preferencia">Sem preferência</SelectItem>
-            </SelectContent>
-          </Select>
-        </FieldRow>
-      )}
-      {(form.tipo ?? r.tipo) === "evento" && (
-        <FieldRow label="Tipo do evento">
-          <Input
-            value={form.tipo_evento ?? ""}
-            onChange={(e) => set("tipo_evento", e.target.value)}
-            className="h-10 rounded-lg"
-          />
-        </FieldRow>
-      )}
-      <FieldRow label="Observações">
-        <Textarea
-          value={form.observacoes ?? ""}
-          onChange={(e) => set("observacoes", e.target.value)}
-          className="min-h-20 rounded-lg"
-        />
-      </FieldRow>
-    </div>
-  );
-}
-
-function CancelFields({
-  motivo,
-  setMotivo,
-  motivoDetalhe,
-  setMotivoDetalhe,
-  onRemarcar,
-}: {
-  motivo: string;
-  setMotivo: (v: string) => void;
-  motivoDetalhe: string;
-  setMotivoDetalhe: (v: string) => void;
-  onRemarcar: () => void;
-}) {
-  return (
-    <div className="space-y-4 text-sm">
-      <button
-        onClick={onRemarcar}
-        className="w-full rounded-xl border border-terracotta/30 bg-terracotta/5 p-4 text-left transition-colors hover:bg-terracotta/10"
-      >
-        <p className="font-medium text-terracotta">Remarcar em vez de cancelar</p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Altere a data ou o horário e mantenha a reserva — o cliente não precisa fazer tudo de
-          novo.
-        </p>
-      </button>
-
-      <div className="flex items-center gap-3 text-xs text-muted-foreground">
-        <div className="h-px flex-1 bg-border" /> ou cancele mesmo assim{" "}
-        <div className="h-px flex-1 bg-border" />
-      </div>
-
-      <FieldRow label="Motivo do cancelamento">
-        <Select value={motivo} onValueChange={setMotivo}>
-          <SelectTrigger className="h-10 rounded-lg">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {MOTIVO_CANCELAMENTO_OPCOES.map((m) => (
-              <SelectItem key={m} value={m}>
-                {m}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </FieldRow>
-
-      {motivo === "Outro" && (
-        <FieldRow label="Detalhe">
-          <Textarea
-            value={motivoDetalhe}
-            onChange={(e) => setMotivoDetalhe(e.target.value)}
-            placeholder="Descreva o motivo…"
-            className="min-h-20 rounded-lg"
-          />
-        </FieldRow>
-      )}
-
-      <p className="text-xs text-muted-foreground">
-        Ao confirmar, o cliente recebe um aviso no WhatsApp com o motivo e um link para fazer uma
-        nova reserva quando quiser.
-      </p>
-    </div>
-  );
-}
-
-function FieldRow({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="space-y-1.5">
-      <Label className="text-[12px] text-muted-foreground">{label}</Label>
-      {children}
-    </div>
-  );
-}
-
-function DetailRow({
-  icon: Icon,
-  label,
-  value,
-  link,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-  value: string;
-  link?: string;
-}) {
-  const content = <span className="font-medium text-foreground">{value}</span>;
-  return (
-    <div className="flex items-center justify-between gap-3">
-      <div className="flex items-center gap-2 text-muted-foreground">
-        <Icon className="h-3.5 w-3.5" />
-        <span className="text-[13px]">{label}</span>
-      </div>
-      {link ? (
-        <a href={link} className="text-right underline-offset-2 hover:underline">
-          {content}
-        </a>
-      ) : (
-        content
-      )}
-    </div>
-  );
-}
-
-function ActionBtn({
-  children,
-  onClick,
-  disabled,
-  variant,
-  icon: Icon,
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-  disabled?: boolean;
-  variant?: "primary" | "danger";
-  icon: React.ComponentType<{ className?: string }>;
-}) {
-  const base =
-    "flex h-11 items-center justify-center gap-1.5 rounded-xl text-xs font-medium transition-all active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none";
-  const styles =
-    variant === "primary"
-      ? "bg-primary text-primary-foreground hover:bg-primary/90"
-      : variant === "danger"
-        ? "bg-background text-destructive border border-border hover:bg-destructive/5"
-        : "bg-background text-foreground border border-border hover:bg-accent";
-  return (
-    <button onClick={onClick} disabled={disabled} className={`${base} ${styles}`}>
-      <Icon className="h-3.5 w-3.5" />
-      {children}
-    </button>
-  );
-}
-
-function EmptyState() {
-  return (
-    <div className="rounded-2xl border border-dashed border-border bg-card/50 py-14 text-center animate-fade">
-      <p className="font-serif text-2xl text-foreground">Nenhuma reserva</p>
-      <p className="mt-1 text-sm text-muted-foreground">Nada por aqui neste filtro.</p>
-    </div>
   );
 }

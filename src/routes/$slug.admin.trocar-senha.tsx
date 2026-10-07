@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/$slug/admin/trocar-senha")({
   head: () => ({
-    meta: [{ title: "Trocar senha — ReservaLab" }, { name: "robots", content: "noindex" }],
+    meta: [{ title: "Trocar senha | Teggly" }, { name: "robots", content: "noindex" }],
   }),
   ssr: false,
   component: TrocarSenha,
@@ -69,13 +69,17 @@ function TrocarSenha() {
     <main className="flex min-h-screen items-center justify-center bg-background px-5 safe-top safe-bottom">
       <div className="w-full max-w-sm animate-in-up">
         <div className="mb-8 text-center">
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-terracotta">
-            ReservaLab
-          </p>
+          <img
+            src="/brand/Teggly_Logo_Primary.svg"
+            alt="Teggly"
+            width={134}
+            height={32}
+            className="mx-auto h-8 w-auto"
+          />
         </div>
 
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-md)]">
-          <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-cream text-terracotta">
+        <div className="rounded-lg border border-border bg-card p-6 shadow-[var(--shadow-md)]">
+          <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-md bg-cream text-terracotta">
             <KeyRound className="h-5 w-5" />
           </div>
           <h1 className="font-serif text-3xl tracking-tight">
@@ -97,11 +101,9 @@ function TrocarSenha() {
                 autoComplete="new-password"
                 required
                 minLength={6}
-                className="h-12 rounded-xl"
+                className="h-12 rounded-md"
               />
-              <p
-                className={`text-[11px] ${forte ? "text-muted-foreground" : "text-muted-foreground"}`}
-              >
+              <p className={`text-xs ${forte ? "text-muted-foreground" : "text-muted-foreground"}`}>
                 Mínimo de 6 caracteres. Recomendado: 8+, com letras e números.
               </p>
             </div>
@@ -114,17 +116,17 @@ function TrocarSenha() {
                 autoComplete="new-password"
                 required
                 minLength={6}
-                className="h-12 rounded-xl"
+                className="h-12 rounded-md"
               />
               {confirma.length > 0 && confirma !== nova && (
-                <p className="text-[11px] text-destructive">As senhas não conferem.</p>
+                <p className="text-xs text-destructive">As senhas não conferem.</p>
               )}
             </div>
 
             <Button
               type="submit"
               disabled={!podeSalvar}
-              className="h-12 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+              className="h-12 w-full rounded-md bg-primary text-primary-foreground hover:bg-blue-700"
             >
               {salvando ? <Loader2 className="h-4 w-4 animate-spin" /> : "Salvar nova senha"}
             </Button>
