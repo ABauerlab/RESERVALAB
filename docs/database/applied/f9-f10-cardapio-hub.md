@@ -19,3 +19,18 @@ Fora de escopo: delivery, carrinho, pagamento, upload de imagens (as fotos entra
 Testado em transacao revertida: publicacao, isolamento entre empresas, FK cruzada bloqueada, preco negativo e URL `javascript:` bloqueados, `anon` sem acesso as tabelas, usuario autenticado sem papel sem leitura nem escrita.
 
 Rollback: `DROP FUNCTION public.cardapio_do_tenant(text), public.hub_do_tenant(text); DROP TABLE public.cardapio_itens, public.cardapio_categorias, public.hub_links, public.tenant_perfil;` (so se nao houver dados).
+
+## f8_marca_opt_in_por_empresa (F8, white-label por opt-in)
+
+Aplicada em producao (aditiva, reversivel, sem tocar dados existentes).
+
+- `ALTER TABLE public.tenant_perfil ADD COLUMN marca_ativa boolean NOT NULL DEFAULT false;`
+- RPC `public.marca_do_tenant(_slug text)` (SECURITY DEFINER, so devolve `cor` e `logo_url` quando `marca_ativa = true`; senao null).
+- Padrao: desligado. Nenhuma empresa muda de visual sem ligar em Ajustes.
+
+Rollback:
+
+```sql
+DROP FUNCTION public.marca_do_tenant(text);
+ALTER TABLE public.tenant_perfil DROP COLUMN marca_ativa;
+```

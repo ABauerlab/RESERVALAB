@@ -48,6 +48,7 @@ export type PerfilRow = {
   instagram: string | null;
   cardapio_publicado: boolean;
   hub_publicado: boolean;
+  marca_ativa?: boolean;
 };
 
 // As tabelas novas ainda nao estao em `types.ts` (arquivo gerado). Cliente sem tipos de tabela,

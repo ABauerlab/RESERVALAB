@@ -1,3 +1,4 @@
+import { MarcaOptIn } from "@/components/admin/MarcaOptIn";
 import { pwaHeadLinks } from "@/lib/pwa-manifest";
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
@@ -204,6 +205,7 @@ function ConfiguracoesPage() {
                       />
                     )}
                   </div>
+                  {tenant && <MarcaOptIn tenantId={tenant.id} />}
                 </div>
 
                 <div className="space-y-4 border-t border-border/60 pt-5 first:border-t-0 first:pt-0">

@@ -1,3 +1,4 @@
+import { useMarcaLogo } from "@/components/public/MarcaScope";
 import { cn } from "@/lib/utils";
 
 /**
@@ -20,6 +21,7 @@ export function PublicShell({
   rodape?: boolean;
   className?: string;
 }) {
+  const logo = useMarcaLogo();
   return (
     <main className="min-h-screen bg-background">
       <div
@@ -29,7 +31,14 @@ export function PublicShell({
         )}
       >
         <header className="text-center">
-          {marca}
+          {marca ??
+            (logo && (
+              <img
+                src={logo}
+                alt={`Logo ${nome}`}
+                className="mx-auto mb-4 h-16 w-auto max-w-[200px] object-contain"
+              />
+            ))}
           <h1 className="text-[28px] font-extrabold leading-tight tracking-tight text-foreground sm:text-3xl">
             {nome}
           </h1>

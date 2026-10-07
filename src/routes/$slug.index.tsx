@@ -1,3 +1,5 @@
+import { useMarcaLogo } from "@/components/public/MarcaScope";
+import { comMarca } from "@/components/public/MarcaScope";
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
@@ -33,7 +35,7 @@ export const Route = createFileRoute("/$slug/")({
       { name: "description", content: "Reserve sua mesa, aniversário ou evento em poucos toques." },
     ],
   }),
-  component: TenantHome,
+  component: comMarca(TenantHome),
 });
 
 const ICONS = {
@@ -45,6 +47,7 @@ const ICONS = {
 
 function TenantHome() {
   const { slug } = useParams({ from: "/$slug/" });
+  const logo = useMarcaLogo();
   const tenantQ = useQuery({
     queryKey: ["tenant", slug],
     queryFn: () => getTenantBySlug(slug),
@@ -107,6 +110,13 @@ function TenantHome() {
     <main className="relative min-h-screen bg-background">
       <div className="mx-auto flex min-h-screen max-w-2xl flex-col px-5 pt-14 pb-10 safe-top safe-bottom sm:pt-20">
         <header className="animate-fade">
+          {logo && (
+            <img
+              src={logo}
+              alt={`Logo ${tenant.nome}`}
+              className="mb-4 h-14 w-auto object-contain"
+            />
+          )}
           <p className="text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">
             {tenant.nome}
           </p>

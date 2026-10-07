@@ -1,3 +1,4 @@
+import { comMarca } from "@/components/public/MarcaScope";
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -22,7 +23,7 @@ export const Route = createFileRoute("/$slug/links")({
       { name: "description", content: "Reserve sua mesa, veja o cardápio e fale com a casa." },
     ],
   }),
-  component: HubPublicoPage,
+  component: comMarca(HubPublicoPage),
 });
 
 const ICONES: Record<HubItem["tipo"], typeof Phone> = {

@@ -1,3 +1,4 @@
+import { comMarca } from "@/components/public/MarcaScope";
 import { createFileRoute, Link, useNavigate, useParams } from "@tanstack/react-router";
 import { ChevronLeft, Search } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -22,7 +23,7 @@ export const Route = createFileRoute("/$slug/acompanhar/")({
   validateSearch: (search: Record<string, unknown>): { codigo?: string } =>
     typeof search.codigo === "string" ? { codigo: search.codigo } : {},
 
-  component: AcompanharPage,
+  component: comMarca(AcompanharPage),
 });
 
 function AcompanharPage() {

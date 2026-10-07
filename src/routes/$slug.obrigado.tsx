@@ -1,3 +1,4 @@
+import { comMarca } from "@/components/public/MarcaScope";
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Check, Copy, Search } from "lucide-react";
@@ -12,7 +13,7 @@ export const Route = createFileRoute("/$slug/obrigado")({
     meta: [{ title: "Reserva enviada | Teggly" }, { name: "robots", content: "noindex" }],
   }),
   ssr: false,
-  component: Obrigado,
+  component: comMarca(Obrigado),
 });
 
 function Obrigado() {

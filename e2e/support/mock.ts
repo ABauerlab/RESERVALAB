@@ -95,6 +95,7 @@ type Fixtures = {
   categorias: Row[];
   itens: Row[];
   perfil: Row[];
+  marca: { cor: string | null; logo_url: string | null } | null;
   hubLinks: Row[];
 };
 
@@ -128,6 +129,7 @@ function fixtures(): Fixtures {
         ativo: true,
       },
     ],
+    marca: null,
     perfil: [
       {
         tenant_id: TENANT_ID,
@@ -352,6 +354,7 @@ export async function installMock(context: BrowserContext, initial: Mode = "data
               .map((l) => ({ id: l.id, titulo: l.titulo, url: l.url })),
           });
         }
+        if (name === "marca_do_tenant") return json(route, mock.state.marca);
         if (name === "bloqueios_do_tenant") return json(route, []);
         if (name === "feriados_do_tenant") return json(route, []);
         if (name === "proximo_evento_do_tenant") return json(route, []);
