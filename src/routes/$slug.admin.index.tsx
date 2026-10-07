@@ -48,7 +48,7 @@ import {
 export const Route = createFileRoute("/$slug/admin/")({
   head: ({ params }) => ({
     meta: [
-      { title: "Painel — ReservaLab" },
+      { title: "Painel | Teggly" },
       { name: "robots", content: "noindex" },
     ],
     links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),
@@ -483,13 +483,13 @@ function StatCard({ icon: Icon, label, value, loading, accent }: { icon: React.C
 
 function StatusPill({ status }: { status: ReservaStatus }) {
   const styles: Record<ReservaStatus, string> = {
-    pendente:   "bg-warning/15 text-[oklch(0.45_0.11_65)]",
-    confirmada: "bg-success/15 text-[oklch(0.4_0.12_150)]",
-    cancelada:  "bg-destructive/12 text-destructive",
-    finalizada: "bg-muted text-muted-foreground",
+    pendente:   "bg-warning-50 text-warning-700 before:bg-warning-500",
+    confirmada: "bg-success-50 text-success-700 before:bg-success-500",
+    cancelada:  "bg-error-50 text-error-700 before:bg-error-500",
+    finalizada: "bg-muted text-muted-foreground before:bg-slate-400",
   };
   return (
-    <span className={`inline-flex h-6 items-center rounded-full px-2.5 text-[11px] font-medium ${styles[status]}`}>
+    <span className={`inline-flex h-[26px] items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 text-xs font-semibold before:size-[7px] before:rounded-full before:content-[''] ${styles[status]}`}>
       {STATUS_LABEL[status]}
     </span>
   );
@@ -513,7 +513,7 @@ function ReservaCard({ r, onClick, delay }: { r: Reserva; onClick: () => void; d
               {r.data ? ` • ${formatData(r.data)}` : ""}
               {r.horario ? ` às ${formatHorario(r.horario)}` : ""}
             </p>
-            <p className="mt-0.5 truncate text-[11px] font-mono text-muted-foreground/70">{r.codigo_acompanhamento}</p>
+            <p className="mt-0.5 truncate text-[11px] font-mono text-muted-foreground">{r.codigo_acompanhamento}</p>
           </div>
         </div>
         <StatusPill status={r.status} />
@@ -593,7 +593,7 @@ function ReservaDialog({
             <DialogHeader className="border-b border-border/70 p-5 text-left">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <DialogTitle className="truncate font-serif text-2xl font-normal tracking-tight">{r.nome}</DialogTitle>
+                  <DialogTitle className="truncate font-serif font-semibold text-2xl tracking-tight">{r.nome}</DialogTitle>
                   <DialogDescription className="mt-1 text-[13px] text-muted-foreground">
                     {TIPO_LABEL[r.tipo as ReservaTipo]} · <span className="font-mono">{r.codigo_acompanhamento}</span>
                   </DialogDescription>
@@ -827,7 +827,7 @@ function ActionBtn({ children, onClick, disabled, variant, icon: Icon }: { child
 function EmptyState() {
   return (
     <div className="rounded-lg border border-dashed border-border bg-card/50 py-14 text-center animate-fade">
-      <p className="font-serif text-2xl text-foreground">Nenhuma reserva</p>
+      <p className="font-serif font-semibold text-2xl text-foreground">Nenhuma reserva</p>
       <p className="mt-1 text-sm text-muted-foreground">Nada por aqui neste filtro.</p>
     </div>
   );

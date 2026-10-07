@@ -67,7 +67,7 @@ function TenantHome() {
             to="/"
             className="mt-6 inline-flex h-11 items-center justify-center rounded-md border border-border bg-card px-5 text-sm font-medium hover:bg-accent"
           >
-            Ir para ReservaLab
+            Ir para Teggly
           </Link>
         </div>
       </main>
@@ -82,7 +82,7 @@ function TenantHome() {
     <main className="relative min-h-screen bg-background">
       <div className="mx-auto flex min-h-screen max-w-2xl flex-col px-5 pt-14 pb-10 safe-top safe-bottom sm:pt-20">
         <header className="animate-fade">
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-terracotta">
+          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">
             {tenant.nome}
           </p>
           <h1 className="mt-6 font-serif text-[44px] leading-[1.05] tracking-tight text-foreground sm:text-6xl">
@@ -103,10 +103,10 @@ function TenantHome() {
               />
             )}
             <div className="p-5">
-              <p className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.18em] text-terracotta">
+              <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">
                 <PartyPopper className="h-3.5 w-3.5" /> Evento em destaque
               </p>
-              <p className="mt-2 font-serif text-2xl leading-snug text-foreground">{eventoQ.data.titulo}</p>
+              <p className="mt-2 font-serif font-semibold text-2xl leading-snug text-foreground">{eventoQ.data.titulo}</p>
               <p className="mt-1 text-sm font-medium text-terracotta">
                 {formatData(eventoQ.data.data)}
                 {eventoQ.data.horario ? ` às ${formatHorario(eventoQ.data.horario)}` : ""}
@@ -155,7 +155,7 @@ function TenantHome() {
         </div>
 
         <div className="mt-auto pt-16 text-center">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/60">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
             ReservaLab
           </p>
         </div>

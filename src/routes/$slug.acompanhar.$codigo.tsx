@@ -25,7 +25,7 @@ import {
 export const Route = createFileRoute("/$slug/acompanhar/$codigo")({
   head: () => ({
     meta: [
-      { title: "Sua reserva — ReservaLab" },
+      { title: "Sua reserva | Teggly" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -55,7 +55,7 @@ function AcompanharDetalhes() {
         </Link>
 
         <header className="mt-6 animate-fade">
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-terracotta">Acompanhar</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">Acompanhar</p>
           <h1 className="mt-3 font-serif text-4xl leading-tight tracking-tight">Reserva {codigo}</h1>
         </header>
 
@@ -63,7 +63,7 @@ function AcompanharDetalhes() {
           <div className="mt-10 flex justify-center"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
         ) : !reservaQ.data ? (
           <div className="mt-8 rounded-lg border border-dashed border-border bg-card/50 py-14 text-center">
-            <p className="font-serif text-2xl text-foreground">Não encontramos</p>
+            <p className="font-serif font-semibold text-2xl text-foreground">Não encontramos</p>
             <p className="mt-1 text-sm text-muted-foreground">Confira o código digitado.</p>
           </div>
         ) : (
@@ -129,7 +129,7 @@ function ReservaEdit({ reserva, onUpdated }: { reserva: Reserva; onUpdated: (r: 
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{TIPO_LABEL[reserva.tipo]}</p>
-            <p className="mt-1 font-serif text-2xl text-foreground">{reserva.nome}</p>
+            <p className="mt-1 font-serif font-semibold text-2xl text-foreground">{reserva.nome}</p>
           </div>
           <StatusPill status={reserva.status} />
         </div>
@@ -221,13 +221,13 @@ function ReservaEdit({ reserva, onUpdated }: { reserva: Reserva; onUpdated: (r: 
 
 function StatusPill({ status }: { status: ReservaStatus }) {
   const styles: Record<ReservaStatus, string> = {
-    pendente:   "bg-warning/15 text-[oklch(0.45_0.11_65)]",
-    confirmada: "bg-success/15 text-[oklch(0.4_0.12_150)]",
-    cancelada:  "bg-destructive/12 text-destructive",
-    finalizada: "bg-muted text-muted-foreground",
+    pendente:   "bg-warning-50 text-warning-700 before:bg-warning-500",
+    confirmada: "bg-success-50 text-success-700 before:bg-success-500",
+    cancelada:  "bg-error-50 text-error-700 before:bg-error-500",
+    finalizada: "bg-muted text-muted-foreground before:bg-slate-400",
   };
   return (
-    <span className={`inline-flex h-6 items-center rounded-full px-2.5 text-[11px] font-medium ${styles[status]}`}>
+    <span className={`inline-flex h-[26px] items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 text-xs font-semibold before:size-[7px] before:rounded-full before:content-[''] ${styles[status]}`}>
       {STATUS_LABEL[status]}
     </span>
   );

@@ -10,7 +10,7 @@ import { initFacebookPixel } from "@/lib/fbpixel";
 export const Route = createFileRoute("/$slug/obrigado")({
   head: () => ({
     meta: [
-      { title: "Reserva enviada — ReservaLab" },
+      { title: "Reserva enviada | Teggly" },
       { name: "robots", content: "noindex" },
     ],
   }),

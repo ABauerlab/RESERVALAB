@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/$slug/admin/agenda")({
   head: ({ params }) => ({
     meta: [
-      { title: "Agenda — ReservaLab" },
+      { title: "Agenda | Teggly" },
       { name: "robots", content: "noindex" },
     ],
     links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),
@@ -202,8 +202,8 @@ function AgendaPage() {
             <div className="mt-6 flex justify-center"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
           ) : (bloqueiosQ.data?.length ?? 0) === 0 ? (
             <div className="mt-4 rounded-lg border border-dashed border-border bg-card/50 py-12 text-center">
-              <CalendarX2 className="mx-auto h-6 w-6 text-muted-foreground/60" />
-              <p className="mt-3 font-serif text-2xl">Nenhum bloqueio</p>
+              <CalendarX2 className="mx-auto h-6 w-6 text-muted-foreground" />
+              <p className="mt-3 font-serif font-semibold text-2xl">Nenhum bloqueio</p>
               <p className="mt-1 text-sm text-muted-foreground">A agenda está totalmente aberta.</p>
             </div>
           ) : (
@@ -264,8 +264,8 @@ function AgendaPage() {
             <div className="mt-6 flex justify-center"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
           ) : (feriadosQ.data?.length ?? 0) === 0 ? (
             <div className="mt-4 rounded-lg border border-dashed border-border bg-card/50 py-12 text-center">
-              <CalendarHeart className="mx-auto h-6 w-6 text-muted-foreground/60" />
-              <p className="mt-3 font-serif text-2xl">Nenhum feriado cadastrado</p>
+              <CalendarHeart className="mx-auto h-6 w-6 text-muted-foreground" />
+              <p className="mt-3 font-serif font-semibold text-2xl">Nenhum feriado cadastrado</p>
               <p className="mt-1 text-sm text-muted-foreground">Todos os dias seguem o horário normal da semana.</p>
             </div>
           ) : (

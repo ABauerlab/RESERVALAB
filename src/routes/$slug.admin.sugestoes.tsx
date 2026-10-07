@@ -16,7 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 export const Route = createFileRoute("/$slug/admin/sugestoes")({
   head: ({ params }) => ({
     meta: [
-      { title: "Sugestões — ReservaLab" },
+      { title: "Sugestões | Teggly" },
       { name: "robots", content: "noindex" },
     ],
     links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),
@@ -89,7 +89,7 @@ function SugestoesPage() {
         <header className="animate-fade">
           <h2 className="font-serif text-3xl tracking-tight">Sugestões de melhoria</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Conte o que falta ou o que poderia funcionar melhor. A equipe ReservaLab recebe direto.
+            Conte o que falta ou o que poderia funcionar melhor. A equipe Teggly recebe direto.
           </p>
         </header>
 
@@ -114,8 +114,8 @@ function SugestoesPage() {
             <div className="mt-6 flex justify-center"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
           ) : (listaQ.data?.length ?? 0) === 0 ? (
             <div className="mt-4 rounded-lg border border-dashed border-border bg-card/50 py-12 text-center">
-              <Lightbulb className="mx-auto h-6 w-6 text-muted-foreground/60" />
-              <p className="mt-3 font-serif text-2xl">Nenhuma sugestão ainda</p>
+              <Lightbulb className="mx-auto h-6 w-6 text-muted-foreground" />
+              <p className="mt-3 font-serif font-semibold text-2xl">Nenhuma sugestão ainda</p>
             </div>
           ) : (
             <ul className="mt-4 space-y-2.5">
@@ -130,7 +130,7 @@ function SugestoesPage() {
                   <p className="mt-1.5 whitespace-pre-wrap text-sm text-muted-foreground">{f.descricao}</p>
                   {f.resposta_master && (
                     <p className="mt-3 rounded-lg bg-cream/60 p-3 text-sm">
-                      <span className="font-medium">Resposta ReservaLab: </span>{f.resposta_master}
+                      <span className="font-medium">Resposta Teggly: </span>{f.resposta_master}
                     </p>
                   )}
                 </li>

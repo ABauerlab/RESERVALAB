@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/master/login")({
   head: () => ({
     meta: [
-      { title: "Master — ReservaLab" },
+      { title: "Master | Teggly" },
       { name: "robots", content: "noindex" },
     ],
     links: pwaHeadLinks("/master", "Master"),
@@ -84,7 +84,7 @@ function MasterLogin() {
     <main className="flex min-h-screen items-center justify-center bg-background px-5 safe-top safe-bottom">
       <div className="w-full max-w-sm animate-in-up">
         <Link to="/" className="mb-10 block text-center">
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-terracotta">ReservaLab</p>
+          <img src="/brand/Teggly_Logo_Primary.svg" alt="Teggly" width={134} height={32} className="mx-auto h-8 w-auto" />
           <p className="mt-1 text-xs text-muted-foreground">Painel master</p>
         </Link>
 

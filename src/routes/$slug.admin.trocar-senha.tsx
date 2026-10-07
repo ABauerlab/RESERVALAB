@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/$slug/admin/trocar-senha")({
   head: () => ({
     meta: [
-      { title: "Trocar senha — ReservaLab" },
+      { title: "Trocar senha | Teggly" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -66,7 +66,7 @@ function TrocarSenha() {
     <main className="flex min-h-screen items-center justify-center bg-background px-5 safe-top safe-bottom">
       <div className="w-full max-w-sm animate-in-up">
         <div className="mb-8 text-center">
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-terracotta">ReservaLab</p>
+          <img src="/brand/Teggly_Logo_Primary.svg" alt="Teggly" width={134} height={32} className="mx-auto h-8 w-auto" />
         </div>
 
         <div className="rounded-lg border border-border bg-card p-6 shadow-[var(--shadow-md)]">

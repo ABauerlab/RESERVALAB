@@ -28,7 +28,7 @@ type NovaEmpresaInput = {
 export const Route = createFileRoute("/master/")({
   head: () => ({
     meta: [
-      { title: "Master — ReservaLab" },
+      { title: "Master | Teggly" },
       { name: "robots", content: "noindex" },
     ],
     links: pwaHeadLinks("/master", "Master"),
@@ -124,7 +124,7 @@ function MasterPanel() {
       <header className="sticky top-0 z-20 border-b border-border/70 bg-background/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-4xl items-center gap-3 px-5 py-4">
           <div className="min-w-0 flex-1">
-            <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-terracotta">ReservaLab</p>
+            <img src="/brand/Teggly_Logo_Primary.svg" alt="Teggly" width={101} height={24} className="h-6 w-auto" />
             <h1 className="truncate text-lg font-medium">Painel master</h1>
           </div>
           <button onClick={signOut} className="flex h-10 w-10 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground" aria-label="Sair">
@@ -169,7 +169,7 @@ function MasterPanel() {
             <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
           ) : tenantsQ.isError ? (
             <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-center">
-              <p className="font-serif text-2xl">Não foi possível carregar</p>
+              <p className="font-serif font-semibold text-2xl">Não foi possível carregar</p>
               <p className="mt-1 text-sm text-muted-foreground">
                 {tenantsQ.error instanceof Error ? tenantsQ.error.message : "Erro desconhecido."}
               </p>
@@ -180,7 +180,7 @@ function MasterPanel() {
           ) : (tenantsQ.data ?? []).length === 0 ? (
 
             <div className="rounded-lg border border-dashed border-border bg-card/50 py-14 text-center">
-              <p className="font-serif text-2xl">Nenhuma empresa</p>
+              <p className="font-serif font-semibold text-2xl">Nenhuma empresa</p>
               <p className="mt-1 text-sm text-muted-foreground">Clique em "Nova empresa" para começar.</p>
             </div>
           ) : (
@@ -194,7 +194,7 @@ function MasterPanel() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className={`inline-flex h-6 items-center rounded-full px-2.5 text-[11px] font-medium ${t.ativo ? "bg-success/15 text-[oklch(0.4_0.12_150)]" : "bg-muted text-muted-foreground"}`}>
+                    <span className={`inline-flex h-[26px] items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 text-xs font-semibold before:size-[7px] before:rounded-full before:content-[''] ${t.ativo ? "bg-success-50 text-success-700 before:bg-success-500" : "bg-muted text-muted-foreground before:bg-slate-400"}`}>
                       {t.ativo ? "Ativa" : "Inativa"}
                     </span>
                     <Link to="/$slug" params={{ slug: t.slug }} className="inline-flex h-9 items-center gap-1 rounded-md border border-border bg-background px-3 text-xs font-medium hover:bg-accent" target="_blank">
@@ -260,7 +260,7 @@ function NovoTenantDialog({ open, onClose, onSubmit, pending }: {
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-md rounded-xl">
         <DialogHeader>
-          <DialogTitle className="font-serif text-2xl font-normal">Nova empresa</DialogTitle>
+          <DialogTitle className="font-serif font-semibold text-2xl">Nova empresa</DialogTitle>
         </DialogHeader>
         <form
           onSubmit={(e) => {
@@ -348,7 +348,7 @@ function MasterFeedbacks() {
         <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
       ) : (feedbacksQ.data ?? []).length === 0 ? (
         <div className="mt-6 rounded-lg border border-dashed border-border bg-card/50 py-14 text-center">
-          <p className="font-serif text-2xl">Nenhuma sugestão</p>
+          <p className="font-serif font-semibold text-2xl">Nenhuma sugestão</p>
         </div>
       ) : (
         <ul className="mt-6 space-y-3">
@@ -447,7 +447,7 @@ function AcessosDialog({ tenant, onClose }: { tenant: { id: string; nome: string
     <Dialog open={!!tenant} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-lg rounded-xl">
         <DialogHeader>
-          <DialogTitle className="font-serif text-2xl font-normal">Logins — {tenant?.nome}</DialogTitle>
+          <DialogTitle className="font-serif font-semibold text-2xl">Logins — {tenant?.nome}</DialogTitle>
         </DialogHeader>
 
         {acessosQ.isLoading ? (

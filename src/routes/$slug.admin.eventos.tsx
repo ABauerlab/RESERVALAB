@@ -26,7 +26,7 @@ type EventoRow = {
 export const Route = createFileRoute("/$slug/admin/eventos")({
   head: ({ params }) => ({
     meta: [
-      { title: "Eventos — ReservaLab" },
+      { title: "Eventos | Teggly" },
       { name: "robots", content: "noindex" },
     ],
     links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),
@@ -159,8 +159,8 @@ function EventosPage() {
             <div className="mt-6 flex justify-center"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
           ) : futuros.length === 0 ? (
             <div className="mt-4 rounded-lg border border-dashed border-border bg-card/50 py-12 text-center">
-              <Music className="mx-auto h-6 w-6 text-muted-foreground/60" />
-              <p className="mt-3 font-serif text-2xl">Nenhum evento</p>
+              <Music className="mx-auto h-6 w-6 text-muted-foreground" />
+              <p className="mt-3 font-serif font-semibold text-2xl">Nenhum evento</p>
               <p className="mt-1 text-sm text-muted-foreground">A página de reservas não mostra nenhum destaque no momento.</p>
             </div>
           ) : (

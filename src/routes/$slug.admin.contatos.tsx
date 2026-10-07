@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/$slug/admin/contatos")({
   head: ({ params }) => ({
     meta: [
-      { title: "Contatos — ReservaLab" },
+      { title: "Contatos | Teggly" },
       { name: "robots", content: "noindex" },
     ],
     links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),
@@ -144,7 +144,7 @@ function ContatosPage() {
             <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
           ) : contatos.length === 0 ? (
             <div className="rounded-lg border border-dashed border-border bg-card/50 py-14 text-center">
-              <p className="font-serif text-2xl text-foreground">Nenhum contato</p>
+              <p className="font-serif font-semibold text-2xl text-foreground">Nenhum contato</p>
               <p className="mt-1 text-sm text-muted-foreground">Ninguém reservou nesse período ainda.</p>
             </div>
           ) : (

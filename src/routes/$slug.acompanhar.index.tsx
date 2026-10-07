@@ -15,7 +15,7 @@ export function normalizeCodigo(v: string): string {
 export const Route = createFileRoute("/$slug/acompanhar/")({
   head: () => ({
     meta: [
-      { title: "Acompanhar reserva — ReservaLab" },
+      { title: "Acompanhar reserva | Teggly" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -48,7 +48,7 @@ function AcompanharPage() {
         </Link>
 
         <header className="mt-6 animate-fade">
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-terracotta">Acompanhar</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">Acompanhar</p>
           <h1 className="mt-3 font-serif text-4xl leading-tight tracking-tight">Sua reserva</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Informe o código recebido após enviar a solicitação.

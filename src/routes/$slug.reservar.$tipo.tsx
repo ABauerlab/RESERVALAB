@@ -30,7 +30,7 @@ const TIPOS_VALIDOS: ReservaTipo[] = ["mesa", "aniversario", "evento", "casament
 export const Route = createFileRoute("/$slug/reservar/$tipo")({
   head: ({ params }) => ({
     meta: [
-      { title: `${TIPO_LABEL[params.tipo as ReservaTipo] ?? "Reserva"} — ReservaLab` },
+      { title: `${TIPO_LABEL[params.tipo as ReservaTipo] ?? "Reserva"} | Teggly` },
       { name: "description", content: "Envie sua solicitação de reserva em poucos toques." },
       { name: "robots", content: "noindex" },
     ],
@@ -201,7 +201,7 @@ function ReservarPage() {
         </Link>
 
         <header className="mt-6 animate-fade">
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-terracotta">
+          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">
             {tenantQ.data?.nome ?? "Reserva"}
           </p>
           <h1 className="mt-3 font-serif text-4xl leading-tight tracking-tight sm:text-5xl">
@@ -214,7 +214,7 @@ function ReservarPage() {
 
         {isAniv && (
           <section className="mt-6 rounded-lg border border-terracotta/25 bg-terracotta/5 p-5 animate-in-up">
-            <p className="font-serif text-xl leading-snug sm:text-2xl">
+            <p className="font-serif font-semibold text-xl leading-snug sm:text-2xl">
               Vai ser um prazer comemorar seu aniversário no {tenantQ.data?.nome ?? "Iracema"}!
             </p>
             <ul className="mt-4 space-y-3 text-sm leading-relaxed text-muted-foreground">
@@ -236,7 +236,7 @@ function ReservarPage() {
         {isEvento && (
           <section className="mt-6 space-y-4 rounded-lg border border-terracotta/25 bg-terracotta/5 p-5 animate-in-up">
             <div>
-              <p className="font-serif text-xl leading-snug sm:text-2xl">Orçamento — eventos particulares</p>
+              <p className="font-serif font-semibold text-xl leading-snug sm:text-2xl">Orçamento — eventos particulares</p>
               <p className="mt-1.5 text-sm text-muted-foreground">Mínimo de 50 pessoas • Máximo de 180 pessoas</p>
             </div>
 
