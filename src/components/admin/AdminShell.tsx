@@ -9,7 +9,19 @@ export type { AdminTab } from "./nav-items";
  * Ajustes, Sugestões) continuam usando AdminShell sem alteração.
  */
 export function AdminShell({
-  slug, tenantNome, active, children,
-}: { slug: string; tenantNome: string; active: AdminTab; children: React.ReactNode }) {
-  return <AppShell slug={slug} tenantNome={tenantNome} active={active}>{children}</AppShell>;
+  slug,
+  tenantNome,
+  active,
+  children,
+}: {
+  slug: string;
+  tenantNome: string;
+  active: AdminTab;
+  children: React.ReactNode;
+}) {
+  return (
+    <AppShell slug={slug} tenantNome={tenantNome} active={active}>
+      {children}
+    </AppShell>
+  );
 }

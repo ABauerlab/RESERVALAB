@@ -17,8 +17,11 @@ export function useHojeData(ready: boolean, tenantId: string | null, dia: string
     enabled,
     queryKey: ["reservas", tenantId, "hoje-dia", dia],
     queryFn: async () => {
-      const { data, error } = await supabase.from("reservas").select("*")
-        .eq("tenant_id", tenantId!).eq("data", dia)
+      const { data, error } = await supabase
+        .from("reservas")
+        .select("*")
+        .eq("tenant_id", tenantId!)
+        .eq("data", dia)
         .order("horario", { ascending: true })
         .order("created_at", { ascending: false })
         .limit(200);
@@ -32,8 +35,11 @@ export function useHojeData(ready: boolean, tenantId: string | null, dia: string
     enabled,
     queryKey: ["reservas", tenantId, "precisa-pendentes"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("reservas").select("*")
-        .eq("tenant_id", tenantId!).eq("status", "pendente")
+      const { data, error } = await supabase
+        .from("reservas")
+        .select("*")
+        .eq("tenant_id", tenantId!)
+        .eq("status", "pendente")
         .order("data", { ascending: true, nullsFirst: false })
         .order("horario", { ascending: true })
         .limit(50);
@@ -47,9 +53,14 @@ export function useHojeData(ready: boolean, tenantId: string | null, dia: string
     enabled,
     queryKey: ["reservas", tenantId, "precisa-reconfirmar", todayISO()],
     queryFn: async () => {
-      const { data, error } = await supabase.from("reservas").select("*")
-        .eq("tenant_id", tenantId!).eq("status", "confirmada").is("reconfirmada_em", null)
-        .gte("data", todayISO()).lte("data", tomorrowISO())
+      const { data, error } = await supabase
+        .from("reservas")
+        .select("*")
+        .eq("tenant_id", tenantId!)
+        .eq("status", "confirmada")
+        .is("reconfirmada_em", null)
+        .gte("data", todayISO())
+        .lte("data", tomorrowISO())
         .order("data", { ascending: true })
         .order("horario", { ascending: true })
         .limit(50);
@@ -65,8 +76,13 @@ export function useHojeData(ready: boolean, tenantId: string | null, dia: string
     enabled,
     queryKey: ["reservas", tenantId, "proximos", dia],
     queryFn: async () => {
-      const { data, error } = await supabase.from("reservas").select("data,quantidade,status")
-        .eq("tenant_id", tenantId!).gte("data", ini).lte("data", fim).neq("status", "cancelada")
+      const { data, error } = await supabase
+        .from("reservas")
+        .select("data,quantidade,status")
+        .eq("tenant_id", tenantId!)
+        .gte("data", ini)
+        .lte("data", fim)
+        .neq("status", "cancelada")
         .limit(500);
       if (error) throw error;
       return data as Array<Pick<Reserva, "data" | "quantidade" | "status">>;
@@ -77,8 +93,12 @@ export function useHojeData(ready: boolean, tenantId: string | null, dia: string
     enabled,
     queryKey: ["hoje-bloqueios", tenantId, ini, fim],
     queryFn: async () => {
-      const { data, error } = await supabase.from("agenda_bloqueios").select("*")
-        .eq("tenant_id", tenantId!).gte("data", ini).lte("data", fim);
+      const { data, error } = await supabase
+        .from("agenda_bloqueios")
+        .select("*")
+        .eq("tenant_id", tenantId!)
+        .gte("data", ini)
+        .lte("data", fim);
       if (error) throw error;
       return data;
     },
@@ -88,8 +108,12 @@ export function useHojeData(ready: boolean, tenantId: string | null, dia: string
     enabled,
     queryKey: ["hoje-feriados", tenantId, ini, fim],
     queryFn: async () => {
-      const { data, error } = await supabase.from("feriados").select("*")
-        .eq("tenant_id", tenantId!).gte("data", ini).lte("data", fim);
+      const { data, error } = await supabase
+        .from("feriados")
+        .select("*")
+        .eq("tenant_id", tenantId!)
+        .gte("data", ini)
+        .lte("data", fim);
       if (error) throw error;
       return data;
     },
@@ -99,8 +123,12 @@ export function useHojeData(ready: boolean, tenantId: string | null, dia: string
     enabled,
     queryKey: ["hoje-eventos", tenantId, ini, fim],
     queryFn: async () => {
-      const { data, error } = await supabase.from("eventos_destaque").select("*")
-        .eq("tenant_id", tenantId!).gte("data", ini).lte("data", fim);
+      const { data, error } = await supabase
+        .from("eventos_destaque")
+        .select("*")
+        .eq("tenant_id", tenantId!)
+        .gte("data", ini)
+        .lte("data", fim);
       if (error) throw error;
       return data;
     },

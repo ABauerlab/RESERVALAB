@@ -187,7 +187,7 @@ function ConfiguracoesPage() {
                     key={t}
                     type="button"
                     onClick={() => toggleTipo(t)}
-                    className={`h-9 rounded-full px-4 text-xs font-medium transition-all ${
+                    className={`h-11 xl:h-9 rounded-full px-4 text-xs font-medium transition-all ${
                       on ? "bg-primary text-primary-foreground shadow-[var(--shadow-sm)]" : "bg-muted text-muted-foreground hover:bg-accent"
                     }`}
                   >
@@ -265,7 +265,7 @@ function ConfiguracoesPage() {
                   type="button"
                   onClick={() => setMensagem((m) => `${m}${p.token}`)}
                   title={p.descricao}
-                  className="rounded-md bg-muted px-2 py-1 font-mono text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  className="inline-flex min-h-11 items-center rounded-md bg-muted px-3 font-mono text-xs text-muted-foreground lg:min-h-0 lg:px-2 lg:py-1 transition-colors hover:bg-accent hover:text-foreground"
                 >
                   {p.token}
                 </button>
@@ -274,7 +274,7 @@ function ConfiguracoesPage() {
             <button
               type="button"
               onClick={() => setMensagem(DEFAULT_MENSAGEM_CONFIRMACAO)}
-              className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              className="inline-flex min-h-11 items-center text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline lg:min-h-0"
             >
               Restaurar mensagem padrão
             </button>
@@ -293,7 +293,7 @@ function ConfiguracoesPage() {
                   type="button"
                   onClick={() => setMensagemCancelamento((m) => `${m}${p.token}`)}
                   title={p.descricao}
-                  className="rounded-md bg-muted px-2 py-1 font-mono text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  className="inline-flex min-h-11 items-center rounded-md bg-muted px-3 font-mono text-xs text-muted-foreground lg:min-h-0 lg:px-2 lg:py-1 transition-colors hover:bg-accent hover:text-foreground"
                 >
                   {p.token}
                 </button>
@@ -302,7 +302,7 @@ function ConfiguracoesPage() {
             <button
               type="button"
               onClick={() => setMensagemCancelamento(DEFAULT_MENSAGEM_CANCELAMENTO)}
-              className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              className="inline-flex min-h-11 items-center text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline lg:min-h-0"
             >
               Restaurar mensagem padrão
             </button>
@@ -324,7 +324,7 @@ function ConfiguracoesPage() {
                   type="button"
                   onClick={() => setMensagemReconfirmacao((m) => `${m}${p.token}`)}
                   title={p.descricao}
-                  className="rounded-md bg-muted px-2 py-1 font-mono text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  className="inline-flex min-h-11 items-center rounded-md bg-muted px-3 font-mono text-xs text-muted-foreground lg:min-h-0 lg:px-2 lg:py-1 transition-colors hover:bg-accent hover:text-foreground"
                 >
                   {p.token}
                 </button>
@@ -333,7 +333,7 @@ function ConfiguracoesPage() {
             <button
               type="button"
               onClick={() => setMensagemReconfirmacao(DEFAULT_MENSAGEM_RECONFIRMACAO)}
-              className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              className="inline-flex min-h-11 items-center text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline lg:min-h-0"
             >
               Restaurar mensagem padrão
             </button>
@@ -345,7 +345,7 @@ function ConfiguracoesPage() {
             <Link
               to="/$slug/admin/trocar-senha"
               params={{ slug }}
-              className="mt-4 inline-flex h-10 items-center gap-2 rounded-md border border-border px-4 text-sm font-medium transition-colors hover:bg-accent"
+              className="mt-4 inline-flex h-11 items-center gap-2 rounded-md border border-border px-4 text-sm font-medium transition-colors hover:bg-accent"
             >
               <KeyRound className="h-4 w-4" /> Alterar senha
             </Link>

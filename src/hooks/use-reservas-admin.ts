@@ -4,8 +4,13 @@ import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import {
-  TIPO_SHORT, formatData, formatHorario, telefoneToWhatsApp,
-  type Reserva, type ReservaStatus, type ReservaUpdate,
+  TIPO_SHORT,
+  formatData,
+  formatHorario,
+  telefoneToWhatsApp,
+  type Reserva,
+  type ReservaStatus,
+  type ReservaUpdate,
 } from "@/lib/reservations";
 import { getTenantBySlug } from "@/lib/tenant";
 import { buildMensagemReconfirmacao, whatsappUrl } from "@/lib/confirmacao";
@@ -21,7 +26,14 @@ export function useReservasRealtime(ready: boolean, tenantId: string | null) {
     if (!ready || !tenantId) return;
     const channel = supabase
       .channel(`reservas-admin-${tenantId}`)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "reservas", filter: `tenant_id=eq.${tenantId}` },
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "reservas",
+          filter: `tenant_id=eq.${tenantId}`,
+        },
         (payload) => {
           const r = payload.new as Reserva;
           qc.invalidateQueries({ queryKey: ["reservas", tenantId] });
@@ -30,14 +42,25 @@ export function useReservasRealtime(ready: boolean, tenantId: string | null) {
           const line = `${TIPO_SHORT[r.tipo]} • ${r.quantidade ?? "?"} pessoas • ${formatData(r.data)}${r.horario ? ` às ${formatHorario(r.horario)}` : ""}`;
           toast.success(`Nova reserva — ${r.nome}`, { description: line });
           showNotification(`Nova reserva — ${r.nome}`, line);
-        })
-      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "reservas", filter: `tenant_id=eq.${tenantId}` },
+        },
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "reservas",
+          filter: `tenant_id=eq.${tenantId}`,
+        },
         () => {
           qc.invalidateQueries({ queryKey: ["reservas", tenantId] });
           qc.invalidateQueries({ queryKey: ["reservas-stats", tenantId] });
-        })
+        },
+      )
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [ready, tenantId, qc]);
 }
 
@@ -111,7 +134,10 @@ export function useReservaActions(
   }
 
   async function handleReconfirm(r: Reserva) {
-    await updateReserva.mutateAsync({ id: r.id, patch: { reconfirmada_em: new Date().toISOString() } });
+    await updateReserva.mutateAsync({
+      id: r.id,
+      patch: { reconfirmada_em: new Date().toISOString() },
+    });
     toast.success("Reconfirmação enviada.");
     const tenant = await getTenantBySlug(slug);
     const numero = telefoneToWhatsApp(r.telefone);
@@ -144,11 +170,19 @@ export function useReservaActions(
     deleteReserva.mutate(r.id);
   }
 
-  const pending = updateReserva.isPending || deleteReserva.isPending || confirmarSemNotificar.isPending;
+  const pending =
+    updateReserva.isPending || deleteReserva.isPending || confirmarSemNotificar.isPending;
 
   return {
-    updateReserva, deleteReserva, confirmarSemNotificar,
-    handleConfirm, handleConfirmSemNotificar, handleReconfirm, handleCancel,
-    handleSetStatus, handleDelete, pending,
+    updateReserva,
+    deleteReserva,
+    confirmarSemNotificar,
+    handleConfirm,
+    handleConfirmSemNotificar,
+    handleReconfirm,
+    handleCancel,
+    handleSetStatus,
+    handleDelete,
+    pending,
   };
 }

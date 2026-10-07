@@ -15,9 +15,15 @@ function localHHMM(d = new Date()) {
 
 function NowMarker({ time }: { time: string }) {
   return (
-    <div className="flex items-center gap-2 bg-card px-4 py-1.5" role="separator" aria-label={`Agora, ${time}`}>
+    <div
+      className="flex items-center gap-2 bg-card px-4 py-1.5"
+      role="separator"
+      aria-label={`Agora, ${time}`}
+    >
       <Drop animate />
-      <span className="text-xs font-extrabold uppercase tracking-[0.08em] text-primary">Agora · {time}</span>
+      <span className="text-xs font-extrabold uppercase tracking-[0.08em] text-primary">
+        Agora · {time}
+      </span>
       <span className="h-px flex-1 bg-primary/40" />
     </div>
   );
@@ -28,7 +34,12 @@ function NowMarker({ time }: { time: string }) {
  * (gota) no ponto certo quando o dia é hoje.
  */
 export function ServiceLine({
-  reservas, dia, selectedId, onOpen, renderAction, compact,
+  reservas,
+  dia,
+  selectedId,
+  onOpen,
+  renderAction,
+  compact,
 }: {
   reservas: Reserva[];
   dia: string;
@@ -63,8 +74,13 @@ export function ServiceLine({
   groups.forEach((g) => {
     const pessoas = g.items.reduce((n, r) => n + (r.quantidade ?? 0), 0);
     nodes.push(
-      <div key={`h-${g.hour}`} className="flex items-baseline justify-between border-b border-border bg-muted/50 px-4 py-1.5">
-        <span className="text-xs font-extrabold uppercase tracking-[0.08em] text-foreground">{g.hour}</span>
+      <div
+        key={`h-${g.hour}`}
+        className="flex items-baseline justify-between border-b border-border bg-muted/50 px-4 py-1.5"
+      >
+        <span className="text-xs font-extrabold uppercase tracking-[0.08em] text-foreground">
+          {g.hour}
+        </span>
         <span className="text-xs text-muted-foreground">
           {g.items.length} {g.items.length === 1 ? "reserva" : "reservas"} · {pessoas} pessoas
         </span>
@@ -72,7 +88,10 @@ export function ServiceLine({
     );
     g.items.forEach((r) => {
       const hhmm = r.horario ? r.horario.slice(0, 5) : null;
-      if (!nowPlaced && hhmm && hhmm > now) { nodes.push(<NowMarker key="now" time={now} />); nowPlaced = true; }
+      if (!nowPlaced && hhmm && hhmm > now) {
+        nodes.push(<NowMarker key="now" time={now} />);
+        nowPlaced = true;
+      }
       nodes.push(
         <ReservationRow
           key={r.id}
@@ -87,5 +106,7 @@ export function ServiceLine({
   });
   if (!nowPlaced) nodes.push(<NowMarker key="now" time={now} />);
 
-  return <div className="overflow-hidden rounded-lg border border-border bg-card shadow-xs">{nodes}</div>;
+  return (
+    <div className="overflow-hidden rounded-lg border border-border bg-card shadow-xs">{nodes}</div>
+  );
 }

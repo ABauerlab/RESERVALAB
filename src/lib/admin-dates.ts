@@ -1,9 +1,21 @@
 // Mesmos helpers de data que o painel já usava (ISO yyyy-mm-dd). Mantidos como estavam
 // para que filtros e contagens sigam exatamente iguais.
-export function todayISO() { return new Date().toISOString().slice(0, 10); }
-export function tomorrowISO() { return addDaysISO(todayISO(), 1); }
-export function endOfWeekISO() { const d = new Date(); d.setDate(d.getDate() + 7); return d.toISOString().slice(0, 10); }
-export function endOfMonthISO() { const d = new Date(); d.setDate(d.getDate() + 30); return d.toISOString().slice(0, 10); }
+export function todayISO() {
+  return new Date().toISOString().slice(0, 10);
+}
+export function tomorrowISO() {
+  return addDaysISO(todayISO(), 1);
+}
+export function endOfWeekISO() {
+  const d = new Date();
+  d.setDate(d.getDate() + 7);
+  return d.toISOString().slice(0, 10);
+}
+export function endOfMonthISO() {
+  const d = new Date();
+  d.setDate(d.getDate() + 30);
+  return d.toISOString().slice(0, 10);
+}
 
 /** Soma dias a uma data ISO sem depender de fuso. */
 export function addDaysISO(iso: string, days: number): string {

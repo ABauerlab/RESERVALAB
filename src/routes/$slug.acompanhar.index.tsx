@@ -43,7 +43,7 @@ function AcompanharPage() {
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto max-w-md px-5 pt-6 pb-24 safe-top safe-bottom">
-        <Link to="/$slug" params={{ slug }} className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground">
+        <Link to="/$slug" params={{ slug }} className="inline-flex min-h-11 items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground">
           <ChevronLeft className="h-4 w-4" /> Voltar
         </Link>
 

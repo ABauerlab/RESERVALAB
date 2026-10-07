@@ -127,7 +127,7 @@ export function MensagemDoDiaButton({ tenantId }: { tenantId: string | null }) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="inline-flex h-11 items-center gap-2 rounded-full border border-border bg-card px-3.5 text-xs font-semibold text-foreground transition-colors hover:bg-accent lg:h-9"
+        className="inline-flex h-11 items-center gap-2 rounded-full border border-border bg-card px-3.5 text-xs font-semibold text-foreground transition-colors hover:bg-accent xl:h-9"
       >
         <MessageSquareText className="h-3.5 w-3.5 text-terracotta" /> Gerar mensagem do dia
       </button>

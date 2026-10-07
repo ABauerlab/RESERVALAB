@@ -6,6 +6,7 @@ import { Bell, BellRing, ChevronLeft, ChevronRight, Download, Loader2 } from "lu
 import { formatData, type Reserva } from "@/lib/reservations";
 import { addDaysISO, todayISO, weekdayLabel } from "@/lib/admin-dates";
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
+import { useDetailMode } from "@/hooks/use-media-query";
 import { useReservaActions, useReservasRealtime } from "@/hooks/use-reservas-admin";
 import { useHojeData } from "@/hooks/use-hoje";
 import { usePwaActions } from "@/hooks/use-pwa-actions";
@@ -43,6 +44,7 @@ function AdminHoje() {
   const tenantId = admin.tenant?.id ?? null;
   const tenantNome = admin.tenant?.nome ?? "";
 
+  const dock = useDetailMode() === "dock";
   const hoje = todayISO();
   const [dia, setDia] = useState(hoje);
   const [selected, setSelected] = useState<Reserva | null>(null);
@@ -96,12 +98,12 @@ function AdminHoje() {
     ? "Nenhuma reserva neste dia"
     : `${resumo.reservas} ${resumo.reservas === 1 ? "reserva" : "reservas"}, ${resumo.pessoas} pessoas, ${resumo.pendentes} ${resumo.pendentes === 1 ? "pendente" : "pendentes"}`;
 
-  const navBtn = "flex h-11 w-11 items-center justify-center rounded-md border border-border bg-card text-foreground transition-colors hover:bg-muted lg:h-9 lg:w-9";
-  const chip = "inline-flex h-11 items-center gap-2 rounded-full px-3.5 lg:h-9 text-xs font-semibold transition-colors disabled:opacity-50";
+  const navBtn = "flex h-11 w-11 items-center justify-center rounded-md border border-border bg-card text-foreground transition-colors hover:bg-muted xl:h-9 xl:w-9";
+  const chip = "inline-flex h-11 items-center gap-2 rounded-full px-3.5 xl:h-9 text-xs font-semibold transition-colors disabled:opacity-50";
 
   return (
     <AdminShell slug={slug} tenantNome={tenantNome} active="hoje">
-      <div className={cn("mx-auto max-w-[1180px] px-4 pb-6 pt-1 lg:px-8 lg:pt-8", selected && "lg:pr-[452px]")}>
+      <div className={cn("mx-auto max-w-[1180px] px-4 pb-6 pt-1 md:px-8 md:pt-8", selected && dock && "xl:pr-[452px]")}>
         <PageHeader
           eyebrow={isToday ? "Hoje" : undefined}
           title={<><span className="capitalize">{weekdayLabel(dia)}</span>, {formatData(dia)}</>}
@@ -115,7 +117,7 @@ function AdminHoje() {
             type="button"
             onClick={() => setDia(hoje)}
             disabled={isToday}
-            className="h-11 rounded-md border border-border bg-card px-4 text-[13px] font-semibold text-foreground transition-colors hover:bg-muted disabled:text-muted-foreground lg:h-9"
+            className="h-11 rounded-md border border-border bg-card px-4 text-[13px] font-semibold text-foreground transition-colors hover:bg-muted disabled:text-muted-foreground xl:h-9"
           >
             Hoje
           </button>
@@ -126,16 +128,16 @@ function AdminHoje() {
           <button
             type="button"
             onClick={() => setNeedsOpen(true)}
-            className="mt-3 flex h-11 w-full items-center justify-between rounded-lg border border-warning-500/30 bg-warning-50 px-4 text-left text-[13px] font-semibold text-warning-700 lg:hidden"
+            className="mt-3 flex h-11 w-full items-center justify-between rounded-lg border border-warning-500/30 bg-warning-50 px-4 text-left text-[13px] font-semibold text-warning-700 xl:hidden"
           >
             <span>Precisa de você · {pendentes.length} {pendentes.length === 1 ? "pendente" : "pendentes"}{reconfirmar.length > 0 ? `, ${reconfirmar.length} a reconfirmar` : ""}</span>
             <ChevronRight className="h-4 w-4" />
           </button>
         )}
 
-        <div className={cn("mt-4 grid gap-6", selected ? "lg:grid-cols-1" : "lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]")}>
+        <div className={cn("mt-4 grid gap-6", selected && dock ? "xl:grid-cols-1" : "xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]")}>
           <section aria-label="Linha do serviço" className="min-w-0">
-            <h2 className="mb-2 hidden text-xs font-extrabold uppercase tracking-[0.08em] text-muted-foreground lg:block">Linha do serviço</h2>
+            <h2 className="mb-2 hidden text-xs font-extrabold uppercase tracking-[0.08em] text-muted-foreground xl:block">Linha do serviço</h2>
             {diaQ.isLoading ? (
               <div className="space-y-2">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-[64px] w-full rounded-lg" />)}</div>
             ) : diaQ.isError ? (
@@ -148,16 +150,16 @@ function AdminHoje() {
                 <p className="mt-1 text-sm text-muted-foreground">Nada marcado para este dia.</p>
               </div>
             ) : (
-              <ServiceLine reservas={reservasDia} dia={dia} selectedId={selected?.id} onOpen={setSelected} renderAction={renderAction} compact={!!selected} />
+              <ServiceLine reservas={reservasDia} dia={dia} selectedId={selected?.id} onOpen={setSelected} renderAction={renderAction} compact={dock && !!selected} />
             )}
             {resumo.canceladas > 0 && (
               <p className="mt-2 text-xs text-muted-foreground">{resumo.canceladas} {resumo.canceladas === 1 ? "cancelada" : "canceladas"} neste dia</p>
             )}
           </section>
 
-          <section aria-label="Precisa de você" className={cn("min-w-0", selected ? "" : "hidden lg:block")}>
-            <h2 className="mb-2 hidden text-xs font-extrabold uppercase tracking-[0.08em] text-muted-foreground lg:block">Precisa de você</h2>
-            <div className="hidden lg:block">
+          <section aria-label="Precisa de você" className={cn("min-w-0", selected && dock ? "" : "hidden xl:block")}>
+            <h2 className="mb-2 hidden text-xs font-extrabold uppercase tracking-[0.08em] text-muted-foreground xl:block">Precisa de você</h2>
+            <div className="hidden xl:block">
               <NeedsYou
                 tenantId={tenantId}
                 pendentes={pendentes}

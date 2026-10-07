@@ -5,7 +5,13 @@ import { cn } from "@/lib/utils";
 import { Drop } from "./Drop";
 import { ReservationStatus } from "./ReservationStatus";
 
-function Chip({ icon: Icon, children }: { icon?: React.ComponentType<{ className?: string }>; children: React.ReactNode }) {
+function Chip({
+  icon: Icon,
+  children,
+}: {
+  icon?: React.ComponentType<{ className?: string }>;
+  children: React.ReactNode;
+}) {
   return (
     <span className="inline-flex h-5 items-center gap-1 rounded-full bg-muted px-2 text-[11px] font-semibold text-muted-foreground">
       {Icon && <Icon className="h-3 w-3" />}
@@ -20,7 +26,13 @@ function Chip({ icon: Icon, children }: { icon?: React.ComponentType<{ className
  * Mobile: duas linhas. Desktop: colunas alinhadas.
  */
 export function ReservationRow({
-  reserva: r, onOpen, action, selected, now, showDate, compact,
+  reserva: r,
+  onOpen,
+  action,
+  selected,
+  now,
+  showDate,
+  compact,
 }: {
   reserva: Reserva;
   onOpen: () => void;
@@ -36,9 +48,24 @@ export function ReservationRow({
 }) {
   const chips: React.ReactNode[] = [];
   if (r.tipo !== "mesa") chips.push(<Chip key="tipo">{TIPO_SHORT[r.tipo]}</Chip>);
-  if (r.tipo === "aniversario" && r.leva_bolo) chips.push(<Chip key="bolo" icon={Cake}>Bolo</Chip>);
-  if (r.tipo === "aniversario" && r.comandas) chips.push(<Chip key="comandas" icon={Receipt}>Comandas</Chip>);
-  if (r.observacoes) chips.push(<Chip key="obs" icon={MessageSquareText}>Observação</Chip>);
+  if (r.tipo === "aniversario" && r.leva_bolo)
+    chips.push(
+      <Chip key="bolo" icon={Cake}>
+        Bolo
+      </Chip>,
+    );
+  if (r.tipo === "aniversario" && r.comandas)
+    chips.push(
+      <Chip key="comandas" icon={Receipt}>
+        Comandas
+      </Chip>,
+    );
+  if (r.observacoes)
+    chips.push(
+      <Chip key="obs" icon={MessageSquareText}>
+        Observação
+      </Chip>,
+    );
 
   const horario = r.horario ? formatHorario(r.horario) : "—";
   const pessoas = r.quantidade != null ? `${r.quantidade}` : "—";
@@ -53,14 +80,32 @@ export function ReservationRow({
 
   // Duas linhas: horário | nome / status · pessoas · área.
   const narrow = (
-    <div className={cn("grid grid-cols-[3.25rem_minmax(0,1fr)] items-center gap-x-3", compact ? "" : "lg:hidden")}>
+    <div
+      className={cn(
+        "grid grid-cols-[3.25rem_minmax(0,1fr)] items-center gap-x-3",
+        compact ? "" : "md:hidden",
+      )}
+    >
       {time}
       <span className="min-w-0">
         <span className="block truncate text-[15px] font-semibold text-foreground">{r.nome}</span>
         <span className="mt-1 flex min-w-0 items-center gap-2 text-[13px] text-muted-foreground">
           <ReservationStatus status={r.status} className="h-[22px] shrink-0 px-2 text-[11px]" />
-          <span className="inline-flex shrink-0 items-center gap-1 tabular-nums">{compact ? <><Users className="h-3.5 w-3.5" aria-label="pessoas" />{pessoas}</> : <>{pessoas} pess.</>}</span>
-          {area && <span className={cn("truncate", action && "hidden sm:inline", compact && "hidden")}>· {area}</span>}
+          <span className="inline-flex shrink-0 items-center gap-1 tabular-nums">
+            {compact ? (
+              <>
+                <Users className="h-3.5 w-3.5" aria-label="pessoas" />
+                {pessoas}
+              </>
+            ) : (
+              <>{pessoas} pess.</>
+            )}
+          </span>
+          {area && (
+            <span className={cn("truncate", action && "hidden sm:inline", compact && "hidden")}>
+              · {area}
+            </span>
+          )}
         </span>
       </span>
     </div>
@@ -68,15 +113,23 @@ export function ReservationRow({
 
   // Colunas alinhadas (desktop).
   const wide = compact ? null : (
-    <div className="hidden grid-cols-[3.75rem_minmax(0,1fr)_3.25rem_5rem_7.5rem] items-center gap-x-3 lg:grid">
+    <div className="hidden grid-cols-[3.5rem_minmax(0,1fr)_6rem_7rem] items-center gap-x-3 md:grid">
       {time}
       <span className="min-w-0">
-        <span className="block truncate text-[15px] font-semibold text-foreground">{r.nome}</span>
+        <span className="block line-clamp-2 break-words text-[15px] font-semibold text-foreground">
+          {r.nome}
+        </span>
         {chips.length > 0 && <span className="mt-1 flex flex-wrap gap-1">{chips}</span>}
       </span>
-      <span className="text-right text-sm tabular-nums text-muted-foreground">{pessoas} <span className="text-xs">pess.</span></span>
-      <span className="truncate text-sm text-muted-foreground">{area ?? ""}</span>
-      <span><ReservationStatus status={r.status} /></span>
+      <span className="min-w-0 text-sm text-muted-foreground">
+        <span className="block tabular-nums">
+          {pessoas} <span className="text-xs">pess.</span>
+        </span>
+        {area && <span className="block truncate text-xs">{area}</span>}
+      </span>
+      <span>
+        <ReservationStatus status={r.status} />
+      </span>
     </div>
   );
 
@@ -92,13 +145,22 @@ export function ReservationRow({
         onClick={onOpen}
         aria-label={`Abrir reserva de ${r.nome}`}
         aria-current={selected ? "true" : undefined}
-        className={cn("min-w-0 flex-1 overflow-hidden px-4 py-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring", dim && "opacity-70")}
+        className={cn(
+          "min-w-0 flex-1 overflow-hidden px-4 py-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring",
+          dim && "opacity-70",
+        )}
       >
         {narrow}
         {wide}
       </button>
 
-      {action !== undefined && <div className={cn("shrink-0 pr-3 lg:pr-4", !compact && "lg:flex lg:w-[132px] lg:justify-end")}>{action}</div>}
+      {action !== undefined && (
+        <div
+          className={cn("shrink-0 pr-3 md:pr-4", !compact && "md:flex md:w-[124px] md:justify-end")}
+        >
+          {action}
+        </div>
+      )}
     </div>
   );
 }

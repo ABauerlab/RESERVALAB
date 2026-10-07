@@ -10,21 +10,36 @@ export type MainAction = "confirmar" | "reconfirmar" | "finalizar" | null;
  */
 export function rowMainAction(r: Reserva): MainAction {
   if (r.status === "pendente") return "confirmar";
-  if (r.status === "confirmada" && !r.reconfirmada_em && r.data && (r.data === todayISO() || r.data === tomorrowISO())) {
+  if (
+    r.status === "confirmada" &&
+    !r.reconfirmada_em &&
+    r.data &&
+    (r.data === todayISO() || r.data === tomorrowISO())
+  ) {
     return "reconfirmar";
   }
   return null;
 }
 
 export type DetailAction =
-  | "confirmar" | "confirmar_sem_avisar" | "reconfirmar" | "finalizar"
-  | "editar" | "cancelar" | "reativar" | "reabrir" | "excluir";
+  | "confirmar"
+  | "confirmar_sem_avisar"
+  | "reconfirmar"
+  | "finalizar"
+  | "editar"
+  | "cancelar"
+  | "reativar"
+  | "reabrir"
+  | "excluir";
 
 /** Ação principal do Detalhe e ações do menu "Mais", por status. */
 export function detailActions(r: Reserva): { primary: DetailAction | null; more: DetailAction[] } {
   switch (r.status) {
     case "pendente":
-      return { primary: "confirmar", more: ["confirmar_sem_avisar", "finalizar", "editar", "cancelar", "excluir"] };
+      return {
+        primary: "confirmar",
+        more: ["confirmar_sem_avisar", "finalizar", "editar", "cancelar", "excluir"],
+      };
     case "confirmada":
       return r.reconfirmada_em
         ? { primary: "finalizar", more: ["reconfirmar", "editar", "cancelar", "excluir"] }

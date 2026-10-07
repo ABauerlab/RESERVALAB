@@ -12,35 +12,48 @@ function useKeyboardOpen() {
   const [open, setOpen] = useState(false);
   useEffect(() => {
     const isField = (el: EventTarget | null) =>
-      el instanceof HTMLElement && (el.matches("input:not([type=checkbox]):not([type=radio]), textarea, [contenteditable=true]"));
-    const on = (e: FocusEvent) => { if (isField(e.target)) setOpen(true); };
+      el instanceof HTMLElement &&
+      el.matches("input:not([type=checkbox]):not([type=radio]), textarea, [contenteditable=true]");
+    const on = (e: FocusEvent) => {
+      if (isField(e.target)) setOpen(true);
+    };
     const off = () => setOpen(false);
     document.addEventListener("focusin", on);
     document.addEventListener("focusout", off);
-    return () => { document.removeEventListener("focusin", on); document.removeEventListener("focusout", off); };
+    return () => {
+      document.removeEventListener("focusin", on);
+      document.removeEventListener("focusout", off);
+    };
   }, []);
   return open;
 }
 
 /** Barra inferior mobile: Hoje · Reservas · Agenda · Mais. 56px + área segura. */
 export function MobileNavigation({
-  slug, active, onSignOut,
-}: { slug: string; active: AdminTab; onSignOut: () => void }) {
+  slug,
+  active,
+  onSignOut,
+}: {
+  slug: string;
+  active: AdminTab;
+  onSignOut: () => void;
+}) {
   const [moreOpen, setMoreOpen] = useState(false);
   const keyboard = useKeyboardOpen();
   const moreActive = MORE_ITEMS.some((i) => i.id === active);
 
-  const itemCls = (on: boolean) => cn(
-    "relative flex h-14 flex-1 flex-col items-center justify-center gap-0.5 text-[11px] font-semibold transition-colors",
-    on ? "text-primary" : "text-muted-foreground",
-  );
+  const itemCls = (on: boolean) =>
+    cn(
+      "relative flex h-14 flex-1 flex-col items-center justify-center gap-0.5 text-[11px] font-semibold transition-colors",
+      on ? "text-primary" : "text-muted-foreground",
+    );
 
   return (
     <>
       <nav
         aria-label="Principal"
         className={cn(
-          "fixed inset-x-0 bottom-0 z-30 border-t border-border bg-card pb-[env(safe-area-inset-bottom)] lg:hidden",
+          "fixed inset-x-0 bottom-0 z-30 border-t border-border bg-card pb-[env(safe-area-inset-bottom)]",
           keyboard && "hidden",
         )}
       >
@@ -49,14 +62,25 @@ export function MobileNavigation({
             const Icon = item.icon;
             const on = item.id === active;
             return (
-              <Link key={item.id} to={item.to} params={{ slug }} aria-current={on ? "page" : undefined} className={itemCls(on)}>
+              <Link
+                key={item.id}
+                to={item.to}
+                params={{ slug }}
+                aria-current={on ? "page" : undefined}
+                className={itemCls(on)}
+              >
                 {on && <Drop className="absolute top-1" />}
                 <Icon className={cn("h-5 w-5", on && "mt-1.5")} />
                 {item.label}
               </Link>
             );
           })}
-          <button type="button" onClick={() => setMoreOpen(true)} className={itemCls(moreActive)} aria-haspopup="dialog">
+          <button
+            type="button"
+            onClick={() => setMoreOpen(true)}
+            className={itemCls(moreActive)}
+            aria-haspopup="dialog"
+          >
             {moreActive && <Drop className="absolute top-1" />}
             <MoreHorizontal className={cn("h-5 w-5", moreActive && "mt-1.5")} />
             Mais

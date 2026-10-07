@@ -165,8 +165,8 @@ function AgendaPage() {
             <div className="space-y-2">
               <Label className="text-[13px]">Abrangência</Label>
               <div className="flex gap-1.5 rounded-[12px] bg-muted p-1">
-                <button type="button" onClick={() => setDiaTodo(true)} className={`h-9 flex-1 rounded-md text-xs font-medium transition-all ${diaTodo ? "bg-background shadow-[var(--shadow-sm)]" : "text-muted-foreground"}`}>Dia inteiro</button>
-                <button type="button" onClick={() => setDiaTodo(false)} className={`h-9 flex-1 rounded-md text-xs font-medium transition-all ${!diaTodo ? "bg-background shadow-[var(--shadow-sm)]" : "text-muted-foreground"}`}>Faixa de horário</button>
+                <button type="button" onClick={() => setDiaTodo(true)} className={`h-11 flex-1 xl:h-9 rounded-md text-xs font-medium transition-all ${diaTodo ? "bg-background shadow-[var(--shadow-sm)]" : "text-muted-foreground"}`}>Dia inteiro</button>
+                <button type="button" onClick={() => setDiaTodo(false)} className={`h-11 flex-1 xl:h-9 rounded-md text-xs font-medium transition-all ${!diaTodo ? "bg-background shadow-[var(--shadow-sm)]" : "text-muted-foreground"}`}>Faixa de horário</button>
               </div>
             </div>
           </div>
@@ -225,7 +225,7 @@ function AgendaPage() {
                   </div>
                   <button
                     onClick={() => remover.mutate(b.id)}
-                    className="flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                    className="flex h-11 w-11 xl:h-9 xl:w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                     aria-label="Remover bloqueio"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -278,7 +278,7 @@ function AgendaPage() {
                   </div>
                   <button
                     onClick={() => removerFeriado.mutate(f.id)}
-                    className="flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                    className="flex h-11 w-11 xl:h-9 xl:w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                     aria-label="Remover feriado"
                   >
                     <Trash2 className="h-4 w-4" />

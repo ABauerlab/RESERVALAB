@@ -195,7 +195,7 @@ function ReservarPage() {
         <Link
           to="/$slug"
           params={{ slug }}
-          className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          className="inline-flex min-h-11 items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           <ChevronLeft className="h-4 w-4" /> Voltar
         </Link>
@@ -419,15 +419,15 @@ function QuantityInput({ value, onChange, min, max }: { value: number; onChange:
     onChange(clamped); setText(String(clamped));
   }
   return (
-    <div className="flex h-12 items-center justify-between rounded-md border border-input bg-background px-2">
-      <button type="button" onClick={() => commit(value - 1)} className="flex h-10 w-10 items-center justify-center rounded-md text-foreground transition-colors hover:bg-accent active:scale-95 disabled:opacity-40" disabled={value <= min} aria-label="Diminuir">
+    <div className="flex h-12 items-center justify-between rounded-md border border-input bg-background px-1">
+      <button type="button" onClick={() => commit(value - 1)} className="flex h-11 w-11 items-center justify-center rounded-md text-foreground transition-colors hover:bg-accent active:scale-95 disabled:opacity-40" disabled={value <= min} aria-label="Diminuir">
         <Minus className="h-4 w-4" />
       </button>
       <input type="text" inputMode="numeric" pattern="[0-9]*" value={text}
         onChange={(e) => { const v = e.target.value.replace(/\D/g, "").slice(0, 4); setText(v); if (v !== "") onChange(Math.max(min, Math.min(max, parseInt(v, 10)))); }}
         onBlur={() => { if (text === "") commit(min); else commit(parseInt(text, 10)); }}
-        className="w-16 bg-transparent text-center text-lg font-medium tabular-nums outline-none" aria-label="Quantidade" />
-      <button type="button" onClick={() => commit(value + 1)} className="flex h-10 w-10 items-center justify-center rounded-md text-foreground transition-colors hover:bg-accent active:scale-95 disabled:opacity-40" disabled={value >= max} aria-label="Aumentar">
+        className="h-11 w-16 bg-transparent text-center text-lg font-medium tabular-nums outline-none" aria-label="Quantidade" />
+      <button type="button" onClick={() => commit(value + 1)} className="flex h-11 w-11 items-center justify-center rounded-md text-foreground transition-colors hover:bg-accent active:scale-95 disabled:opacity-40" disabled={value >= max} aria-label="Aumentar">
         <Plus className="h-4 w-4" />
       </button>
     </div>
@@ -439,7 +439,7 @@ function SegmentedButtons<T extends string>({ value, onChange, options }: { valu
     <div className="grid grid-cols-2 gap-2 rounded-[12px] bg-muted p-1">
       {options.map((o) => (
         <button key={o.value} type="button" onClick={() => onChange(o.value)}
-          className={`h-10 rounded-md text-sm font-medium transition-all ${value === o.value ? "bg-background text-foreground shadow-[var(--shadow-sm)]" : "text-muted-foreground hover:text-foreground"}`}>
+          className={`h-11 rounded-md text-sm font-medium transition-all ${value === o.value ? "bg-background text-foreground shadow-[var(--shadow-sm)]" : "text-muted-foreground hover:text-foreground"}`}>
           {o.label}
         </button>
       ))}

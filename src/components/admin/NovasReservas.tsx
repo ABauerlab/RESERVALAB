@@ -74,7 +74,7 @@ export function NovasReservasBanner({ tenantId }: { tenantId: string | null }) {
         </p>
         <button
           onClick={marcarVistas}
-          className="inline-flex h-11 items-center gap-1.5 lg:h-9 rounded-full border border-primary/25 bg-card px-3 text-xs font-semibold text-accent-foreground transition-colors hover:bg-muted"
+          className="inline-flex h-11 items-center gap-1.5 xl:h-9 rounded-full border border-primary/25 bg-card px-3 text-xs font-semibold text-accent-foreground transition-colors hover:bg-muted"
         >
           <Check className="h-3.5 w-3.5" /> Marcar como vistas
         </button>

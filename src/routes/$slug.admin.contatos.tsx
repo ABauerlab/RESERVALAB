@@ -111,11 +111,11 @@ function ContatosPage() {
           <div className="mt-3 grid grid-cols-2 gap-3 animate-in-up sm:max-w-sm">
             <div className="space-y-1.5">
               <Label className="text-[12px] text-muted-foreground">De</Label>
-              <Input type="date" value={de} onChange={(e) => setDe(e.target.value)} className="h-10 rounded-md" />
+              <Input type="date" value={de} onChange={(e) => setDe(e.target.value)} className="h-11 rounded-md" />
             </div>
             <div className="space-y-1.5">
               <Label className="text-[12px] text-muted-foreground">Até</Label>
-              <Input type="date" value={ate} onChange={(e) => setAte(e.target.value)} className="h-10 rounded-md" />
+              <Input type="date" value={ate} onChange={(e) => setAte(e.target.value)} className="h-11 rounded-md" />
             </div>
           </div>
         )}
@@ -133,7 +133,7 @@ function ContatosPage() {
           <button
             onClick={baixarCsv}
             disabled={contatos.length === 0}
-            className="inline-flex h-10 items-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:bg-blue-700 disabled:opacity-40 disabled:pointer-events-none"
+            className="inline-flex h-11 items-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:bg-blue-700 disabled:opacity-40 disabled:pointer-events-none"
           >
             <Download className="h-4 w-4" /> Baixar CSV
           </button>
@@ -189,7 +189,7 @@ function PresetChip({ active, onClick, children }: { active: boolean; onClick: (
   return (
     <button
       onClick={onClick}
-      className={`h-9 shrink-0 rounded-full px-4 text-xs font-medium transition-all ${
+      className={`h-11 xl:h-9 shrink-0 rounded-full px-4 text-xs font-medium transition-all ${
         active ? "bg-primary text-primary-foreground shadow-[var(--shadow-sm)]" : "bg-muted text-muted-foreground hover:bg-accent hover:text-foreground"
       }`}
     >

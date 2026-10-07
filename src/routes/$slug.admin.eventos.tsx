@@ -180,7 +180,7 @@ function EventosPage() {
                   </div>
                   <button
                     onClick={() => remover.mutate(e.id)}
-                    className="flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                    className="flex h-11 w-11 xl:h-9 xl:w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                     aria-label="Remover evento"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -205,7 +205,7 @@ function EventosPage() {
                   </div>
                   <button
                     onClick={() => remover.mutate(e.id)}
-                    className="flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                    className="flex h-11 w-11 xl:h-9 xl:w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                     aria-label="Remover evento"
                   >
                     <Trash2 className="h-4 w-4" />

@@ -17,3 +17,25 @@ export function useMediaQuery(query: string, initial = false): boolean {
 export function useIsDesktop(): boolean {
   return useMediaQuery("(min-width: 1024px)");
 }
+
+/** Navegação do painel: barra inferior (mobile), trilho de ícones (tablet) ou sidebar completa. */
+export type ShellMode = "bottom" | "rail" | "full";
+
+export function useShellMode(): ShellMode {
+  const short = useMediaQuery("(max-height: 499px)");
+  const tablet = useMediaQuery("(min-width: 768px)");
+  const wide = useMediaQuery("(min-width: 1024px)");
+  if (short || !tablet) return "bottom";
+  return wide ? "full" : "rail";
+}
+
+/** Detalhe da reserva: tela cheia (mobile), painel sobreposto (tablet/notebook) ou acoplado (>= 1280). */
+export type DetailMode = "full" | "overlay" | "dock";
+
+export function useDetailMode(): DetailMode {
+  const short = useMediaQuery("(max-height: 499px)");
+  const tablet = useMediaQuery("(min-width: 768px)");
+  const xl = useMediaQuery("(min-width: 1280px)");
+  if (short || !tablet) return "full";
+  return xl ? "dock" : "overlay";
+}
