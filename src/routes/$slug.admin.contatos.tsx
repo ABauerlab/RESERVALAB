@@ -2,12 +2,19 @@ import { pwaHeadLinks } from "@/lib/pwa-manifest";
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Download, Loader2, Users } from "lucide-react";
+import { Download, Loader2, MessageCircle, Search, Users } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
 import { AdminShell } from "@/components/admin/AdminShell";
-import { agruparContatos, contatosToCsv } from "@/lib/contatos";
+import { PageHeader } from "@/components/admin/PageHeader";
+import {
+  agruparContatos,
+  contatosToCsv,
+  filtrarOrdenarContatos,
+  type Contato,
+  type OrdemContatos,
+} from "@/lib/contatos";
 import { addDaysISO, todayISO } from "@/lib/datetime";
 import { STATUS_LABEL, type Reserva } from "@/lib/reservations";
 import { Input } from "@/components/ui/input";
@@ -22,6 +29,8 @@ export const Route = createFileRoute("/$slug/admin/contatos")({
   component: ContatosPage,
 });
 
+const LIMITE = 5000;
+
 type Preset = "todas" | "30" | "90" | "personalizado";
 
 function ContatosPage() {
@@ -30,6 +39,8 @@ function ContatosPage() {
   const tenantId = admin.tenant?.id ?? null;
 
   const [preset, setPreset] = useState<Preset>("todas");
+  const [busca, setBusca] = useState("");
+  const [ordem, setOrdem] = useState<OrdemContatos>("recentes");
   const [de, setDe] = useState("");
   const [ate, setAte] = useState(todayISO());
 
@@ -52,16 +63,21 @@ function ContatosPage() {
         .eq("tenant_id", tenantId!)
         .lte("data", ateEfetivo);
       if (deEfetivo) q = q.gte("data", deEfetivo);
-      const { data, error } = await q.order("data", { ascending: false }).limit(5000);
+      const { data, error } = await q.order("data", { ascending: false }).limit(LIMITE);
       if (error) throw error;
       return data as Reserva[];
     },
   });
 
   const contatos = useMemo(() => agruparContatos(reservasQ.data ?? []), [reservasQ.data]);
+  const visiveis = useMemo(
+    () => filtrarOrdenarContatos(contatos, busca, ordem),
+    [contatos, busca, ordem],
+  );
+  const truncado = (reservasQ.data?.length ?? 0) >= LIMITE;
 
   function baixarCsv() {
-    const csv = contatosToCsv(contatos);
+    const csv = contatosToCsv(visiveis);
     const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -84,13 +100,11 @@ function ContatosPage() {
 
   return (
     <AdminShell slug={slug} tenantNome={admin.tenant?.nome ?? ""} active="contatos">
-      <div className="mx-auto max-w-4xl px-5 pt-6">
-        <header className="animate-fade">
-          <h2 className="font-serif text-3xl tracking-tight">Contatos</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Nome e telefone de quem já reservou, prontos para exportar e usar em remarketing.
-          </p>
-        </header>
+      <div className="mx-auto max-w-4xl px-5 pb-10 pt-6">
+        <PageHeader
+          title="Clientes"
+          description="Nome e telefone de quem já reservou, prontos para exportar e usar em remarketing."
+        />
 
         <div className="mt-6 flex flex-wrap gap-1.5 animate-in-up">
           <PresetChip active={preset === "todas"} onClick={() => setPreset("todas")}>
@@ -133,44 +147,100 @@ function ContatosPage() {
           </div>
         )}
 
-        <div className="mt-5 flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-4">
+        <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="relative flex-1">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+              placeholder="Buscar por nome ou telefone"
+              aria-label="Buscar contato"
+              className="h-11 rounded-md pl-9"
+            />
+          </div>
+          <div className="flex gap-1.5" role="group" aria-label="Ordem">
+            <PresetChip active={ordem === "recentes"} onClick={() => setOrdem("recentes")}>
+              Recentes
+            </PresetChip>
+            <PresetChip active={ordem === "frequentes"} onClick={() => setOrdem("frequentes")}>
+              Mais frequentes
+            </PresetChip>
+            <PresetChip active={ordem === "nome"} onClick={() => setOrdem("nome")}>
+              A a Z
+            </PresetChip>
+          </div>
+        </div>
+
+        <div className="mt-4 flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-4">
           <div className="flex min-w-0 items-center gap-2.5">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-cream text-terracotta">
               <Users className="h-4 w-4" />
             </span>
             <div>
-              <p className="font-serif text-2xl tabular-nums leading-none">{contatos.length}</p>
-              <p className="mt-1 text-xs text-muted-foreground">contatos únicos no período</p>
+              <p className="text-2xl font-extrabold tabular-nums leading-none">{visiveis.length}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {busca.trim() ? "contatos encontrados" : "contatos únicos no período"}
+              </p>
             </div>
           </div>
           <button
             onClick={baixarCsv}
-            disabled={contatos.length === 0}
+            disabled={visiveis.length === 0}
             className="inline-flex h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:bg-blue-700 disabled:opacity-40 disabled:pointer-events-none"
           >
             <Download className="h-4 w-4" /> Baixar CSV
           </button>
         </div>
 
+        {truncado && (
+          <p className="mt-3 text-xs text-muted-foreground">
+            Mostrando as {LIMITE} reservas mais recentes do período.
+          </p>
+        )}
+
         <div className="mt-5">
           {reservasQ.isLoading ? (
             <div className="flex justify-center py-10">
               <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
             </div>
-          ) : contatos.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-border bg-card/50 py-14 text-center">
-              <p className="font-serif font-semibold text-2xl text-foreground">Nenhum contato</p>
+          ) : reservasQ.isError ? (
+            <div
+              role="alert"
+              className="rounded-xl border border-dashed border-border bg-card py-12 text-center"
+            >
+              <p className="text-lg font-semibold text-foreground">Não foi possível carregar</p>
+              <p className="mt-1 text-sm text-muted-foreground">Tente novamente em instantes.</p>
+              <button
+                type="button"
+                onClick={() => reservasQ.refetch()}
+                className="mt-4 inline-flex h-11 items-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground hover:bg-blue-700"
+              >
+                Tentar novamente
+              </button>
+            </div>
+          ) : visiveis.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-border bg-card/50 py-14 text-center">
+              <p className="text-lg font-semibold text-foreground">
+                {busca.trim() ? "Nenhum contato encontrado" : "Nenhum contato"}
+              </p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Ninguém reservou nesse período ainda.
+                {busca.trim()
+                  ? "Tente outro nome ou telefone."
+                  : "Ninguém reservou nesse período ainda."}
               </p>
             </div>
           ) : (
             <div className="overflow-hidden rounded-lg border border-border bg-card">
               <ul className="max-h-[520px] divide-y divide-border/60 overflow-y-auto sm:hidden">
-                {contatos.map((c) => (
+                {visiveis.map((c) => (
                   <li key={c.telefoneWhatsapp} className="px-4 py-3">
-                    <p className="break-words font-medium">{c.nome}</p>
-                    <p className="text-sm text-muted-foreground">{c.telefone}</p>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="break-words font-medium">{c.nome}</p>
+                        <p className="text-sm text-muted-foreground">{c.telefone}</p>
+                      </div>
+                      <WhatsLink c={c} />
+                    </div>
                     <p className="mt-1 text-xs text-muted-foreground">
                       {c.reservas} {c.reservas === 1 ? "reserva" : "reservas"} · última{" "}
                       {c.ultimaData
@@ -190,10 +260,13 @@ function ContatosPage() {
                       <th className="px-4 py-2.5 font-medium">Reservas</th>
                       <th className="px-4 py-2.5 font-medium">Última</th>
                       <th className="px-4 py-2.5 font-medium">Status</th>
+                      <th className="px-4 py-2.5 font-medium">
+                        <span className="sr-only">Conversar</span>
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {contatos.map((c) => (
+                    {visiveis.map((c) => (
                       <tr key={c.telefoneWhatsapp} className="border-t border-border/60">
                         <td className="px-4 py-2.5 font-medium">{c.nome}</td>
                         <td className="px-4 py-2.5 text-muted-foreground">{c.telefone}</td>
@@ -208,6 +281,9 @@ function ContatosPage() {
                         <td className="px-4 py-2.5 text-muted-foreground">
                           {STATUS_LABEL[c.ultimoStatus]}
                         </td>
+                        <td className="px-4 py-1.5 text-right">
+                          <WhatsLink c={c} />
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -218,6 +294,20 @@ function ContatosPage() {
         </div>
       </div>
     </AdminShell>
+  );
+}
+
+function WhatsLink({ c }: { c: Contato }) {
+  return (
+    <a
+      href={`https://wa.me/${c.telefoneWhatsapp}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`Conversar com ${c.nome} no WhatsApp`}
+      className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground xl:h-9 xl:w-9"
+    >
+      <MessageCircle className="h-4 w-4" />
+    </a>
   );
 }
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { agruparContatos, contatosToCsv } from "@/lib/contatos";
+import { agruparContatos, contatosToCsv, filtrarOrdenarContatos } from "@/lib/contatos";
 import type { Reserva } from "@/lib/reservations";
 
 function makeReserva(overrides: Partial<Reserva> = {}): Reserva {
@@ -108,5 +108,33 @@ describe("contatosToCsv", () => {
       agruparContatos([makeReserva({ nome: 'Maria "Mari"', telefone: "11912345678" })]),
     );
     expect(csv).toContain('"Maria ""Mari"""');
+  });
+});
+
+describe("filtrarOrdenarContatos", () => {
+  const base = agruparContatos([
+    makeReserva({ id: "1", nome: "Maria Silva", telefone: "11912345678", data: "2026-08-01" }),
+    makeReserva({ id: "2", nome: "Maria Silva", telefone: "11912345678", data: "2026-08-05" }),
+    makeReserva({ id: "3", nome: "Ana Souza", telefone: "21988887777", data: "2026-09-01" }),
+  ]);
+
+  it("busca por nome e por telefone", () => {
+    expect(filtrarOrdenarContatos(base, "ana", "recentes").map((c) => c.nome)).toEqual([
+      "Ana Souza",
+    ]);
+    expect(filtrarOrdenarContatos(base, "(11) 91234", "recentes")).toHaveLength(1);
+    expect(filtrarOrdenarContatos(base, "", "recentes")).toHaveLength(2);
+  });
+
+  it("ordena por recentes, frequentes e nome", () => {
+    expect(filtrarOrdenarContatos(base, "", "recentes")[0]!.nome).toBe("Ana Souza");
+    expect(filtrarOrdenarContatos(base, "", "frequentes")[0]!.nome).toBe("Maria Silva");
+    expect(filtrarOrdenarContatos(base, "", "nome")[0]!.nome).toBe("Ana Souza");
+  });
+
+  it("nao altera a lista original", () => {
+    const copia = [...base];
+    filtrarOrdenarContatos(base, "", "nome");
+    expect(base).toEqual(copia);
   });
 });

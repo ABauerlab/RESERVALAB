@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
 import { AdminShell } from "@/components/admin/AdminShell";
+import { PageHeader } from "@/components/admin/PageHeader";
 import { formatData, formatHorario } from "@/lib/reservations";
 import { todayISO } from "@/lib/datetime";
 import { Button } from "@/components/ui/button";
@@ -112,14 +113,11 @@ function EventosPage() {
 
   return (
     <AdminShell slug={slug} tenantNome={admin.tenant?.nome ?? ""} active="eventos">
-      <div className="mx-auto max-w-4xl px-5 pt-6">
-        <header className="animate-fade">
-          <h2 className="font-serif text-3xl tracking-tight">Eventos</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            O próximo evento com data futura aparece automaticamente na página de reservas — e some
-            sozinho assim que a data passa.
-          </p>
-        </header>
+      <div className="mx-auto max-w-4xl px-5 pb-10 pt-6">
+        <PageHeader
+          title="Eventos"
+          description="O próximo evento com data futura aparece automaticamente na página de reservas e some sozinho assim que a data passa."
+        />
 
         <section className="mt-6 rounded-lg border border-border bg-card p-5 animate-in-up">
           <h3 className="font-semibold">Novo evento</h3>
