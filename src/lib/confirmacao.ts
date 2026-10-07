@@ -140,7 +140,11 @@ function valoresDeContexto(ctx: ConfirmacaoContexto): Record<string, string> {
  * link de acompanhamento, mesmo que o template personalizado da empresa não
  * use os placeholders.
  */
-function renderComFallback(tpl: string, valores: Record<string, string>, linkAcompanhar: string): string {
+function renderComFallback(
+  tpl: string,
+  valores: Record<string, string>,
+  linkAcompanhar: string,
+): string {
   let out = tpl;
   for (const [token, valor] of Object.entries(valores)) {
     out = out.split(token).join(valor);
@@ -163,9 +167,7 @@ export function buildMensagemConfirmacao(
   template: string | null | undefined,
   ctx: ConfirmacaoContexto,
 ): string {
-  const tpl = (template && template.trim().length > 0)
-    ? template
-    : DEFAULT_MENSAGEM_CONFIRMACAO;
+  const tpl = template && template.trim().length > 0 ? template : DEFAULT_MENSAGEM_CONFIRMACAO;
   return renderComFallback(tpl, valoresDeContexto(ctx), ctx.linkAcompanhar);
 }
 
@@ -178,12 +180,9 @@ export function buildMensagemReconfirmacao(
   template: string | null | undefined,
   ctx: ConfirmacaoContexto,
 ): string {
-  const tpl = (template && template.trim().length > 0)
-    ? template
-    : DEFAULT_MENSAGEM_RECONFIRMACAO;
+  const tpl = template && template.trim().length > 0 ? template : DEFAULT_MENSAGEM_RECONFIRMACAO;
   return renderComFallback(tpl, valoresDeContexto(ctx), ctx.linkAcompanhar);
 }
-
 
 export type CancelamentoContexto = {
   reserva: Reserva;
@@ -197,9 +196,7 @@ export function buildMensagemCancelamento(
   ctx: CancelamentoContexto,
 ): string {
   const r = ctx.reserva;
-  const tpl = (template && template.trim().length > 0)
-    ? template
-    : DEFAULT_MENSAGEM_CANCELAMENTO;
+  const tpl = template && template.trim().length > 0 ? template : DEFAULT_MENSAGEM_CANCELAMENTO;
 
   const valores: Record<string, string> = {
     "{nome}": r.nome ?? "",

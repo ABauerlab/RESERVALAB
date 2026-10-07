@@ -159,7 +159,9 @@ describe("buildMensagemReconfirmacao", () => {
   });
 });
 
-function makeCancelamentoContexto(overrides: Partial<CancelamentoContexto> = {}): CancelamentoContexto {
+function makeCancelamentoContexto(
+  overrides: Partial<CancelamentoContexto> = {},
+): CancelamentoContexto {
   return {
     reserva: makeReserva({ status: "cancelada" }),
     empresaNome: "Restaurante Exemplo",
@@ -186,7 +188,10 @@ describe("buildMensagemCancelamento", () => {
   });
 
   it("remove a linha de motivo quando nenhum motivo é informado", () => {
-    const msg = buildMensagemCancelamento(null, makeCancelamentoContexto({ motivoCancelamento: null }));
+    const msg = buildMensagemCancelamento(
+      null,
+      makeCancelamentoContexto({ motivoCancelamento: null }),
+    );
     expect(msg).not.toMatch(/^Motivo:\s*$/m);
   });
 

@@ -10,10 +10,22 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 
-const DIAS = ["DOMINGO", "SEGUNDA-FEIRA", "TERÇA-FEIRA", "QUARTA-FEIRA", "QUINTA-FEIRA", "SEXTA-FEIRA", "SÁBADO"];
+const DIAS = [
+  "DOMINGO",
+  "SEGUNDA-FEIRA",
+  "TERÇA-FEIRA",
+  "QUARTA-FEIRA",
+  "QUINTA-FEIRA",
+  "SEXTA-FEIRA",
+  "SÁBADO",
+];
 
 function todayISO() {
   const d = new Date();
@@ -46,11 +58,11 @@ export function buildMensagemDoDia(dataISO: string, reservas: Reserva[]): string
     grupos.set(key, arr);
   }
 
-  const partes: string[] = [
-    `*RESERVAS ${DIAS[parseISO(dataISO).getDay()]} ${ddmm(dataISO)}*`,
-  ];
+  const partes: string[] = [`*RESERVAS ${DIAS[parseISO(dataISO).getDay()]} ${ddmm(dataISO)}*`];
 
-  for (const [local, lista] of [...grupos.entries()].sort((a, b) => a[0].localeCompare(b[0], "pt-BR"))) {
+  for (const [local, lista] of [...grupos.entries()].sort((a, b) =>
+    a[0].localeCompare(b[0], "pt-BR"),
+  )) {
     lista.sort((a, b) => (a.horario ?? "99:99").localeCompare(b.horario ?? "99:99"));
     partes.push("");
     partes.push(`*${local}*`);
@@ -80,7 +92,10 @@ export function buildMensagemProximas(dataISO: string, reservas: Reserva[]): str
     porDia.set(r.data, arr);
   }
   const dias = [...porDia.entries()].sort((a, b) => a[0].localeCompare(b[0]));
-  return dias.map(([dia, lista]) => buildMensagemDoDia(dia, lista)).filter(Boolean).join("\n\n");
+  return dias
+    .map(([dia, lista]) => buildMensagemDoDia(dia, lista))
+    .filter(Boolean)
+    .join("\n\n");
 }
 
 type Modo = "dia" | "proximas";
@@ -95,7 +110,8 @@ export function MensagemDoDiaButton({ tenantId }: { tenantId: string | null }) {
     queryKey: ["mensagem-do-dia", tenantId, data, modo],
     queryFn: async () => {
       let query = supabase
-        .from("reservas").select("*")
+        .from("reservas")
+        .select("*")
         .eq("tenant_id", tenantId!)
         .eq("status", "confirmada");
       query = modo === "dia" ? query.eq("data", data) : query.gte("data", data);
@@ -108,9 +124,10 @@ export function MensagemDoDiaButton({ tenantId }: { tenantId: string | null }) {
   });
 
   const texto = useMemo(
-    () => (modo === "dia"
-      ? buildMensagemDoDia(data, q.data ?? [])
-      : buildMensagemProximas(data, q.data ?? [])),
+    () =>
+      modo === "dia"
+        ? buildMensagemDoDia(data, q.data ?? [])
+        : buildMensagemProximas(data, q.data ?? []),
     [modo, data, q.data],
   );
 
@@ -141,12 +158,19 @@ export function MensagemDoDiaButton({ tenantId }: { tenantId: string | null }) {
 
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-1 rounded-xl bg-muted p-1">
-              {([["dia", "Somente o dia"], ["proximas", "A partir da data"]] as Array<[Modo, string]>).map(([v, label]) => (
+              {(
+                [
+                  ["dia", "Somente o dia"],
+                  ["proximas", "A partir da data"],
+                ] as Array<[Modo, string]>
+              ).map(([v, label]) => (
                 <button
                   key={v}
                   onClick={() => setModo(v)}
                   className={`rounded-lg px-3 py-2 text-xs font-medium transition-colors ${
-                    modo === v ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                    modo === v
+                      ? "bg-card text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {label}
@@ -156,7 +180,12 @@ export function MensagemDoDiaButton({ tenantId }: { tenantId: string | null }) {
 
             <div className="space-y-1.5">
               <Label htmlFor="msg-data">{modo === "dia" ? "Data" : "A partir de"}</Label>
-              <Input id="msg-data" type="date" value={data} onChange={(e) => setData(e.target.value)} />
+              <Input
+                id="msg-data"
+                type="date"
+                value={data}
+                onChange={(e) => setData(e.target.value)}
+              />
             </div>
 
             {q.isLoading ? (
@@ -181,4 +210,3 @@ export function MensagemDoDiaButton({ tenantId }: { tenantId: string | null }) {
     </>
   );
 }
-

@@ -8,16 +8,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
 import { AdminShell } from "@/components/admin/AdminShell";
 import {
-  STATUS_LABEL, STATUS_LIST, TIPO_SHORT,
-  type Reserva, type ReservaStatus, type ReservaTipo,
+  STATUS_LABEL,
+  STATUS_LIST,
+  TIPO_SHORT,
+  type Reserva,
+  type ReservaStatus,
+  type ReservaTipo,
 } from "@/lib/reservations";
 
 export const Route = createFileRoute("/$slug/admin/relatorios")({
   head: ({ params }) => ({
-    meta: [
-      { title: "Relatórios — ReservaLab" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Relatórios — ReservaLab" }, { name: "robots", content: "noindex" }],
     links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),
   }),
   ssr: false,
@@ -50,7 +51,10 @@ function RelatoriosPage() {
 
   const resumo = useMemo(() => {
     const rs = reservasQ.data ?? [];
-    const porStatus = Object.fromEntries(STATUS_LIST.map((s) => [s, 0])) as Record<ReservaStatus, number>;
+    const porStatus = Object.fromEntries(STATUS_LIST.map((s) => [s, 0])) as Record<
+      ReservaStatus,
+      number
+    >;
     const porTipo = Object.fromEntries(TIPOS.map((t) => [t, 0])) as Record<ReservaTipo, number>;
     let pessoas = 0;
     for (const r of rs) {
@@ -59,7 +63,8 @@ function RelatoriosPage() {
       if (r.status === "confirmada" || r.status === "finalizada") pessoas += r.quantidade ?? 0;
     }
     const total = rs.length;
-    const taxa = total > 0 ? Math.round(((porStatus.confirmada + porStatus.finalizada) / total) * 100) : 0;
+    const taxa =
+      total > 0 ? Math.round(((porStatus.confirmada + porStatus.finalizada) / total) * 100) : 0;
     return { total, porStatus, porTipo, pessoas, taxa };
   }, [reservasQ.data]);
 
@@ -82,27 +87,39 @@ function RelatoriosPage() {
         </header>
 
         {reservasQ.isLoading ? (
-          <div className="mt-10 flex justify-center"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
+          <div className="mt-10 flex justify-center">
+            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+          </div>
         ) : (
           <>
             <div className="mt-6 grid grid-cols-2 gap-3 animate-in-up sm:grid-cols-4">
               <Metric label="Solicitações" value={resumo.total} />
-              <Metric label="Confirmadas" value={resumo.porStatus.confirmada + resumo.porStatus.finalizada} />
+              <Metric
+                label="Confirmadas"
+                value={resumo.porStatus.confirmada + resumo.porStatus.finalizada}
+              />
               <Metric label="Pessoas atendidas" value={resumo.pessoas} />
               <Metric label="Taxa de confirmação" value={`${resumo.taxa}%`} />
             </div>
 
             <section className="mt-8 rounded-2xl border border-border bg-card p-5">
-              <h3 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Por tipo</h3>
+              <h3 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                Por tipo
+              </h3>
               <ul className="mt-4 space-y-3">
                 {TIPOS.map((t) => (
                   <li key={t}>
                     <div className="flex items-baseline justify-between text-sm">
                       <span>{TIPO_SHORT[t]}</span>
-                      <span className="tabular-nums text-muted-foreground">{resumo.porTipo[t]}</span>
+                      <span className="tabular-nums text-muted-foreground">
+                        {resumo.porTipo[t]}
+                      </span>
                     </div>
                     <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-muted">
-                      <div className="h-full rounded-full bg-terracotta transition-all" style={{ width: `${(resumo.porTipo[t] / maxTipo) * 100}%` }} />
+                      <div
+                        className="h-full rounded-full bg-terracotta transition-all"
+                        style={{ width: `${(resumo.porTipo[t] / maxTipo) * 100}%` }}
+                      />
                     </div>
                   </li>
                 ))}
@@ -110,7 +127,9 @@ function RelatoriosPage() {
             </section>
 
             <section className="mt-4 rounded-2xl border border-border bg-card p-5">
-              <h3 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Por status</h3>
+              <h3 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                Por status
+              </h3>
               <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {STATUS_LIST.map((s) => (
                   <li key={s} className="rounded-xl bg-muted/50 p-3">

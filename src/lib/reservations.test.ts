@@ -174,7 +174,12 @@ describe("horariosDisponiveis", () => {
   });
 
   it("feriado em dia de semana usa o horário-limite de fim de semana configurado", () => {
-    const slots = horariosDisponiveis("2026-09-07", 4, { semana: "13:00", fimDeSemana: "14:00" }, true);
+    const slots = horariosDisponiveis(
+      "2026-09-07",
+      4,
+      { semana: "13:00", fimDeSemana: "14:00" },
+      true,
+    );
     expect(slots[slots.length - 1]).toBe("14:00");
   });
 

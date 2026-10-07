@@ -10,10 +10,7 @@ import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/$slug/admin/trocar-senha")({
   head: () => ({
-    meta: [
-      { title: "Trocar senha — ReservaLab" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Trocar senha — ReservaLab" }, { name: "robots", content: "noindex" }],
   }),
   ssr: false,
   component: TrocarSenha,
@@ -31,7 +28,10 @@ function TrocarSenha() {
   useEffect(() => {
     (async () => {
       const { data } = await supabase.auth.getSession();
-      if (!data.session) { navigate({ to: "/$slug/admin/login", params: { slug } }); return; }
+      if (!data.session) {
+        navigate({ to: "/$slug/admin/login", params: { slug } });
+        return;
+      }
       setObrigatorio(data.session.user.user_metadata?.must_change_password === true);
       setChecando(false);
     })();
@@ -49,7 +49,10 @@ function TrocarSenha() {
       data: { must_change_password: false },
     });
     setSalvando(false);
-    if (error) { toast.error(error.message || "Não foi possível alterar a senha."); return; }
+    if (error) {
+      toast.error(error.message || "Não foi possível alterar a senha.");
+      return;
+    }
     toast.success("Senha alterada com sucesso.");
     navigate({ to: "/$slug/admin", params: { slug } });
   }
@@ -66,7 +69,9 @@ function TrocarSenha() {
     <main className="flex min-h-screen items-center justify-center bg-background px-5 safe-top safe-bottom">
       <div className="w-full max-w-sm animate-in-up">
         <div className="mb-8 text-center">
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-terracotta">ReservaLab</p>
+          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-terracotta">
+            ReservaLab
+          </p>
         </div>
 
         <div className="rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-md)]">
@@ -85,20 +90,42 @@ function TrocarSenha() {
           <form onSubmit={onSubmit} className="mt-6 space-y-4">
             <div className="space-y-2">
               <Label className="text-[13px]">Nova senha</Label>
-              <Input type="password" value={nova} onChange={(e) => setNova(e.target.value)} autoComplete="new-password" required minLength={6} className="h-12 rounded-xl" />
-              <p className={`text-[11px] ${forte ? "text-muted-foreground" : "text-muted-foreground"}`}>
+              <Input
+                type="password"
+                value={nova}
+                onChange={(e) => setNova(e.target.value)}
+                autoComplete="new-password"
+                required
+                minLength={6}
+                className="h-12 rounded-xl"
+              />
+              <p
+                className={`text-[11px] ${forte ? "text-muted-foreground" : "text-muted-foreground"}`}
+              >
                 Mínimo de 6 caracteres. Recomendado: 8+, com letras e números.
               </p>
             </div>
             <div className="space-y-2">
               <Label className="text-[13px]">Confirmar nova senha</Label>
-              <Input type="password" value={confirma} onChange={(e) => setConfirma(e.target.value)} autoComplete="new-password" required minLength={6} className="h-12 rounded-xl" />
+              <Input
+                type="password"
+                value={confirma}
+                onChange={(e) => setConfirma(e.target.value)}
+                autoComplete="new-password"
+                required
+                minLength={6}
+                className="h-12 rounded-xl"
+              />
               {confirma.length > 0 && confirma !== nova && (
                 <p className="text-[11px] text-destructive">As senhas não conferem.</p>
               )}
             </div>
 
-            <Button type="submit" disabled={!podeSalvar} className="h-12 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button
+              type="submit"
+              disabled={!podeSalvar}
+              className="h-12 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+            >
               {salvando ? <Loader2 className="h-4 w-4 animate-spin" /> : "Salvar nova senha"}
             </Button>
           </form>

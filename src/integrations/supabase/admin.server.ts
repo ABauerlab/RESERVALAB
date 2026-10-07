@@ -19,7 +19,10 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
       new Headers(init.headers).forEach((value, key) => headers.set(key, value));
     }
 
-    if (isNewSupabaseApiKey(supabaseKey) && headers.get("Authorization") === `Bearer ${supabaseKey}`) {
+    if (
+      isNewSupabaseApiKey(supabaseKey) &&
+      headers.get("Authorization") === `Bearer ${supabaseKey}`
+    ) {
       headers.delete("Authorization");
     }
 
@@ -46,14 +49,20 @@ export function getSupabaseAdmin() {
   if (cached) return cached;
 
   const url = readEnv("SUPABASE_URL", "VITE_SUPABASE_URL");
-  const serviceKey = readEnv("SUPABASE_SERVICE_ROLE_KEY", "SUPABASE_SECRET_KEY", "SUPABASE_SECRET_KEYS");
+  const serviceKey = readEnv(
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_SECRET_KEY",
+    "SUPABASE_SECRET_KEYS",
+  );
 
   if (!url || !serviceKey) {
     const missing = [
       ...(!url ? ["SUPABASE_URL"] : []),
       ...(!serviceKey ? ["SUPABASE_SERVICE_ROLE_KEY"] : []),
     ].join(", ");
-    throw new Error(`Backend indisponível no servidor (${missing}). Publique novamente o app para aplicar as chaves.`);
+    throw new Error(
+      `Backend indisponível no servidor (${missing}). Publique novamente o app para aplicar as chaves.`,
+    );
   }
 
   cached = createClient<Database>(url, serviceKey, {

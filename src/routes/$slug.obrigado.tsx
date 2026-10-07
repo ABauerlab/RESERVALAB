@@ -9,10 +9,7 @@ import { initFacebookPixel } from "@/lib/fbpixel";
 
 export const Route = createFileRoute("/$slug/obrigado")({
   head: () => ({
-    meta: [
-      { title: "Reserva enviada — ReservaLab" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Reserva enviada — ReservaLab" }, { name: "robots", content: "noindex" }],
   }),
   ssr: false,
   component: Obrigado,
@@ -21,10 +18,18 @@ export const Route = createFileRoute("/$slug/obrigado")({
 function Obrigado() {
   const { slug } = useParams({ from: "/$slug/obrigado" });
   const [codigo, setCodigo] = useState<string>("");
-  const tenantQ = useQuery({ queryKey: ["tenant", slug], queryFn: () => getTenantBySlug(slug), staleTime: 5 * 60_000 });
+  const tenantQ = useQuery({
+    queryKey: ["tenant", slug],
+    queryFn: () => getTenantBySlug(slug),
+    staleTime: 5 * 60_000,
+  });
 
   useEffect(() => {
-    try { setCodigo(sessionStorage.getItem("ultima-reserva-codigo") ?? ""); } catch { /* noop */ }
+    try {
+      setCodigo(sessionStorage.getItem("ultima-reserva-codigo") ?? "");
+    } catch {
+      /* noop */
+    }
   }, []);
 
   useEffect(() => {
@@ -50,7 +55,8 @@ function Obrigado() {
           Reserva enviada
         </h1>
         <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
-          Nossa equipe irá analisar a disponibilidade e entrar em contato para confirmar sua reserva.
+          Nossa equipe irá analisar a disponibilidade e entrar em contato para confirmar sua
+          reserva.
         </p>
 
         {codigo && (
@@ -60,7 +66,10 @@ function Obrigado() {
             </p>
             <div className="mt-2 flex items-center justify-between gap-3">
               <p className="font-serif text-2xl tracking-wider text-foreground">{codigo}</p>
-              <button onClick={copiar} className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-background px-3 text-xs font-medium transition-colors hover:bg-accent">
+              <button
+                onClick={copiar}
+                className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-background px-3 text-xs font-medium transition-colors hover:bg-accent"
+              >
                 <Copy className="h-3.5 w-3.5" />
                 Copiar
               </button>
@@ -72,11 +81,19 @@ function Obrigado() {
         )}
 
         <div className="mt-6 flex flex-wrap justify-center gap-2">
-          <Link to="/$slug/acompanhar" params={{ slug }} className="inline-flex h-11 items-center justify-center gap-1.5 rounded-xl bg-primary px-5 text-sm font-medium text-primary-foreground transition hover:opacity-90">
+          <Link
+            to="/$slug/acompanhar"
+            params={{ slug }}
+            className="inline-flex h-11 items-center justify-center gap-1.5 rounded-xl bg-primary px-5 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+          >
             <Search className="h-3.5 w-3.5" />
             Acompanhar reserva
           </Link>
-          <Link to="/$slug" params={{ slug }} className="inline-flex h-11 items-center justify-center rounded-xl border border-border bg-background px-5 text-sm font-medium transition hover:bg-accent">
+          <Link
+            to="/$slug"
+            params={{ slug }}
+            className="inline-flex h-11 items-center justify-center rounded-xl border border-border bg-background px-5 text-sm font-medium transition hover:bg-accent"
+          >
             Voltar ao início
           </Link>
         </div>

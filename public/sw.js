@@ -23,7 +23,9 @@ self.addEventListener("push", (event) => {
     try {
       const text = event.data && event.data.text();
       if (text) payload.body = text;
-    } catch { /* noop */ }
+    } catch {
+      /* noop */
+    }
   }
 
   event.waitUntil(
@@ -34,7 +36,7 @@ self.addEventListener("push", (event) => {
       tag: payload.tag || "reservalab-reserva",
       renotify: true,
       data: { url: payload.url || "/" },
-    })
+    }),
   );
 });
 
@@ -49,9 +51,11 @@ self.addEventListener("notificationclick", (event) => {
           if (u.pathname.startsWith(targetUrl.split("?")[0])) {
             return client.focus();
           }
-        } catch { /* noop */ }
+        } catch {
+          /* noop */
+        }
       }
       if (self.clients.openWindow) return self.clients.openWindow(targetUrl);
-    })
+    }),
   );
 });

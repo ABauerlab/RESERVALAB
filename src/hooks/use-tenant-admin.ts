@@ -20,10 +20,16 @@ export type TenantAdminState = {
  *  - sessão sem vínculo com ESTA empresa -> mensagem clara + logout;
  *  - senha provisória (must_change_password) -> força a troca antes de seguir.
  */
-export function useTenantAdmin(slug: string, options?: { skipPasswordGate?: boolean }): TenantAdminState {
+export function useTenantAdmin(
+  slug: string,
+  options?: { skipPasswordGate?: boolean },
+): TenantAdminState {
   const navigate = useNavigate();
   const [state, setState] = useState<TenantAdminState>({
-    ready: false, tenant: null, userId: null, isSuper: false,
+    ready: false,
+    tenant: null,
+    userId: null,
+    isSuper: false,
   });
   const skipPasswordGate = options?.skipPasswordGate ?? false;
 
@@ -73,7 +79,10 @@ export function useTenantAdmin(slug: string, options?: { skipPasswordGate?: bool
       if (event === "SIGNED_OUT") navigate({ to: "/$slug/admin/login", params: { slug } });
     });
 
-    return () => { mounted = false; sub.subscription.unsubscribe(); };
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
+    };
   }, [navigate, slug, skipPasswordGate]);
 
   return state;
