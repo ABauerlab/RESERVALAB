@@ -31,6 +31,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Link } from "@tanstack/react-router";
+import { AgendaEstado } from "@/components/admin/agenda/AgendaEstado";
 
 export const Route = createFileRoute("/$slug/admin/agenda")({
   head: ({ params }) => ({
@@ -125,6 +127,19 @@ function AgendaPage() {
     resumo.reservas === 0
       ? "Nenhuma reserva neste dia"
       : `${resumo.reservas} ${resumo.reservas === 1 ? "reserva" : "reservas"}, ${resumo.pessoas} pessoas, ${resumo.pendentes} ${resumo.pendentes === 1 ? "pendente" : "pendentes"}`;
+
+  const semanaVazia = ag.semana.every((d) => d.reservas === 0);
+  const linkReservas = (
+    <Link
+      to="/$slug/admin/reservas"
+      params={{ slug }}
+      className="inline-flex h-11 items-center rounded-md border border-border bg-card px-4 text-[13px] font-semibold text-foreground hover:bg-muted xl:h-9"
+    >
+      Ver em Reservas
+    </Link>
+  );
+  const btnAcao =
+    "inline-flex h-11 items-center rounded-md bg-primary px-4 text-[13px] font-semibold text-primary-foreground hover:bg-blue-700 xl:h-9";
 
   const navBtn =
     "inline-flex h-11 min-w-12 items-center justify-center gap-1 rounded-md border border-border bg-card px-3 text-[13px] font-semibold text-foreground transition-colors hover:bg-muted disabled:text-muted-foreground xl:h-9";
@@ -255,8 +270,16 @@ function AgendaPage() {
 
         {ag.truncado && (
           <p className="mt-2 text-xs text-muted-foreground">
-            A semana tem mais reservas do que o limite de exibição (500). As contagens podem estar
-            incompletas.
+            Esta semana tem 500 reservas ou mais. Mostramos as 500 primeiras e as contagens podem
+            estar incompletas. Veja todas em{" "}
+            <Link
+              to="/$slug/admin/reservas"
+              params={{ slug }}
+              className="font-semibold text-primary hover:underline"
+            >
+              Reservas
+            </Link>
+            .
           </p>
         )}
 
@@ -321,31 +344,67 @@ function AgendaPage() {
           <DayContext contexto={agendaDia.contexto} slug={slug} />
 
           {ag.error ? (
-            <div className="rounded-lg border border-dashed border-border px-4 py-10 text-center">
-              <p className="text-sm text-muted-foreground">
-                Não foi possível carregar a agenda. Tente novamente em instantes.
-              </p>
-              <Button variant="outline" className="mt-3 h-11 rounded-md" onClick={ag.refetch}>
-                Tentar novamente
-              </Button>
-            </div>
+            <AgendaEstado
+              alert
+              titulo="Não foi possível carregar a agenda"
+              texto="A conexão pode ter falhado. Suas reservas não foram alteradas. Tente novamente em instantes."
+              acoes={
+                <Button className="h-11 rounded-md xl:h-9" onClick={ag.refetch}>
+                  Tentar novamente
+                </Button>
+              }
+            />
           ) : ag.loading ? (
-            <div className="space-y-2">
+            <div className="space-y-2" aria-busy="true" aria-label="Carregando a agenda">
               {Array.from({ length: 4 }).map((_, i) => (
                 <Skeleton key={i} className="h-[64px] w-full rounded-lg" />
               ))}
             </div>
           ) : !temVisiveis ? (
-            <div className="rounded-lg border border-dashed border-border bg-card/50 px-4 py-12 text-center">
-              <p className="text-xl font-extrabold tracking-tight text-foreground">
-                {filtros.soAtencao ? "Nada precisa de atenção" : "Nenhuma reserva neste dia"}
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {filtros.soAtencao
-                  ? "Nenhuma reserva deste dia precisa de atenção."
-                  : "Nada marcado para este dia."}
-              </p>
-            </div>
+            filtros.soAtencao && resumo.reservas > 0 ? (
+              <AgendaEstado
+                titulo="Nada precisa de atenção neste dia"
+                texto={`As ${resumo.reservas} ${resumo.reservas === 1 ? "reserva" : "reservas"} deste dia já estão em ordem: nenhuma está pendente, esperando reconfirmação ou dentro de um bloqueio.`}
+                acoes={
+                  <button type="button" className={btnAcao} onClick={() => ag.setSoAtencao(false)}>
+                    Mostrar todas
+                  </button>
+                }
+              />
+            ) : !filtros.mostrarCanceladas && resumo.canceladas > 0 && resumo.reservas === 0 ? (
+              <AgendaEstado
+                titulo="Só há reservas canceladas neste dia"
+                texto={`${resumo.canceladas} ${resumo.canceladas === 1 ? "reserva foi cancelada" : "reservas foram canceladas"} e ficam ocultas por padrão. Nenhuma reserva ativa neste dia.`}
+                acoes={
+                  <button
+                    type="button"
+                    className={btnAcao}
+                    onClick={() => ag.setMostrarCanceladas(true)}
+                  >
+                    Mostrar canceladas
+                  </button>
+                }
+              />
+            ) : semanaVazia ? (
+              <AgendaEstado
+                titulo="Nenhuma reserva nesta semana"
+                texto="Quando uma reserva for feita, ela aparece aqui sem precisar recarregar. Você pode olhar outra semana ou conferir tudo em Reservas."
+                acoes={
+                  <>
+                    <button type="button" className={btnAcao} onClick={() => ag.shiftWeek(1)}>
+                      Próxima semana
+                    </button>
+                    {linkReservas}
+                  </>
+                }
+              />
+            ) : (
+              <AgendaEstado
+                titulo="Nenhuma reserva neste dia"
+                texto="Escolha outro dia da semana na faixa acima ou consulte todas as reservas."
+                acoes={linkReservas}
+              />
+            )
           ) : (
             <AgendaTimeline
               dia={agendaDia}
