@@ -127,7 +127,7 @@ function AgendaPage() {
       : `${resumo.reservas} ${resumo.reservas === 1 ? "reserva" : "reservas"}, ${resumo.pessoas} pessoas, ${resumo.pendentes} ${resumo.pendentes === 1 ? "pendente" : "pendentes"}`;
 
   const navBtn =
-    "inline-flex h-11 items-center gap-1 rounded-md border border-border bg-card px-3 text-[13px] font-semibold text-foreground transition-colors hover:bg-muted disabled:text-muted-foreground xl:h-9";
+    "inline-flex h-11 min-w-12 items-center justify-center gap-1 rounded-md border border-border bg-card px-3 text-[13px] font-semibold text-foreground transition-colors hover:bg-muted disabled:text-muted-foreground xl:h-9";
 
   return (
     <AdminShell slug={slug} tenantNome={admin.tenant?.nome ?? ""} active="agenda">
