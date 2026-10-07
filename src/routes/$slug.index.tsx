@@ -1,7 +1,15 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { ArrowRight, UtensilsCrossed, Cake, Heart, Search, Loader2, PartyPopper } from "lucide-react";
+import {
+  ArrowRight,
+  UtensilsCrossed,
+  Cake,
+  Heart,
+  Search,
+  Loader2,
+  PartyPopper,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { TIPO_CARDS, formatData, formatHorario, type ReservaTipo } from "@/lib/reservations";
 import { getTenantBySlug } from "@/lib/tenant";
@@ -107,7 +115,9 @@ function TenantHome() {
               <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">
                 <PartyPopper className="h-3.5 w-3.5" /> Evento em destaque
               </p>
-              <p className="mt-2 font-serif font-semibold text-2xl leading-snug text-foreground">{eventoQ.data.titulo}</p>
+              <p className="mt-2 font-serif font-semibold text-2xl leading-snug text-foreground">
+                {eventoQ.data.titulo}
+              </p>
               <p className="mt-1 text-sm font-medium text-terracotta">
                 {formatData(eventoQ.data.data)}
                 {eventoQ.data.horario ? ` às ${formatHorario(eventoQ.data.horario)}` : ""}
@@ -129,7 +139,9 @@ function TenantHome() {
                 key={card.tipo}
                 to="/$slug/reservar/$tipo"
                 params={{ slug, tipo: card.tipo }}
-                onClick={() => trackFacebookCustomEvent(tenant.pixel_facebook_id, CLICK_RESERVA_EVENT[card.tipo])}
+                onClick={() =>
+                  trackFacebookCustomEvent(tenant.pixel_facebook_id, CLICK_RESERVA_EVENT[card.tipo])
+                }
                 className="group relative flex items-center gap-4 rounded-lg border border-border bg-card px-5 py-4 shadow-[var(--shadow-sm)] transition-all duration-200 hover:-translate-y-0.5 hover:border-terracotta/40 hover:shadow-[var(--shadow-md)] active:scale-[0.99] animate-in-up"
                 style={{ animationDelay: `${60 + i * 50}ms` }}
               >

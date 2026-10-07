@@ -18,10 +18,7 @@ import {
 
 export const Route = createFileRoute("/$slug/admin/relatorios")({
   head: ({ params }) => ({
-    meta: [
-      { title: "Relatórios | Teggly" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Relatórios | Teggly" }, { name: "robots", content: "noindex" }],
     links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),
   }),
   ssr: false,
@@ -106,7 +103,9 @@ function RelatoriosPage() {
             </div>
 
             <section className="mt-8 rounded-lg border border-border bg-card p-5">
-              <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Por tipo</h3>
+              <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                Por tipo
+              </h3>
               <ul className="mt-4 space-y-3">
                 {TIPOS.map((t) => (
                   <li key={t}>
@@ -128,7 +127,9 @@ function RelatoriosPage() {
             </section>
 
             <section className="mt-4 rounded-lg border border-border bg-card p-5">
-              <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Por status</h3>
+              <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                Por status
+              </h3>
               <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {STATUS_LIST.map((s) => (
                   <li key={s} className="rounded-lg bg-muted/50 p-3">

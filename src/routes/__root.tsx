@@ -46,12 +46,13 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
     <div className="flex min-h-screen items-center justify-center bg-background px-6">
       <div className="max-w-md text-center animate-in-up">
         <h1 className="text-xl font-semibold">Algo não saiu como esperado</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Tente novamente ou volte ao início.
-        </p>
+        <p className="mt-2 text-sm text-muted-foreground">Tente novamente ou volte ao início.</p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
-            onClick={() => { router.invalidate(); reset(); }}
+            onClick={() => {
+              router.invalidate();
+              reset();
+            }}
             className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-5 text-[15px] font-semibold text-primary-foreground shadow-blue transition-colors hover:bg-blue-700"
           >
             Tentar novamente
@@ -72,9 +73,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" },
+      {
+        name: "viewport",
+        content: "width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1",
+      },
       { title: "Teggly | Mais reservas. Menos trabalho." },
-      { name: "description", content: "Teggly é a plataforma de reservas e atendimento inteligente para restaurantes e bares. Mais reservas. Menos trabalho." },
+      {
+        name: "description",
+        content:
+          "Teggly é a plataforma de reservas e atendimento inteligente para restaurantes e bares. Mais reservas. Menos trabalho.",
+      },
       { name: "theme-color", content: "#2563eb" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
@@ -83,7 +91,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "author", content: "BauerLab" },
       { property: "og:site_name", content: "Teggly" },
       { property: "og:title", content: "Teggly | Mais reservas. Menos trabalho." },
-      { property: "og:description", content: "Reservas e atendimento inteligente para restaurantes, direto no WhatsApp." },
+      {
+        property: "og:description",
+        content: "Reservas e atendimento inteligente para restaurantes, direto no WhatsApp.",
+      },
       { property: "og:type", content: "website" },
       { property: "og:image", content: "https://reserva.bauerlab.com.br/og-image.png" },
       { property: "og:image:width", content: "1200" },
@@ -91,7 +102,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:locale", content: "pt_BR" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Teggly | Mais reservas. Menos trabalho." },
-      { name: "twitter:description", content: "Reservas e atendimento inteligente para restaurantes, direto no WhatsApp." },
+      {
+        name: "twitter:description",
+        content: "Reservas e atendimento inteligente para restaurantes, direto no WhatsApp.",
+      },
       { name: "twitter:image", content: "https://reserva.bauerlab.com.br/og-image.png" },
     ],
     links: [

@@ -13,10 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 export const Route = createFileRoute("/$slug/admin/login")({
   head: ({ params }) => ({
-    meta: [
-      { title: "Admin | Teggly" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Admin | Teggly" }, { name: "robots", content: "noindex" }],
     links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),
   }),
   ssr: false,
@@ -99,7 +96,13 @@ function AdminLogin() {
     <main className="flex min-h-screen items-center justify-center bg-background px-5 safe-top safe-bottom">
       <div className="w-full max-w-sm animate-in-up">
         <Link to="/$slug" params={{ slug }} className="mb-10 block text-center">
-          <img src="/brand/Teggly_Logo_Primary.svg" alt="Teggly" width={134} height={32} className="mx-auto h-8 w-auto" />
+          <img
+            src="/brand/Teggly_Logo_Primary.svg"
+            alt="Teggly"
+            width={134}
+            height={32}
+            className="mx-auto h-8 w-auto"
+          />
           <p className="mt-1 text-xs text-muted-foreground">Painel administrativo</p>
         </Link>
 
@@ -110,11 +113,27 @@ function AdminLogin() {
           <form onSubmit={onSubmit} className="mt-6 space-y-4">
             <div className="space-y-2">
               <Label className="text-[13px]">E-mail</Label>
-              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="voce@empresa.com" autoComplete="email" required className="h-12 rounded-md" />
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="voce@empresa.com"
+                autoComplete="email"
+                required
+                className="h-12 rounded-md"
+              />
             </div>
             <div className="space-y-2">
               <Label className="text-[13px]">Senha</Label>
-              <Input type="password" value={senha} onChange={(e) => setSenha(e.target.value)} autoComplete="current-password" required minLength={6} className="h-12 rounded-md" />
+              <Input
+                type="password"
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+                autoComplete="current-password"
+                required
+                minLength={6}
+                className="h-12 rounded-md"
+              />
             </div>
 
             <label className="flex min-h-11 cursor-pointer items-center gap-2.5 text-sm text-muted-foreground">
@@ -122,7 +141,11 @@ function AdminLogin() {
               Manter conectado neste dispositivo
             </label>
 
-            <Button type="submit" disabled={loading} className="h-12 w-full rounded-md bg-primary text-primary-foreground hover:bg-blue-700">
+            <Button
+              type="submit"
+              disabled={loading}
+              className="h-12 w-full rounded-md bg-primary text-primary-foreground hover:bg-blue-700"
+            >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Entrar"}
             </Button>
           </form>

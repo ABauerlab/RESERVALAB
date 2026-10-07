@@ -285,8 +285,12 @@ function ReservarPage() {
         {isEvento && (
           <section className="mt-6 space-y-4 rounded-lg border border-terracotta/25 bg-terracotta/5 p-5 animate-in-up">
             <div>
-              <p className="font-serif font-semibold text-xl leading-snug sm:text-2xl">Orçamento — eventos particulares</p>
-              <p className="mt-1.5 text-sm text-muted-foreground">Mínimo de 50 pessoas • Máximo de 180 pessoas</p>
+              <p className="font-serif font-semibold text-xl leading-snug sm:text-2xl">
+                Orçamento — eventos particulares
+              </p>
+              <p className="mt-1.5 text-sm text-muted-foreground">
+                Mínimo de 50 pessoas • Máximo de 180 pessoas
+              </p>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
@@ -353,11 +357,29 @@ function ReservarPage() {
 
         <form onSubmit={onSubmit} className="mt-8 space-y-5 animate-in-up">
           <Field label="Nome">
-            <Input value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Seu nome completo" autoComplete="name" className="h-12 rounded-md" required />
+            <Input
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              placeholder="Seu nome completo"
+              autoComplete="name"
+              className="h-12 rounded-md"
+              required
+            />
           </Field>
 
-          <Field label="Telefone / WhatsApp" hint="Se for do exterior, comece com + e o código do país">
-            <Input value={telefone} onChange={(e) => setTelefone(formatTelefone(e.target.value))} placeholder="(11) 91234-5678 ou +1 555 1234" inputMode="tel" autoComplete="tel" className="h-12 rounded-md" required />
+          <Field
+            label="Telefone / WhatsApp"
+            hint="Se for do exterior, comece com + e o código do país"
+          >
+            <Input
+              value={telefone}
+              onChange={(e) => setTelefone(formatTelefone(e.target.value))}
+              placeholder="(11) 91234-5678 ou +1 555 1234"
+              inputMode="tel"
+              autoComplete="tel"
+              className="h-12 rounded-md"
+              required
+            />
           </Field>
 
           <Field label={isEvento || isCasa ? "Quantidade prevista" : "Quantidade de pessoas"}>
@@ -366,7 +388,14 @@ function ReservarPage() {
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <Field label="Data">
-              <Input type="date" min={hoje} value={data} onChange={(e) => setData(e.target.value)} className="h-12 rounded-md" required />
+              <Input
+                type="date"
+                min={hoje}
+                value={data}
+                onChange={(e) => setData(e.target.value)}
+                className="h-12 rounded-md"
+                required
+              />
             </Field>
             {precisaHorario && (
               <Field label="Horário">
@@ -412,7 +441,9 @@ function ReservarPage() {
           {isMesa && (
             <Field label="Área desejada">
               <Select value={area} onValueChange={(v) => setArea(v as ReservaArea)}>
-                <SelectTrigger className="h-12 rounded-md"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="h-12 rounded-md">
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="salao">
                     {AREA_LABEL.salao} ({AREA_DESCRICAO.salao})
@@ -464,22 +495,49 @@ function ReservarPage() {
 
           {isEvento && (
             <Field label="Tipo do evento">
-              <Input value={tipoEvento} onChange={(e) => setTipoEvento(e.target.value)} placeholder="Ex: confraternização de empresa" className="h-12 rounded-md" required />
+              <Input
+                value={tipoEvento}
+                onChange={(e) => setTipoEvento(e.target.value)}
+                placeholder="Ex: confraternização de empresa"
+                className="h-12 rounded-md"
+                required
+              />
             </Field>
           )}
 
           {isEvento || isCasa ? (
             <Field label="Mensagem">
-              <Textarea value={mensagem} onChange={(e) => setMensagem(e.target.value)} placeholder="Conte um pouco sobre o que você imagina." className="min-h-28 rounded-md" />
+              <Textarea
+                value={mensagem}
+                onChange={(e) => setMensagem(e.target.value)}
+                placeholder="Conte um pouco sobre o que você imagina."
+                className="min-h-28 rounded-md"
+              />
             </Field>
           ) : (
             <Field label="Observações">
-              <Textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} placeholder="Alguma preferência ou informação adicional?" className="min-h-24 rounded-md" />
+              <Textarea
+                value={observacoes}
+                onChange={(e) => setObservacoes(e.target.value)}
+                placeholder="Alguma preferência ou informação adicional?"
+                className="min-h-24 rounded-md"
+              />
             </Field>
           )}
 
-          <Button type="submit" disabled={!podeEnviar || enviando} className="mt-2 w-full rounded-lg bg-terracotta text-terracotta-foreground hover:bg-blue-700 disabled:opacity-50" style={{ height: 52 }}>
-            {enviando ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Enviando…</>) : "Enviar reserva"}
+          <Button
+            type="submit"
+            disabled={!podeEnviar || enviando}
+            className="mt-2 w-full rounded-lg bg-terracotta text-terracotta-foreground hover:bg-blue-700 disabled:opacity-50"
+            style={{ height: 52 }}
+          >
+            {enviando ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Enviando…
+              </>
+            ) : (
+              "Enviar reserva"
+            )}
           </Button>
         </form>
       </div>
@@ -524,14 +582,39 @@ function QuantityInput({
   }
   return (
     <div className="flex h-12 items-center justify-between rounded-md border border-input bg-background px-1">
-      <button type="button" onClick={() => commit(value - 1)} className="flex h-11 w-11 items-center justify-center rounded-md text-foreground transition-colors hover:bg-accent active:scale-95 disabled:opacity-40" disabled={value <= min} aria-label="Diminuir">
+      <button
+        type="button"
+        onClick={() => commit(value - 1)}
+        className="flex h-11 w-11 items-center justify-center rounded-md text-foreground transition-colors hover:bg-accent active:scale-95 disabled:opacity-40"
+        disabled={value <= min}
+        aria-label="Diminuir"
+      >
         <Minus className="h-4 w-4" />
       </button>
-      <input type="text" inputMode="numeric" pattern="[0-9]*" value={text}
-        onChange={(e) => { const v = e.target.value.replace(/\D/g, "").slice(0, 4); setText(v); if (v !== "") onChange(Math.max(min, Math.min(max, parseInt(v, 10)))); }}
-        onBlur={() => { if (text === "") commit(min); else commit(parseInt(text, 10)); }}
-        className="h-11 w-16 bg-transparent text-center text-lg font-medium tabular-nums outline-none" aria-label="Quantidade" />
-      <button type="button" onClick={() => commit(value + 1)} className="flex h-11 w-11 items-center justify-center rounded-md text-foreground transition-colors hover:bg-accent active:scale-95 disabled:opacity-40" disabled={value >= max} aria-label="Aumentar">
+      <input
+        type="text"
+        inputMode="numeric"
+        pattern="[0-9]*"
+        value={text}
+        onChange={(e) => {
+          const v = e.target.value.replace(/\D/g, "").slice(0, 4);
+          setText(v);
+          if (v !== "") onChange(Math.max(min, Math.min(max, parseInt(v, 10))));
+        }}
+        onBlur={() => {
+          if (text === "") commit(min);
+          else commit(parseInt(text, 10));
+        }}
+        className="h-11 w-16 bg-transparent text-center text-lg font-medium tabular-nums outline-none"
+        aria-label="Quantidade"
+      />
+      <button
+        type="button"
+        onClick={() => commit(value + 1)}
+        className="flex h-11 w-11 items-center justify-center rounded-md text-foreground transition-colors hover:bg-accent active:scale-95 disabled:opacity-40"
+        disabled={value >= max}
+        aria-label="Aumentar"
+      >
         <Plus className="h-4 w-4" />
       </button>
     </div>
@@ -550,8 +633,12 @@ function SegmentedButtons<T extends string>({
   return (
     <div className="grid grid-cols-2 gap-2 rounded-[12px] bg-muted p-1">
       {options.map((o) => (
-        <button key={o.value} type="button" onClick={() => onChange(o.value)}
-          className={`h-11 rounded-md text-sm font-medium transition-all ${value === o.value ? "bg-background text-foreground shadow-[var(--shadow-sm)]" : "text-muted-foreground hover:text-foreground"}`}>
+        <button
+          key={o.value}
+          type="button"
+          onClick={() => onChange(o.value)}
+          className={`h-11 rounded-md text-sm font-medium transition-all ${value === o.value ? "bg-background text-foreground shadow-[var(--shadow-sm)]" : "text-muted-foreground hover:text-foreground"}`}
+        >
           {o.label}
         </button>
       ))}

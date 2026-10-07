@@ -41,10 +41,7 @@ import {
 
 export const Route = createFileRoute("/$slug/acompanhar/$codigo")({
   head: () => ({
-    meta: [
-      { title: "Sua reserva | Teggly" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Sua reserva | Teggly" }, { name: "robots", content: "noindex" }],
   }),
   ssr: false,
   component: AcompanharDetalhes,
@@ -67,13 +64,21 @@ function AcompanharDetalhes() {
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto max-w-md px-5 pt-6 pb-24 safe-top safe-bottom">
-        <Link to="/$slug/acompanhar" params={{ slug }} className="inline-flex min-h-11 items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground">
+        <Link
+          to="/$slug/acompanhar"
+          params={{ slug }}
+          className="inline-flex min-h-11 items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        >
           <ChevronLeft className="h-4 w-4" /> Outra consulta
         </Link>
 
         <header className="mt-6 animate-fade">
-          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">Acompanhar</p>
-          <h1 className="mt-3 font-serif text-4xl leading-tight tracking-tight">Reserva {codigo}</h1>
+          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">
+            Acompanhar
+          </p>
+          <h1 className="mt-3 font-serif text-4xl leading-tight tracking-tight">
+            Reserva {codigo}
+          </h1>
         </header>
 
         {reservaQ.isLoading ? (
@@ -164,7 +169,9 @@ function ReservaEdit({
       <div className="rounded-lg border border-border bg-card p-5">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">{TIPO_LABEL[reserva.tipo]}</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+              {TIPO_LABEL[reserva.tipo]}
+            </p>
             <p className="mt-1 font-serif font-semibold text-2xl text-foreground">{reserva.nome}</p>
           </div>
           <StatusPill status={reserva.status} />
@@ -193,7 +200,8 @@ function ReservaEdit({
 
       {bloqueada ? (
         <p className="rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
-          Esta reserva está {STATUS_LABEL[reserva.status].toLowerCase()} e não pode mais ser alterada. Para uma nova solicitação, faça uma reserva.
+          Esta reserva está {STATUS_LABEL[reserva.status].toLowerCase()} e não pode mais ser
+          alterada. Para uma nova solicitação, faça uma reserva.
         </p>
       ) : (
         <>
@@ -202,23 +210,45 @@ function ReservaEdit({
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label className="text-[13px]">Data</Label>
-                <Input type="date" value={data} onChange={(e) => setData(e.target.value)} className="h-11 rounded-md" />
+                <Input
+                  type="date"
+                  value={data}
+                  onChange={(e) => setData(e.target.value)}
+                  className="h-11 rounded-md"
+                />
               </div>
               <div className="space-y-2">
                 <Label className="text-[13px]">Horário</Label>
-                <Input type="time" value={horario} onChange={(e) => setHorario(e.target.value)} className="h-11 rounded-md" />
+                <Input
+                  type="time"
+                  value={horario}
+                  onChange={(e) => setHorario(e.target.value)}
+                  className="h-11 rounded-md"
+                />
               </div>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label className="text-[13px]">Quantidade</Label>
-                <Input type="number" min={1} max={5000} value={quantidade} onChange={(e) => setQuantidade(e.target.value.replace(/\D/g, ""))} className="h-11 rounded-md" />
+                <Input
+                  type="number"
+                  min={1}
+                  max={5000}
+                  value={quantidade}
+                  onChange={(e) => setQuantidade(e.target.value.replace(/\D/g, ""))}
+                  className="h-11 rounded-md"
+                />
               </div>
               {reserva.tipo === "mesa" && (
                 <div className="space-y-2">
                   <Label className="text-[13px]">Área</Label>
-                  <Select value={area || undefined} onValueChange={(v) => setArea(v as ReservaArea)}>
-                    <SelectTrigger className="h-11 rounded-md"><SelectValue placeholder="Sem preferência" /></SelectTrigger>
+                  <Select
+                    value={area || undefined}
+                    onValueChange={(v) => setArea(v as ReservaArea)}
+                  >
+                    <SelectTrigger className="h-11 rounded-md">
+                      <SelectValue placeholder="Sem preferência" />
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="salao">
                         {AREA_LABEL.salao} ({AREA_DESCRICAO.salao})
@@ -240,19 +270,39 @@ function ReservaEdit({
             </div>
             <div className="space-y-2">
               <Label className="text-[13px]">Observações</Label>
-              <Textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} className="min-h-24 rounded-md" />
+              <Textarea
+                value={observacoes}
+                onChange={(e) => setObservacoes(e.target.value)}
+                className="min-h-24 rounded-md"
+              />
             </div>
           </div>
 
-          <Button onClick={() => salvar.mutate()} disabled={salvar.isPending} className="h-12 w-full rounded-md bg-primary text-primary-foreground hover:bg-blue-700">
-            {salvar.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+          <Button
+            onClick={() => salvar.mutate()}
+            disabled={salvar.isPending}
+            className="h-12 w-full rounded-md bg-primary text-primary-foreground hover:bg-blue-700"
+          >
+            {salvar.isPending ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Save className="mr-2 h-4 w-4" />
+            )}
             Salvar alterações
           </Button>
 
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="outline" disabled={cancelar.isPending} className="h-12 w-full rounded-md border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive">
-                {cancelar.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <X className="mr-2 h-4 w-4" />}
+              <Button
+                variant="outline"
+                disabled={cancelar.isPending}
+                className="h-12 w-full rounded-md border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive"
+              >
+                {cancelar.isPending ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <X className="mr-2 h-4 w-4" />
+                )}
                 Cancelar reserva
               </Button>
             </AlertDialogTrigger>
@@ -283,13 +333,15 @@ function ReservaEdit({
 
 function StatusPill({ status }: { status: ReservaStatus }) {
   const styles: Record<ReservaStatus, string> = {
-    pendente:   "bg-warning-50 text-warning-700 before:bg-warning-500",
+    pendente: "bg-warning-50 text-warning-700 before:bg-warning-500",
     confirmada: "bg-success-50 text-success-700 before:bg-success-500",
-    cancelada:  "bg-error-50 text-error-700 before:bg-error-500",
+    cancelada: "bg-error-50 text-error-700 before:bg-error-500",
     finalizada: "bg-muted text-muted-foreground before:bg-slate-400",
   };
   return (
-    <span className={`inline-flex h-[26px] items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 text-xs font-semibold before:size-[7px] before:rounded-full before:content-[''] ${styles[status]}`}>
+    <span
+      className={`inline-flex h-[26px] items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 text-xs font-semibold before:size-[7px] before:rounded-full before:content-[''] ${styles[status]}`}
+    >
       {STATUS_LABEL[status]}
     </span>
   );

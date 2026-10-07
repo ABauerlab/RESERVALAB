@@ -39,10 +39,7 @@ type NovaEmpresaInput = {
 
 export const Route = createFileRoute("/master/")({
   head: () => ({
-    meta: [
-      { title: "Master | Teggly" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Master | Teggly" }, { name: "robots", content: "noindex" }],
     links: pwaHeadLinks("/master", "Master"),
   }),
   ssr: false,
@@ -143,10 +140,20 @@ function MasterPanel() {
       <header className="sticky top-0 z-20 border-b border-border/70 bg-background/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-4xl items-center gap-3 px-5 py-4">
           <div className="min-w-0 flex-1">
-            <img src="/brand/Teggly_Logo_Primary.svg" alt="Teggly" width={101} height={24} className="h-6 w-auto" />
+            <img
+              src="/brand/Teggly_Logo_Primary.svg"
+              alt="Teggly"
+              width={101}
+              height={24}
+              className="h-6 w-auto"
+            />
             <h1 className="truncate text-lg font-medium">Painel master</h1>
           </div>
-          <button onClick={signOut} className="flex h-11 w-11 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground" aria-label="Sair">
+          <button
+            onClick={signOut}
+            className="flex h-11 w-11 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            aria-label="Sair"
+          >
             <LogOut className="h-4 w-4" />
           </button>
         </div>
@@ -159,7 +166,9 @@ function MasterPanel() {
               key={id}
               onClick={() => setAba(id)}
               className={`h-11 rounded-full xl:h-9 px-4 text-xs font-medium transition-all ${
-                aba === id ? "bg-primary text-primary-foreground shadow-[var(--shadow-sm)]" : "bg-muted text-muted-foreground hover:bg-accent"
+                aba === id
+                  ? "bg-primary text-primary-foreground shadow-[var(--shadow-sm)]"
+                  : "bg-muted text-muted-foreground hover:bg-accent"
               }`}
             >
               {id === "empresas" ? "Empresas" : "Sugestões"}
@@ -170,71 +179,30 @@ function MasterPanel() {
         {aba === "sugestoes" ? (
           <MasterFeedbacks />
         ) : (
-        <>
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <h2 className="font-serif text-3xl tracking-tight">Empresas</h2>
-            <p className="text-sm text-muted-foreground">{tenantsQ.data?.length ?? 0} cadastradas</p>
-          </div>
-          <Button onClick={() => setOpenNew(true)} className="h-11 rounded-md bg-terracotta text-terracotta-foreground hover:bg-blue-700">
-            <Plus className="mr-1.5 h-4 w-4" /> Nova empresa
-          </Button>
-        </div>
-
-
-
-        <div className="mt-6 space-y-2.5">
-          {tenantsQ.isLoading ? (
-            <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
-          ) : tenantsQ.isError ? (
-            <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-center">
-              <p className="font-serif font-semibold text-2xl">Não foi possível carregar</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {tenantsQ.error instanceof Error ? tenantsQ.error.message : "Erro desconhecido."}
-              </p>
-              <Button onClick={() => tenantsQ.refetch()} variant="outline" className="mt-4 h-10 rounded-md">
-                Tentar novamente
+          <>
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h2 className="font-serif text-3xl tracking-tight">Empresas</h2>
+                <p className="text-sm text-muted-foreground">
+                  {tenantsQ.data?.length ?? 0} cadastradas
+                </p>
+              </div>
+              <Button
+                onClick={() => setOpenNew(true)}
+                className="h-11 rounded-md bg-terracotta text-terracotta-foreground hover:bg-blue-700"
+              >
+                <Plus className="mr-1.5 h-4 w-4" /> Nova empresa
               </Button>
             </div>
 
-            <div className="rounded-lg border border-dashed border-border bg-card/50 py-14 text-center">
-              <p className="font-serif font-semibold text-2xl">Nenhuma empresa</p>
-              <p className="mt-1 text-sm text-muted-foreground">Clique em "Nova empresa" para começar.</p>
-            </div>
-          ) : (
-            (tenantsQ.data ?? []).map((t) => (
-              <div key={t.id} className="rounded-lg border border-border bg-card p-4">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="font-medium">{t.nome}</p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      /{t.slug} · {t.email_contato ?? "—"}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className={`inline-flex h-[26px] items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 text-xs font-semibold before:size-[7px] before:rounded-full before:content-[''] ${t.ativo ? "bg-success-50 text-success-700 before:bg-success-500" : "bg-muted text-muted-foreground before:bg-slate-400"}`}>
-                      {t.ativo ? "Ativa" : "Inativa"}
-                    </span>
-                    <Link to="/$slug" params={{ slug: t.slug }} className="inline-flex h-11 xl:h-9 items-center gap-1 rounded-md border border-border bg-background px-3 text-xs font-medium hover:bg-accent" target="_blank">
-                      <ExternalLink className="h-3.5 w-3.5" /> Abrir
-                    </Link>
-                    <button
-                      onClick={() => setAcessosDe({ id: t.id, nome: t.nome })}
-                      className="inline-flex h-11 xl:h-9 items-center gap-1 rounded-md border border-border bg-background px-3 text-xs font-medium hover:bg-accent"
-                    >
-                      <KeyRound className="h-3.5 w-3.5" /> Logins
-                    </button>
-                    <button
-                      onClick={() => toggleM.mutate({ id: t.id, ativo: !t.ativo })}
-                      className="inline-flex h-11 xl:h-9 items-center gap-1 rounded-md border border-border bg-background px-3 text-xs font-medium hover:bg-accent"
-                    >
-                      <Power className="h-3.5 w-3.5" /> {t.ativo ? "Desativar" : "Ativar"}
-                    </button>
-                  </div>
+            <div className="mt-6 space-y-2.5">
+              {tenantsQ.isLoading ? (
+                <div className="flex justify-center py-10">
+                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                 </div>
               ) : tenantsQ.isError ? (
-                <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-6 text-center">
-                  <p className="font-serif text-2xl">Não foi possível carregar</p>
+                <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-center">
+                  <p className="font-serif font-semibold text-2xl">Não foi possível carregar</p>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {tenantsQ.error instanceof Error
                       ? tenantsQ.error.message
@@ -243,21 +211,21 @@ function MasterPanel() {
                   <Button
                     onClick={() => tenantsQ.refetch()}
                     variant="outline"
-                    className="mt-4 h-10 rounded-xl"
+                    className="mt-4 h-10 rounded-md"
                   >
                     Tentar novamente
                   </Button>
                 </div>
               ) : (tenantsQ.data ?? []).length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-border bg-card/50 py-14 text-center">
-                  <p className="font-serif text-2xl">Nenhuma empresa</p>
+                <div className="rounded-lg border border-dashed border-border bg-card/50 py-14 text-center">
+                  <p className="font-serif font-semibold text-2xl">Nenhuma empresa</p>
                   <p className="mt-1 text-sm text-muted-foreground">
                     Clique em "Nova empresa" para começar.
                   </p>
                 </div>
               ) : (
                 (tenantsQ.data ?? []).map((t) => (
-                  <div key={t.id} className="rounded-2xl border border-border bg-card p-4">
+                  <div key={t.id} className="rounded-lg border border-border bg-card p-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div className="min-w-0">
                         <p className="font-medium">{t.nome}</p>
@@ -267,27 +235,27 @@ function MasterPanel() {
                       </div>
                       <div className="flex items-center gap-2">
                         <span
-                          className={`inline-flex h-6 items-center rounded-full px-2.5 text-[11px] font-medium ${t.ativo ? "bg-success/15 text-[oklch(0.4_0.12_150)]" : "bg-muted text-muted-foreground"}`}
+                          className={`inline-flex h-[26px] items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 text-xs font-semibold before:size-[7px] before:rounded-full before:content-[''] ${t.ativo ? "bg-success-50 text-success-700 before:bg-success-500" : "bg-muted text-muted-foreground before:bg-slate-400"}`}
                         >
                           {t.ativo ? "Ativa" : "Inativa"}
                         </span>
                         <Link
                           to="/$slug"
                           params={{ slug: t.slug }}
-                          className="inline-flex h-9 items-center gap-1 rounded-lg border border-border bg-background px-3 text-xs font-medium hover:bg-accent"
+                          className="inline-flex h-11 xl:h-9 items-center gap-1 rounded-md border border-border bg-background px-3 text-xs font-medium hover:bg-accent"
                           target="_blank"
                         >
                           <ExternalLink className="h-3.5 w-3.5" /> Abrir
                         </Link>
                         <button
                           onClick={() => setAcessosDe({ id: t.id, nome: t.nome })}
-                          className="inline-flex h-9 items-center gap-1 rounded-lg border border-border bg-background px-3 text-xs font-medium hover:bg-accent"
+                          className="inline-flex h-11 xl:h-9 items-center gap-1 rounded-md border border-border bg-background px-3 text-xs font-medium hover:bg-accent"
                         >
                           <KeyRound className="h-3.5 w-3.5" /> Logins
                         </button>
                         <button
                           onClick={() => toggleM.mutate({ id: t.id, ativo: !t.ativo })}
-                          className="inline-flex h-9 items-center gap-1 rounded-lg border border-border bg-background px-3 text-xs font-medium hover:bg-accent"
+                          className="inline-flex h-11 xl:h-9 items-center gap-1 rounded-md border border-border bg-background px-3 text-xs font-medium hover:bg-accent"
                         >
                           <Power className="h-3.5 w-3.5" /> {t.ativo ? "Desativar" : "Ativar"}
                         </button>
@@ -373,19 +341,77 @@ function NovoTenantDialog({
           }}
           className="space-y-3.5"
         >
-          <Field label="Slug (URL)"><Input value={slug} onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"))} placeholder="minha-empresa" required minLength={2} className="h-11 rounded-md" /></Field>
-          <Field label="Nome"><Input value={nome} onChange={(e) => setNome(e.target.value)} required minLength={2} className="h-11 rounded-md" /></Field>
-          <Field label="E-mail do admin"><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-11 rounded-md" /></Field>
-          <Field label="Senha inicial"><Input type="text" value={senha} onChange={(e) => setSenha(e.target.value)} required minLength={6} className="h-11 rounded-md" /></Field>
-          <Field label="Endereço"><Input value={endereco} onChange={(e) => setEndereco(e.target.value)} className="h-11 rounded-md" /></Field>
+          <Field label="Slug (URL)">
+            <Input
+              value={slug}
+              onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"))}
+              placeholder="minha-empresa"
+              required
+              minLength={2}
+              className="h-11 rounded-md"
+            />
+          </Field>
+          <Field label="Nome">
+            <Input
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              required
+              minLength={2}
+              className="h-11 rounded-md"
+            />
+          </Field>
+          <Field label="E-mail do admin">
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="h-11 rounded-md"
+            />
+          </Field>
+          <Field label="Senha inicial">
+            <Input
+              type="text"
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              required
+              minLength={6}
+              className="h-11 rounded-md"
+            />
+          </Field>
+          <Field label="Endereço">
+            <Input
+              value={endereco}
+              onChange={(e) => setEndereco(e.target.value)}
+              className="h-11 rounded-md"
+            />
+          </Field>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Telefone"><Input value={telefone} onChange={(e) => setTelefone(e.target.value)} className="h-11 rounded-md" /></Field>
-            <Field label="WhatsApp"><Input value={wa} onChange={(e) => setWa(e.target.value)} className="h-11 rounded-md" /></Field>
+            <Field label="Telefone">
+              <Input
+                value={telefone}
+                onChange={(e) => setTelefone(e.target.value)}
+                className="h-11 rounded-md"
+              />
+            </Field>
+            <Field label="WhatsApp">
+              <Input
+                value={wa}
+                onChange={(e) => setWa(e.target.value)}
+                className="h-11 rounded-md"
+              />
+            </Field>
           </div>
 
           <DialogFooter className="pt-2">
-            <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button type="submit" disabled={pending} className="bg-terracotta text-terracotta-foreground hover:bg-blue-700">
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              disabled={pending}
+              className="bg-terracotta text-terracotta-foreground hover:bg-blue-700"
+            >
               {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Criar"}
             </Button>
           </DialogFooter>
@@ -475,7 +501,9 @@ function MasterFeedbacks() {
                         key={s}
                         onClick={() => atualizar.mutate({ id: f.id, status: s })}
                         className={`h-8 rounded-full px-3 text-xs font-medium transition-all ${
-                          f.status === s ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-accent"
+                          f.status === s
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted text-muted-foreground hover:bg-accent"
                         }`}
                       >
                         {FEEDBACK_LABEL[s]}
@@ -496,7 +524,9 @@ function MasterFeedbacks() {
                     className="h-10 flex-1 rounded-md"
                   />
                   <Button
-                    onClick={() => atualizar.mutate({ id: f.id, resposta_master: respostas[f.id] ?? "" })}
+                    onClick={() =>
+                      atualizar.mutate({ id: f.id, resposta_master: respostas[f.id] ?? "" })
+                    }
                     className="h-10 rounded-md bg-primary text-primary-foreground hover:bg-blue-700"
                   >
                     Responder
@@ -577,7 +607,9 @@ function AcessosDialog({
     <Dialog open={!!tenant} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-lg rounded-xl">
         <DialogHeader>
-          <DialogTitle className="font-serif font-semibold text-2xl">Logins — {tenant?.nome}</DialogTitle>
+          <DialogTitle className="font-serif font-semibold text-2xl">
+            Logins — {tenant?.nome}
+          </DialogTitle>
         </DialogHeader>
 
         {acessosQ.isLoading ? (
@@ -617,7 +649,10 @@ function AcessosDialog({
                       <KeyRound className="h-3.5 w-3.5" /> Senha
                     </button>
                     <button
-                      onClick={() => { if (window.confirm(`Remover o acesso de ${a.email}?`)) removerM.mutate(a.role_id); }}
+                      onClick={() => {
+                        if (window.confirm(`Remover o acesso de ${a.email}?`))
+                          removerM.mutate(a.role_id);
+                      }}
                       className="inline-flex h-8 items-center gap-1 rounded-md border border-border bg-background px-2.5 text-xs font-medium text-destructive hover:bg-destructive/10"
                     >
                       <Trash2 className="h-3.5 w-3.5" /> Remover
@@ -637,10 +672,29 @@ function AcessosDialog({
           className="mt-2 space-y-3 border-t border-border pt-4"
         >
           <p className="text-[12px] font-medium text-muted-foreground">Adicionar login</p>
-          <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@empresa.com" required className="h-11 rounded-md" />
-          <Input type="text" value={senha} onChange={(e) => setSenha(e.target.value)} placeholder="Senha inicial (mín. 6)" required minLength={6} className="h-11 rounded-md" />
+          <Input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="email@empresa.com"
+            required
+            className="h-11 rounded-md"
+          />
+          <Input
+            type="text"
+            value={senha}
+            onChange={(e) => setSenha(e.target.value)}
+            placeholder="Senha inicial (mín. 6)"
+            required
+            minLength={6}
+            className="h-11 rounded-md"
+          />
           <DialogFooter>
-            <Button type="submit" disabled={criarM.isPending} className="bg-terracotta text-terracotta-foreground hover:bg-blue-700">
+            <Button
+              type="submit"
+              disabled={criarM.isPending}
+              className="bg-terracotta text-terracotta-foreground hover:bg-blue-700"
+            >
               {criarM.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Adicionar"}
             </Button>
           </DialogFooter>

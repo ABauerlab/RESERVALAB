@@ -25,10 +25,7 @@ type EventoRow = {
 
 export const Route = createFileRoute("/$slug/admin/eventos")({
   head: ({ params }) => ({
-    meta: [
-      { title: "Eventos | Teggly" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Eventos | Teggly" }, { name: "robots", content: "noindex" }],
     links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),
   }),
   ssr: false,
@@ -128,25 +125,51 @@ function EventosPage() {
           <div className="mt-4 space-y-4">
             <div className="space-y-2">
               <Label className="text-[13px]">Título</Label>
-              <Input value={titulo} onChange={(e) => setTitulo(e.target.value)} placeholder="Ex: Samba com Sérgio Santiago e Banda" className="h-11 rounded-md" />
+              <Input
+                value={titulo}
+                onChange={(e) => setTitulo(e.target.value)}
+                placeholder="Ex: Samba com Sérgio Santiago e Banda"
+                className="h-11 rounded-md"
+              />
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label className="text-[13px]">Data</Label>
-                <Input type="date" min={hoje} value={data} onChange={(e) => setData(e.target.value)} className="h-11 rounded-md" />
+                <Input
+                  type="date"
+                  min={hoje}
+                  value={data}
+                  onChange={(e) => setData(e.target.value)}
+                  className="h-11 rounded-md"
+                />
               </div>
               <div className="space-y-2">
                 <Label className="text-[13px]">Horário (opcional)</Label>
-                <Input type="time" value={horario} onChange={(e) => setHorario(e.target.value)} className="h-11 rounded-md" />
+                <Input
+                  type="time"
+                  value={horario}
+                  onChange={(e) => setHorario(e.target.value)}
+                  className="h-11 rounded-md"
+                />
               </div>
             </div>
             <div className="space-y-2">
               <Label className="text-[13px]">Descrição (opcional)</Label>
-              <Textarea value={descricao} onChange={(e) => setDescricao(e.target.value)} placeholder="Detalhes que aparecem para o cliente na página de reservas." className="min-h-20 rounded-md" />
+              <Textarea
+                value={descricao}
+                onChange={(e) => setDescricao(e.target.value)}
+                placeholder="Detalhes que aparecem para o cliente na página de reservas."
+                className="min-h-20 rounded-md"
+              />
             </div>
             <div className="space-y-2">
               <Label className="text-[13px]">URL da imagem/flyer (opcional)</Label>
-              <Input value={imagemUrl} onChange={(e) => setImagemUrl(e.target.value)} placeholder="https://..." className="h-11 rounded-md" />
+              <Input
+                value={imagemUrl}
+                onChange={(e) => setImagemUrl(e.target.value)}
+                placeholder="https://..."
+                className="h-11 rounded-md"
+              />
               {imagemUrl.trim() && (
                 <img
                   src={imagemUrl}
@@ -156,14 +179,24 @@ function EventosPage() {
               )}
             </div>
           </div>
-          <Button onClick={() => criar.mutate()} disabled={!podeCriar} className="mt-5 h-11 w-full rounded-md bg-primary text-primary-foreground hover:bg-blue-700 sm:w-auto sm:px-6">
-            {criar.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
+          <Button
+            onClick={() => criar.mutate()}
+            disabled={!podeCriar}
+            className="mt-5 h-11 w-full rounded-md bg-primary text-primary-foreground hover:bg-blue-700 sm:w-auto sm:px-6"
+          >
+            {criar.isPending ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Plus className="mr-2 h-4 w-4" />
+            )}
             Adicionar evento
           </Button>
         </section>
 
         <section className="mt-8">
-          <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Próximos eventos</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+            Próximos eventos
+          </h3>
           {eventosQ.isLoading ? (
             <div className="mt-6 flex justify-center">
               <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
@@ -172,17 +205,24 @@ function EventosPage() {
             <div className="mt-4 rounded-lg border border-dashed border-border bg-card/50 py-12 text-center">
               <Music className="mx-auto h-6 w-6 text-muted-foreground" />
               <p className="mt-3 font-serif font-semibold text-2xl">Nenhum evento</p>
-              <p className="mt-1 text-sm text-muted-foreground">A página de reservas não mostra nenhum destaque no momento.</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                A página de reservas não mostra nenhum destaque no momento.
+              </p>
             </div>
           ) : (
             <ul className="mt-4 space-y-2.5">
               {futuros.map((e: EventoRow, i: number) => (
-                <li key={e.id} className={`flex items-center gap-3 rounded-lg border bg-card p-4 ${i === 0 ? "border-terracotta/40" : "border-border"}`}>
+                <li
+                  key={e.id}
+                  className={`flex items-center gap-3 rounded-lg border bg-card p-4 ${i === 0 ? "border-terracotta/40" : "border-border"}`}
+                >
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <p className="font-medium">{e.titulo}</p>
                       {i === 0 && (
-                        <span className="rounded-full bg-terracotta/15 px-2 py-0.5 text-xs font-medium text-terracotta">No ar agora</span>
+                        <span className="rounded-full bg-terracotta/15 px-2 py-0.5 text-xs font-medium text-terracotta">
+                          No ar agora
+                        </span>
                       )}
                     </div>
                     <p className="text-sm text-muted-foreground">
@@ -205,10 +245,15 @@ function EventosPage() {
 
         {passados.length > 0 && (
           <section className="mt-8">
-            <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Já realizados</h3>
+            <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+              Já realizados
+            </h3>
             <ul className="mt-4 space-y-2.5">
               {passados.map((e: EventoRow) => (
-                <li key={e.id} className="flex items-center gap-3 rounded-lg border border-border bg-card/60 p-4 opacity-70">
+                <li
+                  key={e.id}
+                  className="flex items-center gap-3 rounded-lg border border-border bg-card/60 p-4 opacity-70"
+                >
                   <div className="min-w-0 flex-1">
                     <p className="font-medium">{e.titulo}</p>
                     <p className="text-sm text-muted-foreground">

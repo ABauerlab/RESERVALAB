@@ -97,9 +97,7 @@ function CTAPrimary({ className = "", onDark = false }: { className?: string; on
 
 function SectionTag({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">
-      {children}
-    </p>
+    <p className="text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">{children}</p>
   );
 }
 
@@ -117,9 +115,7 @@ function DesktopMockup() {
         <span className="h-2.5 w-2.5 rounded-full bg-terracotta/50" />
         <span className="h-2.5 w-2.5 rounded-full bg-warning/50" />
         <span className="h-2.5 w-2.5 rounded-full bg-success/50" />
-        <span className="ml-3 truncate text-[11px] text-muted-foreground">
-          teggly / painel
-        </span>
+        <span className="ml-3 truncate text-[11px] text-muted-foreground">teggly / painel</span>
       </div>
       <div className="p-4 sm:p-5">
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -130,9 +126,7 @@ function DesktopMockup() {
             ["Pessoas", "46"],
           ].map(([k, v]) => (
             <div key={k} className="rounded-lg border border-border bg-background p-3">
-              <p className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
-                {k}
-              </p>
+              <p className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">{k}</p>
               <p className="mt-1 font-serif text-2xl">{v}</p>
             </div>
           ))}
@@ -390,10 +384,30 @@ function Landing() {
             />
           </a>
           <nav aria-label="Navegação principal" className="hidden items-center gap-6 md:flex">
-            <a href="#como-funciona" className="inline-flex min-h-11 items-center text-sm text-muted-foreground transition hover:text-foreground">Como funciona</a>
-            <a href="#recursos" className="inline-flex min-h-11 items-center text-sm text-muted-foreground transition hover:text-foreground">Recursos</a>
-            <a href="#segmentos" className="inline-flex min-h-11 items-center text-sm text-muted-foreground transition hover:text-foreground">Segmentos</a>
-            <a href="#faq" className="inline-flex min-h-11 items-center text-sm text-muted-foreground transition hover:text-foreground">Dúvidas</a>
+            <a
+              href="#como-funciona"
+              className="inline-flex min-h-11 items-center text-sm text-muted-foreground transition hover:text-foreground"
+            >
+              Como funciona
+            </a>
+            <a
+              href="#recursos"
+              className="inline-flex min-h-11 items-center text-sm text-muted-foreground transition hover:text-foreground"
+            >
+              Recursos
+            </a>
+            <a
+              href="#segmentos"
+              className="inline-flex min-h-11 items-center text-sm text-muted-foreground transition hover:text-foreground"
+            >
+              Segmentos
+            </a>
+            <a
+              href="#faq"
+              className="inline-flex min-h-11 items-center text-sm text-muted-foreground transition hover:text-foreground"
+            >
+              Dúvidas
+            </a>
           </nav>
           <a
             href={WHATSAPP}
@@ -418,10 +432,12 @@ function Landing() {
               <Reveal>
                 <SectionTag>Reservas e agendamentos</SectionTag>
                 <h1 className="mt-5 font-serif text-[2.6rem] leading-[1.05] tracking-tight sm:text-6xl lg:text-[3.6rem]">
-                  Mais reservas.<br className="hidden sm:block" /> Menos trabalho.
+                  Mais reservas.
+                  <br className="hidden sm:block" /> Menos trabalho.
                 </h1>
                 <p className="mt-6 max-w-xl text-[15px] leading-relaxed text-muted-foreground sm:text-lg xl:max-w-md">
-                  A Teggly cuida das reservas da sua empresa. Centralize reservas, horários e clientes em um só lugar, sem depender de conversas perdidas no WhatsApp.
+                  A Teggly cuida das reservas da sua empresa. Centralize reservas, horários e
+                  clientes em um só lugar, sem depender de conversas perdidas no WhatsApp.
                 </p>
               </Reveal>
               <Reveal delay={120}>
@@ -732,16 +748,52 @@ function Landing() {
           </div>
           <div className="grid grid-cols-2 gap-6 text-sm sm:justify-items-end">
             <nav aria-label="Links da página" className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Página</p>
-              <a href="#como-funciona" className="flex min-h-11 items-center text-muted-foreground transition hover:text-foreground">Como funciona</a>
-              <a href="#recursos" className="flex min-h-11 items-center text-muted-foreground transition hover:text-foreground">Recursos</a>
-              <a href="#faq" className="flex min-h-11 items-center text-muted-foreground transition hover:text-foreground">Dúvidas</a>
+              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                Página
+              </p>
+              <a
+                href="#como-funciona"
+                className="flex min-h-11 items-center text-muted-foreground transition hover:text-foreground"
+              >
+                Como funciona
+              </a>
+              <a
+                href="#recursos"
+                className="flex min-h-11 items-center text-muted-foreground transition hover:text-foreground"
+              >
+                Recursos
+              </a>
+              <a
+                href="#faq"
+                className="flex min-h-11 items-center text-muted-foreground transition hover:text-foreground"
+              >
+                Dúvidas
+              </a>
             </nav>
             <nav aria-label="Contato e acesso" className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Contato</p>
-              <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="flex min-h-11 items-center text-muted-foreground transition hover:text-foreground">WhatsApp</a>
-              <a href="mailto:contato.bauerlab@gmail.com" className="flex min-h-11 items-center text-muted-foreground transition hover:text-foreground">E-mail</a>
-              <Link to="/master/login" className="flex min-h-11 items-center text-muted-foreground transition hover:text-foreground">Área administrativa</Link>
+              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                Contato
+              </p>
+              <a
+                href={WHATSAPP}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex min-h-11 items-center text-muted-foreground transition hover:text-foreground"
+              >
+                WhatsApp
+              </a>
+              <a
+                href="mailto:contato.bauerlab@gmail.com"
+                className="flex min-h-11 items-center text-muted-foreground transition hover:text-foreground"
+              >
+                E-mail
+              </a>
+              <Link
+                to="/master/login"
+                className="flex min-h-11 items-center text-muted-foreground transition hover:text-foreground"
+              >
+                Área administrativa
+              </Link>
             </nav>
           </div>
         </div>

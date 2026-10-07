@@ -158,12 +158,19 @@ export function MensagemDoDiaButton({ tenantId }: { tenantId: string | null }) {
 
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-1 rounded-[12px] bg-muted p-1">
-              {([["dia", "Somente o dia"], ["proximas", "A partir da data"]] as Array<[Modo, string]>).map(([v, label]) => (
+              {(
+                [
+                  ["dia", "Somente o dia"],
+                  ["proximas", "A partir da data"],
+                ] as Array<[Modo, string]>
+              ).map(([v, label]) => (
                 <button
                   key={v}
                   onClick={() => setModo(v)}
                   className={`min-h-11 rounded-lg px-3 py-2 text-xs font-medium transition-colors ${
-                    modo === v ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                    modo === v
+                      ? "bg-card text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {label}

@@ -10,10 +10,7 @@ import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/$slug/admin/trocar-senha")({
   head: () => ({
-    meta: [
-      { title: "Trocar senha | Teggly" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Trocar senha | Teggly" }, { name: "robots", content: "noindex" }],
   }),
   ssr: false,
   component: TrocarSenha,
@@ -72,7 +69,13 @@ function TrocarSenha() {
     <main className="flex min-h-screen items-center justify-center bg-background px-5 safe-top safe-bottom">
       <div className="w-full max-w-sm animate-in-up">
         <div className="mb-8 text-center">
-          <img src="/brand/Teggly_Logo_Primary.svg" alt="Teggly" width={134} height={32} className="mx-auto h-8 w-auto" />
+          <img
+            src="/brand/Teggly_Logo_Primary.svg"
+            alt="Teggly"
+            width={134}
+            height={32}
+            className="mx-auto h-8 w-auto"
+          />
         </div>
 
         <div className="rounded-lg border border-border bg-card p-6 shadow-[var(--shadow-md)]">
@@ -91,20 +94,40 @@ function TrocarSenha() {
           <form onSubmit={onSubmit} className="mt-6 space-y-4">
             <div className="space-y-2">
               <Label className="text-[13px]">Nova senha</Label>
-              <Input type="password" value={nova} onChange={(e) => setNova(e.target.value)} autoComplete="new-password" required minLength={6} className="h-12 rounded-md" />
+              <Input
+                type="password"
+                value={nova}
+                onChange={(e) => setNova(e.target.value)}
+                autoComplete="new-password"
+                required
+                minLength={6}
+                className="h-12 rounded-md"
+              />
               <p className={`text-xs ${forte ? "text-muted-foreground" : "text-muted-foreground"}`}>
                 Mínimo de 6 caracteres. Recomendado: 8+, com letras e números.
               </p>
             </div>
             <div className="space-y-2">
               <Label className="text-[13px]">Confirmar nova senha</Label>
-              <Input type="password" value={confirma} onChange={(e) => setConfirma(e.target.value)} autoComplete="new-password" required minLength={6} className="h-12 rounded-md" />
+              <Input
+                type="password"
+                value={confirma}
+                onChange={(e) => setConfirma(e.target.value)}
+                autoComplete="new-password"
+                required
+                minLength={6}
+                className="h-12 rounded-md"
+              />
               {confirma.length > 0 && confirma !== nova && (
                 <p className="text-xs text-destructive">As senhas não conferem.</p>
               )}
             </div>
 
-            <Button type="submit" disabled={!podeSalvar} className="h-12 w-full rounded-md bg-primary text-primary-foreground hover:bg-blue-700">
+            <Button
+              type="submit"
+              disabled={!podeSalvar}
+              className="h-12 w-full rounded-md bg-primary text-primary-foreground hover:bg-blue-700"
+            >
               {salvando ? <Loader2 className="h-4 w-4 animate-spin" /> : "Salvar nova senha"}
             </Button>
           </form>
