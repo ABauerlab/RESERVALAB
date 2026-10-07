@@ -33,6 +33,7 @@ export function ReservationRow({
   now,
   showDate,
   compact,
+  extra,
 }: {
   reserva: Reserva;
   onOpen: () => void;
@@ -45,6 +46,8 @@ export function ReservationRow({
   showDate?: React.ReactNode;
   /** Força o layout de duas linhas (colunas estreitas). */
   compact?: boolean;
+  /** Marcadores informativos extras (ex.: "Dentro de bloqueio", "Grupo grande"). */
+  extra?: React.ReactNode;
 }) {
   const chips: React.ReactNode[] = [];
   if (r.tipo !== "mesa") chips.push(<Chip key="tipo">{TIPO_SHORT[r.tipo]}</Chip>);
@@ -107,6 +110,7 @@ export function ReservationRow({
             </span>
           )}
         </span>
+        {extra && <span className="mt-1 flex flex-wrap gap-1">{extra}</span>}
       </span>
     </div>
   );
@@ -119,7 +123,12 @@ export function ReservationRow({
         <span className="block line-clamp-2 break-words text-[15px] font-semibold text-foreground">
           {r.nome}
         </span>
-        {chips.length > 0 && <span className="mt-1 flex flex-wrap gap-1">{chips}</span>}
+        {(chips.length > 0 || extra) && (
+          <span className="mt-1 flex flex-wrap gap-1">
+            {chips}
+            {extra}
+          </span>
+        )}
       </span>
       <span className="min-w-0 text-sm text-muted-foreground">
         <span className="block tabular-nums">

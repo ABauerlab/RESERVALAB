@@ -1,7 +1,7 @@
 import type { Database } from "@/integrations/supabase/types";
 import { addDaysISO, todayISO, weekdayLabel } from "@/lib/admin-dates";
 import { rowMainAction } from "@/lib/reservation-actions";
-import type { Reserva } from "@/lib/reservations";
+import { formatHorario, type Reserva } from "@/lib/reservations";
 
 /**
  * Fundação da Agenda (F2.1): funções puras de data, agrupamento e contexto.
@@ -55,6 +55,15 @@ export function resolveSelectedDay(dia: unknown, fallback: string = todayISO()):
   return parseDiaParam(dia) ?? fallback;
 }
 
+/** Mesmo texto da gestão de bloqueios: dia inteiro, faixa, "a partir das" ou "até as". */
+export function descreverBloqueio(b: Pick<Bloqueio, "hora_inicio" | "hora_fim">): string {
+  if (b.hora_inicio && b.hora_fim)
+    return `Das ${formatHorario(b.hora_inicio)} às ${formatHorario(b.hora_fim)}`;
+  if (b.hora_inicio) return `A partir das ${formatHorario(b.hora_inicio)}`;
+  if (b.hora_fim) return `Até as ${formatHorario(b.hora_fim)}`;
+  return "Dia inteiro";
+}
+
 /* ---------- Regras de leitura (texto, nunca capacidade) ---------- */
 
 export type GrupoLabel = "Grupo grande" | "Evento fechado";
@@ -86,12 +95,12 @@ export function bloqueioCobre(
   return t >= ini && t <= fim;
 }
 
-/** Reserva ativa (não cancelada) dentro de um bloqueio. Apenas informativo. */
+/** Reserva ativa (pendente ou confirmada) dentro de um bloqueio. Apenas informativo. */
 export function reservaDentroDeBloqueio(
   r: Pick<Reserva, "data" | "horario" | "status">,
   bloqueios: Pick<Bloqueio, "data" | "hora_inicio" | "hora_fim">[],
 ): boolean {
-  if (r.status === "cancelada") return false;
+  if (r.status === "cancelada" || r.status === "finalizada") return false;
   return bloqueios.some((b) => bloqueioCobre(b, r.data, r.horario));
 }
 
@@ -137,6 +146,10 @@ export type DiaResumo = {
   pessoas: number;
   pendentes: number;
   canceladas: number;
+  /** Reservas ativas que pedem atenção no dia (independe dos filtros). */
+  atencao: number;
+  /** Reservas ativas dentro de bloqueio no dia (informativo). */
+  dentroBloqueio: number;
 };
 
 export type DiaContexto = {
@@ -181,14 +194,7 @@ export function buildAgendaDia(input: {
   const doDia = input.reservas.filter((r) => r.data === dia);
   const bloqueiosDia = input.bloqueios.filter((b) => b.data === dia);
 
-  const resumo: DiaResumo = {
-    reservas: doDia.filter(naoCancelada).length,
-    pessoas: doDia.filter(naoCancelada).reduce((n, r) => n + pessoasDe(r), 0),
-    pendentes: doDia.filter((r) => r.status === "pendente").length,
-    canceladas: doDia.filter((r) => r.status === "cancelada").length,
-  };
-
-  const visiveis: AgendaReserva[] = doDia
+  const mapeadas: AgendaReserva[] = doDia
     .filter((r) => filtros.mostrarCanceladas || naoCancelada(r))
     .sort(porHorarioEntao)
     .map((reserva) => {
@@ -199,8 +205,19 @@ export function buildAgendaDia(input: {
         grupo: grupoLabel(reserva.quantidade),
         atencao: precisaAtencao(reserva, dentroBloqueio),
       };
-    })
-    .filter((x) => !filtros.soAtencao || x.atencao);
+    });
+  const ativas = doDia.filter(naoCancelada);
+
+  const resumo: DiaResumo = {
+    reservas: ativas.length,
+    pessoas: ativas.reduce((n, r) => n + pessoasDe(r), 0),
+    pendentes: doDia.filter((r) => r.status === "pendente").length,
+    canceladas: doDia.length - ativas.length,
+    atencao: mapeadas.filter((x) => naoCancelada(x.reserva) && x.atencao).length,
+    dentroBloqueio: mapeadas.filter((x) => naoCancelada(x.reserva) && x.dentroBloqueio).length,
+  };
+
+  const visiveis = mapeadas.filter((x) => !filtros.soAtencao || x.atencao);
 
   const horas: HoraGroup[] = [];
   const semHorario: AgendaReserva[] = [];

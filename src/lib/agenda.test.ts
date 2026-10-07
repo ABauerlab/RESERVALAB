@@ -166,11 +166,12 @@ describe("bloqueio cobre reserva (mesma regra do servidor)", () => {
     expect(bloqueioCobre(b, "2026-10-07", null)).toBe(false);
   });
 
-  it("cancelada nunca é marcada como dentro de bloqueio", () => {
+  it("só reserva ativa (pendente ou confirmada) é marcada como dentro de bloqueio", () => {
     const b = [bloqueio()];
     expect(reservaDentroDeBloqueio(reserva({ status: "cancelada" }), b)).toBe(false);
     expect(reservaDentroDeBloqueio(reserva({ status: "confirmada" }), b)).toBe(true);
-    expect(reservaDentroDeBloqueio(reserva({ status: "finalizada" }), b)).toBe(true);
+    expect(reservaDentroDeBloqueio(reserva({ status: "pendente" }), b)).toBe(true);
+    expect(reservaDentroDeBloqueio(reserva({ status: "finalizada" }), b)).toBe(false);
   });
 });
 
@@ -244,7 +245,7 @@ describe("linha do tempo do dia", () => {
       reserva({ quantidade: 10, status: "cancelada" }),
     ];
     const dia = buildAgendaDia({ ...base, reservas: rs });
-    expect(dia.resumo).toEqual({ reservas: 2, pessoas: 10, pendentes: 1, canceladas: 1 });
+    expect(dia.resumo).toMatchObject({ reservas: 2, pessoas: 10, pendentes: 1, canceladas: 1 });
     expect(dia.horas[0].items).toHaveLength(2);
     expect(dia.horas[0].reservas).toBe(2);
     expect(dia.horas[0].pessoas).toBe(10);
@@ -279,6 +280,7 @@ describe("linha do tempo do dia", () => {
     expect(dia.horas[0].items).toHaveLength(1);
     expect(dia.horas[0].items[0].reserva.status).toBe("pendente");
     expect(dia.resumo.reservas).toBe(2);
+    expect(dia.resumo.atencao).toBe(1);
   });
 
   it("marca dentro de bloqueio e grupo, sem alterar a reserva", () => {
@@ -294,6 +296,7 @@ describe("linha do tempo do dia", () => {
     expect(item.grupo).toBe("Evento fechado");
     expect(item.atencao).toBe(true);
     expect(item.reserva).toEqual(copia);
+    expect(dia.resumo.dentroBloqueio).toBe(1);
   });
 
   it("contexto: bloqueios, feriado (não fecha o dia) e eventos do dia", () => {
