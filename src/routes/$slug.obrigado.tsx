@@ -68,7 +68,7 @@ function Obrigado() {
               <p className="font-serif text-2xl tracking-wider text-foreground">{codigo}</p>
               <button
                 onClick={copiar}
-                className="inline-flex h-10 items-center gap-1.5 rounded-md border border-border bg-background px-3 text-xs font-medium transition-colors hover:bg-accent"
+                className="inline-flex h-11 items-center gap-1.5 rounded-md border border-border bg-background px-3 text-xs font-medium transition-colors hover:bg-accent"
               >
                 <Copy className="h-3.5 w-3.5" />
                 Copiar
@@ -81,14 +81,25 @@ function Obrigado() {
         )}
 
         <div className="mt-6 flex flex-wrap justify-center gap-2">
-          <Link
-            to="/$slug/acompanhar"
-            params={{ slug }}
-            className="inline-flex h-11 items-center justify-center gap-1.5 rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground transition hover:opacity-90"
-          >
-            <Search className="h-3.5 w-3.5" />
-            Acompanhar reserva
-          </Link>
+          {codigo ? (
+            <Link
+              to="/$slug/acompanhar/$codigo"
+              params={{ slug, codigo }}
+              className="inline-flex h-11 items-center justify-center gap-1.5 rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+            >
+              <Search className="h-3.5 w-3.5" />
+              Acompanhar reserva
+            </Link>
+          ) : (
+            <Link
+              to="/$slug/acompanhar"
+              params={{ slug }}
+              className="inline-flex h-11 items-center justify-center gap-1.5 rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+            >
+              <Search className="h-3.5 w-3.5" />
+              Acompanhar reserva
+            </Link>
+          )}
           <Link
             to="/$slug"
             params={{ slug }}
