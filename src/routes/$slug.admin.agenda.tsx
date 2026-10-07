@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { formatData, formatHorario } from "@/lib/reservations";
+import { parseDiaParam } from "@/lib/agenda";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +19,11 @@ export const Route = createFileRoute("/$slug/admin/agenda")({
     meta: [{ title: "Agenda | Teggly" }, { name: "robots", content: "noindex" }],
     links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),
   }),
+  // `?dia=YYYY-MM-DD`: dia selecionado da Agenda (F2.1). Inválido ou ausente = sem filtro.
+  validateSearch: (search: Record<string, unknown>): { dia?: string } => {
+    const dia = parseDiaParam(search.dia);
+    return dia ? { dia } : {};
+  },
   ssr: false,
   component: AgendaPage,
 });
