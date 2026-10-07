@@ -43,7 +43,9 @@ export function notificationPermission(): NotificationPermission | "unsupported"
   return Notification.permission;
 }
 
-export async function requestNotificationPermission(): Promise<NotificationPermission | "unsupported"> {
+export async function requestNotificationPermission(): Promise<
+  NotificationPermission | "unsupported"
+> {
   if (!canNotify()) return "unsupported";
   if (Notification.permission === "granted") return "granted";
   const result = await Notification.requestPermission();
@@ -132,16 +134,23 @@ async function fetchVapidPublicKey(): Promise<string | null> {
 }
 
 export function pushSupported(): boolean {
-  return IS_BROWSER && "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
+  return (
+    IS_BROWSER &&
+    "serviceWorker" in navigator &&
+    "PushManager" in window &&
+    "Notification" in window
+  );
 }
 
 /**
  * Subscribe this device for background push. Returns the subscription object
  * (endpoint + keys) — caller persists it into `push_subscriptions`.
  */
-export async function subscribeToPush(): Promise<
-  { endpoint: string; p256dh: string; auth: string } | null
-> {
+export async function subscribeToPush(): Promise<{
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+} | null> {
   if (!pushSupported()) return null;
   const perm = await requestNotificationPermission();
   if (perm !== "granted") return null;

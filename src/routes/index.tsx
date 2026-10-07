@@ -143,9 +143,7 @@ function DesktopMockup() {
             <span
               key={c}
               className={`rounded-full px-3 py-1 text-[11px] ${
-                i === 0
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground"
+                i === 0 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
               }`}
             >
               {c}
@@ -190,9 +188,7 @@ function MobileMockup() {
         <span className="h-1 w-12 rounded-full bg-background/40" />
       </div>
       <div className="space-y-3 p-4">
-        <p className="text-[9px] uppercase tracking-[0.2em] text-terracotta">
-          Nova reserva
-        </p>
+        <p className="text-[9px] uppercase tracking-[0.2em] text-terracotta">Nova reserva</p>
         <p className="font-serif text-xl leading-tight">Reserve sua mesa</p>
         <div className="space-y-2">
           {["Nome completo", "WhatsApp", "Data"].map((f) => (
@@ -453,7 +449,6 @@ function Landing() {
                 </div>
               </div>
               <div className="mt-10 xl:hidden">
-
                 <MobileMockup />
               </div>
             </Reveal>
@@ -496,7 +491,9 @@ function Landing() {
                 Um só lugar para tudo que envolve reserva.
               </h2>
               <p className="mt-5 max-w-xl leading-relaxed text-muted-foreground">
-                O cliente reserva pelo seu link. Você recebe, confirma e avisa pelo WhatsApp sem sair do painel. Os horários, bloqueios e o histórico ficam organizados automaticamente.
+                O cliente reserva pelo seu link. Você recebe, confirma e avisa pelo WhatsApp sem
+                sair do painel. Os horários, bloqueios e o histórico ficam organizados
+                automaticamente.
               </p>
               <ul className="mt-7 space-y-3">
                 {[
@@ -518,7 +515,10 @@ function Landing() {
         </section>
 
         {/* COMO FUNCIONA */}
-        <section id="como-funciona" className="scroll-mt-20 border-b border-border/60 py-20 sm:py-24">
+        <section
+          id="como-funciona"
+          className="scroll-mt-20 border-b border-border/60 py-20 sm:py-24"
+        >
           <div className="mx-auto max-w-6xl px-5">
             <Reveal>
               <SectionTag>Como funciona</SectionTag>
@@ -529,9 +529,21 @@ function Landing() {
 
             <div className="mt-10 grid gap-3 md:grid-cols-3">
               {[
-                ["01", "Configure sua empresa", "Nome, logo, contatos, endereço, horários e os tipos de reserva que você aceita."],
-                ["02", "Divulgue seu link", "Compartilhe reserva.bauerlab.com.br/suaempresa nas redes, no perfil e no WhatsApp."],
-                ["03", "Gerencie pelo painel", "Receba, confirme, edite, bloqueie a agenda e acompanhe os relatórios."],
+                [
+                  "01",
+                  "Configure sua empresa",
+                  "Nome, logo, contatos, endereço, horários e os tipos de reserva que você aceita.",
+                ],
+                [
+                  "02",
+                  "Divulgue seu link",
+                  "Compartilhe reserva.bauerlab.com.br/suaempresa nas redes, no perfil e no WhatsApp.",
+                ],
+                [
+                  "03",
+                  "Gerencie pelo painel",
+                  "Receba, confirme, edite, bloqueie a agenda e acompanhe os relatórios.",
+                ],
               ].map(([n, t, d], i) => (
                 <Reveal key={n} delay={i * 90}>
                   <div className="h-full rounded-lg border border-border bg-card p-6 transition-all motion-safe:hover:-translate-y-1 hover:shadow-[var(--shadow-md)]">
@@ -584,17 +596,21 @@ function Landing() {
                     Do celular do cliente ao seu painel.
                   </h3>
                   <p className="mt-3 max-w-lg text-sm leading-relaxed text-muted-foreground">
-                    A página de reserva é feita para o celular e pode ser instalada como aplicativo. O painel funciona igualmente bem no computador do balcão.
+                    A página de reserva é feita para o celular e pode ser instalada como aplicativo.
+                    O painel funciona igualmente bem no computador do balcão.
                   </p>
                   <div className="mt-6 flex flex-wrap gap-4 text-xs text-muted-foreground">
                     <span className="inline-flex items-center gap-1.5">
-                      <Smartphone className="h-3.5 w-3.5 text-terracotta" aria-hidden="true" /> Mobile-first
+                      <Smartphone className="h-3.5 w-3.5 text-terracotta" aria-hidden="true" />{" "}
+                      Mobile-first
                     </span>
                     <span className="inline-flex items-center gap-1.5">
-                      <Store className="h-3.5 w-3.5 text-terracotta" aria-hidden="true" /> Multiempresa
+                      <Store className="h-3.5 w-3.5 text-terracotta" aria-hidden="true" />{" "}
+                      Multiempresa
                     </span>
                     <span className="inline-flex items-center gap-1.5">
-                      <ShieldCheck className="h-3.5 w-3.5 text-terracotta" aria-hidden="true" /> Acesso restrito por empresa
+                      <ShieldCheck className="h-3.5 w-3.5 text-terracotta" aria-hidden="true" />{" "}
+                      Acesso restrito por empresa
                     </span>
                   </div>
                 </div>

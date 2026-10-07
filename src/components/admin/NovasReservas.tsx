@@ -3,9 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { BellRing, Check, Loader2 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
-import {
-  TIPO_SHORT, formatData, formatHorario, type Reserva,
-} from "@/lib/reservations";
+import { TIPO_SHORT, formatData, formatHorario, type Reserva } from "@/lib/reservations";
 
 function storageKey(tenantId: string) {
   return `reservalab:ultima-visita:${tenantId}`;
@@ -61,7 +59,9 @@ export function NovasReservasBanner({ tenantId }: { tenantId: string | null }) {
   function marcarVistas() {
     try {
       localStorage.setItem(storageKey(tenantId!), new Date().toISOString());
-    } catch { /* noop */ }
+    } catch {
+      /* noop */
+    }
     setDispensado(true);
   }
 
@@ -70,7 +70,9 @@ export function NovasReservasBanner({ tenantId }: { tenantId: string | null }) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="flex items-center gap-2 text-sm font-semibold text-accent-foreground">
           <BellRing className="h-4 w-4" />
-          {novas.length === 1 ? "1 nova reserva desde sua última visita" : `${novas.length} novas reservas desde sua última visita`}
+          {novas.length === 1
+            ? "1 nova reserva desde sua última visita"
+            : `${novas.length} novas reservas desde sua última visita`}
         </p>
         <button
           onClick={marcarVistas}
@@ -85,7 +87,8 @@ export function NovasReservasBanner({ tenantId }: { tenantId: string | null }) {
           <li key={r.id} className="rounded-md bg-card px-3 py-2 text-[13px]">
             <span className="font-medium">{r.nome}</span>
             <span className="text-muted-foreground">
-              {" — "}{TIPO_SHORT[r.tipo]} • {r.quantidade ?? "?"} pessoas • {formatData(r.data)}
+              {" — "}
+              {TIPO_SHORT[r.tipo]} • {r.quantidade ?? "?"} pessoas • {formatData(r.data)}
               {r.horario ? ` às ${formatHorario(r.horario)}` : ""}
             </span>
           </li>

@@ -44,7 +44,8 @@ function AdminLogin() {
       return;
     }
     const { data: allowed, error } = await supabase.rpc("has_tenant_role", {
-      _user_id: userId, _tenant_id: tenant.id,
+      _user_id: userId,
+      _tenant_id: tenant.id,
     });
     if (error) {
       // Erro de verificação (ex.: Supabase mal configurado) NÃO é a mesma

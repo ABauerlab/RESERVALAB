@@ -11,8 +11,11 @@ import { useTenantAdmin } from "@/hooks/use-tenant-admin";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { clearTenantCache } from "@/lib/tenant";
 import {
-  DEFAULT_MENSAGEM_CANCELAMENTO, DEFAULT_MENSAGEM_CONFIRMACAO, DEFAULT_MENSAGEM_RECONFIRMACAO,
-  PLACEHOLDERS, PLACEHOLDERS_CANCELAMENTO,
+  DEFAULT_MENSAGEM_CANCELAMENTO,
+  DEFAULT_MENSAGEM_CONFIRMACAO,
+  DEFAULT_MENSAGEM_RECONFIRMACAO,
+  PLACEHOLDERS,
+  PLACEHOLDERS_CANCELAMENTO,
 } from "@/lib/confirmacao";
 import { TIPO_LABEL, type ReservaTipo } from "@/lib/reservations";
 import { Button } from "@/components/ui/button";
@@ -125,7 +128,8 @@ function ConfiguracoesPage() {
         <header className="animate-fade">
           <h2 className="font-serif text-3xl tracking-tight">Configurações</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Estes dados aparecem para o cliente em <span className="font-mono text-foreground">/{slug}</span>.
+            Estes dados aparecem para o cliente em{" "}
+            <span className="font-mono text-foreground">/{slug}</span>.
           </p>
         </header>
 
@@ -149,7 +153,11 @@ function ConfiguracoesPage() {
               <Label className="text-[13px]">URL do logo</Label>
               <Input value={logoUrl} onChange={(e) => setLogoUrl(e.target.value)} placeholder="https://..." className="h-11 rounded-md" />
               {logoUrl.trim() && (
-                <img src={logoUrl} alt={`Logo ${nome}`} className="mt-2 h-14 w-auto rounded-lg object-contain" />
+                <img
+                  src={logoUrl}
+                  alt={`Logo ${nome}`}
+                  className="mt-2 h-14 w-auto rounded-lg object-contain"
+                />
               )}
             </div>
           </div>
@@ -202,8 +210,9 @@ function ConfiguracoesPage() {
             <div>
               <h3 className="font-semibold">Observação sobre áreas (reserva de mesa)</h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                Aparece na tela de reserva de mesa, junto ao campo "Área desejada". Use para listar as áreas da casa
-                e avisar que a escolhida não é garantida. Deixe em branco para não mostrar nada.
+                Aparece na tela de reserva de mesa, junto ao campo "Área desejada". Use para listar
+                as áreas da casa e avisar que a escolhida não é garantida. Deixe em branco para não
+                mostrar nada.
               </p>
             </div>
             <Textarea
@@ -218,7 +227,8 @@ function ConfiguracoesPage() {
             <div>
               <h3 className="font-semibold">Horário-limite para reservas</h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                Último horário aceito para mesa/aniversário (capacidade normal, até 30 pessoas). Deixe em branco para não aplicar corte, além do horário de fechamento padrão.
+                Último horário aceito para mesa/aniversário (capacidade normal, até 30 pessoas).
+                Deixe em branco para não aplicar corte, além do horário de fechamento padrão.
               </p>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -237,10 +247,11 @@ function ConfiguracoesPage() {
             <div>
               <h3 className="font-semibold">Pixel do Meta (Facebook/Instagram Ads)</h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                ID do pixel para medir conversões dos anúncios. Quando preenchido, a página desta empresa passa a
-                registrar PageView, um clique por tipo de reserva (Click_Reserva_Mesa, Click_Reserva_Aniversario,
-                Click_Reserva_Evento, Click_Reserva_Casamento) e o evento Lead ao enviar uma reserva. Deixe em branco
-                para não carregar nenhum pixel nesta empresa.
+                ID do pixel para medir conversões dos anúncios. Quando preenchido, a página desta
+                empresa passa a registrar PageView, um clique por tipo de reserva
+                (Click_Reserva_Mesa, Click_Reserva_Aniversario, Click_Reserva_Evento,
+                Click_Reserva_Casamento) e o evento Lead ao enviar uma reserva. Deixe em branco para
+                não carregar nenhum pixel nesta empresa.
               </p>
             </div>
             <Input
@@ -283,7 +294,8 @@ function ConfiguracoesPage() {
           <div className="rounded-lg border border-border bg-card p-5 space-y-3">
             <h3 className="font-semibold">Mensagem de cancelamento (WhatsApp)</h3>
             <p className="text-sm text-muted-foreground">
-              Texto enviado ao cliente quando uma reserva é cancelada pelo painel. Sempre inclui um link para o cliente fazer uma nova reserva.
+              Texto enviado ao cliente quando uma reserva é cancelada pelo painel. Sempre inclui um
+              link para o cliente fazer uma nova reserva.
             </p>
             <Textarea value={mensagemCancelamento} onChange={(e) => setMensagemCancelamento(e.target.value)} className="min-h-56 rounded-md font-mono text-[13px] leading-relaxed" />
             <div className="flex flex-wrap gap-1.5">
@@ -312,8 +324,9 @@ function ConfiguracoesPage() {
             <div>
               <h3 className="font-semibold">Mensagem de reconfirmação (WhatsApp)</h3>
               <p className="text-sm text-muted-foreground">
-                Texto enviado ao clicar em "Reconfirmar + WhatsApp" numa reserva já confirmada — use perto do dia do
-                evento para reduzir faltas, pedindo que o cliente confirme presença de novo.
+                Texto enviado ao clicar em "Reconfirmar + WhatsApp" numa reserva já confirmada — use
+                perto do dia do evento para reduzir faltas, pedindo que o cliente confirme presença
+                de novo.
               </p>
             </div>
             <Textarea value={mensagemReconfirmacao} onChange={(e) => setMensagemReconfirmacao(e.target.value)} className="min-h-56 rounded-md font-mono text-[13px] leading-relaxed" />

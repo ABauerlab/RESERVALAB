@@ -75,7 +75,11 @@ function EventosPage() {
     },
     onSuccess: () => {
       toast.success("Evento adicionado.");
-      setTitulo(""); setData(""); setHorario(""); setDescricao(""); setImagemUrl("");
+      setTitulo("");
+      setData("");
+      setHorario("");
+      setDescricao("");
+      setImagemUrl("");
       qc.invalidateQueries({ queryKey: ["eventos-admin", tenantId] });
     },
     onError: () => toast.error("Não foi possível adicionar o evento."),
@@ -114,7 +118,8 @@ function EventosPage() {
         <header className="animate-fade">
           <h2 className="font-serif text-3xl tracking-tight">Eventos</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            O próximo evento com data futura aparece automaticamente na página de reservas — e some sozinho assim que a data passa.
+            O próximo evento com data futura aparece automaticamente na página de reservas — e some
+            sozinho assim que a data passa.
           </p>
         </header>
 
@@ -143,7 +148,11 @@ function EventosPage() {
               <Label className="text-[13px]">URL da imagem/flyer (opcional)</Label>
               <Input value={imagemUrl} onChange={(e) => setImagemUrl(e.target.value)} placeholder="https://..." className="h-11 rounded-md" />
               {imagemUrl.trim() && (
-                <img src={imagemUrl} alt="Prévia do evento" className="mt-2 max-h-48 w-auto rounded-lg object-contain" />
+                <img
+                  src={imagemUrl}
+                  alt="Prévia do evento"
+                  className="mt-2 max-h-48 w-auto rounded-lg object-contain"
+                />
               )}
             </div>
           </div>
@@ -156,7 +165,9 @@ function EventosPage() {
         <section className="mt-8">
           <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Próximos eventos</h3>
           {eventosQ.isLoading ? (
-            <div className="mt-6 flex justify-center"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
+            <div className="mt-6 flex justify-center">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
           ) : futuros.length === 0 ? (
             <div className="mt-4 rounded-lg border border-dashed border-border bg-card/50 py-12 text-center">
               <Music className="mx-auto h-6 w-6 text-muted-foreground" />
@@ -175,7 +186,8 @@ function EventosPage() {
                       )}
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {formatData(e.data)}{e.horario ? ` às ${formatHorario(e.horario)}` : ""}
+                      {formatData(e.data)}
+                      {e.horario ? ` às ${formatHorario(e.horario)}` : ""}
                     </p>
                   </div>
                   <button
@@ -200,7 +212,8 @@ function EventosPage() {
                   <div className="min-w-0 flex-1">
                     <p className="font-medium">{e.titulo}</p>
                     <p className="text-sm text-muted-foreground">
-                      {formatData(e.data)}{e.horario ? ` às ${formatHorario(e.horario)}` : ""}
+                      {formatData(e.data)}
+                      {e.horario ? ` às ${formatHorario(e.horario)}` : ""}
                     </p>
                   </div>
                   <button

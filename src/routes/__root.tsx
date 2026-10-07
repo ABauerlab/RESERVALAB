@@ -144,7 +144,6 @@ function RootComponent() {
     return () => window.removeEventListener("vite:preloadError", onPreloadError);
   }, []);
 
-
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />

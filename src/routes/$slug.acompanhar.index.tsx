@@ -7,7 +7,10 @@ import { Label } from "@/components/ui/label";
 
 /** Normaliza o código: maiúsculas, sem espaços, com o prefixo RL-. */
 export function normalizeCodigo(v: string): string {
-  let s = v.toUpperCase().replace(/\s+/g, "").replace(/[^A-Z0-9-]/g, "");
+  let s = v
+    .toUpperCase()
+    .replace(/\s+/g, "")
+    .replace(/[^A-Z0-9-]/g, "");
   s = s.replace(/^RL-?/, "");
   return s.length > 0 ? `RL-${s}` : "";
 }

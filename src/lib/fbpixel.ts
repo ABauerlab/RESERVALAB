@@ -78,13 +78,21 @@ export function initFacebookPixel(pixelId: string | null | undefined): void {
 }
 
 /** Dispara um evento padrão do Meta Pixel (ex.: "Lead"). */
-export function trackFacebookEvent(pixelId: string | null | undefined, eventName: string, params?: Record<string, unknown>): void {
+export function trackFacebookEvent(
+  pixelId: string | null | undefined,
+  eventName: string,
+  params?: Record<string, unknown>,
+): void {
   if (!pixelId || typeof window === "undefined" || !window.fbq) return;
   window.fbq("track", eventName, params);
 }
 
 /** Dispara um evento personalizado do Meta Pixel (nome fora da lista padrão). */
-export function trackFacebookCustomEvent(pixelId: string | null | undefined, eventName: string, params?: Record<string, unknown>): void {
+export function trackFacebookCustomEvent(
+  pixelId: string | null | undefined,
+  eventName: string,
+  params?: Record<string, unknown>,
+): void {
   if (!pixelId || typeof window === "undefined" || !window.fbq) return;
   window.fbq("trackCustom", eventName, params);
 }

@@ -89,7 +89,8 @@ function TenantHome() {
             Como podemos te receber?
           </h1>
           <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-muted-foreground sm:text-base">
-            Escolha o tipo de reserva. Levamos poucos segundos, e nossa equipe confirma com você em seguida.
+            Escolha o tipo de reserva. Levamos poucos segundos, e nossa equipe confirma com você em
+            seguida.
           </p>
         </header>
 
@@ -112,7 +113,9 @@ function TenantHome() {
                 {eventoQ.data.horario ? ` às ${formatHorario(eventoQ.data.horario)}` : ""}
               </p>
               {eventoQ.data.descricao && (
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{eventoQ.data.descricao}</p>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {eventoQ.data.descricao}
+                </p>
               )}
             </div>
           </div>
@@ -135,7 +138,9 @@ function TenantHome() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="font-medium text-foreground">{card.titulo}</p>
-                  <p className="mt-0.5 line-clamp-1 text-sm text-muted-foreground">{card.descricao}</p>
+                  <p className="mt-0.5 line-clamp-1 text-sm text-muted-foreground">
+                    {card.descricao}
+                  </p>
                 </div>
                 <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-terracotta" />
               </Link>

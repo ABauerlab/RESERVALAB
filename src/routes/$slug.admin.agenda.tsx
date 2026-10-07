@@ -57,15 +57,19 @@ function AgendaPage() {
       const { error } = await supabase.from("agenda_bloqueios").insert({
         tenant_id: tenantId!,
         data,
-        hora_inicio: diaTodo ? null : (horaInicio || null),
-        hora_fim: diaTodo ? null : (horaFim || null),
+        hora_inicio: diaTodo ? null : horaInicio || null,
+        hora_fim: diaTodo ? null : horaFim || null,
         motivo: motivo.trim() || null,
       });
       if (error) throw error;
     },
     onSuccess: () => {
       toast.success("Bloqueio adicionado.");
-      setData(""); setHoraInicio(""); setHoraFim(""); setMotivo(""); setDiaTodo(true);
+      setData("");
+      setHoraInicio("");
+      setHoraFim("");
+      setMotivo("");
+      setDiaTodo(true);
       qc.invalidateQueries({ queryKey: ["bloqueios-admin", tenantId] });
     },
     onError: () => toast.error("Não foi possível adicionar o bloqueio."),
@@ -83,7 +87,8 @@ function AgendaPage() {
     onError: () => toast.error("Não foi possível remover."),
   });
 
-  const podeCriar = !!data && (diaTodo || (!!horaInicio && (!horaFim || horaFim > horaInicio))) && !criar.isPending;
+  const podeCriar =
+    !!data && (diaTodo || (!!horaInicio && (!horaFim || horaFim > horaInicio))) && !criar.isPending;
 
   const [feriadoData, setFeriadoData] = useState("");
   const [feriadoMotivo, setFeriadoMotivo] = useState("");
@@ -114,7 +119,8 @@ function AgendaPage() {
     },
     onSuccess: () => {
       toast.success("Feriado adicionado.");
-      setFeriadoData(""); setFeriadoMotivo("");
+      setFeriadoData("");
+      setFeriadoMotivo("");
       qc.invalidateQueries({ queryKey: ["feriados-admin", tenantId] });
     },
     onError: (err: { code?: string }) => {
@@ -199,7 +205,9 @@ function AgendaPage() {
         <section className="mt-8">
           <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Bloqueios ativos</h3>
           {bloqueiosQ.isLoading ? (
-            <div className="mt-6 flex justify-center"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
+            <div className="mt-6 flex justify-center">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
           ) : (bloqueiosQ.data?.length ?? 0) === 0 ? (
             <div className="mt-4 rounded-lg border border-dashed border-border bg-card/50 py-12 text-center">
               <CalendarX2 className="mx-auto h-6 w-6 text-muted-foreground" />
@@ -216,10 +224,10 @@ function AgendaPage() {
                       {b.hora_inicio && b.hora_fim
                         ? `Das ${formatHorario(b.hora_inicio)} às ${formatHorario(b.hora_fim)}`
                         : b.hora_inicio
-                        ? `A partir das ${formatHorario(b.hora_inicio)}`
-                        : b.hora_fim
-                        ? `Até as ${formatHorario(b.hora_fim)}`
-                        : "Dia inteiro"}
+                          ? `A partir das ${formatHorario(b.hora_inicio)}`
+                          : b.hora_fim
+                            ? `Até as ${formatHorario(b.hora_fim)}`
+                            : "Dia inteiro"}
                       {b.motivo ? ` · ${b.motivo}` : ""}
                     </p>
                   </div>
@@ -239,8 +247,8 @@ function AgendaPage() {
         <section className="mt-10 rounded-lg border border-border bg-card p-5 animate-in-up">
           <h3 className="font-semibold">Feriados</h3>
           <p className="mt-1 text-sm text-muted-foreground">
-            Uma data marcada como feriado passa a usar os horários de fim de semana (janela e horário-limite),
-            mesmo caindo num dia de semana.
+            Uma data marcada como feriado passa a usar os horários de fim de semana (janela e
+            horário-limite), mesmo caindo num dia de semana.
           </p>
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
@@ -261,7 +269,9 @@ function AgendaPage() {
         <section className="mt-6">
           <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Próximos feriados</h3>
           {feriadosQ.isLoading ? (
-            <div className="mt-6 flex justify-center"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
+            <div className="mt-6 flex justify-center">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
           ) : (feriadosQ.data?.length ?? 0) === 0 ? (
             <div className="mt-4 rounded-lg border border-dashed border-border bg-card/50 py-12 text-center">
               <CalendarHeart className="mx-auto h-6 w-6 text-muted-foreground" />

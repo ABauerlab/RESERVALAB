@@ -18,7 +18,10 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
       new Headers(init.headers).forEach((value, key) => headers.set(key, value));
     }
 
-    if (isNewSupabaseApiKey(supabaseKey) && headers.get("Authorization") === `Bearer ${supabaseKey}`) {
+    if (
+      isNewSupabaseApiKey(supabaseKey) &&
+      headers.get("Authorization") === `Bearer ${supabaseKey}`
+    ) {
       headers.delete("Authorization");
     }
 
@@ -39,61 +42,63 @@ function readEnv(...names: string[]): string | undefined {
   return undefined;
 }
 
-export const requireRuntimeSupabaseAuth = createMiddleware({ type: "function" }).server(async ({ next }) => {
-  const supabaseUrl = readEnv("SUPABASE_URL", "VITE_SUPABASE_URL");
-  const publishableKey = readEnv(
-    "SUPABASE_PUBLISHABLE_KEY",
-    "SUPABASE_ANON_KEY",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_ANON_KEY",
-  );
+export const requireRuntimeSupabaseAuth = createMiddleware({ type: "function" }).server(
+  async ({ next }) => {
+    const supabaseUrl = readEnv("SUPABASE_URL", "VITE_SUPABASE_URL");
+    const publishableKey = readEnv(
+      "SUPABASE_PUBLISHABLE_KEY",
+      "SUPABASE_ANON_KEY",
+      "VITE_SUPABASE_PUBLISHABLE_KEY",
+      "VITE_SUPABASE_ANON_KEY",
+    );
 
-  if (!supabaseUrl || !publishableKey) {
-    const missing = [
-      ...(!supabaseUrl ? ["SUPABASE_URL"] : []),
-      ...(!publishableKey ? ["SUPABASE_PUBLISHABLE_KEY"] : []),
-    ];
-    const message = `Configuração do backend indisponível: ${missing.join(", ")}.`;
-    console.error(`[ReservaLab] ${message}`);
-    throw new Error(message);
-  }
+    if (!supabaseUrl || !publishableKey) {
+      const missing = [
+        ...(!supabaseUrl ? ["SUPABASE_URL"] : []),
+        ...(!publishableKey ? ["SUPABASE_PUBLISHABLE_KEY"] : []),
+      ];
+      const message = `Configuração do backend indisponível: ${missing.join(", ")}.`;
+      console.error(`[ReservaLab] ${message}`);
+      throw new Error(message);
+    }
 
-  const request = getRequest();
-  const authHeader = request?.headers?.get("authorization");
+    const request = getRequest();
+    const authHeader = request?.headers?.get("authorization");
 
-  if (!authHeader?.startsWith("Bearer ")) {
-    throw new Error("Sessão expirada. Entre novamente.");
-  }
+    if (!authHeader?.startsWith("Bearer ")) {
+      throw new Error("Sessão expirada. Entre novamente.");
+    }
 
-  const token = authHeader.replace("Bearer ", "");
-  if (!token || token.split(".").length !== 3) {
-    throw new Error("Sessão inválida. Entre novamente.");
-  }
+    const token = authHeader.replace("Bearer ", "");
+    if (!token || token.split(".").length !== 3) {
+      throw new Error("Sessão inválida. Entre novamente.");
+    }
 
-  const supabase = createClient<Database>(supabaseUrl, publishableKey, {
-    global: {
-      fetch: createSupabaseFetch(publishableKey),
-      headers: {
-        Authorization: `Bearer ${token}`,
+    const supabase = createClient<Database>(supabaseUrl, publishableKey, {
+      global: {
+        fetch: createSupabaseFetch(publishableKey),
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    },
-    auth: {
-      storage: undefined,
-      persistSession: false,
-      autoRefreshToken: false,
-    },
-  });
+      auth: {
+        storage: undefined,
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    });
 
-  const { data, error } = await supabase.auth.getClaims(token);
-  if (error || !data?.claims?.sub) {
-    throw new Error("Sessão inválida. Entre novamente.");
-  }
+    const { data, error } = await supabase.auth.getClaims(token);
+    if (error || !data?.claims?.sub) {
+      throw new Error("Sessão inválida. Entre novamente.");
+    }
 
-  return next({
-    context: {
-      supabase,
-      userId: data.claims.sub,
-      claims: data.claims,
-    },
-  });
-});
+    return next({
+      context: {
+        supabase,
+        userId: data.claims.sub,
+        claims: data.claims,
+      },
+    });
+  },
+);

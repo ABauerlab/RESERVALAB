@@ -21,10 +21,18 @@ export const Route = createFileRoute("/$slug/obrigado")({
 function Obrigado() {
   const { slug } = useParams({ from: "/$slug/obrigado" });
   const [codigo, setCodigo] = useState<string>("");
-  const tenantQ = useQuery({ queryKey: ["tenant", slug], queryFn: () => getTenantBySlug(slug), staleTime: 5 * 60_000 });
+  const tenantQ = useQuery({
+    queryKey: ["tenant", slug],
+    queryFn: () => getTenantBySlug(slug),
+    staleTime: 5 * 60_000,
+  });
 
   useEffect(() => {
-    try { setCodigo(sessionStorage.getItem("ultima-reserva-codigo") ?? ""); } catch { /* noop */ }
+    try {
+      setCodigo(sessionStorage.getItem("ultima-reserva-codigo") ?? "");
+    } catch {
+      /* noop */
+    }
   }, []);
 
   useEffect(() => {
@@ -50,7 +58,8 @@ function Obrigado() {
           Reserva enviada
         </h1>
         <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
-          Nossa equipe irá analisar a disponibilidade e entrar em contato para confirmar sua reserva.
+          Nossa equipe irá analisar a disponibilidade e entrar em contato para confirmar sua
+          reserva.
         </p>
 
         {codigo && (

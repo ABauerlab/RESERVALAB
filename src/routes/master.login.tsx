@@ -43,7 +43,8 @@ function MasterLogin() {
       const { data } = await supabase.auth.getSession();
       if (data.session) {
         const { data: isSuper, error } = await supabase.rpc("has_role", {
-          _user_id: data.session.user.id, _role: "super_admin",
+          _user_id: data.session.user.id,
+          _role: "super_admin",
         });
         if (error) console.error("[master/login] Falha ao verificar permissão:", error.message);
         else if (isSuper) navigate({ to: "/master" });
@@ -55,14 +56,18 @@ function MasterLogin() {
     e.preventDefault();
     if (loading) return;
     setLoading(true);
-    const { data: signIn, error } = await supabase.auth.signInWithPassword({ email, password: senha });
+    const { data: signIn, error } = await supabase.auth.signInWithPassword({
+      email,
+      password: senha,
+    });
     if (error || !signIn.session) {
       setLoading(false);
       toast.error("E-mail ou senha inválidos.");
       return;
     }
     const { data: isSuper, error: roleError } = await supabase.rpc("has_role", {
-      _user_id: signIn.session.user.id, _role: "super_admin",
+      _user_id: signIn.session.user.id,
+      _role: "super_admin",
     });
     setLoading(false);
     if (roleError) {

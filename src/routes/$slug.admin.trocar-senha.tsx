@@ -31,7 +31,10 @@ function TrocarSenha() {
   useEffect(() => {
     (async () => {
       const { data } = await supabase.auth.getSession();
-      if (!data.session) { navigate({ to: "/$slug/admin/login", params: { slug } }); return; }
+      if (!data.session) {
+        navigate({ to: "/$slug/admin/login", params: { slug } });
+        return;
+      }
       setObrigatorio(data.session.user.user_metadata?.must_change_password === true);
       setChecando(false);
     })();
@@ -49,7 +52,10 @@ function TrocarSenha() {
       data: { must_change_password: false },
     });
     setSalvando(false);
-    if (error) { toast.error(error.message || "Não foi possível alterar a senha."); return; }
+    if (error) {
+      toast.error(error.message || "Não foi possível alterar a senha.");
+      return;
+    }
     toast.success("Senha alterada com sucesso.");
     navigate({ to: "/$slug/admin", params: { slug } });
   }
