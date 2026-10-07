@@ -9,9 +9,18 @@ import {
   Search,
   Loader2,
   PartyPopper,
+  MessageCircle,
+  MapPin,
+  Phone,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { TIPO_CARDS, formatData, formatHorario, type ReservaTipo } from "@/lib/reservations";
+import {
+  TIPO_CARDS,
+  formatData,
+  formatHorario,
+  telefoneToWhatsApp,
+  type ReservaTipo,
+} from "@/lib/reservations";
 import { getTenantBySlug } from "@/lib/tenant";
 import { CLICK_RESERVA_EVENT, initFacebookPixel, trackFacebookCustomEvent } from "@/lib/fbpixel";
 
@@ -160,6 +169,12 @@ function TenantHome() {
           })}
         </div>
 
+        <ContatoRapido
+          whatsapp={tenant.whatsapp}
+          telefone={tenant.telefone_contato}
+          endereco={tenant.endereco}
+        />
+
         <div className="mt-8 flex justify-center">
           <Link
             to="/$slug/acompanhar"
@@ -183,5 +198,50 @@ function TenantHome() {
         </div>
       </div>
     </main>
+  );
+}
+
+/** Atalhos para falar com a casa. Só aparecem os que o restaurante preencheu. */
+function ContatoRapido({
+  whatsapp,
+  telefone,
+  endereco,
+}: {
+  whatsapp?: string | null;
+  telefone?: string | null;
+  endereco?: string | null;
+}) {
+  const wa = whatsapp ? telefoneToWhatsApp(whatsapp) : "";
+  const tel = telefone ? telefone.replace(/[^\d+]/g, "") : "";
+  const itens = [
+    wa && { href: `https://wa.me/${wa}`, rotulo: "WhatsApp", Icone: MessageCircle, externo: true },
+    tel && { href: `tel:${tel}`, rotulo: "Ligar", Icone: Phone, externo: false },
+    endereco && {
+      href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endereco)}`,
+      rotulo: "Como chegar",
+      Icone: MapPin,
+      externo: true,
+    },
+  ].filter(Boolean) as Array<{
+    href: string;
+    rotulo: string;
+    Icone: typeof Phone;
+    externo: boolean;
+  }>;
+  if (itens.length === 0) return null;
+  return (
+    <nav aria-label="Falar com a casa" className="mt-8 flex flex-wrap justify-center gap-2">
+      {itens.map(({ href, rotulo, Icone, externo }) => (
+        <a
+          key={rotulo}
+          href={href}
+          {...(externo ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+          className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border bg-card px-4 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+        >
+          <Icone className="h-4 w-4 text-muted-foreground" />
+          {rotulo}
+        </a>
+      ))}
+    </nav>
   );
 }

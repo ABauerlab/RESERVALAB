@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { ChevronLeft, Loader2, Save, X } from "lucide-react";
 import { toast } from "sonner";
+import { mensagemErroReserva } from "@/lib/reserva-erros";
 
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -146,7 +147,7 @@ function ReservaEdit({
       toast.success("Reserva atualizada.");
       if (r) onUpdated(r);
     },
-    onError: () => toast.error("Não foi possível atualizar."),
+    onError: (e) => toast.error(mensagemErroReserva(e, "Não foi possível atualizar.")),
   });
 
   const cancelar = useMutation({
@@ -161,7 +162,7 @@ function ReservaEdit({
       toast.success("Reserva cancelada.");
       if (r) onUpdated(r);
     },
-    onError: () => toast.error("Não foi possível cancelar."),
+    onError: (e) => toast.error(mensagemErroReserva(e, "Não foi possível cancelar.")),
   });
 
   return (
