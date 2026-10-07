@@ -1,12 +1,10 @@
 import { pwaHeadLinks } from "@/lib/pwa-manifest";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
-import { bootstrapSuperAdmin } from "@/lib/master.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,21 +20,12 @@ export const Route = createFileRoute("/master/login")({
 
 function MasterLogin() {
   const navigate = useNavigate();
-  const bootstrap = useServerFn(bootstrapSuperAdmin);
-  const [email, setEmail] = useState("contato.bauerlab@gmail.com");
+  const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
-  const [booting, setBooting] = useState(true);
 
   useEffect(() => {
     (async () => {
-      try {
-        await bootstrap();
-      } catch {
-        // Ignora: idempotente. Se falhar, o login abaixo dará erro claro.
-      } finally {
-        setBooting(false);
-      }
       const { data } = await supabase.auth.getSession();
       if (data.session) {
         const { data: isSuper, error } = await supabase.rpc("has_role", {
@@ -47,7 +36,7 @@ function MasterLogin() {
         else if (isSuper) navigate({ to: "/master" });
       }
     })();
-  }, [navigate, bootstrap]);
+  }, [navigate]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -127,10 +116,10 @@ function MasterLogin() {
 
             <Button
               type="submit"
-              disabled={loading || booting}
+              disabled={loading}
               className="h-12 w-full rounded-md bg-primary text-primary-foreground hover:bg-blue-700"
             >
-              {loading || booting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Entrar"}
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Entrar"}
             </Button>
           </form>
         </div>
