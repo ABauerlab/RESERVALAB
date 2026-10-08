@@ -1,11 +1,13 @@
 import { pwaHeadLinks } from "@/lib/pwa-manifest";
 import { createFileRoute, useParams } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2, Music, Plus, Trash2 } from "lucide-react";
+import { ImagePlus, Loader2, Music, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
+import { enviarFlyerDoEvento } from "@/lib/assets";
+import { FlyerEvento } from "@/components/public/FlyerEvento";
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { PageHeader } from "@/components/admin/PageHeader";
@@ -23,6 +25,8 @@ type EventoRow = {
   horario: string | null;
   descricao: string | null;
   imagem_url: string | null;
+  imagem_largura?: number | null;
+  imagem_altura?: number | null;
 };
 
 export const Route = createFileRoute("/$slug/admin/eventos")({
@@ -45,6 +49,48 @@ function EventosPage() {
   const [horario, setHorario] = useState("");
   const [descricao, setDescricao] = useState("");
   const [imagemUrl, setImagemUrl] = useState("");
+  const [dim, setDim] = useState<{ w: number; h: number } | null>(null);
+  const [enviando, setEnviando] = useState(false);
+  const arquivo = useRef<HTMLInputElement>(null);
+  const arquivoTroca = useRef<HTMLInputElement>(null);
+  const [trocandoId, setTrocandoId] = useState<string | null>(null);
+
+  async function enviarFlyer(file: File | undefined) {
+    if (!file || !tenantId) return;
+    setEnviando(true);
+    try {
+      const f = await enviarFlyerDoEvento(tenantId, file);
+      setImagemUrl(f.url);
+      setDim({ w: f.largura, h: f.altura });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Não foi possível enviar o flyer.");
+    } finally {
+      setEnviando(false);
+      if (arquivo.current) arquivo.current.value = "";
+    }
+  }
+
+  const trocarFlyer = useMutation({
+    mutationFn: async (a: { id: string; file: File }) => {
+      const f = await enviarFlyerDoEvento(tenantId!, a.file);
+      const { error } = await supabase
+        .from("eventos_destaque")
+        .update({ imagem_url: f.url, imagem_largura: f.largura, imagem_altura: f.altura } as never)
+        .eq("id", a.id)
+        .eq("tenant_id", tenantId!);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Flyer atualizado.");
+      qc.invalidateQueries({ queryKey: ["eventos-admin", tenantId] });
+    },
+    onError: (e) =>
+      toast.error(e instanceof Error ? e.message : "Não foi possível trocar o flyer."),
+    onSettled: () => {
+      setTrocandoId(null);
+      if (arquivoTroca.current) arquivoTroca.current.value = "";
+    },
+  });
 
   const eventosQ = useQuery({
     enabled: !!tenantId,
@@ -69,7 +115,8 @@ function EventosPage() {
         horario: horario || null,
         descricao: descricao.trim() || null,
         imagem_url: imagemUrl.trim() || null,
-      });
+        ...(imagemUrl.trim() && dim ? { imagem_largura: dim.w, imagem_altura: dim.h } : {}),
+      } as never);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -79,6 +126,7 @@ function EventosPage() {
       setHorario("");
       setDescricao("");
       setImagemUrl("");
+      setDim(null);
       qc.invalidateQueries({ queryKey: ["eventos-admin", tenantId] });
     },
     onError: () => toast.error("Não foi possível adicionar o evento."),
@@ -123,8 +171,11 @@ function EventosPage() {
           <h3 className="font-semibold">Novo evento</h3>
           <div className="mt-4 space-y-4">
             <div className="space-y-2">
-              <Label className="text-[13px]">Título</Label>
+              <Label htmlFor="ev-titulo" className="text-[13px]">
+                Título
+              </Label>
               <Input
+                id="ev-titulo"
                 value={titulo}
                 onChange={(e) => setTitulo(e.target.value)}
                 placeholder="Ex: Samba com Sérgio Santiago e Banda"
@@ -133,8 +184,11 @@ function EventosPage() {
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label className="text-[13px]">Data</Label>
+                <Label htmlFor="ev-data" className="text-[13px]">
+                  Data
+                </Label>
                 <Input
+                  id="ev-data"
                   type="date"
                   min={hoje}
                   value={data}
@@ -143,8 +197,11 @@ function EventosPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-[13px]">Horário (opcional)</Label>
+                <Label htmlFor="ev-horario" className="text-[13px]">
+                  Horário (opcional)
+                </Label>
                 <Input
+                  id="ev-horario"
                   type="time"
                   value={horario}
                   onChange={(e) => setHorario(e.target.value)}
@@ -153,8 +210,11 @@ function EventosPage() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="text-[13px]">Descrição (opcional)</Label>
+              <Label htmlFor="ev-descricao" className="text-[13px]">
+                Descrição (opcional)
+              </Label>
               <Textarea
+                id="ev-descricao"
                 value={descricao}
                 onChange={(e) => setDescricao(e.target.value)}
                 placeholder="Detalhes que aparecem para o cliente na página de reservas."
@@ -162,19 +222,75 @@ function EventosPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[13px]">URL da imagem/flyer (opcional)</Label>
+              <Label className="text-[13px]">Flyer do evento (opcional)</Label>
+              <p className="text-xs text-muted-foreground">
+                Qualquer formato: vertical, horizontal ou quadrado. O flyer aparece inteiro, sem
+                cortar nem esticar.
+              </p>
+              <div className="flex flex-wrap items-center gap-2">
+                <input
+                  ref={arquivo}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  className="sr-only"
+                  aria-label="Enviar flyer"
+                  onChange={(e) => void enviarFlyer(e.target.files?.[0])}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={enviando || !tenantId}
+                  onClick={() => arquivo.current?.click()}
+                  className="h-11 rounded-md"
+                >
+                  {enviando ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <ImagePlus className="mr-2 h-4 w-4" />
+                  )}
+                  {imagemUrl ? "Trocar flyer" : "Enviar flyer"}
+                </Button>
+                {imagemUrl && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => {
+                      setImagemUrl("");
+                      setDim(null);
+                    }}
+                    className="h-11 rounded-md"
+                  >
+                    Remover
+                  </Button>
+                )}
+                {dim && (
+                  <span className="text-xs text-muted-foreground">
+                    {dim.w} × {dim.h} px
+                  </span>
+                )}
+              </div>
               <Input
                 value={imagemUrl}
-                onChange={(e) => setImagemUrl(e.target.value)}
-                placeholder="https://..."
+                onChange={(e) => {
+                  setImagemUrl(e.target.value);
+                  setDim(null);
+                }}
+                placeholder="ou cole o endereço da imagem (https://...)"
+                aria-label="Endereço do flyer"
                 className="h-11 rounded-md"
               />
-              {imagemUrl.trim() && (
-                <img
-                  src={imagemUrl}
-                  alt="Prévia do evento"
-                  className="mt-2 max-h-48 w-auto rounded-lg object-contain"
-                />
+              {imagemUrl.trim() && /^https?:\/\//i.test(imagemUrl.trim()) && (
+                <div className="mt-2 max-w-xs overflow-hidden rounded-lg border border-border">
+                  <p className="bg-muted px-3 py-1.5 text-xs font-semibold text-muted-foreground">
+                    Como aparece para o cliente
+                  </p>
+                  <FlyerEvento
+                    src={imagemUrl.trim()}
+                    alt={titulo.trim() || "Prévia do flyer"}
+                    largura={dim?.w}
+                    altura={dim?.h}
+                  />
+                </div>
               )}
             </div>
           </div>
@@ -215,6 +331,17 @@ function EventosPage() {
                   key={e.id}
                   className={`flex items-center gap-3 rounded-lg border bg-card p-4 ${i === 0 ? "border-brand/40" : "border-border"}`}
                 >
+                  {e.imagem_url && (
+                    <img
+                      src={e.imagem_url}
+                      alt=""
+                      width={e.imagem_largura ?? 48}
+                      height={e.imagem_altura ?? 64}
+                      loading="lazy"
+                      referrerPolicy="no-referrer"
+                      className="h-16 w-12 shrink-0 rounded-md border border-border bg-slate-100 object-contain"
+                    />
+                  )}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <p className="font-medium">{e.titulo}</p>
@@ -230,6 +357,18 @@ function EventosPage() {
                     </p>
                   </div>
                   <button
+                    type="button"
+                    onClick={() => {
+                      setTrocandoId(e.id);
+                      arquivoTroca.current?.click();
+                    }}
+                    disabled={trocarFlyer.isPending}
+                    className="flex h-11 w-11 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent xl:h-9 xl:w-9"
+                    aria-label={`${e.imagem_url ? "Trocar" : "Enviar"} flyer de ${e.titulo}`}
+                  >
+                    <ImagePlus className="h-4 w-4" />
+                  </button>
+                  <button
                     onClick={() => remover.mutate(e.id)}
                     className="flex h-11 w-11 xl:h-9 xl:w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                     aria-label="Remover evento"
@@ -240,6 +379,17 @@ function EventosPage() {
               ))}
             </ul>
           )}
+          <input
+            ref={arquivoTroca}
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            className="sr-only"
+            aria-label="Novo flyer do evento"
+            onChange={(ev) => {
+              const f = ev.target.files?.[0];
+              if (f && trocandoId) trocarFlyer.mutate({ id: trocandoId, file: f });
+            }}
+          />
         </section>
 
         {passados.length > 0 && (

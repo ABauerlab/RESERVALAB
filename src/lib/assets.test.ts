@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { medidasContain, recorteCover, validarArquivo } from "@/lib/assets";
+import { medidasContain, medidasFlyer, recorteCover, validarArquivo } from "@/lib/assets";
 
 describe("recorteCover (banner 3:1)", () => {
   it("imagem larga demais corta as laterais, centralizado", () => {
@@ -29,5 +29,15 @@ describe("validarArquivo", () => {
     expect(validarArquivo({ type: "image/png", size: 1000 })).toBeNull();
     expect(validarArquivo({ type: "image/svg+xml", size: 1000 })).not.toBeNull();
     expect(validarArquivo({ type: "image/jpeg", size: 11 * 1024 * 1024 })).not.toBeNull();
+  });
+});
+
+describe("medidasFlyer", () => {
+  it("preserva a proporcao em qualquer formato e so reduz", () => {
+    expect(medidasFlyer(1080, 1920)).toEqual({ largura: 900, altura: 1600 });
+    expect(medidasFlyer(3200, 1600)).toEqual({ largura: 1600, altura: 800 });
+    expect(medidasFlyer(2000, 2000)).toEqual({ largura: 1600, altura: 1600 });
+    expect(medidasFlyer(800, 500)).toEqual({ largura: 800, altura: 500 });
+    expect(medidasFlyer(1, 1)).toEqual({ largura: 1, altura: 1 });
   });
 });

@@ -8,6 +8,8 @@ import { MapaIncorporado, MapaRecolhivel } from "@/components/hub/HubMapa";
 import { EstadoPublico, PublicShell } from "@/components/public/PublicShell";
 import { buildHubItens, fetchHub, type HubItem } from "@/lib/hub";
 import { iconeUrlSegura } from "@/lib/hub-icons";
+import { fetchProximoEvento } from "@/lib/eventos";
+import { formatData } from "@/lib/reservations";
 import { urlDeMapaValida } from "@/lib/mapa";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
@@ -58,6 +60,13 @@ function HubPublicoPage() {
     queryKey: ["hub-publico", slug],
     queryFn: () => fetchHub(slug),
     staleTime: 60_000,
+  });
+
+  const eventoQ = useQuery({
+    queryKey: ["proximo-evento", slug],
+    queryFn: () => fetchProximoEvento(slug),
+    staleTime: 5 * 60_000,
+    retry: false,
   });
 
   if (hubQ.isLoading) {
@@ -180,6 +189,21 @@ function HubPublicoPage() {
                 >
                   <HubIcone chave={principal.icone} className="h-[18px] w-[18px]" />
                   {principal.rotulo}
+                </a>
+              )}
+              {eventoQ.data && (
+                <a
+                  href={`/${slug}`}
+                  className={cn(
+                    link,
+                    "min-h-12 gap-3 border border-primary/25 bg-accent/60 px-3 text-foreground hover:bg-accent",
+                  )}
+                >
+                  <HubIcone chave="eventos" className="h-5 w-5 shrink-0 text-primary" />
+                  <span className="min-w-0 flex-1 truncate">{eventoQ.data.titulo}</span>
+                  <span className="shrink-0 text-xs font-semibold text-muted-foreground">
+                    {formatData(eventoQ.data.data).slice(0, 5)}
+                  </span>
                 </a>
               )}
               {destaques.map((item) => (

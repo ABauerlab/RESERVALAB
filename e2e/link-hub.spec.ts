@@ -60,7 +60,9 @@ test.describe("Link Hub (painel e página pública)", () => {
     await expect(page.locator("main img[width='1200']")).toHaveAttribute("src", /tenant-assets/);
     const links = page.getByRole("link");
     await expect(links.first()).toHaveText("Reservar mesa");
-    await expect(links.nth(1)).toContainText("Peça no iFood");
+    // O próximo evento (quando existe) vem logo depois, depois os destaques da casa.
+    await expect(links.nth(1)).toContainText("Festa Junina");
+    await expect(links.nth(2)).toContainText("Peça no iFood");
     await expect(page.getByRole("link", { name: "Cardápio" })).toHaveCount(0);
     await expect(page.getByRole("link", { name: "WhatsApp" })).toBeVisible();
   });

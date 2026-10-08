@@ -42,6 +42,19 @@ export function medidasContain(srcW: number, srcH: number, dstW: number, dstH: n
   return { x: Math.round((dstW - w) / 2), y: Math.round((dstH - h) / 2), w, h };
 }
 
+/** Maior lado do flyer enviado. Menor que isso, vai como esta (nunca amplia). */
+export const FLYER_LADO_MAX = 1600;
+
+/** Reduz mantendo a proporcao: o flyer nunca e cortado nem deformado. */
+export function medidasFlyer(
+  srcW: number,
+  srcH: number,
+  ladoMax = FLYER_LADO_MAX,
+): { largura: number; altura: number } {
+  const k = Math.min(1, ladoMax / Math.max(srcW, srcH));
+  return { largura: Math.max(1, Math.round(srcW * k)), altura: Math.max(1, Math.round(srcH * k)) };
+}
+
 export function validarArquivo(file: { type: string; size: number }): string | null {
   if (!TIPOS_ACEITOS.includes(file.type)) return "Use uma imagem PNG, JPG ou WebP.";
   if (file.size > MAX_ENTRADA) return "A imagem passa de 10 MB. Escolha uma menor.";
@@ -88,4 +101,43 @@ export async function enviarImagemDaEmpresa(
     .upload(caminho, blob, { contentType: "image/webp", cacheControl: "31536000", upsert: false });
   if (error) throw new Error(error.message);
   return supabase.storage.from(BUCKET).getPublicUrl(caminho).data.publicUrl;
+}
+
+export type FlyerEnviado = { url: string; largura: number; altura: number };
+
+/**
+ * Flyer de evento: qualquer proporcao (vertical, horizontal, quadrada ou outra). So reduz se passar
+ * de 1600 px no maior lado, em WebP de alta qualidade, e devolve o tamanho real para a pagina
+ * publica reservar o espaco exato e mostrar o flyer inteiro.
+ */
+export async function enviarFlyerDoEvento(tenantId: string, file: File): Promise<FlyerEnviado> {
+  const erro = validarArquivo(file);
+  if (erro) throw new Error(erro);
+  const bmp = await createImageBitmap(file);
+  const { largura, altura } = medidasFlyer(bmp.width, bmp.height);
+  const canvas = document.createElement("canvas");
+  canvas.width = largura;
+  canvas.height = altura;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("canvas indisponivel");
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(bmp, 0, 0, largura, altura);
+  bmp.close();
+  const blob = await new Promise<Blob>((resolve, reject) =>
+    canvas.toBlob(
+      (b) => (b ? resolve(b) : reject(new Error("falha ao converter"))),
+      "image/webp",
+      0.88,
+    ),
+  );
+  const caminho = `${tenantId}/flyer-${Date.now()}.webp`;
+  const { error } = await supabase.storage
+    .from(BUCKET)
+    .upload(caminho, blob, { contentType: "image/webp", cacheControl: "31536000", upsert: false });
+  if (error) throw new Error(error.message);
+  return {
+    url: supabase.storage.from(BUCKET).getPublicUrl(caminho).data.publicUrl,
+    largura,
+    altura,
+  };
 }

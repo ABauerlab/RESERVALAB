@@ -1,3 +1,5 @@
+import { fetchProximoEvento } from "@/lib/eventos";
+import { FlyerEvento } from "@/components/public/FlyerEvento";
 import { IconeWhatsApp } from "@/components/brand/BrandIcons";
 import { useMarcaLogo } from "@/components/public/MarcaScope";
 import { comMarca } from "@/components/public/MarcaScope";
@@ -67,10 +69,7 @@ function TenantHome() {
   const eventoQ = useQuery({
     queryKey: ["proximo-evento", slug],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("proximo_evento_do_tenant", { _slug: slug });
-      if (error) throw error;
-      const first = Array.isArray(data) ? data[0] : null;
-      return first ?? null;
+      return fetchProximoEvento(slug);
     },
     staleTime: 5 * 60_000,
   });
@@ -132,10 +131,11 @@ function TenantHome() {
         {eventoQ.data && (
           <div className="mt-8 overflow-hidden rounded-lg border border-brand/25 bg-brand/5 animate-in-up">
             {eventoQ.data.imagem_url && (
-              <img
+              <FlyerEvento
                 src={eventoQ.data.imagem_url}
                 alt={eventoQ.data.titulo}
-                className="max-h-72 w-full object-cover"
+                largura={eventoQ.data.imagem_largura}
+                altura={eventoQ.data.imagem_altura}
               />
             )}
             <div className="p-5">
