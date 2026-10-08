@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { formatData, type Reserva } from "@/lib/reservations";
 import { NovasReservasBanner } from "../NovasReservas";
 import { ReservationRow } from "../ReservationRow";
@@ -36,6 +38,7 @@ export function NeedsYou({
   onOpen,
   renderAction,
   loading,
+  limite = 3,
 }: {
   tenantId: string | null;
   pendentes: Reserva[];
@@ -44,7 +47,10 @@ export function NeedsYou({
   onOpen: (r: Reserva) => void;
   renderAction: (r: Reserva) => React.ReactNode;
   loading?: boolean;
+  /** Quantas linhas mostrar por grupo antes de "Ver mais". */
+  limite?: number;
 }) {
+  const [todos, setTodos] = useState(false);
   const total = pendentes.length + reconfirmar.length;
   const row = (r: Reserva) => (
     <ReservationRow
@@ -65,11 +71,20 @@ export function NeedsYou({
     <div className="space-y-4">
       <NovasReservasBanner tenantId={tenantId} />
       <Group title="Pendentes" count={pendentes.length}>
-        {pendentes.map(row)}
+        {(todos ? pendentes : pendentes.slice(0, limite)).map(row)}
       </Group>
       <Group title="Reconfirmar" count={reconfirmar.length}>
-        {reconfirmar.map(row)}
+        {(todos ? reconfirmar : reconfirmar.slice(0, limite)).map(row)}
       </Group>
+      {!todos && (pendentes.length > limite || reconfirmar.length > limite) && (
+        <button
+          type="button"
+          onClick={() => setTodos(true)}
+          className="h-11 w-full rounded-lg border border-dashed border-border bg-card/60 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+        >
+          Ver todos os {total}
+        </button>
+      )}
       {!loading && total === 0 && (
         <p className="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
           Nada esperando por você.

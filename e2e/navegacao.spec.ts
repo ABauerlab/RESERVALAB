@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 import { installMock } from "./support/mock";
 
 test.describe("Painel", () => {
-  test("Hoje, Reservas, Clientes, Relatorios e Ajustes abrem sem erro", async ({
+  test("Dashboard, Reservas, Clientes, Relatorios e Ajustes abrem sem erro", async ({
     page,
     context,
   }) => {

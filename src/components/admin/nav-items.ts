@@ -1,8 +1,8 @@
 import {
   BarChart3,
-  CalendarCheck,
   CalendarDays,
   ClipboardList,
+  LayoutDashboard,
   Lightbulb,
   Link2,
   Music,
@@ -30,11 +30,11 @@ export type NavItem = {
   to: string;
 };
 
-// Rotas existentes preservadas. Hoje é a raiz do painel; Reservas é a rota nova.
+// Rotas existentes preservadas. O Dashboard é a raiz do painel; Reservas é a rota nova.
 export const NAV_HOJE: NavItem = {
   id: "hoje",
-  label: "Hoje",
-  icon: CalendarCheck,
+  label: "Dashboard",
+  icon: LayoutDashboard,
   to: "/$slug/admin",
 };
 export const NAV_RESERVAS: NavItem = {
