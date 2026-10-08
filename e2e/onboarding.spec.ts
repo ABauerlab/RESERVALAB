@@ -18,7 +18,7 @@ test.describe("Onboarding", () => {
     await expect(d.getByRole("heading", { name: "Bem-vindo ao Teggly" })).toBeVisible();
     await d.getByRole("button", { name: "Começar" }).click();
 
-    await expect(d.getByRole("heading", { name: "Hoje: o que fazer agora" })).toBeVisible();
+    await expect(d.getByRole("heading", { name: "Dashboard: o que fazer agora" })).toBeVisible();
     if (!isMobile) {
       // Desktop: o item de navegação é destacado e o painel continua utilizável.
       await expect(page.locator("[data-tour='nav-hoje']")).toBeVisible();

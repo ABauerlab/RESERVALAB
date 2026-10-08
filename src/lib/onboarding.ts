@@ -58,7 +58,7 @@ export function passosDoTour(opts: { whatsapp: boolean; assistente: boolean }): 
     {
       id: "hoje",
       alvo: "nav-hoje",
-      titulo: "Hoje: o que fazer agora",
+      titulo: "Dashboard: o que fazer agora",
       texto:
         "Veja quem chega, o que está pendente e quem precisa reconfirmar. Comece por aqui todo dia.",
     },
@@ -120,7 +120,8 @@ export function passosDoTour(opts: { whatsapp: boolean; assistente: boolean }): 
     id: "fim",
     alvo: null,
     titulo: "Tudo pronto",
-    texto: "Compartilhe o link de reserva do restaurante e as reservas passam a aparecer em Hoje.",
+    texto:
+      "Compartilhe o link de reserva do restaurante e as reservas passam a aparecer no Dashboard.",
   });
   return passos;
 }

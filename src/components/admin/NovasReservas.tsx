@@ -82,8 +82,8 @@ export function NovasReservasBanner({ tenantId }: { tenantId: string | null }) {
         </button>
       </div>
 
-      <ul className="mt-3 max-h-44 space-y-1.5 overflow-y-auto">
-        {novas.map((r) => (
+      <ul className="mt-3 space-y-1.5">
+        {novas.slice(0, 3).map((r) => (
           <li key={r.id} className="rounded-md bg-card px-3 py-2 text-[13px]">
             <span className="font-medium">{r.nome}</span>
             <span className="text-muted-foreground">
@@ -93,6 +93,9 @@ export function NovasReservasBanner({ tenantId }: { tenantId: string | null }) {
             </span>
           </li>
         ))}
+        {novas.length > 3 && (
+          <li className="px-1 text-xs text-muted-foreground">e mais {novas.length - 3}</li>
+        )}
       </ul>
     </section>
   );

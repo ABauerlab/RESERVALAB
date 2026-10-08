@@ -22,10 +22,13 @@ export function UpcomingDays({
   dia,
   info,
   onPick,
+  lista,
 }: {
   dia: string;
   info: Record<string, DayInfo>;
   onPick: (iso: string) => void;
+  /** Uma coluna (para colunas estreitas); sem isso, vira grade quando ha espaco. */
+  lista?: boolean;
 }) {
   const days = Array.from({ length: 7 }, (_, i) => addDaysISO(dia, i + 1));
   return (
@@ -33,7 +36,12 @@ export function UpcomingDays({
       <h2 className="mb-2 text-xs font-extrabold uppercase tracking-[0.08em] text-muted-foreground">
         Próximos dias
       </h2>
-      <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2 sm:gap-2 md:grid-cols-4 xl:grid-cols-7">
+      <div
+        className={cn(
+          "grid grid-cols-1 gap-1.5",
+          !lista && "sm:grid-cols-2 sm:gap-2 md:grid-cols-4 xl:grid-cols-7",
+        )}
+      >
         {days.map((iso) => {
           const d = info[iso] ?? {
             reservas: 0,
@@ -49,7 +57,8 @@ export function UpcomingDays({
               type="button"
               onClick={() => onPick(iso)}
               className={cn(
-                "flex min-h-11 items-center justify-between gap-2 rounded-lg border border-border bg-card px-3 py-2 text-left transition-colors hover:bg-muted sm:flex-col sm:items-start sm:justify-start sm:gap-1",
+                "flex min-h-11 items-center justify-between gap-2 rounded-lg border border-border bg-card px-3 py-2 text-left transition-colors hover:bg-muted",
+                !lista && "sm:flex-col sm:items-start sm:justify-start sm:gap-1",
                 d.bloqueio && "bg-muted/60",
               )}
             >

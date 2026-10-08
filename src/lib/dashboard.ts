@@ -76,3 +76,59 @@ export function clientesDeCasa(
   }
   return out.sort((a, b) => b.anteriores - a.anteriores).slice(0, 5);
 }
+
+export type HistoricoNegocio = Pick<Reserva, "telefone" | "data" | "status" | "quantidade">;
+
+export type VisaoDoNegocio = {
+  /** Janela olhada, em dias (ate hoje). */
+  janelaDias: number;
+  reservas: number;
+  pessoas: number;
+  canceladas: number;
+  /** Percentual de canceladas sobre o total da janela (0 quando nao ha reservas). */
+  taxaCancelamento: number;
+  /** Clientes diferentes (por telefone) que reservaram na janela. */
+  clientes: number;
+  /** Desses, quantos ja tinham reservado antes ou reservaram mais de uma vez na janela. */
+  clientesQueVoltaram: number;
+};
+
+/**
+ * Leitura do negocio na janela [inicioJanela, hoje], so com o que o sistema registra:
+ * reservas, pessoas, cancelamentos e clientes recorrentes. Sem faturamento, ticket ou ocupacao.
+ * `historico` deve incluir tambem reservas anteriores a janela para reconhecer quem voltou.
+ */
+export function visaoDoNegocio(
+  historico: HistoricoNegocio[],
+  hoje: string,
+  inicioJanela: string,
+  janelaDias: number,
+): VisaoDoNegocio {
+  const naJanela = historico.filter((h) => h.data && h.data >= inicioJanela && h.data <= hoje);
+  const ativas = naJanela.filter((h) => h.status !== "cancelada");
+  const canceladas = naJanela.length - ativas.length;
+
+  const antes = new Set<string>();
+  for (const h of historico) {
+    if (h.status === "cancelada" || !h.data || h.data >= inicioJanela) continue;
+    const k = telefoneToWhatsApp(h.telefone);
+    if (k) antes.add(k);
+  }
+  const porCliente = new Map<string, number>();
+  for (const h of ativas) {
+    const k = telefoneToWhatsApp(h.telefone);
+    if (k) porCliente.set(k, (porCliente.get(k) ?? 0) + 1);
+  }
+  let voltaram = 0;
+  for (const [k, n] of porCliente) if (n > 1 || antes.has(k)) voltaram += 1;
+
+  return {
+    janelaDias,
+    reservas: ativas.length,
+    pessoas: ativas.reduce((n, h) => n + (h.quantidade ?? 0), 0),
+    canceladas,
+    taxaCancelamento: naJanela.length === 0 ? 0 : Math.round((canceladas / naJanela.length) * 100),
+    clientes: porCliente.size,
+    clientesQueVoltaram: voltaram,
+  };
+}
