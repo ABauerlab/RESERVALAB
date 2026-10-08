@@ -75,4 +75,75 @@ describe("buildHubItens", () => {
     expect(urlSegura("data:text/html,x")).toBe(false);
     expect(urlSegura("HTTPS://x.com")).toBe(true);
   });
+
+  it("toggle Mostrar cardapio desliga o item mesmo com cardapio publicado", () => {
+    const off = buildHubItens({ ...base, mostrar_cardapio: false }, "casa");
+    expect(off.some((i) => i.tipo === "cardapio")).toBe(false);
+    const on = buildHubItens({ ...base, mostrar_cardapio: true }, "casa");
+    expect(on.some((i) => i.tipo === "cardapio")).toBe(true);
+    // Ausente (clientes antigos do RPC) conta como ligado.
+    expect(buildHubItens(base, "casa").some((i) => i.tipo === "cardapio")).toBe(true);
+  });
+
+  it("destaques (iFood, 99Food) vem logo depois do cardapio, antes do WhatsApp", () => {
+    const itens = buildHubItens(
+      {
+        ...base,
+        links: [
+          { id: "a", titulo: "Playlist", url: "https://example.com/p" },
+          { id: "b", titulo: "Peça no iFood", url: "https://www.ifood.com.br/x", destaque: true },
+          {
+            id: "c",
+            titulo: "99Food",
+            url: "https://99app.com/x",
+            destaque: true,
+            icone: "99food",
+          },
+        ],
+      },
+      "casa",
+    );
+    expect(itens.map((i) => i.rotulo)).toEqual([
+      "Reservar mesa",
+      "Cardápio",
+      "Peça no iFood",
+      "99Food",
+      "WhatsApp",
+      "Instagram",
+      "Como chegar",
+      "Ligar",
+      "Playlist",
+    ]);
+    expect(itens[0]?.principal).toBe(true);
+    expect(itens[2]).toMatchObject({ destaque: true, icone: "ifood" });
+    expect(itens[3]).toMatchObject({ destaque: true, icone: "99food" });
+  });
+
+  it("icone proprio so vale com imagem https; senao cai na deteccao ou no link", () => {
+    const itens = buildHubItens(
+      {
+        ...base,
+        links: [
+          {
+            id: "a",
+            titulo: "A",
+            url: "https://ex.com",
+            icone: "proprio",
+            icone_url: "https://cdn/x.png",
+          },
+          {
+            id: "b",
+            titulo: "B",
+            url: "https://ex.com",
+            icone: "proprio",
+            icone_url: "javascript:x",
+          },
+        ],
+      },
+      "casa",
+    );
+    const [a, b] = itens.filter((i) => i.tipo === "extra");
+    expect(a).toMatchObject({ icone: "proprio", iconeUrl: "https://cdn/x.png" });
+    expect(b?.iconeUrl ?? null).toBeNull();
+  });
 });

@@ -1,6 +1,6 @@
 import { pwaHeadLinks } from "@/lib/pwa-manifest";
 import { createFileRoute, useParams } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowDown,
@@ -9,8 +9,11 @@ import {
   ExternalLink,
   Eye,
   EyeOff,
+  ImagePlus,
   Loader2,
+  Palette,
   Plus,
+  Star,
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -22,6 +25,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { HubIcone } from "@/components/hub/HubIcone";
+import { IconPicker, type IconeEscolhido } from "@/components/hub/IconPicker";
+import { enviarImagemDaEmpresa } from "@/lib/assets";
+import { detectarIcone } from "@/lib/hub-icons";
 import { fetchPerfil, reordenar, tabela } from "@/lib/cardapio";
 import { buildHubItens, urlSegura, type HubDados } from "@/lib/hub";
 import { cn } from "@/lib/utils";
@@ -42,6 +50,9 @@ type LinkRow = {
   url: string;
   ordem: number;
   ativo: boolean;
+  icone: string | null;
+  icone_url: string | null;
+  destaque: boolean;
 };
 
 function LinksAdminPage() {
@@ -54,6 +65,12 @@ function LinksAdminPage() {
   const [instagram, setInstagram] = useState("");
   const [titulo, setTitulo] = useState("");
   const [url, setUrl] = useState("");
+  const [descricao, setDescricao] = useState("");
+  const [novoIcone, setNovoIcone] = useState<IconeEscolhido>({ icone: null, icone_url: null });
+  const [novoDestaque, setNovoDestaque] = useState(false);
+  const [seletor, setSeletor] = useState<null | { id: string | "novo"; titulo: string }>(null);
+  const [enviandoBanner, setEnviandoBanner] = useState(false);
+  const arquivoBanner = useRef<HTMLInputElement>(null);
 
   const perfilQ = useQuery({
     enabled: !!tenantId,
@@ -80,6 +97,9 @@ function LinksAdminPage() {
   useEffect(() => {
     setInstagram(perfilQ.data?.instagram ?? "");
   }, [perfilQ.data?.instagram]);
+  useEffect(() => {
+    setDescricao(perfilQ.data?.hub_descricao ?? "");
+  }, [perfilQ.data?.hub_descricao]);
 
   const links = useMemo(
     () => [...(linksQ.data ?? [])].sort((a, b) => a.ordem - b.ordem),
@@ -87,12 +107,37 @@ function LinksAdminPage() {
   );
   const hubPublicado = perfilQ.data?.hub_publicado ?? true;
   const cardapioPublicado = perfilQ.data?.cardapio_publicado ?? false;
+  const mostrarCardapio = perfilQ.data?.hub_mostrar_cardapio ?? true;
+  const bannerUrl = perfilQ.data?.hub_banner_url ?? null;
+  const bannerAtivo = perfilQ.data?.hub_banner_ativo ?? false;
+  const descricaoValida = descricao.length <= 280;
+
+  async function enviarBanner(file: File | undefined) {
+    if (!file || !tenantId) return;
+    setEnviandoBanner(true);
+    try {
+      const url = await enviarImagemDaEmpresa(tenantId, "banner", file);
+      salvarPerfil.mutate({ hub_banner_url: url, hub_banner_ativo: true });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Não foi possível enviar o banner.");
+    } finally {
+      setEnviandoBanner(false);
+      if (arquivoBanner.current) arquivoBanner.current.value = "";
+    }
+  }
 
   const invalidar = () => qc.invalidateQueries({ queryKey: ["hub-admin"] });
   const falha = (msg: string) => () => toast.error(msg);
 
   const salvarPerfil = useMutation({
-    mutationFn: async (campos: { instagram?: string | null; hub_publicado?: boolean }) => {
+    mutationFn: async (campos: {
+      instagram?: string | null;
+      hub_publicado?: boolean;
+      hub_descricao?: string | null;
+      hub_banner_url?: string | null;
+      hub_banner_ativo?: boolean;
+      hub_mostrar_cardapio?: boolean;
+    }) => {
       const { error } = await tabela("tenant_perfil").upsert(
         { tenant_id: tenantId!, ...campos },
         { onConflict: "tenant_id" },
@@ -114,6 +159,9 @@ function LinksAdminPage() {
         titulo: titulo.trim(),
         url: url.trim(),
         ordem,
+        icone: novoIcone.icone,
+        icone_url: novoIcone.icone_url,
+        destaque: novoDestaque,
       });
       if (error) throw new Error(error.message);
     },
@@ -121,16 +169,25 @@ function LinksAdminPage() {
       toast.success("Link adicionado.");
       setTitulo("");
       setUrl("");
+      setNovoIcone({ icone: null, icone_url: null });
+      setNovoDestaque(false);
       invalidar();
     },
     onError: falha("Não foi possível adicionar o link."),
   });
 
   const alternar = useMutation({
-    mutationFn: async (a: { id: string; ativo: boolean }) => {
+    mutationFn: async (a: {
+      id: string;
+      ativo?: boolean;
+      destaque?: boolean;
+      icone?: string | null;
+      icone_url?: string | null;
+    }) => {
+      const { id, ...campos } = a;
       const { error } = await tabela("hub_links")
-        .update({ ativo: a.ativo })
-        .eq("id", a.id)
+        .update(campos)
+        .eq("id", id)
         .eq("tenant_id", tenantId!);
       if (error) throw new Error(error.message);
     },
@@ -180,6 +237,7 @@ function LinksAdminPage() {
     telefone: tenant?.telefone_contato ?? null,
     instagram: perfilQ.data?.instagram ?? null,
     cardapio_publicado: cardapioPublicado,
+    mostrar_cardapio: mostrarCardapio,
     tipos_aceitos: tenant?.tipos_aceitos ?? ["mesa"],
     links: [],
   };
@@ -239,7 +297,145 @@ function LinksAdminPage() {
         </section>
 
         <section className="mt-4 rounded-xl border border-border bg-card p-4">
-          <h2 className="text-base font-bold">Instagram</h2>
+          <h2 className="text-base font-semibold">Banner e descrição</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            A imagem aparece no topo da página. Use 1200 × 400 px (proporção 3:1). Reduzimos e
+            otimizamos para o celular ao enviar.
+          </p>
+
+          <div className="mt-3 overflow-hidden rounded-xl border border-border bg-slate-50">
+            {bannerUrl ? (
+              <img
+                src={bannerUrl}
+                alt="Prévia do banner"
+                width={1200}
+                height={400}
+                className={cn(
+                  "aspect-[3/1] w-full object-cover",
+                  !bannerAtivo && "opacity-40 grayscale",
+                )}
+              />
+            ) : (
+              <div className="grid aspect-[3/1] w-full place-items-center text-sm text-muted-foreground">
+                Sem banner. A página abre direto com o nome do restaurante.
+              </div>
+            )}
+          </div>
+
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <input
+              ref={arquivoBanner}
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              className="sr-only"
+              aria-label="Enviar banner"
+              onChange={(e) => void enviarBanner(e.target.files?.[0])}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              disabled={enviandoBanner || !tenantId}
+              onClick={() => arquivoBanner.current?.click()}
+              className="h-11 rounded-md"
+            >
+              {enviandoBanner ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <ImagePlus className="mr-2 h-4 w-4" />
+              )}
+              {bannerUrl ? "Trocar imagem" : "Enviar imagem"}
+            </Button>
+            {bannerUrl && (
+              <>
+                <div className="flex items-center gap-2">
+                  <Switch
+                    id="banner-ativo"
+                    checked={bannerAtivo}
+                    disabled={salvarPerfil.isPending}
+                    onCheckedChange={(v) => salvarPerfil.mutate({ hub_banner_ativo: v })}
+                    aria-label="Mostrar banner"
+                  />
+                  <Label htmlFor="banner-ativo" className="text-sm font-medium">
+                    Mostrar banner
+                  </Label>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() =>
+                    salvarPerfil.mutate({ hub_banner_url: null, hub_banner_ativo: false })
+                  }
+                  className="h-11 rounded-md"
+                >
+                  Remover
+                </Button>
+              </>
+            )}
+          </div>
+
+          <div className="mt-5">
+            <Label htmlFor="hub-descricao" className="text-sm font-medium">
+              Descrição curta
+            </Label>
+            <Textarea
+              id="hub-descricao"
+              value={descricao}
+              onChange={(e) => setDescricao(e.target.value)}
+              rows={2}
+              maxLength={300}
+              placeholder="Ex.: Comida mineira no coração de Santa Tereza."
+              className="mt-1.5"
+            />
+            <div className="mt-2 flex items-center justify-between gap-3">
+              <p className="text-xs text-muted-foreground">{descricao.length}/280</p>
+              <Button
+                onClick={() => salvarPerfil.mutate({ hub_descricao: descricao.trim() || null })}
+                disabled={!descricaoValida || salvarPerfil.isPending}
+                className="h-11 rounded-md"
+              >
+                Salvar descrição
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-4 rounded-xl border border-border bg-card p-4">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="text-base font-semibold">Cardápio no Link Hub</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {cardapioPublicado ? (
+                  "Ligado, o botão Cardápio aparece logo depois de Reservar mesa."
+                ) : (
+                  <>
+                    O cardápio ainda não está publicado.{" "}
+                    <a
+                      href={`/${slug}/admin/cardapio`}
+                      className="font-medium text-primary underline-offset-2 hover:underline"
+                    >
+                      Publicar cardápio
+                    </a>
+                  </>
+                )}
+              </p>
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <Switch
+                id="mostrar-cardapio"
+                checked={mostrarCardapio}
+                disabled={perfilQ.isLoading || salvarPerfil.isPending}
+                onCheckedChange={(v) => salvarPerfil.mutate({ hub_mostrar_cardapio: v })}
+                aria-label="Mostrar cardápio"
+              />
+              <Label htmlFor="mostrar-cardapio" className="text-sm font-medium">
+                Mostrar cardápio
+              </Label>
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-4 rounded-xl border border-border bg-card p-4">
+          <h2 className="text-base font-semibold">Instagram</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Só o usuário, sem o endereço completo.
           </p>
@@ -269,7 +465,7 @@ function LinksAdminPage() {
         </section>
 
         <section className="mt-4 rounded-xl border border-border bg-card p-4">
-          <h2 className="text-base font-bold">Links automáticos</h2>
+          <h2 className="text-base font-semibold">Links automáticos</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Saem dos dados do restaurante. Para mudar WhatsApp, telefone ou endereço, use{" "}
             <a
@@ -283,7 +479,10 @@ function LinksAdminPage() {
           <ul className="mt-3 divide-y divide-border/70">
             {automaticos.map((i) => (
               <li key={i.id} className="flex items-center justify-between gap-3 py-2.5 text-sm">
-                <span className="font-medium">{i.rotulo}</span>
+                <span className="inline-flex items-center gap-2.5 font-medium">
+                  <HubIcone chave={i.icone} className="h-[18px] w-[18px]" />
+                  {i.rotulo}
+                </span>
                 <span className="truncate text-xs text-muted-foreground">
                   {i.tipo === "reserva"
                     ? "sempre em primeiro"
@@ -297,9 +496,10 @@ function LinksAdminPage() {
         </section>
 
         <section className="mt-4 rounded-xl border border-border bg-card p-4">
-          <h2 className="text-base font-bold">Links extras</h2>
+          <h2 className="text-base font-semibold">Links extras</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Aparecem depois dos automáticos. Aceitamos http(s), telefone (tel:) e e-mail (mailto:).
+            Destaques aparecem logo depois do Cardápio, com ícone maior. Os demais vêm no fim.
+            Aceitamos http(s), telefone (tel:) e e-mail (mailto:).
           </p>
 
           {linksQ.isLoading ? (
@@ -316,11 +516,38 @@ function LinksAdminPage() {
                   key={l.id}
                   className={cn("flex flex-wrap items-center gap-3 py-3", !l.ativo && "opacity-60")}
                 >
+                  <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-slate-50">
+                    <HubIcone
+                      chave={l.icone ?? detectarIcone(l.url) ?? "link"}
+                      iconeUrl={l.icone_url}
+                      colorido
+                      className="h-5 w-5"
+                    />
+                  </span>
                   <div className="min-w-0 flex-1">
-                    <p className="break-words text-sm font-semibold">{l.titulo}</p>
+                    <p className="break-words text-sm font-semibold">
+                      {l.titulo}
+                      {l.destaque && (
+                        <span className="ml-2 rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-700">
+                          Destaque
+                        </span>
+                      )}
+                    </p>
                     <p className="truncate text-xs text-muted-foreground">{l.url}</p>
                   </div>
                   <div className="flex shrink-0 items-center gap-1">
+                    <Btn
+                      label={`Escolher ícone de ${l.titulo}`}
+                      onClick={() => setSeletor({ id: l.id, titulo: l.titulo })}
+                    >
+                      <Palette className="h-4 w-4" />
+                    </Btn>
+                    <Btn
+                      label={l.destaque ? `Tirar destaque de ${l.titulo}` : `Destacar ${l.titulo}`}
+                      onClick={() => alternar.mutate({ id: l.id, destaque: !l.destaque })}
+                    >
+                      <Star className={cn("h-4 w-4", l.destaque && "fill-current text-blue-700")} />
+                    </Btn>
                     <Btn
                       label={`Subir ${l.titulo}`}
                       disabled={i === 0}
@@ -375,6 +602,32 @@ function LinksAdminPage() {
             <Button type="submit" disabled={!podeAdicionar} className="h-11 rounded-md">
               <Plus className="mr-1.5 h-4 w-4" /> Adicionar
             </Button>
+            <div className="flex flex-wrap items-center gap-4 sm:col-span-3">
+              <button
+                type="button"
+                onClick={() => setSeletor({ id: "novo", titulo: titulo.trim() })}
+                className="inline-flex min-h-11 items-center gap-2 rounded-md border border-border px-3 text-sm font-medium hover:bg-accent"
+              >
+                <HubIcone
+                  chave={novoIcone.icone ?? detectarIcone(url) ?? "link"}
+                  iconeUrl={novoIcone.icone_url}
+                  colorido
+                  className="h-5 w-5"
+                />
+                Ícone
+              </button>
+              <div className="flex items-center gap-2">
+                <Switch
+                  id="novo-destaque"
+                  checked={novoDestaque}
+                  onCheckedChange={setNovoDestaque}
+                  aria-label="Destacar link"
+                />
+                <Label htmlFor="novo-destaque" className="text-sm font-medium">
+                  Destaque (ex.: iFood, 99Food)
+                </Label>
+              </div>
+            </div>
           </form>
           {url.trim() && !urlSegura(url) && (
             <p className="mt-2 text-xs text-destructive">
@@ -383,6 +636,26 @@ function LinksAdminPage() {
           )}
         </section>
       </div>
+      {tenantId && seletor && (
+        <IconPicker
+          aberto
+          onFechar={() => setSeletor(null)}
+          tenantId={tenantId}
+          titulo={seletor.titulo}
+          atual={
+            seletor.id === "novo"
+              ? novoIcone
+              : (() => {
+                  const l = links.find((x) => x.id === seletor.id);
+                  return { icone: l?.icone ?? null, icone_url: l?.icone_url ?? null };
+                })()
+          }
+          onSalvar={(v) => {
+            if (seletor.id === "novo") setNovoIcone(v);
+            else alternar.mutate({ id: seletor.id, icone: v.icone, icone_url: v.icone_url });
+          }}
+        />
+      )}
     </AdminShell>
   );
 }

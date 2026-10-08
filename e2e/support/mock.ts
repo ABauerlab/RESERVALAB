@@ -304,6 +304,23 @@ export async function installMock(context: BrowserContext, initial: Mode = "data
       }
       if (p.startsWith("/auth/v1")) return json(route, sessionJson().user);
 
+      // Storage: envio aceito; arquivos publicos devolvem um PNG 1x1 para a imagem carregar.
+      if (p.startsWith("/storage/v1/object/public/")) {
+        return route.fulfill({
+          status: 200,
+          contentType: "image/png",
+          headers: { "access-control-allow-origin": "*" },
+          body: Buffer.from(
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+            "base64",
+          ),
+        });
+      }
+      if (p.startsWith("/storage/v1/object/") && method === "POST") {
+        mock.writes.push({ method, url: req.url(), body: "[arquivo]" });
+        return json(route, { Key: p.replace("/storage/v1/object/", ""), Id: "arquivo-1" });
+      }
+
       if (p.includes("/rpc/")) {
         const name = p.split("/rpc/")[1]!;
         let body: unknown = null;
@@ -348,10 +365,21 @@ export async function installMock(context: BrowserContext, initial: Mode = "data
             telefone: tenant.telefone_contato,
             instagram: perfil.instagram,
             cardapio_publicado: perfil.cardapio_publicado,
+            mostrar_cardapio: perfil.hub_mostrar_cardapio ?? true,
+            descricao: perfil.hub_descricao ?? null,
+            banner_url: perfil.hub_banner_ativo ? (perfil.hub_banner_url ?? null) : null,
             tipos_aceitos: tenant.tipos_aceitos,
             links: mock.state.hubLinks
               .filter((l) => l.ativo)
-              .map((l) => ({ id: l.id, titulo: l.titulo, url: l.url })),
+              .sort((a, b) => Number(!!b.destaque) - Number(!!a.destaque))
+              .map((l) => ({
+                id: l.id,
+                titulo: l.titulo,
+                url: l.url,
+                icone: l.icone ?? null,
+                icone_url: l.icone_url ?? null,
+                destaque: !!l.destaque,
+              })),
           });
         }
         if (name === "marca_do_tenant") return json(route, mock.state.marca);

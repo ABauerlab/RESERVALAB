@@ -1,3 +1,4 @@
+import { IconeWhatsApp } from "@/components/brand/BrandIcons";
 import { useMarcaLogo } from "@/components/public/MarcaScope";
 import { comMarca } from "@/components/public/MarcaScope";
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
@@ -12,7 +13,6 @@ import {
   Loader2,
   PartyPopper,
   BookOpen,
-  MessageCircle,
   MapPin,
   Phone,
 } from "lucide-react";
@@ -236,7 +236,7 @@ function ContatoRapido({
   const tel = telefone ? telefone.replace(/[^\d+]/g, "") : "";
   const itens = [
     cardapioHref && { href: cardapioHref, rotulo: "Cardápio", Icone: BookOpen, externo: false },
-    wa && { href: `https://wa.me/${wa}`, rotulo: "WhatsApp", Icone: MessageCircle, externo: true },
+    wa && { href: `https://wa.me/${wa}`, rotulo: "WhatsApp", Icone: IconeWhatsApp, externo: true },
     tel && { href: `tel:${tel}`, rotulo: "Ligar", Icone: Phone, externo: false },
     endereco && {
       href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endereco)}`,

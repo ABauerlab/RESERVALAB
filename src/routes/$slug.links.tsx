@@ -1,20 +1,12 @@
 import { comMarca } from "@/components/public/MarcaScope";
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import {
-  BookOpen,
-  CalendarCheck,
-  ExternalLink,
-  Instagram,
-  Loader2,
-  MapPin,
-  MessageCircle,
-  Phone,
-} from "lucide-react";
+import { Loader2 } from "lucide-react";
 
+import { HubIcone } from "@/components/hub/HubIcone";
 import { EstadoPublico, PublicShell } from "@/components/public/PublicShell";
-import { buildHubItens, fetchHub, type HubItem } from "@/lib/hub";
-import { cn } from "@/lib/utils";
+import { buildHubItens, fetchHub } from "@/lib/hub";
+import { iconeUrlSegura } from "@/lib/hub-icons";
 
 export const Route = createFileRoute("/$slug/links")({
   head: ({ params }) => ({
@@ -25,16 +17,6 @@ export const Route = createFileRoute("/$slug/links")({
   }),
   component: comMarca(HubPublicoPage),
 });
-
-const ICONES: Record<HubItem["tipo"], typeof Phone> = {
-  reserva: CalendarCheck,
-  cardapio: BookOpen,
-  whatsapp: MessageCircle,
-  instagram: Instagram,
-  localizacao: MapPin,
-  telefone: Phone,
-  extra: ExternalLink,
-};
 
 function HubPublicoPage() {
   const { slug } = useParams({ from: "/$slug/links" });
@@ -91,26 +73,72 @@ function HubPublicoPage() {
     );
   }
 
-  const itens = buildHubItens(hubQ.data, slug);
+  const hub = hubQ.data;
+  const itens = buildHubItens(hub, slug);
+  const banner = iconeUrlSegura(hub.banner_url) ? hub.banner_url : null;
 
   return (
-    <PublicShell nome={hubQ.data.nome}>
+    <PublicShell
+      nome={hub.nome}
+      subtitulo={hub.descricao?.trim() || undefined}
+      capa={
+        banner && (
+          <img
+            src={banner}
+            alt=""
+            width={1200}
+            height={400}
+            decoding="async"
+            className="aspect-[3/1] w-full rounded-2xl border border-border bg-slate-100 object-cover"
+          />
+        )
+      }
+    >
       <ul className="space-y-3">
         {itens.map((item) => {
-          const Icone = ICONES[item.tipo];
+          const externo = item.interno ? {} : { target: "_blank", rel: "noopener noreferrer" };
+          if (item.principal) {
+            return (
+              <li key={item.id}>
+                <a
+                  href={item.href}
+                  className="flex h-14 w-full items-center justify-center gap-2.5 rounded-xl bg-primary px-5 text-[15px] font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-blue-700"
+                >
+                  <HubIcone chave={item.icone} className="h-[18px] w-[18px]" />
+                  {item.rotulo}
+                </a>
+              </li>
+            );
+          }
+          if (item.destaque) {
+            return (
+              <li key={item.id}>
+                <a
+                  href={item.href}
+                  {...externo}
+                  className="flex h-16 w-full items-center gap-3.5 rounded-xl border border-slate-300 bg-card px-4 text-[15px] font-semibold text-foreground shadow-sm transition-colors hover:bg-accent"
+                >
+                  <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-slate-50">
+                    <HubIcone
+                      chave={item.icone}
+                      iconeUrl={item.iconeUrl}
+                      colorido
+                      className="h-6 w-6"
+                    />
+                  </span>
+                  <span className="min-w-0 flex-1 truncate">{item.rotulo}</span>
+                </a>
+              </li>
+            );
+          }
           return (
             <li key={item.id}>
               <a
                 href={item.href}
-                {...(item.interno ? {} : { target: "_blank", rel: "noopener noreferrer" })}
-                className={cn(
-                  "flex w-full items-center justify-center gap-2.5 rounded-xl px-5 text-[15px] font-semibold transition-colors",
-                  item.destaque
-                    ? "h-14 bg-primary text-primary-foreground shadow-sm hover:bg-blue-700"
-                    : "h-12 border border-border bg-card text-foreground hover:bg-accent",
-                )}
+                {...externo}
+                className="flex h-12 w-full items-center justify-center gap-2.5 rounded-xl border border-border bg-card px-5 text-[15px] font-semibold text-foreground transition-colors hover:bg-accent"
               >
-                <Icone className="h-[18px] w-[18px]" aria-hidden="true" />
+                <HubIcone chave={item.icone} iconeUrl={item.iconeUrl} />
                 {item.rotulo}
               </a>
             </li>

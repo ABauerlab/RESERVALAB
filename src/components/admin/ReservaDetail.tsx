@@ -1,3 +1,4 @@
+import { IconeWhatsApp } from "@/components/brand/BrandIcons";
 import { useEffect, useState } from "react";
 import {
   Calendar,
@@ -14,7 +15,6 @@ import {
   Trash2,
   CheckCircle2,
   BellRing,
-  MessageCircle,
   RotateCcw,
   Save,
   Loader2,
@@ -60,7 +60,7 @@ const LABEL: Record<DetailAction, string> = {
   excluir: "Excluir",
 };
 const ICON: Record<DetailAction, React.ComponentType<{ className?: string }>> = {
-  confirmar: MessageCircle,
+  confirmar: IconeWhatsApp,
   confirmar_sem_avisar: CheckCircle2,
   reconfirmar: BellRing,
   finalizar: CheckCircle2,

@@ -69,3 +69,8 @@ export function BrandIcon({
     </svg>
   );
 }
+
+/** Atalho para quem espera um componente de icone simples (className). */
+export function IconeWhatsApp({ className }: { className?: string }) {
+  return <BrandIcon marca="whatsapp" className={className} />;
+}
