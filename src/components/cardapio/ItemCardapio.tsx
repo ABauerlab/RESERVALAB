@@ -92,8 +92,13 @@ export function ItemDoCardapio({
           <span className="break-words text-[15px] font-semibold leading-snug text-foreground">
             {item.nome}
           </span>
-          {item.descricao && !temFoto && (
-            <span className="mt-1 line-clamp-3 text-[13px] leading-snug text-muted-foreground">
+          {item.descricao && (
+            <span
+              className={cn(
+                "mt-1 text-[13px] leading-snug text-muted-foreground",
+                temFoto ? "line-clamp-2" : "line-clamp-4",
+              )}
+            >
               {item.descricao}
             </span>
           )}

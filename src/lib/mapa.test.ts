@@ -46,3 +46,18 @@ describe("urlDeMapaValida", () => {
     expect(urlDeMapaValida("https://maps.google.com/?q=x")).toBe(false);
   });
 });
+
+describe("iframe de referência do Google Maps (Iracema)", () => {
+  const SRC =
+    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3751.138297681434!2d-43.92750982388556!3d-19.918576137954766!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xa699cf9028e6f3%3A0x98fd4b62d5e43837!2sIracema!5e0!3m2!1spt-BR!2sbr!4v1791482620558!5m2!1spt-BR!2sbr";
+  const IFRAME = `<iframe src="${SRC}" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+
+  it("extrai só a URL de incorporação, descartando atributos e estilo", () => {
+    expect(extrairMapaEmbed(IFRAME)).toEqual({ ok: true, url: SRC });
+  });
+
+  it("aceita a URL pura e nunca guarda nada além da URL, mesmo com script junto", () => {
+    expect(extrairMapaEmbed(SRC)).toEqual({ ok: true, url: SRC });
+    expect(extrairMapaEmbed(`${IFRAME}<script>alert(1)</script>`)).toEqual({ ok: true, url: SRC });
+  });
+});

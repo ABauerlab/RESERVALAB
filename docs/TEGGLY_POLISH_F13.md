@@ -38,3 +38,9 @@ Resumo do que foi entregue e do que fica para depois. Detalhes por PR no GitHub.
 - **Open Graph por restaurante** (`src/lib/og.ts`): o preview de `/{slug}`, `/{slug}/links` e `/{slug}/cardapio` usa o nome, o selo, a frase e a imagem da casa (banner do Link Hub, senão foto de um prato do cardápio publicado, senão a imagem padrão). Gerado no servidor a partir de conteúdo já público; sem dados, cai no preview genérico. Uma arte de compartilhamento desenhada automaticamente (texto sobre a foto) exigiria uma biblioteca de rasterização no servidor; fica como evolução.
 - **Arrastar no cardápio**: categorias e itens se reordenam arrastando (mouse, toque segurando um instante, teclado: espaço, setas, espaço). As setas continuam como alternativa. Usa `@dnd-kit` (só no painel).
 - **Fotos do Iracema**: 60 itens receberam as fotos do novo ensaio (`produto-<id>-ensaio.webp`, até 900 px, WebP). Ficaram sem foto: Acréscimo de molho, Soda italiana e o item inativo da categoria "Comida di Buteco".
+
+## F15: ajustes finais
+
+- Cardapio: textos de 49 itens do Iracema revisados (`f15_iracema_textos_revisados.sql`); a descricao aparece em todos os layouts, inclusive cards com foto e na faixa de destaques.
+- Mapa: causa raiz do erro ao salvar era o CHECK do banco (`{10,2000}` passa do limite 255 do Postgres). Corrigido em `f15_mapa_check.sql`. O app guarda so a URL `https://www.google.com/maps/embed?pb=...` extraida do iframe.
+- Link Hub: selo removido (e a secao do painel), endereco completo no cabecalho, card de EVENTO (badge, data, hora, "Ver"), botoes com profundidade e micro-interacoes em React (`HubBotao`), delivery (iFood/99Food) com prioridade e etiqueta. Destinos inalterados.
