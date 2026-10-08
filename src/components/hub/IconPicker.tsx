@@ -74,7 +74,7 @@ export function IconPicker({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex items-center gap-3 rounded-xl border border-border bg-slate-50 p-3">
+        <div className="flex items-center gap-3 rounded-lg border border-border bg-slate-50 p-3">
           <span className="grid size-12 place-items-center rounded-lg bg-card">
             <HubIcone chave={sel.icone} iconeUrl={sel.icone_url} colorido className="h-7 w-7" />
           </span>
@@ -119,7 +119,7 @@ export function IconPicker({
           ))}
         </div>
 
-        <div className="rounded-xl border border-dashed border-border p-3">
+        <div className="rounded-lg border border-dashed border-border p-3">
           <input
             ref={arquivo}
             type="file"

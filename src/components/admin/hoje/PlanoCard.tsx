@@ -12,7 +12,7 @@ export function PlanoCard({ slug, plano, uso }: { slug: string; plano: Plano; us
         ? "bg-warning-500"
         : "bg-primary";
   return (
-    <section aria-label="Seu plano" className="mt-8 rounded-2xl border border-border bg-card p-4">
+    <section aria-label="Seu plano" className="mt-8 rounded-lg border border-border bg-card p-4">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm font-semibold">
           Plano {plano.nome}

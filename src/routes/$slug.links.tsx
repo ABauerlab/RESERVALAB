@@ -89,7 +89,7 @@ function HubPublicoPage() {
             width={1200}
             height={400}
             decoding="async"
-            className="aspect-[3/1] w-full rounded-2xl border border-border bg-slate-100 object-cover"
+            className="aspect-[3/1] w-full rounded-lg border border-border bg-slate-100 object-cover"
           />
         )
       }
@@ -102,7 +102,7 @@ function HubPublicoPage() {
               <li key={item.id}>
                 <a
                   href={item.href}
-                  className="flex h-14 w-full items-center justify-center gap-2.5 rounded-xl bg-primary px-5 text-[15px] font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-blue-700"
+                  className="flex h-14 w-full items-center justify-center gap-2.5 rounded-[10px] bg-primary px-5 text-[15px] font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-blue-700"
                 >
                   <HubIcone chave={item.icone} className="h-[18px] w-[18px]" />
                   {item.rotulo}
@@ -116,7 +116,7 @@ function HubPublicoPage() {
                 <a
                   href={item.href}
                   {...externo}
-                  className="flex h-16 w-full items-center gap-3.5 rounded-xl border border-slate-300 bg-card px-4 text-[15px] font-semibold text-foreground shadow-sm transition-colors hover:bg-accent"
+                  className="flex h-16 w-full items-center gap-3.5 rounded-lg border border-slate-300 bg-card px-4 text-[15px] font-semibold text-foreground shadow-sm transition-colors hover:bg-accent"
                 >
                   <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-slate-50">
                     <HubIcone
@@ -136,7 +136,7 @@ function HubPublicoPage() {
               <a
                 href={item.href}
                 {...externo}
-                className="flex h-12 w-full items-center justify-center gap-2.5 rounded-xl border border-border bg-card px-5 text-[15px] font-semibold text-foreground transition-colors hover:bg-accent"
+                className="flex h-12 w-full items-center justify-center gap-2.5 rounded-[10px] border border-border bg-card px-5 text-[15px] font-semibold text-foreground transition-colors hover:bg-accent"
               >
                 <HubIcone chave={item.icone} iconeUrl={item.iconeUrl} />
                 {item.rotulo}

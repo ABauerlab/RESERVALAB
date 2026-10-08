@@ -28,7 +28,7 @@ export function ClientesDeCasa({
           Ver clientes
         </Link>
       </div>
-      <ul className="divide-y divide-border/70 overflow-hidden rounded-2xl border border-border bg-card">
+      <ul className="divide-y divide-border/70 overflow-hidden rounded-lg border border-border bg-card">
         {itens.map((c) => (
           <li key={c.reserva.id}>
             <button

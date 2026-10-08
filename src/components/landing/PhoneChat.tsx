@@ -1,15 +1,15 @@
 import { Drop } from "@/components/admin/Drop";
 
 /**
- * Conversa de exemplo no WhatsApp, escrita com o texto que o sistema realmente envia
- * (confirmacao com codigo, data e pessoas). Ilustracao: nomes e horarios sao de exemplo.
+ * Conversa de exemplo no WhatsApp. Reflete o produto real: o Assistente responde e envia o link; quem
+ * reserva e o cliente, pela pagina da casa; a confirmacao com codigo, data e pessoas e enviada pelo sistema. Ilustracao: nomes e horarios sao de exemplo.
  */
 export function PhoneChat() {
   return (
     <div
-      className="relative mx-auto w-[272px] rounded-[2.4rem] border-[7px] border-slate-900 bg-slate-900 shadow-lg sm:w-[300px]"
+      className="relative mx-auto w-[272px] motion-safe:animate-drop rounded-[2.4rem] border-[7px] border-slate-900 bg-slate-900 shadow-lg sm:w-[300px]"
       role="img"
-      aria-label="Exemplo de conversa no WhatsApp: o cliente pede mesa para sábado e recebe a reserva confirmada com código."
+      aria-label="Exemplo de conversa no WhatsApp: o cliente pede mesa, o Assistente envia o link de reserva e a confirmação chega com o código."
     >
       <div className="overflow-hidden rounded-[1.9rem] bg-[#ECE5DD]">
         <div className="flex items-center gap-3 bg-card px-4 py-3">
@@ -29,16 +29,19 @@ export function PhoneChat() {
             <p className="mb-1 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-blue-700">
               <span className="ai-pulse" aria-hidden="true" /> Assistente
             </p>
-            <p>Tenho 19:30, 20:00 e 21:00. Qual você prefere?</p>
+            <p>Posso te mandar o link para reservar. Quer?</p>
           </div>
           <p className="ml-auto w-fit max-w-[80%] rounded-xl rounded-tr-sm bg-[#D9FDD3] px-3 py-2 text-slate-900 shadow-xs">
-            20:00, por favor.
+            Quero, por favor.
           </p>
           <div className="w-fit max-w-[88%] rounded-xl rounded-tl-sm bg-card px-3 py-2 text-slate-900 shadow-xs">
-            <p className="font-semibold">Reserva confirmada.</p>
+            <p className="font-semibold">Ana, sua reserva está confirmada.</p>
             <p className="mt-1 text-slate-700">
-              Sáb, 21 jun · 20:00
-              <br />4 pessoas
+              Sábado, 21 de junho
+              <br />
+              Horário: 20:00
+              <br />
+              Pessoas: 4
               <br />
               Código: CE-2M8Q4L
             </p>
@@ -46,7 +49,7 @@ export function PhoneChat() {
           </div>
         </div>
       </div>
-      <div className="pointer-events-none absolute -bottom-7 -right-8 hidden items-center gap-2 rounded-2xl border border-border bg-card px-4 py-3 shadow-lg sm:flex">
+      <div className="pointer-events-none absolute -bottom-7 -right-8 hidden items-center gap-2 rounded-lg border border-border bg-card px-4 py-3 shadow-lg sm:flex">
         <Drop className="animate-drop" />
         <div className="leading-tight">
           <p className="text-xs font-semibold text-success-700">Confirmada</p>

@@ -1,7 +1,8 @@
 /**
  * Planos do Teggly (sem billing). Fonte unica de precos, limites e recursos para o site, a tela
- * "Seu plano" e qualquer checagem de recurso. Valores de lancamento: ver
- * docs/TEGGLY_PRICING_STRATEGY.md. Nenhuma cobranca existe ainda; nada aqui bloqueia a empresa.
+ * "Seu plano" e qualquer checagem de recurso. Precos e limites sao HIPOTESE COMERCIAL INICIAL
+ * (premissas numeradas em docs/TEGGLY_PRICING_STRATEGY.md). Nenhuma cobranca existe ainda; nada aqui
+ * bloqueia a empresa.
  */
 
 export type PlanoId = "gratuito" | "essencial" | "pro";

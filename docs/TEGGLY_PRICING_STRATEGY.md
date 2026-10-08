@@ -1,5 +1,7 @@
 # Teggly: estratégia de preço e planos
 
+> **Hipótese comercial inicial.** Preços, limites e margens abaixo são uma proposta de lançamento, não uma decisão fechada. Cada premissa está numerada na seção "Premissas e como validar". Nada aqui é cobrado hoje (não há billing).
+
 Base: `TEGGLY_MARKET_PRICING_RESEARCH.md`. **Todos os preços e limites abaixo são propostas de lançamento, a validar com custo real de mensagens e com os primeiros clientes.** Premissas de custo e de conversão são hipóteses de trabalho e estão marcadas como tais. Não há billing: nenhum plano é cobrado no produto.
 
 ## 1. Planos propostos
@@ -89,3 +91,20 @@ Leitura: o Pro no teto de 800 reservas é o ponto frágil. Por isso o limite é 
 - Limites medidos (reservas do mês) e exibidos no painel, sem bloquear.
 - Tela "Seu plano" em Configurações e comparação, com contato por e-mail para mudar de plano.
 - Preparado para uma camada futura de cobrança (campo de plano e vigência; nenhum provedor integrado).
+
+## Premissas e como validar
+
+| # | Premissa | Fonte | Confiança | Como validar |
+|---|---|---|---|---|
+| H1 | A faixa de preço do segmento no Brasil é R$ 60 a R$ 300 por mês | Goomer, Anota AI, Saipos (páginas de terceiros, algumas de blog concorrente) | Média | Conferir as páginas oficiais e pedir proposta |
+| H2 | Freemium com limite por volume é norma (resOS 25 reservas por 30 dias, Goomer 30 pedidos) | resOS (página oficial), Goomer (guia de terceiro) | Média/alta | Revisar a cada trimestre |
+| H3 | 40 reservas/mês no Gratuito é "generoso" sem canibalizar o Essencial | Raciocínio sobre as âncoras H2 | Baixa | Distribuição real de reservas/mês das casas atendidas |
+| H4 | Custo por reserva com WhatsApp: 3 modelos de utilidade a ~R$ 0,05 = ~R$ 0,15 | Fornecedor de WhatsApp API (fontes divergem sobre mensagens na janela de 24 h) | Baixa | Tabela oficial da Meta e custo real do número em produção |
+| H5 | Assistente (IA) custa centavos por conversa e mensagens iniciadas pelo cliente na janela custam R$ 0 | Premissa interna | Baixa | Medir tokens e custo por conversa |
+| H6 | Conversão do grátis para o pago entre 3% e 5% | Meta de trabalho, sem fonte verificada | Baixa | Funil real (cadastros, 40 reservas atingidas, ativações) |
+| H7 | ARPU de ~R$ 119 (70% Essencial, 30% Pro) | Derivado de H6 e do mix suposto | Baixa | Mix real após 20 clientes |
+| H8 | O canal de WhatsApp é a API oficial (custo por mensagem) | **Não é verdade hoje**: o produto usa EvolutionAPI (não oficial) | n/a | Decisão do proprietário sobre migrar para a API oficial; muda custo e risco |
+| H9 | No-show cai com confirmação e lembrete | Intuição de produto; **nenhum benchmark brasileiro encontrado** | Baixa | Comparar faltas antes e depois nas casas atendidas. Não citar percentual publicamente até medir |
+| H10 | Planos pagos são ativados à mão pelo time (sem checkout) | Escopo atual | Alta | Revisar quando houver billing |
+
+Efeito de cada hipótese se falhar: H4 ou H8 sobem o custo e reduzem a margem do Pro; H3 define se o Gratuito atrai ou se esvazia o Essencial; H6 e H7 definem o ponto de equilíbrio.

@@ -76,7 +76,7 @@ export function EstadoPublico({
   acao?: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center">
+    <div className="rounded-lg border border-dashed border-border bg-card p-8 text-center">
       <p className="text-lg font-semibold text-foreground">{titulo}</p>
       <p className="mt-1.5 text-sm text-muted-foreground">{texto}</p>
       {acao && <div className="mt-5 flex justify-center">{acao}</div>}

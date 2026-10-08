@@ -63,7 +63,7 @@ export function PlanosSection() {
             <li
               key={id}
               className={cn(
-                "flex flex-col rounded-2xl border bg-card p-6 shadow-sm",
+                "flex flex-col rounded-lg border bg-card p-6 shadow-sm",
                 destaque ? "border-primary shadow-md ring-1 ring-primary" : "border-border",
               )}
             >
@@ -92,7 +92,7 @@ export function PlanosSection() {
               <p className="mt-6 rounded-xl bg-slate-50 px-4 py-3 text-sm">
                 <span className="font-semibold">{p.reservasPorMes} reservas por mês</span>
                 <span className="block text-xs text-slate-600">
-                  {p.usuarios} {p.usuarios === 1 ? "usuário" : "usuários"} no painel
+                  {p.usuarios} {p.usuarios === 1 ? "acesso" : "acessos"} ao painel
                 </span>
               </p>
               <ul className="mb-8 mt-5 space-y-2.5 text-sm">
@@ -122,7 +122,7 @@ export function PlanosSection() {
         })}
       </ul>
 
-      <details className="group mt-8 rounded-2xl border border-border bg-card">
+      <details className="group mt-8 rounded-lg border border-border bg-card">
         <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between px-5 text-sm font-semibold">
           Comparar os planos
           <span className="text-xs font-medium text-slate-600 group-open:hidden">Abrir</span>
@@ -193,9 +193,9 @@ export function PlanosSection() {
       </details>
 
       <p className="mt-6 max-w-3xl text-sm leading-relaxed text-slate-600">
-        Preços de lançamento. Sem fidelidade e sem taxa por reserva. O limite de reservas é um
-        aviso: nenhuma reserva fica escondida. Por enquanto, os planos são ativados pelo nosso time.
-        Para redes com várias unidades, fale com a gente.
+        Valores de lançamento, sujeitos a ajuste. Sem fidelidade e sem taxa por reserva. O limite de
+        reservas é um aviso: nenhuma reserva fica escondida. Por enquanto, os planos são ativados
+        pelo nosso time. Para redes com várias unidades, fale com a gente.
       </p>
     </div>
   );

@@ -14,7 +14,6 @@ import {
 import { BrandIcon } from "@/components/brand/BrandIcons";
 import { PhoneChat } from "@/components/landing/PhoneChat";
 import { PlanosSection } from "@/components/landing/PlanosSection";
-import { Reveal } from "@/components/landing/Reveal";
 import {
   Accordion,
   AccordionContent,
@@ -30,9 +29,9 @@ const DESCRICAO =
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Teggly | Mais reservas. Menos trabalho." },
+      { title: "Teggly · Mais reservas. Menos trabalho." },
       { name: "description", content: DESCRICAO },
-      { property: "og:title", content: "Teggly | Mais reservas. Menos trabalho." },
+      { property: "og:title", content: "Teggly · Mais reservas. Menos trabalho." },
       { property: "og:description", content: DESCRICAO },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://reserva.bauerlab.com.br/" },
@@ -67,6 +66,11 @@ export const Route = createFileRoute("/")({
 });
 
 /* ---------------------------------- UI ---------------------------------- */
+
+/** Brand System (Website): movimento so na entrada do hero. As secoes nao animam. */
+function Reveal({ children }: { children: React.ReactNode; delay?: number }) {
+  return <>{children}</>;
+}
 
 const CTA_ASSUNTO = "Quero começar com o Teggly";
 const CTA_CORPO = "Nome do restaurante:\nCidade:\nWhatsApp para contato:";
@@ -154,6 +158,10 @@ const faq = [
     a: "Não. O Teggly usa o número que o restaurante já tem. Seus clientes continuam falando com o mesmo contato.",
   },
   {
+    q: "O Assistente pode errar uma reserva?",
+    a: "Ele responde dúvidas, envia o link de reserva e só confirma ou cancela quando o próprio cliente pede, pelo sistema. Não inventa horário nem disponibilidade: se não souber, diz que vai confirmar com a casa.",
+  },
+  {
     q: "O cliente precisa baixar um app ou criar conta?",
     a: "Não. Ele reserva pelo seu link ou pelo WhatsApp, em poucos toques, e acompanha a reserva por um código.",
   },
@@ -183,7 +191,7 @@ const faq = [
 
 function Landing() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-white text-foreground">
       <a
         href="#conteudo"
         className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-50 focus:rounded-md focus:bg-card focus:px-3 focus:py-2 focus:text-sm focus:shadow-md"
@@ -237,14 +245,14 @@ function Landing() {
               <p className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700">
                 <span className="ai-pulse" aria-hidden="true" /> Assistente no WhatsApp
               </p>
-              <h1 className="mt-6 text-[2.75rem] font-extrabold leading-[1.02] tracking-[-0.035em] sm:text-6xl lg:text-[4.5rem]">
+              <h1 className="mt-6 text-[2.75rem] font-extrabold leading-[1.02] tracking-[-0.035em] sm:text-6xl lg:text-[3.5rem] xl:text-[4.5rem]">
                 Mais reservas.
                 <br />
                 Menos trabalho.
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-slate-600 sm:text-xl">
-                O Teggly atende, reserva, confirma e lembra seus clientes pelo WhatsApp, a qualquer
-                hora, com a marca do seu restaurante.
+                O Teggly recebe as reservas, confirma e lembra seus clientes pelo WhatsApp, a
+                qualquer hora, com a marca do seu restaurante.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <CTAPrimary />
@@ -260,6 +268,23 @@ function Landing() {
               <p className="mt-4 text-sm text-slate-600">
                 Plano Gratuito com cardápio incluído. Sem cartão.
               </p>
+              <ul className="mt-10 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-4">
+                {(
+                  [
+                    [CalendarCheck, "Reservas online"],
+                    [Bell, "Lembretes automáticos"],
+                    [Users, "Clientes e histórico"],
+                    [BarChart3, "Relatórios"],
+                  ] as const
+                ).map(([Icone, rotulo]) => (
+                  <li key={rotulo} className="flex flex-col items-start gap-2.5">
+                    <span className="grid size-14 place-items-center rounded-full bg-blue-50 text-blue-700">
+                      <Icone className="h-7 w-7" strokeWidth={1.5} aria-hidden="true" />
+                    </span>
+                    <span className="text-sm font-medium leading-snug">{rotulo}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
             <div className="relative isolate">
               <div
@@ -281,11 +306,11 @@ function Landing() {
           <div className="mx-auto max-w-[1200px] px-5">
             <Reveal>
               <Tag>O problema</Tag>
-              <H2>Reserva chega por todo lado. A casa fica sem fôlego.</H2>
+              <H2>Reserva chega por todo lado.</H2>
             </Reveal>
             <div className="mt-10 grid gap-5 md:grid-cols-2">
               <Reveal>
-                <div className="h-full rounded-2xl border border-border bg-card p-6 shadow-sm">
+                <div className="h-full rounded-lg border border-border bg-card p-6 shadow-sm">
                   <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-600">
                     Hoje
                   </p>
@@ -310,7 +335,7 @@ function Landing() {
                 </div>
               </Reveal>
               <Reveal delay={80}>
-                <div className="h-full rounded-2xl border border-primary bg-card p-6 shadow-md ring-1 ring-primary">
+                <div className="h-full rounded-lg border border-primary bg-card p-6 shadow-md ring-1 ring-primary">
                   <p className="text-xs font-semibold uppercase tracking-[0.08em] text-blue-700">
                     Com o Teggly
                   </p>
@@ -351,7 +376,7 @@ function Landing() {
                   },
                   {
                     t: "O Teggly resolve",
-                    d: "Confere a agenda, oferece horários, confirma e envia o código da reserva.",
+                    d: "Mostra os horários, confirma e envia o código da reserva.",
                   },
                   {
                     t: "Você abre a agenda",
@@ -424,17 +449,23 @@ function Landing() {
               </p>
             </Reveal>
             <Reveal delay={80}>
-              <ol className="relative space-y-6 rounded-2xl border border-white/10 bg-white/5 p-6 pl-12">
+              <ol className="relative space-y-6 rounded-lg border border-white/10 bg-white/5 p-6 pl-12">
                 <span
                   aria-hidden="true"
                   className="absolute bottom-9 left-[1.65rem] top-9 w-0.5 bg-gradient-to-b from-blue-500 to-blue-900"
                 />
                 {[
-                  ["Reserva criada", "Pelo link, pelo WhatsApp ou pela equipe."],
+                  ["Reserva criada", "Pelo link da casa, por telefone ou pela equipe."],
                   ["Confirmação", "O cliente recebe os dados e o código no WhatsApp."],
                   ["Lembrete", "Um aviso antes da data, para a mesa não ficar vazia."],
-                  ["Reconfirmação", "Quando precisa, pede um “sim” e a agenda se ajusta."],
-                  ["Cliente chega", "Você marca no painel e o histórico do cliente cresce."],
+                  [
+                    "Reconfirmação",
+                    "Se falta confirmar, o cliente recebe um aviso e responde “sim”.",
+                  ],
+                  [
+                    "Cliente chega",
+                    "Você finaliza a reserva no painel e o histórico do cliente cresce.",
+                  ],
                 ].map(([t, d]) => (
                   <li key={t} className="relative">
                     <span
@@ -462,56 +493,53 @@ function Landing() {
               </p>
             </Reveal>
             <Reveal delay={80}>
-              <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {[
-                  [CalendarCheck, "Reservas", "Pelo link, WhatsApp ou balcão, no mesmo lugar."],
-                  [Users, "Clientes", "Perfil e histórico criados sozinhos a cada reserva."],
-                  [Bell, "Avisos", "Confirmação, lembrete e reconfirmação automáticos."],
-                  [BarChart3, "Relatórios", "O que mudou na casa, por período e por tipo."],
-                ].map(([Icone, t, d]) => {
-                  const I = Icone as typeof Users;
-                  return (
-                    <li
-                      key={t as string}
-                      className="rounded-2xl border border-border bg-card p-5 shadow-sm"
-                    >
-                      <span className="grid size-12 place-items-center rounded-full bg-blue-50 text-blue-700">
-                        <I className="h-6 w-6" strokeWidth={1.5} aria-hidden="true" />
-                      </span>
-                      <h3 className="mt-4 font-semibold">{t as string}</h3>
-                      <p className="mt-1 text-sm text-slate-600">{d as string}</p>
-                    </li>
-                  );
-                })}
-              </ul>
+              <ol className="mt-10 flex flex-wrap items-center gap-x-3 gap-y-2 text-lg font-semibold">
+                {["Reserva", "Cliente", "Agenda", "Relatórios"].map((t, i, a) => (
+                  <li key={t} className="flex items-center gap-3">
+                    {t}
+                    {i < a.length - 1 && (
+                      <span aria-hidden="true" className="h-0.5 w-8 rounded-full bg-blue-200" />
+                    )}
+                  </li>
+                ))}
+              </ol>
             </Reveal>
 
             <div className="mt-20 grid items-center gap-12 lg:grid-cols-2">
               <Reveal>
-                <Tag>Cardápio e Link Hub</Tag>
+                <Tag>Sua marca</Tag>
                 <h3 className="mt-3 text-[1.9rem] font-extrabold leading-[1.1] tracking-[-0.03em] sm:text-4xl">
-                  O restaurante aparece. O Teggly fica nos bastidores.
+                  Seu cliente reserva com você. Não com um app.
                 </h3>
                 <p className="mt-4 text-lg leading-relaxed text-slate-600">
-                  Seu Link Hub abre com “Reservar mesa”, e leva ao cardápio, WhatsApp, Instagram,
-                  delivery e localização. Logo e cor do restaurante nas páginas públicas, quando
-                  você escolher.
+                  Página de reserva, cardápio e Link Hub com o logo e a cor do restaurante. O Teggly
+                  trabalha nos bastidores.
                 </p>
-                <ul className="mt-6 space-y-3 text-base">
+                <ul className="mt-6 space-y-4">
                   {[
-                    "Cardápio digital em todos os planos",
-                    "Destaque para iFood e outros canais da casa",
-                    "Cada clique de reserva cai na agenda",
-                  ].map((t) => (
-                    <li key={t} className="flex items-start gap-3">
-                      <Link2 className="mt-1 h-4 w-4 shrink-0 text-blue-700" aria-hidden="true" />
-                      {t}
+                    [
+                      "Sua marca",
+                      "Logo e cor do restaurante nas páginas públicas, quando você ligar.",
+                    ],
+                    ["Seus clientes", "A base é sua: exporte a lista quando quiser."],
+                    [
+                      "Seu cardápio e seu Link Hub",
+                      "Em todos os planos, com destaque para iFood e outros canais da casa.",
+                    ],
+                  ].map(([t, d]) => (
+                    <li key={t} className="border-l-2 border-blue-200 pl-4">
+                      <p className="font-semibold">{t}</p>
+                      <p className="text-sm text-slate-600">{d}</p>
                     </li>
                   ))}
                 </ul>
               </Reveal>
               <Reveal delay={80}>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 gap-3 sm:gap-4">
+                  <Tela
+                    src="/site/produto-reserva.png"
+                    alt="Página de reserva de um restaurante de exemplo, com nome, telefone, pessoas e data."
+                  />
                   <Tela
                     src="/site/produto-link-hub.png"
                     alt="Link Hub de um restaurante de exemplo, com Reservar mesa em destaque."
@@ -559,13 +587,13 @@ function Landing() {
           id="faq"
           className="scroll-mt-20 border-t border-border/60 bg-slate-50 py-[72px] md:py-28"
         >
-          <div className="mx-auto max-w-3xl px-5">
+          <div className="mx-auto grid max-w-[1200px] gap-10 px-5 lg:grid-cols-[1fr_1.6fr]">
             <Reveal>
               <Tag>Dúvidas</Tag>
               <H2>Perguntas comuns.</H2>
             </Reveal>
             <Reveal delay={80}>
-              <Accordion type="single" collapsible className="mt-8">
+              <Accordion type="single" collapsible className="lg:mt-0">
                 {faq.map((f) => (
                   <AccordionItem key={f.q} value={f.q}>
                     <AccordionTrigger className="text-left text-base">{f.q}</AccordionTrigger>
@@ -583,7 +611,7 @@ function Landing() {
         <section className="py-[72px] md:py-28">
           <div className="mx-auto max-w-[1200px] px-5">
             <Reveal>
-              <div className="rounded-3xl bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 px-6 py-14 text-center text-white sm:px-10">
+              <div className="rounded-[20px] bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 px-6 py-14 text-center text-white sm:px-10">
                 <h2 className="mx-auto max-w-2xl text-[2rem] font-extrabold leading-[1.08] tracking-[-0.03em] sm:text-5xl">
                   Sexta cheia. Celular em paz.
                 </h2>

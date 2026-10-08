@@ -499,7 +499,7 @@
    "origem": 12411197,
    "categoria_origem": 535576,
    "nome": "Flor do Norte",
-   "descricao": "Refrescante, frutado e temperado. Gim de jambu, manjericão, limão e xarope de açúcar.",
+   "descricao": "Refrescante, frutado e temperado. Gin de jambu, manjericão, limão e xarope de açúcar.",
    "preco_centavos": 2690,
    "imagem_url": "https://www.goomer.app/webmenu/iracema/product/12424878/picture/medium/260502222854",
    "ordem": 0,
@@ -511,7 +511,7 @@
    "origem": 12411206,
    "categoria_origem": 535576,
    "nome": "Geraldim",
-   "descricao": "Refrescante, cítrico e frutado. Gim de jambu, notas de limão siciliano, licor Brasil e bitter.",
+   "descricao": "Refrescante, cítrico e frutado. Gin de jambu, notas de limão siciliano, licor Brasil e bitter.",
    "preco_centavos": 2890,
    "imagem_url": "https://www.goomer.app/webmenu/iracema/product/12424887/picture/medium/260502222959",
    "ordem": 1,
@@ -523,7 +523,7 @@
    "origem": 12411198,
    "categoria_origem": 535576,
    "nome": "Quintal da Jabu",
-   "descricao": "Adocicado e refrescante. Gim de jambu, geleia e espuma de jabuticaba, soda de baunilha e limão siciliano.",
+   "descricao": "Adocicado e refrescante. Gin de jambu, geleia e espuma de jabuticaba, soda de baunilha e limão siciliano.",
    "preco_centavos": 3090,
    "imagem_url": "https://www.goomer.app/webmenu/iracema/product/12424879/picture/medium/261003184715",
    "ordem": 2,
@@ -535,13 +535,13 @@
    "origem": 3079611,
    "categoria_origem": 535576,
    "nome": "Almandina 56",
-   "descricao": "Vodka Absolut, suco de limão, suco de abacaxi, xarope de baunilha, espuma de limão e raspas de limão.",
+   "descricao": "Vodca Absolut, suco de limão, suco de abacaxi, xarope de baunilha, espuma de limão e raspas de limão.",
    "preco_centavos": 3590,
    "imagem_url": null,
    "ordem": 3,
    "ativo": true,
    "nome_original": "Almandina 56",
-   "descricao_original": "Vodka Absolut, suco de limão, suco de abacaxi, xarope de baunilia, espuma de limão e raspas de limão."
+   "descricao_original": "Vodca Absolut, suco de limão, suco de abacaxi, xarope de baunilia, espuma de limão e raspas de limão."
   },
   {
    "origem": 3079734,
@@ -661,7 +661,7 @@
    "ordem": 13,
    "ativo": true,
    "nome_original": "Moscou Mule",
-   "descricao_original": "Vodka Absolut, suco de limão, espuma de gengibre."
+   "descricao_original": "Vodca Absolut, suco de limão, espuma de gengibre."
   },
   {
    "origem": 3079596,
@@ -673,7 +673,7 @@
    "ordem": 14,
    "ativo": true,
    "nome_original": "Porn Star",
-   "descricao_original": "Vodka Absolut, xarope de baunilha, suco de maracujá e suco de limão."
+   "descricao_original": "Vodca Absolut, xarope de baunilha, suco de maracujá e suco de limão."
   },
   {
    "origem": 10006374,
@@ -792,8 +792,8 @@
    "imagem_url": null,
    "ordem": 3,
    "ativo": true,
-   "nome_original": "Dose Vodka Absolut",
-   "descricao_original": "Dose Vodka Absolut"
+   "nome_original": "Dose Vodca Absolut",
+   "descricao_original": "Dose Vodca Absolut"
   },
   {
    "origem": 5395208,

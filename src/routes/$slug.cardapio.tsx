@@ -185,7 +185,7 @@ function CardapioPublicoPage() {
           <section key={c.id} id={`cat-${c.id}`} className="scroll-mt-20">
             <h2 className="text-xl font-extrabold tracking-tight text-foreground">{c.nome}</h2>
             {c.descricao && <p className="mt-1 text-sm text-muted-foreground">{c.descricao}</p>}
-            <ul className="mt-4 divide-y divide-border/70 rounded-2xl border border-border bg-card">
+            <ul className="mt-4 divide-y divide-border/70 rounded-lg border border-border bg-card">
               {c.itens.map((i) => {
                 const preco = formatPreco(i.preco_centavos);
                 return (

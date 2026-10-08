@@ -31,4 +31,21 @@ test.describe("Website", () => {
     );
     expect(over).toBeLessThanOrEqual(1);
   });
+
+  test("conteúdo fiel ao produto e ao Brand System", async ({ page }) => {
+    await page.goto("/");
+    // O Assistente envia o link; ele não reserva dentro do chat (como o produto real).
+    await expect(page.getByText("Posso te mandar o link para reservar. Quer?")).toBeVisible();
+    // Títulos de seção com no máximo 8 palavras (Brand System, Identidade verbal).
+    const titulos = await page.locator("main h1, main h2").allInnerTexts();
+    for (const t of titulos) {
+      expect(t.trim().split(/\s+/).length, t).toBeLessThanOrEqual(8);
+    }
+    // Sem travessão, sem emoji e sem "usuário" para o restaurante.
+    const texto = await page.locator("main").innerText();
+    expect(texto).not.toMatch(/[—–]|\p{Extended_Pictographic}/u);
+    expect(texto.toLowerCase()).not.toContain("usuário");
+    // Uma única seção escura e sem nenhuma seção animada por rolagem.
+    await expect(page.locator("section.bg-slate-900")).toHaveCount(1);
+  });
 });

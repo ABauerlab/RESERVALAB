@@ -18,7 +18,7 @@ type Props = {
 };
 
 const card =
-  "group flex min-h-[92px] flex-col justify-between rounded-2xl border border-border bg-card p-4 text-left shadow-xs transition-colors hover:border-blue-200 hover:bg-blue-50/40 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/30";
+  "group flex min-h-[92px] flex-col justify-between rounded-lg border border-border bg-card p-4 text-left shadow-xs transition-colors hover:border-blue-200 hover:bg-blue-50/40 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/30";
 
 function Rotulo({ children }: { children: React.ReactNode }) {
   return (
