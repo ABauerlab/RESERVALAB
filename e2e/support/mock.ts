@@ -407,6 +407,13 @@ export async function installMock(
         if (name === "bloqueios_do_tenant") return json(route, []);
         if (name === "feriados_do_tenant") return json(route, []);
         if (name === "proximo_evento_do_tenant") return json(route, []);
+        if (name === "evento_destaque_do_tenant") {
+          const hoje = todayISO();
+          const prox = [...mock.state.eventos]
+            .filter((e) => String(e.data) >= hoje)
+            .sort((a, b) => String(a.data).localeCompare(String(b.data)))[0];
+          return json(route, prox ? [prox] : []);
+        }
         return json(route, []);
       }
 
