@@ -148,3 +148,26 @@ export function reordenar<T extends { id: string; ordem: number }>(
 export function categoriasVisiveis(c: CardapioPublico | null): CategoriaCardapio[] {
   return (c?.categorias ?? []).filter((cat) => cat.itens.length > 0);
 }
+
+function normalizar(t: string): string {
+  return t
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+/** Busca por nome ou descricao, sem acento e sem diferenciar maiuscula. Categoria sem item some. */
+export function filtrarCardapio(
+  categorias: CategoriaCardapio[],
+  termo: string,
+): CategoriaCardapio[] {
+  const t = normalizar(termo);
+  if (!t) return categorias;
+  return categorias
+    .map((c) => ({
+      ...c,
+      itens: c.itens.filter((i) => normalizar(`${i.nome} ${i.descricao ?? ""}`).includes(t)),
+    }))
+    .filter((c) => c.itens.length > 0);
+}

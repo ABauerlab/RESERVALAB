@@ -7,12 +7,14 @@ import { supabase } from "@/integrations/supabase/client";
  */
 
 export const BUCKET = "tenant-assets";
-export type TipoImagem = "banner" | "icone";
+export type TipoImagem = "banner" | "icone" | "produto";
 
 export const MEDIDAS: Record<TipoImagem, { largura: number; altura: number; qualidade: number }> = {
   /** 3:1, boa leitura em 320 px e nitido em tela grande. */
   banner: { largura: 1200, altura: 400, qualidade: 0.82 },
   icone: { largura: 128, altura: 128, qualidade: 0.9 },
+  /** 4:3, foto de prato no cardapio (aparece pequena na lista e maior em telas largas). */
+  produto: { largura: 800, altura: 600, qualidade: 0.82 },
 };
 
 const TIPOS_ACEITOS = ["image/png", "image/jpeg", "image/webp"];
@@ -54,7 +56,7 @@ async function processar(file: File, tipo: TipoImagem): Promise<Blob> {
   canvas.height = altura;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("canvas indisponivel");
-  if (tipo === "banner") {
+  if (tipo === "banner" || tipo === "produto") {
     const c = recorteCover(bmp.width, bmp.height, largura, altura);
     ctx.drawImage(bmp, c.sx, c.sy, c.sw, c.sh, 0, 0, largura, altura);
   } else {
