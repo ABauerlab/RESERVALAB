@@ -68,7 +68,6 @@ function LinksAdminPage() {
   const [titulo, setTitulo] = useState("");
   const [url, setUrl] = useState("");
   const [descricao, setDescricao] = useState("");
-  const [selo, setSelo] = useState("");
   const [codigoMapa, setCodigoMapa] = useState("");
   const [novoIcone, setNovoIcone] = useState<IconeEscolhido>({ icone: null, icone_url: null });
   const [novoDestaque, setNovoDestaque] = useState(false);
@@ -104,10 +103,6 @@ function LinksAdminPage() {
   useEffect(() => {
     setDescricao(perfilQ.data?.hub_descricao ?? "");
   }, [perfilQ.data?.hub_descricao]);
-
-  useEffect(() => {
-    setSelo(perfilQ.data?.hub_selo ?? "");
-  }, [perfilQ.data?.hub_selo]);
 
   const links = useMemo(
     () => [...(linksQ.data ?? [])].sort((a, b) => a.ordem - b.ordem),
@@ -413,35 +408,6 @@ function LinksAdminPage() {
                 Salvar descrição
               </Button>
             </div>
-          </div>
-        </section>
-
-        <section className="mt-4 rounded-xl border border-border bg-card p-4">
-          <h2 className="text-base font-semibold">Selo da casa</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Uma frase curta que aparece em destaque abaixo do nome. Ex.: Comida de Buteco.
-          </p>
-          <div className="mt-3 flex flex-wrap items-end gap-3">
-            <div className="min-w-0 flex-1 basis-56">
-              <Label htmlFor="hub-selo" className="text-sm font-medium">
-                Selo
-              </Label>
-              <Input
-                id="hub-selo"
-                value={selo}
-                onChange={(e) => setSelo(e.target.value)}
-                maxLength={40}
-                placeholder="Ex.: Comida de Buteco"
-                className="mt-1.5 h-11"
-              />
-            </div>
-            <Button
-              onClick={() => salvarPerfil.mutate({ hub_selo: selo.trim() || null })}
-              disabled={salvarPerfil.isPending || selo.trim() === (perfilQ.data?.hub_selo ?? "")}
-              className="h-11 rounded-md"
-            >
-              Salvar selo
-            </Button>
           </div>
         </section>
 

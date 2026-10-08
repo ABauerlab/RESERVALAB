@@ -319,6 +319,11 @@ function CardapioPublicoPage() {
                     <span className="block break-words text-[15px] font-semibold leading-snug">
                       {i.nome}
                     </span>
+                    {i.descricao && (
+                      <span className="mt-1 line-clamp-2 block text-[13px] leading-snug text-muted-foreground">
+                        {i.descricao}
+                      </span>
+                    )}
                     {formatPreco(i.preco_centavos) && (
                       <span className="mt-1 block text-sm font-bold tabular-nums">
                         {formatPreco(i.preco_centavos)}

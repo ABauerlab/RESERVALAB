@@ -46,6 +46,24 @@ test.describe("Cardápio público como experiência", () => {
     await expect(page).not.toHaveURL(/item=/);
   });
 
+  test("a descrição aparece na lista, com e sem foto, em todos os layouts", async ({
+    page,
+    context,
+  }) => {
+    const mock = await installMock(context);
+    mock.state.itens.push(
+      item("i8", "Prato com foto", { imagem_url: PNG }),
+      item("i9", "Prato sem foto"),
+    );
+    for (const layout of ["lista", "cards", "galeria", "compacto"]) {
+      await page.goto(`/iracema/cardapio?layout=${layout}`);
+      await expect(page.getByText("Descrição de Prato sem foto").first()).toBeVisible();
+      if (layout !== "galeria" && layout !== "compacto") {
+        await expect(page.getByText("Descrição de Prato com foto").first()).toBeVisible();
+      }
+    }
+  });
+
   test("link direto para um prato abre o detalhe; destaques aparecem no topo", async ({
     page,
     context,
