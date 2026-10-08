@@ -27,13 +27,14 @@ import {
   type ReservaTipo,
 } from "@/lib/reservations";
 import { fetchHub } from "@/lib/hub";
-import { fetchOgRestaurante, montarOg } from "@/lib/og";
+import { carregarOg, montarOg } from "@/lib/og";
 import { getTenantBySlug } from "@/lib/tenant";
 import { CLICK_RESERVA_EVENT, initFacebookPixel, trackFacebookCustomEvent } from "@/lib/fbpixel";
+import { TegglyLogo } from "@/components/brand/TegglyLogo";
 
 export const Route = createFileRoute("/$slug/")({
   // Preview ao compartilhar: nome, frase e imagem da propria casa (ver src/lib/og.ts).
-  loader: ({ params }) => fetchOgRestaurante(params.slug),
+  loader: ({ params, context }) => carregarOg(params.slug, context.queryClient),
   head: ({ params, loaderData }) => {
     const og = montarOg(params.slug, "", loaderData ?? null);
     return {
@@ -119,7 +120,7 @@ function TenantHome() {
   const cards = TIPO_CARDS.filter((c) => tiposAceitos.includes(c.tipo as ReservaTipo));
 
   return (
-    <main className="relative min-h-screen bg-background">
+    <main className="relative min-h-screen bg-pagina">
       <div className="mx-auto flex min-h-screen max-w-2xl flex-col px-5 pt-14 pb-10 safe-top safe-bottom sm:pt-20">
         <header className="animate-fade">
           {logo && (
@@ -220,13 +221,7 @@ function TenantHome() {
 
         <div className="mt-auto flex flex-col items-center gap-1.5 pt-16 text-center">
           <p className="text-xs text-muted-foreground">powered by</p>
-          <img
-            src="/brand/Teggly_Logo_Primary.svg"
-            alt="Teggly"
-            width={96}
-            height={23}
-            className="h-[23px] w-24"
-          />
+          <TegglyLogo width={96} height={23} className="h-[23px] w-24" />
         </div>
       </div>
     </main>

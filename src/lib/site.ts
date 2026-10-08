@@ -16,3 +16,14 @@ export function mailtoContato(assunto: string, corpo?: string): string {
   if (corpo) q.push(`body=${encodeURIComponent(corpo)}`);
   return `mailto:${EMAIL_CONTATO}?${q.join("&")}`;
 }
+
+/**
+ * Origem usada nos links publicos que o painel copia ou envia (reserva, Link Hub, acompanhamento).
+ * Em producao e sempre o dominio oficial; em desenvolvimento e testes (localhost) segue o endereco aberto.
+ */
+export function origemPublica(): string {
+  if (typeof window === "undefined") return SITE_URL;
+  const host = window.location.hostname;
+  const local = host === "localhost" || host === "127.0.0.1" || host === "[::1]" || host === "::1";
+  return local ? window.location.origin : SITE_URL;
+}

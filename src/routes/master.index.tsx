@@ -26,6 +26,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { TegglyLogo } from "@/components/brand/TegglyLogo";
 
 type NovaEmpresaInput = {
   slug: string;
@@ -140,13 +141,7 @@ function MasterPanel() {
       <header className="sticky top-0 z-20 border-b border-border/70 bg-background/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-4xl items-center gap-3 px-5 py-4">
           <div className="min-w-0 flex-1">
-            <img
-              src="/brand/Teggly_Logo_Primary.svg"
-              alt="Teggly"
-              width={101}
-              height={24}
-              className="h-6 w-auto"
-            />
+            <TegglyLogo width={101} height={24} className="h-6 w-auto" />
             <h1 className="truncate text-lg font-medium">Painel master</h1>
           </div>
           <button

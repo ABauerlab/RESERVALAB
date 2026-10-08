@@ -144,5 +144,9 @@ test.describe("Link Hub em uma tela", () => {
     await expect(delivery).toContainText("Delivery");
     await expect(delivery).toHaveAttribute("href", /ifood/);
     await expect(page.getByText("Comida de Buteco")).toHaveCount(0);
+    // A logo do Teggly leva ao site oficial.
+    const logo = page.getByRole("link", { name: /Teggly/ });
+    await expect(logo).toHaveAttribute("href", "https://teggly.com.br/");
+    await expect(logo).toHaveAttribute("rel", /noopener/);
   });
 });

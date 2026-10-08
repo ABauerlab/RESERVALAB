@@ -1,3 +1,4 @@
+import { origemPublica } from "@/lib/site";
 import { useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -147,7 +148,7 @@ export function useReservaActions(
       empresaNome: tenant?.nome ?? "",
       endereco: tenant?.endereco,
       telefoneEmpresa: tenant?.telefone_contato,
-      linkAcompanhar: `${window.location.origin}/${slug}/acompanhar/${r.codigo_acompanhamento}`,
+      linkAcompanhar: `${origemPublica()}/${slug}/acompanhar/${r.codigo_acompanhamento}`,
     });
     window.open(whatsappUrl(numero, msg), "_blank", "noopener");
   }

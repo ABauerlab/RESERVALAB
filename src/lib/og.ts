@@ -1,3 +1,5 @@
+import type { QueryClient } from "@tanstack/react-query";
+
 import { fetchCardapioPublico } from "@/lib/cardapio";
 import { fetchHub } from "@/lib/hub";
 import { iconeUrlSegura } from "@/lib/hub-icons";
@@ -50,6 +52,26 @@ export async function fetchOgRestaurante(slug: string): Promise<OgRestaurante | 
   } catch {
     return null;
   }
+}
+
+/**
+ * Loader das paginas publicas. No servidor busca o preview completo (o que os crawlers leem). No
+ * navegador nao espera rede: a navegacao entre paginas nao pode esperar por uma busca so de
+ * titulo, entao usa o que o Link Hub ja carregou (nome e frase) ou o titulo generico.
+ */
+export async function carregarOg(
+  slug: string,
+  queryClient: QueryClient,
+): Promise<OgRestaurante | null> {
+  if (typeof window === "undefined") return fetchOgRestaurante(slug);
+  const hub = queryClient.getQueryData<Awaited<ReturnType<typeof fetchHub>>>(["hub-publico", slug]);
+  if (!hub) return null;
+  return {
+    nome: hub.nome,
+    selo: hub.selo?.trim() || null,
+    descricao: hub.descricao?.trim() || null,
+    imagem: null,
+  };
 }
 
 export type MetaTag = Record<string, string>;

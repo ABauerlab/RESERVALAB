@@ -4,6 +4,7 @@ import { LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Drop } from "./Drop";
 import { SIDEBAR_FOOTER, SIDEBAR_GROUPS, type AdminTab, type NavItem } from "./nav-items";
+import { TegglyLogo } from "@/components/brand/TegglyLogo";
 
 function SidebarLink({
   item,
@@ -75,9 +76,8 @@ export function Sidebar({
     >
       {rail ? (
         <div className="flex h-16 items-center justify-center">
-          <img
-            src="/brand/Teggly_Symbol_Small_Blue.svg"
-            alt="Teggly"
+          <TegglyLogo
+            arquivo="Teggly_Symbol_Small_Blue.svg"
             width={30}
             height={27}
             className="h-7 w-auto"
@@ -85,13 +85,7 @@ export function Sidebar({
         </div>
       ) : (
         <div className="px-5 pb-4 pt-6">
-          <img
-            src="/brand/Teggly_Logo_Primary.svg"
-            alt="Teggly"
-            width={101}
-            height={24}
-            className="h-6 w-auto"
-          />
+          <TegglyLogo width={101} height={24} className="h-6 w-auto" />
           <p className="mt-4 truncate text-sm font-semibold text-foreground">{tenantNome}</p>
           <p className="text-xs text-muted-foreground">Painel da empresa</p>
         </div>

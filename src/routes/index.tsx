@@ -636,13 +636,15 @@ function Landing() {
       <footer className="border-t border-border bg-card safe-bottom">
         <div className="mx-auto grid max-w-[1200px] gap-8 px-5 py-12 sm:grid-cols-2">
           <div>
-            <img
-              src="/brand/Teggly_Logo_Primary.svg"
-              alt="Teggly"
-              width={118}
-              height={28}
-              className="h-7 w-auto"
-            />
+            <a href="#topo" className="inline-flex">
+              <img
+                src="/brand/Teggly_Logo_Primary.svg"
+                alt="Teggly"
+                width={118}
+                height={28}
+                className="h-7 w-auto"
+              />
+            </a>
             <p className="mt-3 text-sm font-semibold">Mais reservas. Menos trabalho.</p>
             <p className="mt-1 max-w-sm text-sm text-slate-600">
               Feito no Brasil para quem vive de receber pessoas.
