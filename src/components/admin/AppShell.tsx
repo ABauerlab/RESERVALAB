@@ -7,6 +7,7 @@ import { MobileNavigation } from "./MobileNavigation";
 import { Onboarding } from "./Onboarding";
 import { Sidebar } from "./Sidebar";
 import type { AdminTab } from "./nav-items";
+import { TegglyLogo } from "@/components/brand/TegglyLogo";
 
 /**
  * Casca do painel: barra inferior no mobile, trilho de ícones no tablet e Sidebar completa
@@ -46,9 +47,8 @@ export function AppShell({
       <div className={cn(mode === "rail" && "pl-[88px]", mode === "full" && "pl-[248px]")}>
         {mode === "bottom" && (
           <header className="flex h-12 items-center gap-2.5 px-4 safe-top">
-            <img
-              src="/brand/Teggly_Symbol_Small_Blue.svg"
-              alt="Teggly"
+            <TegglyLogo
+              arquivo="Teggly_Symbol_Small_Blue.svg"
               width={27}
               height={24}
               className="h-6 w-auto shrink-0"

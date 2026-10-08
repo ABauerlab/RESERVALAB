@@ -1,3 +1,4 @@
+import { origemPublica } from "@/lib/site";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
@@ -224,7 +225,7 @@ export function Onboarding({ slug }: { slug: string }) {
         : { left: 16, right: 16, bottom: "calc(5.5rem + env(safe-area-inset-bottom))" };
 
   const copiar = () =>
-    navigator.clipboard?.writeText(`${window.location.origin}/${slug}`).then(
+    navigator.clipboard?.writeText(`${origemPublica()}/${slug}`).then(
       () => toast.success("Link copiado."),
       () => toast.error("Não foi possível copiar."),
     );

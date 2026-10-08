@@ -161,6 +161,7 @@
 }
 
 .dark {
+  --pagina-topo: #172554;
   --background: #020617;
   --foreground: #f8fafc;
   --card: #0f172a;
@@ -266,6 +267,13 @@
 @keyframes in-up {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Fundo das paginas publicas (Link Hub e reserva): gradiente simples, azul suave no topo. */
+@utility bg-pagina {
+  background-color: var(--background);
+  background-image: linear-gradient(180deg, var(--pagina-topo, #dbeafe) 0%, var(--background) 420px);
+  background-repeat: no-repeat;
 }
 
 /* Brilho unico dos botoes de delivery no Link Hub. */

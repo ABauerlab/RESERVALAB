@@ -44,3 +44,11 @@ Resumo do que foi entregue e do que fica para depois. Detalhes por PR no GitHub.
 - Cardapio: textos de 49 itens do Iracema revisados (`f15_iracema_textos_revisados.sql`); a descricao aparece em todos os layouts, inclusive cards com foto e na faixa de destaques.
 - Mapa: causa raiz do erro ao salvar era o CHECK do banco (`{10,2000}` passa do limite 255 do Postgres). Corrigido em `f15_mapa_check.sql`. O app guarda so a URL `https://www.google.com/maps/embed?pb=...` extraida do iframe.
 - Link Hub: selo removido (e a secao do painel), endereco completo no cabecalho, card de EVENTO (badge, data, hora, "Ver"), botoes com profundidade e micro-interacoes em React (`HubBotao`), delivery (iFood/99Food) com prioridade e etiqueta. Destinos inalterados.
+
+## F16: performance, cardapio e dominio
+
+- **Performance**: a navegacao entre paginas publicas deixou de esperar por uma busca so de titulo (o loader de Open Graph agora so busca no servidor; no navegador usa o que o Link Hub ja carregou). Roteador com `defaultPreload: "intent"` (carrega a pagina ao apontar/tocar) e consultas com `staleTime` de 15 s (sem refazer tudo a cada foco da janela). O banner do Link Hub so e baixado em telas altas (antes era baixado e escondido em telas baixas). Atencao: o banner atual do Iracema e um PNG de 1,1 MB; reenviar pelo painel o comprime em WebP.
+- **Cardapio**: 16 itens sem descricao receberam texto curto com informacao ja existente (`f16_iracema_descricoes.sql`); "Catupiry" com maiuscula.
+- **Dominio**: links copiados e enviados pelo painel usam `https://teggly.com.br` (`origemPublica()` em `src/lib/site.ts`; em localhost segue o endereco aberto). Workflows n8n de atendimento, confirmacao e lembrete atualizados. Mantidos de proposito: `n8n.bauerlab.com.br` (webhooks do banco), IP da EvolutionAPI e URLs do Supabase (infra).
+- **Logo do Teggly**: toda logo leva a `https://teggly.com.br/` (`TegglyLogo`), abrindo em outra aba.
+- **Visual**: gradiente simples no fundo do Link Hub e da pagina de reserva (`bg-pagina`); botoes ficaram planos, com borda e sombra.

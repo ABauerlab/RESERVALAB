@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { TegglyLogo } from "@/components/brand/TegglyLogo";
 
 export const Route = createFileRoute("/$slug/admin/trocar-senha")({
   head: () => ({
@@ -69,13 +70,7 @@ function TrocarSenha() {
     <main className="flex min-h-screen items-center justify-center bg-background px-5 safe-top safe-bottom">
       <div className="w-full max-w-sm animate-in-up">
         <div className="mb-8 text-center">
-          <img
-            src="/brand/Teggly_Logo_Primary.svg"
-            alt="Teggly"
-            width={134}
-            height={32}
-            className="mx-auto h-8 w-auto"
-          />
+          <TegglyLogo width={134} height={32} className="mx-auto h-8 w-auto" />
         </div>
 
         <div className="rounded-lg border border-border bg-card p-6 shadow-[var(--shadow-md)]">

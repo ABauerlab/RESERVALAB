@@ -17,12 +17,12 @@ import {
   formatPreco,
   type ItemCardapio,
 } from "@/lib/cardapio";
-import { fetchOgRestaurante, montarOg } from "@/lib/og";
+import { carregarOg, montarOg } from "@/lib/og";
 import { cn } from "@/lib/utils";
 import { getTenantBySlug } from "@/lib/tenant";
 
 export const Route = createFileRoute("/$slug/cardapio")({
-  loader: ({ params }) => fetchOgRestaurante(params.slug),
+  loader: ({ params, context }) => carregarOg(params.slug, context.queryClient),
   head: ({ params, loaderData }) => {
     const og = montarOg(params.slug, "cardapio", loaderData ?? null);
     return {

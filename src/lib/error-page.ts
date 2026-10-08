@@ -27,7 +27,7 @@ export function renderErrorPage(): string {
   </head>
   <body>
     <div class="card">
-      <img class="logo" src="/brand/Teggly_Logo_Primary.svg" alt="Teggly" width="118" height="28" />
+      <a href="https://teggly.com.br/" target="_blank" rel="noopener" aria-label="Teggly, abrir o site"><img class="logo" src="/brand/Teggly_Logo_Primary.svg" alt="Teggly" width="118" height="28" /></a>
       <h1>Esta página não carregou</h1>
       <p>Algo não saiu como esperado do nosso lado. Atualize a página ou volte ao início.</p>
       <div class="actions">

@@ -1,3 +1,4 @@
+import { origemPublica } from "@/lib/site";
 import { pwaHeadLinks } from "@/lib/pwa-manifest";
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -251,7 +252,7 @@ function LinksAdminPage() {
     links: [],
   };
   const automaticos = buildHubItens(previa, slug);
-  const urlPublica = `${typeof window !== "undefined" ? window.location.origin : ""}/${slug}/links`;
+  const urlPublica = `${origemPublica()}/${slug}/links`;
   const instagramValido = /^[A-Za-z0-9._]{0,30}$/.test(instagram.replace(/^@/, ""));
   const podeAdicionar = titulo.trim().length > 0 && urlSegura(url) && !adicionar.isPending;
 

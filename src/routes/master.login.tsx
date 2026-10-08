@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { TegglyLogo } from "@/components/brand/TegglyLogo";
 
 export const Route = createFileRoute("/master/login")({
   head: () => ({
@@ -74,16 +75,10 @@ function MasterLogin() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-5 safe-top safe-bottom">
       <div className="w-full max-w-sm animate-in-up">
-        <Link to="/" className="mb-10 block text-center">
-          <img
-            src="/brand/Teggly_Logo_Primary.svg"
-            alt="Teggly"
-            width={134}
-            height={32}
-            className="mx-auto h-8 w-auto"
-          />
+        <div className="mb-10 text-center">
+          <TegglyLogo width={134} height={32} className="mx-auto h-8 w-auto" />
           <p className="mt-1 text-xs text-muted-foreground">Painel master</p>
-        </Link>
+        </div>
 
         <div className="rounded-lg border border-border bg-card p-6 shadow-[var(--shadow-md)]">
           <h1 className="font-serif text-3xl tracking-tight">Master</h1>

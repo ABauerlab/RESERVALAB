@@ -1,5 +1,6 @@
 import { useMarcaLogo } from "@/components/public/MarcaScope";
 import { cn } from "@/lib/utils";
+import { TegglyLogo } from "@/components/brand/TegglyLogo";
 
 /**
  * Casca das paginas publicas do restaurante (Cardapio, Link Hub). A identidade do restaurante vem
@@ -52,13 +53,7 @@ export function PublicShell({
         {rodape && (
           <footer className="mt-12 flex flex-col items-center gap-1.5 text-center">
             <p className="text-xs text-muted-foreground">powered by</p>
-            <img
-              src="/brand/Teggly_Logo_Primary.svg"
-              alt="Teggly"
-              width={96}
-              height={23}
-              className="h-[23px] w-24"
-            />
+            <TegglyLogo width={96} height={23} className="h-[23px] w-24" />
           </footer>
         )}
       </div>

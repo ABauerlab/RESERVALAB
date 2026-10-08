@@ -9,14 +9,15 @@ import { MapaIncorporado, MapaRecolhivel } from "@/components/hub/HubMapa";
 import { EstadoPublico, PublicShell } from "@/components/public/PublicShell";
 import { buildHubItens, fetchHub, type HubItem } from "@/lib/hub";
 import { iconeUrlSegura } from "@/lib/hub-icons";
-import { fetchOgRestaurante, montarOg } from "@/lib/og";
+import { carregarOg, montarOg } from "@/lib/og";
 import { fetchProximoEvento } from "@/lib/eventos";
 import { urlDeMapaValida } from "@/lib/mapa";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
+import { TegglyLogo } from "@/components/brand/TegglyLogo";
 
 export const Route = createFileRoute("/$slug/links")({
-  loader: ({ params }) => fetchOgRestaurante(params.slug),
+  loader: ({ params, context }) => carregarOg(params.slug, context.queryClient),
   head: ({ params, loaderData }) => {
     const og = montarOg(params.slug, "links", loaderData ?? null);
     return {
@@ -58,6 +59,8 @@ function HubPublicoPage() {
   const logo = useMarcaLogo();
   // Um unico mapa na pagina: ao lado no desktop, recolhido no celular (nunca os dois no DOM).
   const largo = useMediaQuery("(min-width: 768px)");
+  // O banner so cabe em telas altas; em telas baixas nem baixa a imagem.
+  const alto = useMediaQuery("(min-height: 720px)");
   const hubQ = useQuery({
     queryKey: ["hub-publico", slug],
     queryFn: () => fetchHub(slug),
@@ -120,7 +123,7 @@ function HubPublicoPage() {
 
   const hub = hubQ.data;
   const itens = buildHubItens(hub, slug);
-  const banner = iconeUrlSegura(hub.banner_url) ? hub.banner_url : null;
+  const banner = alto && iconeUrlSegura(hub.banner_url) ? hub.banner_url : null;
   const mapa = urlDeMapaValida(hub.mapa_url) ? hub.mapa_url : null;
   const evento = eventoQ.data
     ? { ...partesData(eventoQ.data.data), hora: horaCurta(eventoQ.data.horario) }
@@ -139,7 +142,7 @@ function HubPublicoPage() {
   const impar = demais.length % 2 === 1;
 
   return (
-    <main className="min-h-dvh bg-background">
+    <main className="min-h-dvh bg-pagina">
       <div
         className={cn(
           "mx-auto flex min-h-dvh w-full flex-col justify-center px-5 py-6 safe-top safe-bottom [@media(max-height:600px)]:py-3",
@@ -161,7 +164,7 @@ function HubPublicoPage() {
                 height={400}
                 decoding="async"
                 fetchPriority="high"
-                className="mb-4 hidden aspect-[3/1] w-full rounded-lg border border-border bg-slate-100 object-cover [@media(min-height:720px)]:block"
+                className="mb-4 aspect-[3/1] w-full rounded-lg border border-border bg-slate-100 object-cover"
               />
             )}
             <header className="text-center">
@@ -199,7 +202,7 @@ function HubPublicoPage() {
                 <HubBotao href={`/${slug}`} variante="evento" indice={1}>
                   <span
                     aria-hidden="true"
-                    className="grid size-11 shrink-0 place-items-center rounded-lg bg-gradient-to-b from-blue-500 to-blue-600 leading-none text-white shadow-sm"
+                    className="grid size-11 shrink-0 place-items-center rounded-lg bg-primary leading-none text-white shadow-sm"
                   >
                     <span className="text-lg font-extrabold tabular-nums">{evento.dia}</span>
                     <span className="-mt-1 text-[10px] font-bold uppercase tracking-wider text-blue-100">
@@ -284,13 +287,7 @@ function HubPublicoPage() {
 
             <p className="mt-5 flex items-center justify-center gap-2 text-xs text-muted-foreground">
               powered by
-              <img
-                src="/brand/Teggly_Logo_Primary.svg"
-                alt="Teggly"
-                width={72}
-                height={17}
-                className="h-[17px] w-[72px]"
-              />
+              <TegglyLogo width={72} height={17} className="h-[17px] w-[72px]" />
             </p>
           </div>
 
