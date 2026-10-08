@@ -83,6 +83,35 @@ export async function fetchCardapioPublico(slug: string): Promise<CardapioPublic
   return data ?? null;
 }
 
+/**
+ * Previa para o admin: monta o mesmo formato da leitura publica a partir das tabelas. Quem nao e
+ * admin da empresa recebe vazio (RLS), entao a previa nunca expoe cardapio nao publicado.
+ */
+export async function fetchCardapioPrevia(
+  tenantId: string,
+  nome: string,
+): Promise<CardapioPublico | null> {
+  const [cats, itens] = await Promise.all([fetchCategorias(tenantId), fetchItens(tenantId)]);
+  if (cats.error || itens.error) throw new Error((cats.error ?? itens.error)!.message);
+  const categorias = (cats.data ?? [])
+    .filter((c) => c.ativo)
+    .map((c) => ({
+      id: c.id,
+      nome: c.nome,
+      descricao: c.descricao,
+      itens: (itens.data ?? [])
+        .filter((i) => i.ativo && i.categoria_id === c.id)
+        .map((i) => ({
+          id: i.id,
+          nome: i.nome,
+          descricao: i.descricao,
+          preco_centavos: i.preco_centavos,
+          imagem_url: i.imagem_url,
+        })),
+    }));
+  return categorias.length > 0 ? { nome, categorias } : null;
+}
+
 export function fetchCategorias(tenantId: string) {
   return tabela<CategoriaRow[]>("cardapio_categorias")
     .select("*")

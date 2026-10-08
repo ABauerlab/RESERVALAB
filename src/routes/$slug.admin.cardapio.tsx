@@ -294,7 +294,7 @@ function CardapioAdminPage() {
 
   const carregando = categoriasQ.isLoading || itensQ.isLoading || perfilQ.isLoading;
   const erro = categoriasQ.isError || itensQ.isError || perfilQ.isError;
-  const urlPublica = `/${slug}/cardapio`;
+  const urlPublica = publicado ? `/${slug}/cardapio` : `/${slug}/cardapio?previa=1`;
 
   return (
     <AdminShell slug={slug} tenantNome={admin.tenant?.nome ?? ""} active="cardapio">
@@ -328,7 +328,7 @@ function CardapioAdminPage() {
               <p className="text-xs text-muted-foreground">
                 {publicado
                   ? "Quem acessar o link vê as categorias e itens ativos."
-                  : "O link ainda não mostra o cardápio."}
+                  : 'O cliente ainda vê "indisponível". Use Pré-visualizar para conferir antes de publicar.'}
               </p>
             </div>
           </div>
@@ -338,7 +338,7 @@ function CardapioAdminPage() {
             rel="noopener noreferrer"
             className="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-border px-3 text-sm font-medium hover:bg-accent xl:min-h-9"
           >
-            <ExternalLink className="h-4 w-4" /> Ver página
+            <ExternalLink className="h-4 w-4" /> {publicado ? "Ver página" : "Pré-visualizar"}
           </a>
         </section>
 

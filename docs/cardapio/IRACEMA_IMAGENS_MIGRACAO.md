@@ -32,3 +32,7 @@ Data: 2026-10-08. Estado do cardápio: **NÃO PUBLICADO** (`tenant_perfil.cardap
 - As imagens "medium" são pequenas (poucas dezenas de KB). Se o dono quiser fotos maiores, precisa enviar os originais pelo painel (Cardápio, ícone de foto).
 - Direitos de uso: as fotos são do restaurante, mas o dono deve confirmar antes de publicar.
 - `docs/cardapio/iracema-seed.json` e `docs/database/applied/f12_*.sql` ainda citam as URLs do Goomer como registro histórico da importação. Não fazem parte do app (`src`, `public`, `e2e`, `supabase` estão sem referência ao Goomer).
+
+## Atualização: fotos em melhor qualidade enviadas pelo dono
+
+O dono enviou um pacote com 19 fotos (cerca de 700 px de altura, 53 a 255 KB, JPEG). Elas substituíram as versões pequenas dos mesmos 19 itens (caminho `<tenant>/produto-<id>-hd.jpg`; o arquivo pequeno correspondente foi removido). Sobraram 6 itens com a versão pequena (Amstel 600 ml, Eisenbahn, Heineken, Amstel Lager, Geraldim, Quintal da Jabu). Resultado no banco: 19 em alta, 6 pequenas, 38 sem foto, 0 apontando para o Goomer. O cardápio segue **não publicado**; use "Pré-visualizar" no painel.
