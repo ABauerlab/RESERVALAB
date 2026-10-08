@@ -87,4 +87,22 @@ test.describe("Cardápio: do painel à página pública", () => {
     await page.getByLabel("Buscar no cardápio").fill("sushi");
     await expect(page.getByText(/Nada encontrado/)).toBeVisible();
   });
+
+  test("cardápio não publicado: cliente vê indisponível e o admin pré-visualiza", async ({
+    page,
+    context,
+  }) => {
+    const mock = await installMock(context);
+    mock.state.perfil[0]!.cardapio_publicado = false;
+    await page.goto("/iracema/cardapio");
+    await expect(page.getByText("Cardápio indisponível por enquanto")).toBeVisible();
+
+    await page.goto("/iracema/admin/cardapio");
+    const previa = page.getByRole("link", { name: "Pré-visualizar" });
+    await expect(previa).toHaveAttribute("href", "/iracema/cardapio?previa=1");
+
+    await page.goto("/iracema/cardapio?previa=1");
+    await expect(page.getByText(/Pré-visualização para você/)).toBeVisible();
+    await expect(page.getByText("Feijoada", { exact: true })).toBeVisible();
+  });
 });

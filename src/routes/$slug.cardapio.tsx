@@ -7,6 +7,7 @@ import { Loader2, Search, X } from "lucide-react";
 import { EstadoPublico, PublicShell } from "@/components/public/PublicShell";
 import {
   categoriasVisiveis,
+  fetchCardapioPrevia,
   fetchCardapioPublico,
   filtrarCardapio,
   formatPreco,
@@ -26,15 +27,21 @@ export const Route = createFileRoute("/$slug/cardapio")({
 
 function CardapioPublicoPage() {
   const { slug } = useParams({ from: "/$slug/cardapio" });
-  const cardapioQ = useQuery({
-    queryKey: ["cardapio-publico", slug],
-    queryFn: () => fetchCardapioPublico(slug),
-    staleTime: 60_000,
-  });
+  const previa =
+    typeof window !== "undefined" && new URLSearchParams(window.location.search).has("previa");
   const tenantQ = useQuery({
     queryKey: ["tenant", slug],
     queryFn: () => getTenantBySlug(slug),
     staleTime: 5 * 60_000,
+  });
+  const cardapioQ = useQuery({
+    queryKey: ["cardapio-publico", slug, previa],
+    queryFn: async () => {
+      if (!previa) return fetchCardapioPublico(slug);
+      const t = await getTenantBySlug(slug);
+      return t ? fetchCardapioPrevia(t.id, t.nome) : null;
+    },
+    staleTime: previa ? 0 : 60_000,
   });
 
   const [busca, setBusca] = useState("");
@@ -126,6 +133,11 @@ function CardapioPublicoPage() {
 
   return (
     <PublicShell nome={nome} subtitulo="Cardápio" className="pb-28">
+      {previa && (
+        <p className="mb-4 rounded-lg border border-border bg-muted px-4 py-3 text-sm text-muted-foreground">
+          Pré-visualização para você. O cliente só vê o cardápio depois de publicado.
+        </p>
+      )}
       <div className="sticky top-0 z-10 -mx-5 mb-6 bg-background/95 px-5 pb-1 pt-3 backdrop-blur">
         <div className="relative">
           <Search
