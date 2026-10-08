@@ -21,7 +21,13 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { PLANOS, ORDEM_PLANOS } from "@/lib/plans";
-import { EMAIL_CONTATO, INSTAGRAM_TEGGLY, WHATSAPP_TEGGLY, mailtoContato } from "@/lib/site";
+import {
+  EMAIL_CONTATO,
+  INSTAGRAM_TEGGLY,
+  SITE_URL,
+  WHATSAPP_TEGGLY,
+  mailtoContato,
+} from "@/lib/site";
 
 const DESCRICAO =
   "Plataforma de reservas e atendimento inteligente para restaurantes: reservas, WhatsApp, clientes, cardápio e Link Hub em um só lugar.";
@@ -34,14 +40,14 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Teggly · Mais reservas. Menos trabalho." },
       { property: "og:description", content: DESCRICAO },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://reserva.bauerlab.com.br/" },
-      { property: "og:image", content: "https://reserva.bauerlab.com.br/og-image.png" },
+      { property: "og:url", content: `${SITE_URL}/` },
+      { property: "og:image", content: `${SITE_URL}/og-image.png` },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: "https://reserva.bauerlab.com.br/og-image.png" },
+      { name: "twitter:image", content: `${SITE_URL}/og-image.png` },
     ],
-    links: [{ rel: "canonical", href: "https://reserva.bauerlab.com.br/" }],
+    links: [{ rel: "canonical", href: `${SITE_URL}/` }],
     scripts: [
       {
         type: "application/ld+json",
