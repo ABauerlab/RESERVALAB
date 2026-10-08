@@ -168,3 +168,44 @@ test.describe("Cardápio no painel: conteúdo, aparência e publicação", () =>
     }
   });
 });
+
+test.describe("Cardápio: reordenar arrastando", () => {
+  test("alça de arrastar funciona pelo teclado e grava a nova ordem da categoria", async ({
+    page,
+    context,
+  }) => {
+    const mock = await installMock(context);
+    await page.goto("/iracema/admin/cardapio");
+    await expect(page.getByRole("heading", { name: "Pratos" })).toBeVisible();
+
+    const alca = page.getByRole("button", { name: "Arrastar para reordenar: Pratos" });
+    await alca.focus();
+    await page.keyboard.press("Space");
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("Space");
+
+    await expect
+      .poll(() =>
+        mock.writes
+          .filter((w) => w.method === "PATCH" && w.url.includes("cardapio_categorias"))
+          .map((w) => ({ url: w.url, body: w.body })),
+      )
+      .toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            body: { ordem: 1 },
+            url: expect.stringContaining("tenant_id=eq.11111111-1111-1111-1111-111111111111"),
+          }),
+        ]),
+      );
+  });
+
+  test("as setas de subir e descer continuam disponíveis como alternativa", async ({
+    page,
+    context,
+  }) => {
+    await installMock(context);
+    await page.goto("/iracema/admin/cardapio");
+    await expect(page.getByRole("button", { name: "Descer categoria" }).first()).toBeVisible();
+  });
+});

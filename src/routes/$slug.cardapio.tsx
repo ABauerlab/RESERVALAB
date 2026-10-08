@@ -17,20 +17,25 @@ import {
   formatPreco,
   type ItemCardapio,
 } from "@/lib/cardapio";
+import { fetchOgRestaurante, montarOg } from "@/lib/og";
 import { cn } from "@/lib/utils";
 import { getTenantBySlug } from "@/lib/tenant";
 
 export const Route = createFileRoute("/$slug/cardapio")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `Cardápio | ${params.slug}` },
-      { name: "description", content: "Veja o cardápio e reserve sua mesa." },
-      { property: "og:type", content: "website" },
-      { property: "og:title", content: `Cardápio | ${params.slug}` },
-      { property: "og:description", content: "Veja o cardápio e reserve sua mesa." },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
+  loader: ({ params }) => fetchOgRestaurante(params.slug),
+  head: ({ params, loaderData }) => {
+    const og = montarOg(params.slug, "cardapio", loaderData ?? null);
+    return {
+      meta: loaderData
+        ? og.meta
+        : [
+            { title: `Cardápio | ${params.slug}` },
+            { name: "description", content: "Veja o cardápio e reserve sua mesa." },
+            ...og.meta,
+          ],
+      links: og.links,
+    };
+  },
   // `item` (prato aberto) e `de` (de onde veio) moram na URL: o voltar do navegador fecha o prato
   // e leva de volta ao Link Hub. `previa` e `layout` so valem para o admin.
   validateSearch: (search: Record<string, unknown>): CardapioBusca => {

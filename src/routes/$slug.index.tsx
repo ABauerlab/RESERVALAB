@@ -27,16 +27,29 @@ import {
   type ReservaTipo,
 } from "@/lib/reservations";
 import { fetchHub } from "@/lib/hub";
+import { fetchOgRestaurante, montarOg } from "@/lib/og";
 import { getTenantBySlug } from "@/lib/tenant";
 import { CLICK_RESERVA_EVENT, initFacebookPixel, trackFacebookCustomEvent } from "@/lib/fbpixel";
 
 export const Route = createFileRoute("/$slug/")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `Reservas — ${params.slug}` },
-      { name: "description", content: "Reserve sua mesa, aniversário ou evento em poucos toques." },
-    ],
-  }),
+  // Preview ao compartilhar: nome, frase e imagem da propria casa (ver src/lib/og.ts).
+  loader: ({ params }) => fetchOgRestaurante(params.slug),
+  head: ({ params, loaderData }) => {
+    const og = montarOg(params.slug, "", loaderData ?? null);
+    return {
+      meta: loaderData
+        ? og.meta
+        : [
+            { title: `Reservas | ${params.slug}` },
+            {
+              name: "description",
+              content: "Reserve sua mesa, aniversário ou evento em poucos toques.",
+            },
+            ...og.meta,
+          ],
+      links: og.links,
+    };
+  },
   component: comMarca(TenantHome),
 });
 
