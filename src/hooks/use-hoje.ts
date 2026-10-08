@@ -3,6 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Reserva } from "@/lib/reservations";
 import { addDaysISO, todayISO, tomorrowISO } from "@/lib/admin-dates";
+import type { HistoricoNegocio } from "@/lib/dashboard";
+
+export const JANELA_NEGOCIO_DIAS = 30;
 
 /**
  * Leituras do painel Hoje. Somente SELECT, sempre filtrando por tenant_id.
@@ -153,7 +156,31 @@ export function useHojeData(ready: boolean, tenantId: string | null, dia: string
     },
   });
 
+  // Visao do negocio: ultimos 30 dias + 90 dias antes para reconhecer quem voltou. O limite de 1000
+  // linhas do banco vale; vem ordenado do mais recente, entao a janela atual sempre entra inteira.
+  const hoje = todayISO();
+  const inicioJanela = addDaysISO(hoje, -JANELA_NEGOCIO_DIAS);
+  const negocioQ = useQuery({
+    enabled,
+    queryKey: ["reservas", tenantId, "visao-negocio", hoje],
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("reservas")
+        .select("telefone,data,status,quantidade")
+        .eq("tenant_id", tenantId!)
+        .gte("data", addDaysISO(inicioJanela, -90))
+        .lte("data", hoje)
+        .order("data", { ascending: false })
+        .limit(1000);
+      if (error) throw error;
+      return data as HistoricoNegocio[];
+    },
+  });
+
   return {
+    negocioQ,
+    inicioJanela,
     diaQ,
     historicoQ,
     pendentesQ,

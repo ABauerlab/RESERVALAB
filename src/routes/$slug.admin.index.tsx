@@ -1,44 +1,57 @@
 import { pwaHeadLinks } from "@/lib/pwa-manifest";
-import { createFileRoute, useParams } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, useNavigate, useParams } from "@tanstack/react-router";
+import { useMemo } from "react";
 import { Link } from "@tanstack/react-router";
 import { Bell, BellRing, ChevronLeft, ChevronRight, Download, Loader2 } from "lucide-react";
 
 import type { Reserva } from "@/lib/reservations";
 import { addDaysISO, formatDataLonga, localHHMM, todayISO } from "@/lib/admin-dates";
-import { clientesDeCasa, resumoDoDia } from "@/lib/dashboard";
+import { parseDiaParam } from "@/lib/agenda";
+import { clientesDeCasa, resumoDoDia, visaoDoNegocio } from "@/lib/dashboard";
+import { parseReservaParam } from "@/lib/reservas-busca";
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
 import { useDetailMode } from "@/hooks/use-media-query";
 import { useReservaActions, useReservasRealtime } from "@/hooks/use-reservas-admin";
-import { useHojeData } from "@/hooks/use-hoje";
+import { useNavigateReserva, useReservaUrl } from "@/hooks/use-reserva-url";
+import { JANELA_NEGOCIO_DIAS, useHojeData } from "@/hooks/use-hoje";
 import { usePlano } from "@/hooks/use-plano";
 import { usePwaActions } from "@/hooks/use-pwa-actions";
 import { cn } from "@/lib/utils";
 
 import { AdminShell } from "@/components/admin/AdminShell";
-import { BottomSheet } from "@/components/admin/BottomSheet";
+import { DateField } from "@/components/admin/DateField";
 import { MensagemDoDiaButton } from "@/components/admin/MensagemDoDia";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { useRowAction } from "@/components/admin/RowAction";
 import { ReservaDetail } from "@/components/admin/ReservaDetail";
+import { Atalhos } from "@/components/admin/hoje/Atalhos";
+import { Atencao } from "@/components/admin/hoje/Atencao";
 import { ClientesDeCasa } from "@/components/admin/hoje/ClientesDeCasa";
-import { Kpis } from "@/components/admin/hoje/Kpis";
-import { NeedsYou } from "@/components/admin/hoje/NeedsYou";
+import { DiaResumo } from "@/components/admin/hoje/DiaResumo";
 import { PlanoCard } from "@/components/admin/hoje/PlanoCard";
 import { ServiceLine } from "@/components/admin/hoje/ServiceLine";
 import { UpcomingDays, type DayInfo } from "@/components/admin/hoje/UpcomingDays";
+import { VisaoNegocio } from "@/components/admin/hoje/VisaoNegocio";
 import { Skeleton } from "@/components/ui/skeleton";
+
+type DashboardBusca = { dia?: string; reserva?: string };
 
 export const Route = createFileRoute("/$slug/admin/")({
   head: ({ params }) => ({
-    meta: [{ title: "Hoje | Teggly" }, { name: "robots", content: "noindex" }],
+    meta: [{ title: "Dashboard | Teggly" }, { name: "robots", content: "noindex" }],
     links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),
   }),
+  // `?dia=` e `?reserva=` na URL: atualizar a pagina ou voltar de uma reserva preserva o contexto.
+  validateSearch: (search: Record<string, unknown>): DashboardBusca => {
+    const dia = parseDiaParam(search.dia);
+    const reserva = parseReservaParam(search.reserva);
+    return { ...(dia ? { dia } : {}), ...(reserva ? { reserva } : {}) };
+  },
   ssr: false,
-  component: AdminHoje,
+  component: AdminDashboard,
 });
 
-function AdminHoje() {
+function AdminDashboard() {
   const { slug } = useParams({ from: "/$slug/admin/" });
 
   // Guarda única: sessão, vínculo com a empresa e troca de senha obrigatória.
@@ -49,22 +62,58 @@ function AdminHoje() {
 
   const dock = useDetailMode() === "dock";
   const hoje = todayISO();
-  const [dia, setDia] = useState(hoje);
-  const [selected, setSelected] = useState<Reserva | null>(null);
-  const [needsOpen, setNeedsOpen] = useState(false);
+  const search = Route.useSearch();
+  const navigate = useNavigate();
+  const dia = search.dia ?? hoje;
+  const setDia = (iso: string) =>
+    navigate({
+      to: "/$slug/admin",
+      params: { slug },
+      search: ((prev: DashboardBusca) => ({
+        ...prev,
+        dia: iso === hoje ? undefined : iso,
+      })) as never,
+      replace: true,
+    });
 
   useReservasRealtime(ready, tenantId);
   const pwa = usePwaActions(tenantId);
+  const navegarReserva = useNavigateReserva("/$slug/admin", slug);
   const actions = useReservaActions(slug, tenantId, {
-    onPatched: (id, patch) =>
-      setSelected((s) => (s && s.id === id ? ({ ...s, ...patch } as Reserva) : s)),
-    onDeleted: () => setSelected(null),
+    onDeleted: () => navegarReserva(undefined, true),
   });
-  const { diaQ, historicoQ, pendentesQ, reconfirmarQ, proximosQ, bloqueiosQ, feriadosQ, eventosQ } =
-    useHojeData(ready, tenantId, dia);
+  const {
+    diaQ,
+    historicoQ,
+    pendentesQ,
+    reconfirmarQ,
+    proximosQ,
+    bloqueiosQ,
+    feriadosQ,
+    eventosQ,
+    negocioQ,
+    inicioJanela,
+  } = useHojeData(ready, tenantId, dia);
   const planoInfo = usePlano(ready, tenantId);
 
   const reservasDia = useMemo(() => diaQ.data ?? [], [diaQ.data]);
+  const pendentes = useMemo(() => pendentesQ.data ?? [], [pendentesQ.data]);
+  const reconfirmar = useMemo(() => reconfirmarQ.data ?? [], [reconfirmarQ.data]);
+
+  const {
+    selecionada: selected,
+    abrir,
+    fechar,
+  } = useReservaUrl({
+    tenantId,
+    reservaId: search.reserva,
+    candidatas: useMemo(
+      () => [...reservasDia, ...pendentes, ...reconfirmar],
+      [reservasDia, pendentes, reconfirmar],
+    ),
+    navegar: navegarReserva,
+  });
+
   const resumo = useMemo(
     () => resumoDoDia(reservasDia, dia, hoje, localHHMM()),
     [reservasDia, dia, hoje],
@@ -72,6 +121,11 @@ function AdminHoje() {
   const deCasa = useMemo(
     () => clientesDeCasa(reservasDia, historicoQ.data ?? [], dia),
     [reservasDia, historicoQ.data, dia],
+  );
+  const visao = useMemo(
+    () =>
+      negocioQ.data ? visaoDoNegocio(negocioQ.data, hoje, inicioJanela, JANELA_NEGOCIO_DIAS) : null,
+    [negocioQ.data, hoje, inicioJanela],
   );
 
   const proximos = useMemo(() => {
@@ -90,10 +144,6 @@ function AdminHoje() {
     return out;
   }, [proximosQ.data, bloqueiosQ.data, feriadosQ.data, eventosQ.data]);
 
-  const pendentes = pendentesQ.data ?? [];
-  const reconfirmar = reconfirmarQ.data ?? [];
-  const needsTotal = pendentes.length + reconfirmar.length;
-
   const renderAction = useRowAction(actions);
 
   if (!ready) {
@@ -108,13 +158,12 @@ function AdminHoje() {
   const sentence =
     resumo.reservas === 0
       ? "Nenhuma reserva neste dia"
-      : `${resumo.reservas} ${resumo.reservas === 1 ? "reserva" : "reservas"}, ${resumo.pessoas} pessoas, ${resumo.pendentes} ${resumo.pendentes === 1 ? "pendente" : "pendentes"}`;
+      : `${resumo.reservas} ${resumo.reservas === 1 ? "reserva" : "reservas"}, ${resumo.pessoas} ${resumo.pessoas === 1 ? "pessoa" : "pessoas"}`;
 
   const navBtn =
     "flex h-11 w-11 items-center justify-center rounded-md border border-border bg-card text-foreground transition-colors hover:bg-muted xl:h-9 xl:w-9";
   const chip =
     "inline-flex h-11 items-center gap-2 rounded-full px-3.5 xl:h-9 text-xs font-semibold transition-colors disabled:opacity-50";
-
   return (
     <AdminShell slug={slug} tenantNome={tenantNome} active="hoje">
       <div
@@ -124,17 +173,17 @@ function AdminHoje() {
         )}
       >
         <PageHeader
-          eyebrow={isToday ? "Hoje" : undefined}
+          eyebrow={isToday ? "Dashboard · hoje" : "Dashboard"}
           title={formatDataLonga(dia)}
-          description={`${isToday ? "Hoje: " : ""}${sentence}`}
+          description={sentence}
           actions={<MensagemDoDiaButton tenantId={tenantId} />}
         />
 
-        <div className="mt-3 flex items-center gap-2">
+        <div className="mt-3 flex flex-wrap items-center gap-2">
           <button
             type="button"
             className={navBtn}
-            onClick={() => setDia((d) => addDaysISO(d, -1))}
+            onClick={() => setDia(addDaysISO(dia, -1))}
             aria-label="Dia anterior"
           >
             <ChevronLeft className="h-4 w-4" />
@@ -150,117 +199,106 @@ function AdminHoje() {
           <button
             type="button"
             className={navBtn}
-            onClick={() => setDia((d) => addDaysISO(d, 1))}
+            onClick={() => setDia(addDaysISO(dia, 1))}
             aria-label="Próximo dia"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
+          <DateField value={isToday ? null : dia} onChange={setDia} placeholder="Outro dia" />
         </div>
 
-        <Kpis
-          slug={slug}
-          reservas={resumo.reservas}
-          pessoas={resumo.pessoas}
-          proxima={resumo.proxima}
-          restantes={resumo.restantes}
-          isToday={dia === hoje}
-          pendentes={pendentes.length}
-          reconfirmar={reconfirmar.length}
-          onAbrirProxima={setSelected}
-          onAbrirPrecisaDeVoce={() => {
-            if (window.matchMedia("(min-width: 1280px)").matches) {
-              document
-                .getElementById("precisa-de-voce")
-                ?.scrollIntoView({ behavior: "smooth", block: "start" });
-            } else {
-              setNeedsOpen(true);
-            }
-          }}
-        />
+        <div className="mt-5">
+          <Atencao
+            slug={slug}
+            tenantId={tenantId}
+            pendentes={pendentes}
+            reconfirmar={reconfirmar}
+            loading={pendentesQ.isLoading || reconfirmarQ.isLoading}
+            selectedId={selected?.id}
+            onOpen={abrir}
+            renderAction={renderAction}
+          />
+        </div>
 
         <div
           className={cn(
-            "mt-4 grid gap-6",
+            "mt-6 grid gap-6",
             selected && dock ? "xl:grid-cols-1" : "xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]",
           )}
         >
-          <section aria-label="Linha do serviço" className="min-w-0">
-            <div className="mb-2 flex items-center justify-between">
-              <h2 className="hidden text-xs font-extrabold uppercase tracking-[0.08em] text-muted-foreground xl:block">
-                Linha do serviço
-              </h2>
-              <Link
-                to="/$slug/admin/agenda"
-                params={{ slug }}
-                className="ml-auto inline-flex min-h-11 items-center text-xs font-semibold text-primary hover:underline xl:min-h-0"
-              >
-                Ver na Agenda
-              </Link>
-            </div>
-            {diaQ.isLoading ? (
-              <div className="space-y-2">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <Skeleton key={i} className="h-[64px] w-full rounded-lg" />
-                ))}
+          <section aria-label="Linha do serviço" className="min-w-0 space-y-4">
+            <DiaResumo
+              slug={slug}
+              dia={dia}
+              reservas={resumo.reservas}
+              pessoas={resumo.pessoas}
+              proxima={resumo.proxima}
+              isToday={isToday}
+              onAbrirProxima={abrir}
+            />
+            <div>
+              <div className="mb-2 flex items-center justify-between">
+                <h2 className="text-xs font-extrabold uppercase tracking-[0.08em] text-muted-foreground">
+                  {isToday ? "Hoje, hora a hora" : "O dia, hora a hora"}
+                </h2>
+                <Link
+                  to="/$slug/admin/agenda"
+                  params={{ slug }}
+                  search={{ dia }}
+                  className="inline-flex min-h-11 items-center text-xs font-semibold text-primary hover:underline xl:min-h-0"
+                >
+                  Ver na Agenda
+                </Link>
               </div>
-            ) : diaQ.isError ? (
-              <p className="rounded-lg border border-dashed border-border px-4 py-10 text-center text-sm text-muted-foreground">
-                Não foi possível carregar as reservas. Tente novamente em instantes.
-              </p>
-            ) : resumo.reservas === 0 ? (
-              <div className="rounded-lg border border-dashed border-border bg-card/50 px-4 py-12 text-center">
-                <p className="text-xl font-extrabold tracking-tight text-foreground">
-                  Nenhuma reserva
+              {diaQ.isLoading ? (
+                <div className="space-y-2">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <Skeleton key={i} className="h-[64px] w-full rounded-lg" />
+                  ))}
+                </div>
+              ) : diaQ.isError ? (
+                <p className="rounded-lg border border-dashed border-border px-4 py-10 text-center text-sm text-muted-foreground">
+                  Não foi possível carregar as reservas. Tente novamente em instantes.
                 </p>
-                <p className="mt-1 text-sm text-muted-foreground">Nada marcado para este dia.</p>
-              </div>
-            ) : (
-              <ServiceLine
-                reservas={reservasDia}
-                dia={dia}
-                selectedId={selected?.id}
-                onOpen={setSelected}
-                renderAction={renderAction}
-                compact={dock && !!selected}
-              />
-            )}
-            {resumo.canceladas > 0 && (
-              <p className="mt-2 text-xs text-muted-foreground">
-                {resumo.canceladas} {resumo.canceladas === 1 ? "cancelada" : "canceladas"} neste dia
-              </p>
-            )}
-            <ClientesDeCasa slug={slug} itens={deCasa} onOpen={(c) => setSelected(c.reserva)} />
-          </section>
-
-          <section
-            id="precisa-de-voce"
-            aria-label="Precisa de você"
-            className={cn("min-w-0", selected && dock ? "" : "hidden xl:block")}
-          >
-            <h2 className="mb-2 hidden text-xs font-extrabold uppercase tracking-[0.08em] text-muted-foreground xl:block">
-              Precisa de você
-            </h2>
-            <div className="hidden xl:block">
-              <NeedsYou
-                tenantId={tenantId}
-                pendentes={pendentes}
-                reconfirmar={reconfirmar}
-                selectedId={selected?.id}
-                onOpen={setSelected}
-                renderAction={renderAction}
-                loading={pendentesQ.isLoading || reconfirmarQ.isLoading}
-              />
+              ) : resumo.reservas === 0 ? (
+                <div className="rounded-lg border border-dashed border-border bg-card/50 px-4 py-10 text-center">
+                  <p className="text-xl font-extrabold tracking-tight text-foreground">
+                    Nenhuma reserva
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">Nada marcado para este dia.</p>
+                </div>
+              ) : (
+                <ServiceLine
+                  reservas={reservasDia}
+                  dia={dia}
+                  selectedId={selected?.id}
+                  onOpen={abrir}
+                  renderAction={renderAction}
+                  compact={dock && !!selected}
+                />
+              )}
+              {resumo.canceladas > 0 && (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  {resumo.canceladas} {resumo.canceladas === 1 ? "cancelada" : "canceladas"} neste
+                  dia
+                </p>
+              )}
             </div>
+            <ClientesDeCasa slug={slug} itens={deCasa} onOpen={(c) => abrir(c.reserva)} />
           </section>
+
+          <div className="min-w-0 space-y-6">
+            <UpcomingDays dia={dia} info={proximos} onPick={setDia} lista />
+            <Atalhos slug={slug} />
+          </div>
         </div>
 
-        <div className="mt-8">
-          <UpcomingDays dia={dia} info={proximos} onPick={setDia} />
+        <div className="mt-6 space-y-4">
+          <VisaoNegocio slug={slug} visao={visao} loading={negocioQ.isLoading} />
+          {planoInfo.explicito && !planoInfo.loading && (
+            <PlanoCard slug={slug} plano={planoInfo.plano} uso={planoInfo.uso} />
+          )}
         </div>
-
-        {planoInfo.explicito && !planoInfo.loading && (
-          <PlanoCard slug={slug} plano={planoInfo.plano} uso={planoInfo.uso} />
-        )}
 
         {(pwa.showPushCTA || pwa.pushActive || pwa.showLegacyNotifCTA || pwa.showInstall) && (
           <div className="mt-8 flex flex-wrap gap-2 border-t border-border pt-4">
@@ -303,23 +341,9 @@ function AdminHoje() {
         )}
       </div>
 
-      <BottomSheet open={needsOpen} onOpenChange={setNeedsOpen} title="Precisa de você">
-        <NeedsYou
-          tenantId={tenantId}
-          pendentes={pendentes}
-          reconfirmar={reconfirmar}
-          onOpen={(r) => {
-            setNeedsOpen(false);
-            setSelected(r);
-          }}
-          renderAction={renderAction}
-          loading={pendentesQ.isLoading || reconfirmarQ.isLoading}
-        />
-      </BottomSheet>
-
       <ReservaDetail
         reserva={selected}
-        onClose={() => setSelected(null)}
+        onClose={fechar}
         onConfirm={() => selected && actions.handleConfirm(selected)}
         onConfirmSemNotificar={() => selected && actions.handleConfirmSemNotificar(selected)}
         onReconfirm={() => selected && actions.handleReconfirm(selected)}

@@ -28,7 +28,7 @@ function useKeyboardOpen() {
   return open;
 }
 
-/** Barra inferior mobile: Hoje · Reservas · Agenda · Mais. 56px + área segura. */
+/** Barra inferior mobile: Dashboard · Reservas · Agenda · Mais. 56px + área segura. */
 export function MobileNavigation({
   slug,
   active,

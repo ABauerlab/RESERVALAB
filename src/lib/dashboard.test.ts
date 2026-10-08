@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { clientesDeCasa, resumoDoDia } from "@/lib/dashboard";
+import { clientesDeCasa, resumoDoDia, visaoDoNegocio } from "@/lib/dashboard";
 import type { Reserva } from "@/lib/reservations";
 
 const r = (id: string, status: string, horario: string | null, q: number, tel = "31988887777") =>
@@ -80,5 +80,34 @@ describe("clientesDeCasa", () => {
       "2026-10-07",
     );
     expect(out).toHaveLength(1);
+  });
+});
+
+describe("visaoDoNegocio", () => {
+  const h = (telefone: string, data: string, status = "finalizada", quantidade = 2) =>
+    ({ telefone, data, status, quantidade }) as never;
+  const hist = [
+    h("31988887777", "2026-09-01"),
+    h("31988887777", "2026-10-02"),
+    h("(31) 97777-6666", "2026-09-20"),
+    h("(31) 97777-6666", "2026-09-25"),
+    h("31966665555", "2026-09-28", "cancelada"),
+    h("31955554444", "2026-10-05", "confirmada", 5),
+    h("31955554444", "2026-10-30", "confirmada", 5),
+  ];
+  const v = visaoDoNegocio(hist, "2026-10-07", "2026-09-08", 30);
+  it("conta reservas ativas, pessoas e cancelamentos so da janela", () => {
+    expect(v).toMatchObject({ reservas: 4, pessoas: 11, canceladas: 1, taxaCancelamento: 20 });
+  });
+  it("reconhece quem voltou por historico anterior ou repeticao na janela", () => {
+    expect(v.clientes).toBe(3);
+    expect(v.clientesQueVoltaram).toBe(2);
+  });
+  it("janela vazia nao inventa percentual", () => {
+    expect(visaoDoNegocio([], "2026-10-07", "2026-09-08", 30)).toMatchObject({
+      reservas: 0,
+      taxaCancelamento: 0,
+      clientes: 0,
+    });
   });
 });

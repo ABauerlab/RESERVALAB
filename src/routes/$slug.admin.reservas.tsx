@@ -1,8 +1,8 @@
 import { pwaHeadLinks } from "@/lib/pwa-manifest";
-import { createFileRoute, useParams } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, useNavigate, useParams } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, Search, SlidersHorizontal, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, Search, SlidersHorizontal, X } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -14,12 +14,23 @@ import {
   type ReservaTipo,
 } from "@/lib/reservations";
 import {
+  addDaysISO,
   endOfMonthISO,
   endOfWeekISO,
+  formatDataLonga,
   todayISO,
   tomorrowISO,
   weekdayLabel,
 } from "@/lib/admin-dates";
+import {
+  PERIODO_PADRAO,
+  parseReservasBusca,
+  type EncerradaFiltro,
+  type Periodo,
+  type ReservasBusca,
+  type StatusFiltro,
+} from "@/lib/reservas-busca";
+import { useNavigateReserva, useReservaUrl } from "@/hooks/use-reserva-url";
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
 import { useReservaActions, useReservasRealtime } from "@/hooks/use-reservas-admin";
 import { useDetailMode, useMediaQuery } from "@/hooks/use-media-query";
@@ -27,6 +38,7 @@ import { cn } from "@/lib/utils";
 
 import { AdminShell } from "@/components/admin/AdminShell";
 import { BottomSheet } from "@/components/admin/BottomSheet";
+import { DateField } from "@/components/admin/DateField";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { ReservaDetail } from "@/components/admin/ReservaDetail";
 import { ReservationRow } from "@/components/admin/ReservationRow";
@@ -39,11 +51,13 @@ export const Route = createFileRoute("/$slug/admin/reservas")({
     meta: [{ title: "Reservas | Teggly" }, { name: "robots", content: "noindex" }],
     links: pwaHeadLinks(`/${params.slug}/admin`, "Admin"),
   }),
+  // Filtros, dia e reserva aberta moram na URL: voltar de uma reserva devolve a mesma lista.
+  validateSearch: (search: Record<string, unknown>): ReservasBusca => parseReservasBusca(search),
   ssr: false,
   component: AdminReservas,
 });
 
-type FiltroData = "hoje" | "amanha" | "semana" | "mes" | "todos";
+type FiltroData = Exclude<Periodo, "dia">;
 const FILTROS_DATA: Array<{ id: FiltroData; label: string }> = [
   { id: "hoje", label: "Hoje" },
   { id: "amanha", label: "Amanhã" },
@@ -54,14 +68,14 @@ const FILTROS_DATA: Array<{ id: FiltroData; label: string }> = [
 
 // Status: Todas, Pendentes, Confirmadas e Encerradas (canceladas + finalizadas).
 // Dentro de "Encerradas" os filtros antigos "Canceladas" e "Finalizadas" continuam acessíveis.
-type FiltroStatus = "todos" | "pendente" | "confirmada" | "encerradas";
+type FiltroStatus = StatusFiltro;
 const FILTROS_STATUS: Array<{ id: FiltroStatus; label: string }> = [
   { id: "todos", label: "Todas" },
   { id: "pendente", label: "Pendentes" },
   { id: "confirmada", label: "Confirmadas" },
   { id: "encerradas", label: "Encerradas" },
 ];
-type EncerradaSub = "ambas" | "cancelada" | "finalizada";
+type EncerradaSub = EncerradaFiltro;
 
 const TIPOS: ReservaTipo[] = ["mesa", "aniversario", "evento", "casamento"];
 const AREAS: ReservaArea[] = ["salao", "fundos", "corredor", "varanda", "sem_preferencia"];
@@ -101,21 +115,51 @@ function AdminReservas() {
   const desktop = useMediaQuery("(min-width: 768px)");
   const dock = useDetailMode() === "dock";
 
-  const [filtroData, setFiltroData] = useState<FiltroData>("semana");
-  const [filtroStatus, setFiltroStatus] = useState<FiltroStatus>("todos");
-  const [encerradaSub, setEncerradaSub] = useState<EncerradaSub>("ambas");
-  const [filtroTipo, setFiltroTipo] = useState<ReservaTipo | "todos">("todos");
-  const [filtroArea, setFiltroArea] = useState<ReservaArea | "todas">("todas");
-  const [busca, setBusca] = useState("");
+  const search = Route.useSearch();
+  const navigate = useNavigate();
+  const filtroData: Periodo = search.periodo ?? PERIODO_PADRAO;
+  const diaEscolhido = search.dia ?? null;
+  const filtroStatus: FiltroStatus = search.status ?? "todos";
+  const encerradaSub: EncerradaSub = search.encerradas ?? "ambas";
+  const filtroTipo = (search.tipo ?? "todos") as ReservaTipo | "todos";
+  const filtroArea = (search.area ?? "todas") as ReservaArea | "todas";
+  const busca = search.q ?? "";
+
+  /** Muda filtros na URL sem empilhar historico; `reserva` so e limpa ao trocar de filtro. */
+  function setBusca_(patch: Partial<Record<keyof ReservasBusca, string | undefined>>) {
+    navigate({
+      to: "/$slug/admin/reservas",
+      params: { slug },
+      search: ((prev: ReservasBusca) => parseReservasBusca({ ...prev, ...patch })) as never,
+      replace: true,
+    });
+  }
+  const setFiltroData = (p: FiltroData) => setBusca_({ periodo: p, dia: undefined });
+  const setDia = (iso: string) => setBusca_({ periodo: "dia", dia: iso });
+  const setFiltroStatus = (s: FiltroStatus) => setBusca_({ status: s, encerradas: undefined });
+  const setEncerradaSub = (e: EncerradaSub) => setBusca_({ encerradas: e });
+  const setFiltroTipo = (t: ReservaTipo | "todos") =>
+    setBusca_({ tipo: t === "todos" ? undefined : t });
+  const setFiltroArea = (a: ReservaArea | "todas") =>
+    setBusca_({ area: a === "todas" ? undefined : a });
+
+  // O campo de busca tem estado proprio e grava na URL depois de uma pausa na digitacao.
+  const [buscaCampo, setBuscaCampo] = useState(busca);
+  useEffect(() => setBuscaCampo(busca), [busca]);
+  useEffect(() => {
+    if (buscaCampo === busca) return;
+    const t = setTimeout(() => setBusca_({ q: buscaCampo }), 300);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [buscaCampo]);
+
   const [mostrarFinalizadas, setMostrarFinalizadas] = useState(false);
   const [filtrosOpen, setFiltrosOpen] = useState(false);
-  const [selected, setSelected] = useState<Reserva | null>(null);
 
   useReservasRealtime(ready, tenantId);
+  const navegarReserva = useNavigateReserva("/$slug/admin/reservas", slug);
   const actions = useReservaActions(slug, tenantId, {
-    onPatched: (id, patch) =>
-      setSelected((s) => (s && s.id === id ? ({ ...s, ...patch } as Reserva) : s)),
-    onDeleted: () => setSelected(null),
+    onDeleted: () => navegarReserva(undefined, true),
   });
   const renderAction = useRowAction(actions);
 
@@ -127,7 +171,8 @@ function AdminReservas() {
       lte: (c: string, v: string) => unknown;
       or: (f: string) => unknown;
     };
-    if (filtroData === "hoje") out = out.eq("data", todayISO()) as typeof out;
+    if (filtroData === "dia" && diaEscolhido) out = out.eq("data", diaEscolhido) as typeof out;
+    else if (filtroData === "hoje") out = out.eq("data", todayISO()) as typeof out;
     else if (filtroData === "amanha") out = out.eq("data", tomorrowISO()) as typeof out;
     else if (filtroData === "semana")
       out = (out.gte("data", todayISO()) as typeof out).lte("data", endOfWeekISO()) as typeof out;
@@ -137,7 +182,8 @@ function AdminReservas() {
     if (filtroTipo !== "todos") out = out.eq("tipo", filtroTipo) as typeof out;
     if (filtroArea !== "todas") out = out.eq("area", filtroArea) as typeof out;
 
-    const term = busca.trim();
+    // Virgula e parenteses quebrariam o filtro `or` do PostgREST.
+    const term = busca.replace(/[,()]/g, " ").trim();
     if (term)
       out = out.or(
         `nome.ilike.%${term}%,telefone.ilike.%${term}%,codigo_acompanhamento.ilike.%${term.toUpperCase()}%`,
@@ -152,6 +198,7 @@ function AdminReservas() {
       tenantId,
       "lista",
       filtroData,
+      diaEscolhido,
       filtroStatus,
       encerradaSub,
       filtroTipo,
@@ -189,7 +236,15 @@ function AdminReservas() {
 
   const finalizadasCountQ = useQuery({
     enabled: ready && !!tenantId && filtroStatus === "todos" && !mostrarFinalizadas,
-    queryKey: ["reservas-finalizadas-count", tenantId, filtroData, filtroTipo, filtroArea, busca],
+    queryKey: [
+      "reservas-finalizadas-count",
+      tenantId,
+      filtroData,
+      diaEscolhido,
+      filtroTipo,
+      filtroArea,
+      busca,
+    ],
     queryFn: async () => {
       let q = supabase
         .from("reservas")
@@ -214,6 +269,17 @@ function AdminReservas() {
     return out;
   }, [listaQ.data]);
 
+  const {
+    selecionada: selected,
+    abrir,
+    fechar,
+  } = useReservaUrl({
+    tenantId,
+    reservaId: search.reserva,
+    candidatas: listaQ.data ?? [],
+    navegar: navegarReserva,
+  });
+
   if (!ready) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
@@ -222,26 +288,11 @@ function AdminReservas() {
     );
   }
 
-  const filtrosAtivos =
-    (filtroTipo !== "todos" ? 1 : 0) +
-    (filtroArea !== "todas" ? 1 : 0) +
-    (filtroData !== "semana" ? 1 : 0);
+  const filtrosAtivos = (filtroTipo !== "todos" ? 1 : 0) + (filtroArea !== "todas" ? 1 : 0);
   const total = listaQ.data?.length ?? 0;
 
   const filtrosBody = (
     <div className="space-y-4">
-      <div>
-        <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.08em] text-muted-foreground">
-          Período
-        </p>
-        <div className="flex flex-wrap gap-1.5">
-          {FILTROS_DATA.map((f) => (
-            <Chip key={f.id} active={filtroData === f.id} onClick={() => setFiltroData(f.id)}>
-              {f.label}
-            </Chip>
-          ))}
-        </div>
-      </div>
       <div>
         <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.08em] text-muted-foreground">
           Tipo
@@ -296,16 +347,16 @@ function AdminReservas() {
           <div className="relative min-w-0 flex-1">
             <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
+              value={buscaCampo}
+              onChange={(e) => setBuscaCampo(e.target.value)}
               placeholder="Nome, telefone ou código…"
               aria-label="Buscar reserva"
               className="h-11 rounded-md pl-10 pr-10"
             />
-            {busca && (
+            {buscaCampo && (
               <button
                 type="button"
-                onClick={() => setBusca("")}
+                onClick={() => setBuscaCampo("")}
                 aria-label="Limpar busca"
                 className="absolute right-0 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground hover:text-foreground"
               >
@@ -330,7 +381,51 @@ function AdminReservas() {
           </button>
         </div>
 
-        <div className="mt-3">
+        <div
+          role="group"
+          aria-label="Período"
+          className="-mx-4 mt-3 flex items-center gap-1.5 overflow-x-auto px-4 scrollbar-none md:mx-0 md:px-0"
+        >
+          {FILTROS_DATA.map((f) => (
+            <Chip key={f.id} active={filtroData === f.id} onClick={() => setFiltroData(f.id)}>
+              {f.label}
+            </Chip>
+          ))}
+          <DateField
+            value={diaEscolhido}
+            onChange={setDia}
+            label="Escolher um dia específico"
+            placeholder="Outro dia"
+            active={filtroData === "dia"}
+            className="shrink-0"
+          />
+        </div>
+
+        {filtroData === "dia" && diaEscolhido && (
+          <div className="mt-2 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setDia(addDaysISO(diaEscolhido, -1))}
+              aria-label="Dia anterior"
+              className="flex h-11 w-11 items-center justify-center rounded-md border border-border bg-card hover:bg-muted xl:h-9 xl:w-9"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <p className="min-w-0 flex-1 text-center text-sm font-semibold text-foreground">
+              {formatDataLonga(diaEscolhido)}
+            </p>
+            <button
+              type="button"
+              onClick={() => setDia(addDaysISO(diaEscolhido, 1))}
+              aria-label="Próximo dia"
+              className="flex h-11 w-11 items-center justify-center rounded-md border border-border bg-card hover:bg-muted xl:h-9 xl:w-9"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+
+        <div className="mt-2">
           <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 scrollbar-none md:mx-0 md:px-0">
             {FILTROS_STATUS.map((f) => (
               <Chip
@@ -420,7 +515,7 @@ function AdminReservas() {
                           reserva={r}
                           selected={selected?.id === r.id}
                           compact={dock && !!selected}
-                          onOpen={() => setSelected(r)}
+                          onOpen={() => abrir(r)}
                           action={renderAction(r)}
                         />
                       ))}
@@ -458,7 +553,7 @@ function AdminReservas() {
 
       <ReservaDetail
         reserva={selected}
-        onClose={() => setSelected(null)}
+        onClose={fechar}
         onConfirm={() => selected && actions.handleConfirm(selected)}
         onConfirmSemNotificar={() => selected && actions.handleConfirmSemNotificar(selected)}
         onReconfirm={() => selected && actions.handleReconfirm(selected)}
