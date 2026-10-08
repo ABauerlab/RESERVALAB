@@ -32,3 +32,21 @@ test.describe("Experiência pública", () => {
     ).toHaveLength(0);
   });
 });
+
+test.describe("Acessibilidade das páginas públicas", () => {
+  test("a página permite zoom (sem maximum-scale) e a prévia do cardápio não é indexada", async ({
+    page,
+    context,
+  }) => {
+    await installMock(context);
+    await page.goto("/iracema/links");
+    const viewport = await page.locator("meta[name=viewport]").getAttribute("content");
+    expect(viewport).not.toMatch(/maximum-scale|user-scalable/);
+
+    await page.goto("/iracema/cardapio?previa=1");
+    await expect(page.locator("meta[name=robots][content=noindex]")).toHaveCount(1);
+    await page.goto("/iracema/cardapio");
+    await expect(page.getByRole("heading", { name: "Pratos" })).toBeVisible();
+    await expect(page.locator("meta[name=robots][content=noindex]")).toHaveCount(0);
+  });
+});

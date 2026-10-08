@@ -86,7 +86,11 @@ function EventosPage() {
 
   const remover = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("eventos_destaque").delete().eq("id", id);
+      const { error } = await supabase
+        .from("eventos_destaque")
+        .delete()
+        .eq("id", id)
+        .eq("tenant_id", tenantId!);
       if (error) throw error;
     },
     onSuccess: () => {
