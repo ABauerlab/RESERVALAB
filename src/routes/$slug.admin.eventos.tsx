@@ -213,13 +213,13 @@ function EventosPage() {
               {futuros.map((e: EventoRow, i: number) => (
                 <li
                   key={e.id}
-                  className={`flex items-center gap-3 rounded-lg border bg-card p-4 ${i === 0 ? "border-terracotta/40" : "border-border"}`}
+                  className={`flex items-center gap-3 rounded-lg border bg-card p-4 ${i === 0 ? "border-brand/40" : "border-border"}`}
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <p className="font-medium">{e.titulo}</p>
                       {i === 0 && (
-                        <span className="rounded-full bg-terracotta/15 px-2 py-0.5 text-xs font-medium text-terracotta">
+                        <span className="rounded-full bg-brand/15 px-2 py-0.5 text-xs font-medium text-brand">
                           No ar agora
                         </span>
                       )}

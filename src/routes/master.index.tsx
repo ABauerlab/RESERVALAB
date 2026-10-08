@@ -189,7 +189,7 @@ function MasterPanel() {
               </div>
               <Button
                 onClick={() => setOpenNew(true)}
-                className="h-11 rounded-md bg-terracotta text-terracotta-foreground hover:bg-blue-700"
+                className="h-11 rounded-md bg-brand text-brand-foreground hover:bg-blue-700"
               >
                 <Plus className="mr-1.5 h-4 w-4" /> Nova empresa
               </Button>
@@ -410,7 +410,7 @@ function NovoTenantDialog({
             <Button
               type="submit"
               disabled={pending}
-              className="bg-terracotta text-terracotta-foreground hover:bg-blue-700"
+              className="bg-brand text-brand-foreground hover:bg-blue-700"
             >
               {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Criar"}
             </Button>
@@ -693,7 +693,7 @@ function AcessosDialog({
             <Button
               type="submit"
               disabled={criarM.isPending}
-              className="bg-terracotta text-terracotta-foreground hover:bg-blue-700"
+              className="bg-brand text-brand-foreground hover:bg-blue-700"
             >
               {criarM.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Adicionar"}
             </Button>

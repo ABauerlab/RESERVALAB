@@ -56,7 +56,7 @@ function ConfiguracoesPage() {
   const [telefone, setTelefone] = useState("");
   const [email, setEmail] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
-  const [cor, setCor] = useState("#B4552D");
+  const [cor, setCor] = useState("#2563EB");
   const [tipos, setTipos] = useState<ReservaTipo[]>([]);
   const [mensagem, setMensagem] = useState("");
   const [mensagemCancelamento, setMensagemCancelamento] = useState("");
@@ -74,7 +74,7 @@ function ConfiguracoesPage() {
     setTelefone(tenant.telefone_contato ?? "");
     setEmail(tenant.email_contato ?? "");
     setWhatsapp(tenant.whatsapp ?? "");
-    setCor(tenant.cor_primaria ?? "#B4552D");
+    setCor(tenant.cor_primaria ?? "#2563EB");
     setTipos((tenant.tipos_aceitos ?? []) as ReservaTipo[]);
     setMensagem(tenant.mensagem_confirmacao ?? DEFAULT_MENSAGEM_CONFIRMACAO);
     setMensagemCancelamento(tenant.mensagem_cancelamento ?? DEFAULT_MENSAGEM_CANCELAMENTO);

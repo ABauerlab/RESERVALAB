@@ -48,7 +48,7 @@ function Obrigado() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-6 safe-top safe-bottom">
       <div className="w-full max-w-md text-center animate-in-up">
-        <div className="mx-auto flex animate-drop h-14 w-14 items-center justify-center rounded-full bg-terracotta/10 text-terracotta">
+        <div className="mx-auto flex animate-drop h-14 w-14 items-center justify-center rounded-full bg-brand/10 text-brand">
           <Check className="h-6 w-6" strokeWidth={2.25} />
         </div>
 

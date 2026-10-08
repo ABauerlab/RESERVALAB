@@ -107,8 +107,8 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   /* Nomes historicos mantidos (muitos consumidores); valores agora sao Teggly. */
-  --color-terracotta: var(--terracotta);
-  --color-terracotta-foreground: var(--terracotta-foreground);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
   --color-cream: var(--cream);
   --color-brown: var(--brown);
   --color-success: var(--success);
@@ -149,8 +149,8 @@
   --ring: #3b82f6;
 
   /* Tokens historicos do produto, agora na paleta Teggly */
-  --terracotta: #2563eb; /* acento forte (icones, links, CTA secundario) */
-  --terracotta-foreground: #ffffff;
+  --brand: #2563eb; /* acento forte (icones, links, CTA secundario) */
+  --brand-foreground: #ffffff;
   --cream: #eff6ff; /* fundo claro dos chips de icone (blue-50) */
   --brown: #0f172a; /* faixas e rodapes escuros (Dark Navy) */
   --success: #10b981; /* sinal; texto de estado usa success-700 */
@@ -180,8 +180,8 @@
   --border: #1e293b;
   --input: #1e293b;
   --ring: #60a5fa;
-  --terracotta: #60a5fa;
-  --terracotta-foreground: #0f172a;
+  --brand: #60a5fa;
+  --brand-foreground: #0f172a;
   --cream: #172554;
   --brown: #020617;
 }

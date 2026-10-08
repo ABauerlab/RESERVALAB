@@ -175,7 +175,7 @@ function ContatosPage() {
 
         <div className="mt-4 flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-4">
           <div className="flex min-w-0 items-center gap-2.5">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-cream text-terracotta">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-cream text-brand">
               <Users className="h-4 w-4" />
             </span>
             <div>

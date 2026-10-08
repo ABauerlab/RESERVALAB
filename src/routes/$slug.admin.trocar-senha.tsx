@@ -79,7 +79,7 @@ function TrocarSenha() {
         </div>
 
         <div className="rounded-lg border border-border bg-card p-6 shadow-[var(--shadow-md)]">
-          <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-md bg-cream text-terracotta">
+          <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-md bg-cream text-brand">
             <KeyRound className="h-5 w-5" />
           </div>
           <h1 className="font-serif text-3xl tracking-tight">
