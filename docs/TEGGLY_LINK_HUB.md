@@ -50,3 +50,10 @@ Chega: Hoje (atalho), Configurações, bio do Instagram. Vai: reserva (CTA), car
 - Pré-visualização ao vivo ao lado do formulário (hoje: "Ver página").
 - Arrastar para reordenar (hoje: subir/descer).
 - Cliques por link (relatório do Hub) exigem tabela de eventos; não criada para não coletar dado sem necessidade.
+
+## F13: Link Hub em uma tela, selo e mapa
+
+- A pagina publica cabe em uma tela em 320x568 ate 1920x1080 (teste E2E `link-hub-tela.spec.ts`). Ordem: Reservar, destaques marcados pela casa, Cardapio, WhatsApp, Como chegar, Instagram, Ligar, demais links.
+- Selo (`tenant_perfil.hub_selo`, ate 40 caracteres): aparece abaixo do nome. No Iracema: "Comida de Buteco".
+- Mapa (`tenant_perfil.hub_mapa_url`): o painel aceita o codigo "Incorporar um mapa" do Google, extrai e guarda so a URL `https://www.google.com/maps/embed?pb=...`. Regra repetida em `src/lib/mapa.ts` e em CHECK no banco. A pagina monta o proprio iframe (sandbox, lazy, titulo). Desktop: ao lado; celular: recolhido atras de "Ver no mapa".
+- Banco: ver `docs/database/applied/f13_polimento_hub_cardapio_eventos.sql` (aditivo, com rollback).

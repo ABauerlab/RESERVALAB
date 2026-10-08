@@ -37,7 +37,7 @@ test.describe("Cardápio e Link Hub (público)", () => {
     await expect(links.first()).toHaveAttribute("href", "/iracema/reservar/mesa");
     await expect(page.getByRole("link", { name: "Cardápio" })).toHaveAttribute(
       "href",
-      "/iracema/cardapio",
+      "/iracema/cardapio?de=links",
     );
     await expect(page.getByRole("link", { name: "WhatsApp" })).toHaveAttribute(
       "href",

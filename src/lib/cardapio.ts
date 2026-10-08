@@ -53,6 +53,9 @@ export type PerfilRow = {
   hub_banner_url?: string | null;
   hub_banner_ativo?: boolean;
   hub_mostrar_cardapio?: boolean;
+  hub_selo?: string | null;
+  hub_mapa_url?: string | null;
+  cardapio_layout?: string | null;
 };
 
 // As tabelas novas ainda nao estao em `types.ts` (arquivo gerado). Cliente sem tipos de tabela,

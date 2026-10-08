@@ -27,8 +27,8 @@ describe("buildHubItens", () => {
       "reserva",
       "cardapio",
       "whatsapp",
-      "instagram",
       "localizacao",
+      "instagram",
       "telefone",
       "extra",
     ]);
@@ -85,7 +85,7 @@ describe("buildHubItens", () => {
     expect(buildHubItens(base, "casa").some((i) => i.tipo === "cardapio")).toBe(true);
   });
 
-  it("destaques (iFood, 99Food) vem logo depois do cardapio, antes do WhatsApp", () => {
+  it("destaques (iFood, 99Food) vem logo depois do cardapio, antes do WhatsApp e da localizacao", () => {
     const itens = buildHubItens(
       {
         ...base,
@@ -109,8 +109,8 @@ describe("buildHubItens", () => {
       "Peça no iFood",
       "99Food",
       "WhatsApp",
-      "Instagram",
       "Como chegar",
+      "Instagram",
       "Ligar",
       "Playlist",
     ]);

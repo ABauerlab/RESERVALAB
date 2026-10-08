@@ -32,6 +32,8 @@ import { enviarImagemDaEmpresa } from "@/lib/assets";
 import { detectarIcone } from "@/lib/hub-icons";
 import { fetchPerfil, reordenar, tabela } from "@/lib/cardapio";
 import { buildHubItens, urlSegura, type HubDados } from "@/lib/hub";
+import { extrairMapaEmbed, urlDeMapaValida } from "@/lib/mapa";
+import { MapaIncorporado } from "@/components/hub/HubMapa";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/$slug/admin/links")({
@@ -66,6 +68,8 @@ function LinksAdminPage() {
   const [titulo, setTitulo] = useState("");
   const [url, setUrl] = useState("");
   const [descricao, setDescricao] = useState("");
+  const [selo, setSelo] = useState("");
+  const [codigoMapa, setCodigoMapa] = useState("");
   const [novoIcone, setNovoIcone] = useState<IconeEscolhido>({ icone: null, icone_url: null });
   const [novoDestaque, setNovoDestaque] = useState(false);
   const [seletor, setSeletor] = useState<null | { id: string | "novo"; titulo: string }>(null);
@@ -101,6 +105,10 @@ function LinksAdminPage() {
     setDescricao(perfilQ.data?.hub_descricao ?? "");
   }, [perfilQ.data?.hub_descricao]);
 
+  useEffect(() => {
+    setSelo(perfilQ.data?.hub_selo ?? "");
+  }, [perfilQ.data?.hub_selo]);
+
   const links = useMemo(
     () => [...(linksQ.data ?? [])].sort((a, b) => a.ordem - b.ordem),
     [linksQ.data],
@@ -111,6 +119,10 @@ function LinksAdminPage() {
   const bannerUrl = perfilQ.data?.hub_banner_url ?? null;
   const bannerAtivo = perfilQ.data?.hub_banner_ativo ?? false;
   const descricaoValida = descricao.length <= 280;
+  const mapaSalvo = urlDeMapaValida(perfilQ.data?.hub_mapa_url)
+    ? perfilQ.data!.hub_mapa_url!
+    : null;
+  const leituraMapa = codigoMapa.trim() ? extrairMapaEmbed(codigoMapa) : null;
 
   async function enviarBanner(file: File | undefined) {
     if (!file || !tenantId) return;
@@ -137,6 +149,8 @@ function LinksAdminPage() {
       hub_banner_url?: string | null;
       hub_banner_ativo?: boolean;
       hub_mostrar_cardapio?: boolean;
+      hub_selo?: string | null;
+      hub_mapa_url?: string | null;
     }) => {
       const { error } = await tabela("tenant_perfil").upsert(
         { tenant_id: tenantId!, ...campos },
@@ -396,6 +410,103 @@ function LinksAdminPage() {
                 Salvar descrição
               </Button>
             </div>
+          </div>
+        </section>
+
+        <section className="mt-4 rounded-xl border border-border bg-card p-4">
+          <h2 className="text-base font-semibold">Selo da casa</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Uma frase curta que aparece em destaque abaixo do nome. Ex.: Comida de Buteco.
+          </p>
+          <div className="mt-3 flex flex-wrap items-end gap-3">
+            <div className="min-w-0 flex-1 basis-56">
+              <Label htmlFor="hub-selo" className="text-sm font-medium">
+                Selo
+              </Label>
+              <Input
+                id="hub-selo"
+                value={selo}
+                onChange={(e) => setSelo(e.target.value)}
+                maxLength={40}
+                placeholder="Ex.: Comida de Buteco"
+                className="mt-1.5 h-11"
+              />
+            </div>
+            <Button
+              onClick={() => salvarPerfil.mutate({ hub_selo: selo.trim() || null })}
+              disabled={salvarPerfil.isPending || selo.trim() === (perfilQ.data?.hub_selo ?? "")}
+              className="h-11 rounded-md"
+            >
+              Salvar selo
+            </Button>
+          </div>
+        </section>
+
+        <section className="mt-4 rounded-xl border border-border bg-card p-4">
+          <h2 className="text-base font-semibold">Mapa do Google Maps</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Mostra onde fica a casa. Em telas grandes o mapa aparece ao lado; no celular, atrás do
+            botão “Ver no mapa”.
+          </p>
+          <details className="mt-3 rounded-lg bg-muted/60 px-3 py-2 text-sm">
+            <summary className="min-h-11 cursor-pointer py-2.5 font-medium">
+              Como pegar o código do mapa
+            </summary>
+            <ol className="ml-5 list-decimal space-y-1 pb-2 text-muted-foreground">
+              <li>Abra o Google Maps e procure o endereço do restaurante.</li>
+              <li>Clique em Compartilhar e depois na aba Incorporar um mapa.</li>
+              <li>Clique em Copiar HTML.</li>
+              <li>Cole aqui embaixo. Aceitamos só o mapa; qualquer outra coisa é ignorada.</li>
+            </ol>
+          </details>
+          {mapaSalvo && (
+            <div className="mt-3">
+              <div className="aspect-[16/9] w-full overflow-hidden rounded-lg border border-border bg-slate-100">
+                <MapaIncorporado url={mapaSalvo} nome={tenant?.nome ?? "restaurante"} />
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => salvarPerfil.mutate({ hub_mapa_url: null })}
+                className="mt-2 h-11 rounded-md"
+              >
+                Remover mapa
+              </Button>
+            </div>
+          )}
+          <Label htmlFor="hub-mapa" className="mt-3 block text-sm font-medium">
+            {mapaSalvo ? "Trocar o mapa" : "Código de incorporação"}
+          </Label>
+          <Textarea
+            id="hub-mapa"
+            value={codigoMapa}
+            onChange={(e) => setCodigoMapa(e.target.value)}
+            rows={3}
+            placeholder='<iframe src="https://www.google.com/maps/embed?pb=..." ...></iframe>'
+            className="mt-1.5 font-mono text-xs"
+          />
+          {leituraMapa && !leituraMapa.ok && (
+            <p role="alert" className="mt-2 text-sm text-destructive">
+              {leituraMapa.motivo}
+            </p>
+          )}
+          {leituraMapa?.ok && (
+            <p className="mt-2 text-sm text-success-700">Mapa reconhecido. Salve para publicar.</p>
+          )}
+          <div className="mt-2 flex justify-end">
+            <Button
+              onClick={() => {
+                if (leituraMapa?.ok)
+                  salvarPerfil.mutate(
+                    { hub_mapa_url: leituraMapa.url },
+                    { onSuccess: () => setCodigoMapa("") },
+                  );
+              }}
+              disabled={!leituraMapa?.ok || salvarPerfil.isPending}
+              className="h-11 rounded-md"
+            >
+              Salvar mapa
+            </Button>
           </div>
         </section>
 
