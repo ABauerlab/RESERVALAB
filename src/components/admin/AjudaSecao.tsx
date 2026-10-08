@@ -11,7 +11,8 @@ export function AjudaSecao() {
       <div>
         <h3 className="font-semibold">Passo a passo do painel</h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          Um tour curto por Dashboard, Reservas, Agenda, Clientes, Cardápio, Link Hub e Ajustes.
+          Um passeio pelas telas de verdade: Dashboard, Reservas, Agenda, Cardápio, Link Hub,
+          Eventos e Ajustes. Você pode pular a qualquer momento.
         </p>
         <button
           type="button"

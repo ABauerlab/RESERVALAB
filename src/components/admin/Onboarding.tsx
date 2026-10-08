@@ -1,15 +1,19 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { usePlano } from "@/hooks/use-plano";
 import { supabase } from "@/integrations/supabase/client";
 import {
+  CHAVE_TOUR_ATIVO,
   EVENTO_REINICIAR,
   ONBOARDING_VERSAO,
+  caminhoDoPasso,
   chavePasso,
   deveMostrar,
+  mesmaPagina,
   limitarPasso,
   passosDoTour,
 } from "@/lib/onboarding";
@@ -43,6 +47,8 @@ export function Onboarding({ slug }: { slug: string }) {
   const [alvo, setAlvo] = useState<Alvo | null>(null);
   const [largo, setLargo] = useState(true);
   const cartao = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: (st) => st.location.pathname });
 
   const tenantQ = useQuery({
     queryKey: ["tenant", slug],
@@ -60,6 +66,27 @@ export function Onboarding({ slug }: { slug: string }) {
   );
   const passo = passos[limitarPasso(i, passos.length)]!;
   const ultimo = i >= passos.length - 1;
+  const caminho = caminhoDoPasso(slug, passo);
+  const naPagina = caminho === null || mesmaPagina(pathname, caminho);
+
+  /** Muda de passo e, se o passo mora em outra pagina, leva a pessoa para ela. */
+  const irPara = useCallback(
+    (novo: number) => {
+      const n = limitarPasso(novo, passos.length);
+      setI(n);
+      try {
+        sessionStorage.setItem(CHAVE_TOUR_ATIVO, "1");
+        if (userId) localStorage.setItem(chavePasso(userId), String(n));
+      } catch {
+        /* sem storage */
+      }
+      const destino = caminhoDoPasso(slug, passos[n]!);
+      if (destino && !mesmaPagina(window.location.pathname, destino)) {
+        void navigate({ to: destino as never });
+      }
+    },
+    [navigate, passos, slug, userId],
+  );
 
   // Quem abre o painel pela primeira vez ve o tour; os demais so se pedirem em Ajustes.
   useEffect(() => {
@@ -69,17 +96,26 @@ export function Onboarding({ slug }: { slug: string }) {
       const u = data.session?.user;
       if (!vivo || !u) return;
       setUserId(u.id);
-      if (deveMostrar(u)) {
+      let emAndamento = false;
+      try {
+        emAndamento = sessionStorage.getItem(CHAVE_TOUR_ATIVO) === "1";
+      } catch {
+        /* sem storage */
+      }
+      if (emAndamento || deveMostrar(u)) {
         let salvo = 0;
         try {
           salvo = Number(localStorage.getItem(chavePasso(u.id)) ?? 0);
         } catch {
           /* sem storage */
         }
-        t = setTimeout(() => {
-          setI(limitarPasso(salvo, 20));
-          setAberto(true);
-        }, 700);
+        t = setTimeout(
+          () => {
+            setI(limitarPasso(salvo, 20));
+            setAberto(true);
+          },
+          emAndamento ? 150 : 700,
+        );
       }
     });
     return () => {
@@ -92,6 +128,11 @@ export function Onboarding({ slug }: { slug: string }) {
     const abrir = () => {
       setI(0);
       setAberto(true);
+      try {
+        sessionStorage.setItem(CHAVE_TOUR_ATIVO, "1");
+      } catch {
+        /* sem storage */
+      }
     };
     window.addEventListener(EVENTO_REINICIAR, abrir);
     return () => window.removeEventListener(EVENTO_REINICIAR, abrir);
@@ -99,11 +140,18 @@ export function Onboarding({ slug }: { slug: string }) {
 
   const medir = useCallback(() => {
     setLargo(window.innerWidth >= 768);
-    setAlvo(aberto ? acharAlvo(passo.alvo) : null);
-  }, [aberto, passo.alvo]);
+    setAlvo(aberto && naPagina ? acharAlvo(passo.alvo) : null);
+  }, [aberto, passo.alvo, naPagina]);
 
   useLayoutEffect(() => {
     medir();
+    if (!aberto) return;
+    // A pagina nova carrega dados depois de montar: mede de novo ate o alvo aparecer.
+    const retries = [150, 400, 900, 1800].map((ms) => setTimeout(medir, ms));
+    return () => retries.forEach(clearTimeout);
+  }, [aberto, medir, i, pathname]);
+
+  useLayoutEffect(() => {
     if (!aberto) return;
     window.addEventListener("resize", medir);
     window.addEventListener("scroll", medir, true);
@@ -128,6 +176,11 @@ export function Onboarding({ slug }: { slug: string }) {
   const encerrar = useCallback(
     (como: "concluido_em" | "pulado_em") => {
       setAberto(false);
+      try {
+        sessionStorage.removeItem(CHAVE_TOUR_ATIVO);
+      } catch {
+        /* sem storage */
+      }
       if (userId) {
         try {
           localStorage.removeItem(chavePasso(userId));
@@ -258,12 +311,21 @@ export function Onboarding({ slug }: { slug: string }) {
             </Button>
           )}
           {i > 0 && (
-            <Button variant="ghost" onClick={() => setI(i - 1)} className="h-11 rounded-md">
+            <Button variant="ghost" onClick={() => irPara(i - 1)} className="h-11 rounded-md">
               Voltar
             </Button>
           )}
+          {!naPagina && caminho && (
+            <Button
+              variant="outline"
+              onClick={() => void navigate({ to: caminho as never })}
+              className="h-11 rounded-md"
+            >
+              Ir para esta página
+            </Button>
+          )}
           <Button
-            onClick={() => (ultimo ? encerrar("concluido_em") : setI(i + 1))}
+            onClick={() => (ultimo ? encerrar("concluido_em") : irPara(i + 1))}
             className="h-11 rounded-md"
           >
             {i === 0 ? "Começar" : ultimo ? "Concluir" : "Próximo"}

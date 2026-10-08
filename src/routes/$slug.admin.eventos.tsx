@@ -167,7 +167,10 @@ function EventosPage() {
           description="O próximo evento com data futura aparece automaticamente na página de reservas e some sozinho assim que a data passa."
         />
 
-        <section className="mt-6 rounded-lg border border-border bg-card p-5 animate-in-up">
+        <section
+          data-tour="eventos-novo"
+          className="mt-6 rounded-lg border border-border bg-card p-5 animate-in-up"
+        >
           <h3 className="font-semibold">Novo evento</h3>
           <div className="mt-4 space-y-4">
             <div className="space-y-2">

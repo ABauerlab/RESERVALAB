@@ -33,6 +33,7 @@ export function Atencao({
     return (
       <section
         aria-label="Precisa de atenção"
+        data-tour="dash-atencao"
         className="flex items-center gap-3 rounded-lg border border-success-200 bg-success-50/60 px-4 py-3"
       >
         <CheckCircle2 className="h-5 w-5 shrink-0 text-success-600" aria-hidden="true" />
@@ -47,7 +48,7 @@ export function Atencao({
   }
 
   return (
-    <section aria-label="Precisa de atenção" id="precisa-de-voce">
+    <section aria-label="Precisa de atenção" id="precisa-de-voce" data-tour="dash-atencao">
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
         <h2 className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.08em] text-foreground">
           Precisa de atenção
