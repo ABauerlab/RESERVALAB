@@ -18,6 +18,10 @@ export type HubDados = {
   /** Toggle "Mostrar cardapio" do Link Hub (padrao ligado). */
   mostrar_cardapio?: boolean;
   descricao?: string | null;
+  /** Selo curto de marca (ex.: "Comida de Buteco"), opcional. */
+  selo?: string | null;
+  /** URL de embed do Google Maps, ja validada no banco; revalidada no app antes de renderizar. */
+  mapa_url?: string | null;
   /** Ja vem nulo quando o banner esta desativado. */
   banner_url?: string | null;
   tipos_aceitos: string[];
@@ -74,8 +78,9 @@ export function mapsUrl(endereco: string): string {
 }
 
 /**
- * Lista final, na ordem: reservar (CTA principal), cardapio (se publicado e o toggle estiver
- * ligado), destaques (ex.: iFood, 99Food), whatsapp, instagram, localizacao, ligar e demais extras.
+ * Lista final, na ordem de conversao: reservar (CTA principal), cardapio (se publicado e o toggle
+ * estiver ligado), destaques marcados pela casa (ex.: iFood, 99Food), whatsapp, localizacao,
+ * instagram, ligar e demais links.
  */
 export function buildHubItens(hub: HubDados, slug: string): HubItem[] {
   const mesa = hub.tipos_aceitos.includes("mesa");
@@ -95,7 +100,7 @@ export function buildHubItens(hub: HubDados, slug: string): HubItem[] {
     itens.push({
       id: "cardapio",
       rotulo: "Cardápio",
-      href: `/${slug}/cardapio`,
+      href: `/${slug}/cardapio?de=links`,
       interno: true,
       tipo: "cardapio",
       destaque: false,
@@ -132,17 +137,6 @@ export function buildHubItens(hub: HubDados, slug: string): HubItem[] {
       icone: "whatsapp",
     });
   }
-  if (hub.instagram) {
-    itens.push({
-      id: "instagram",
-      rotulo: "Instagram",
-      href: instagramUrl(hub.instagram),
-      interno: false,
-      tipo: "instagram",
-      destaque: false,
-      icone: "instagram",
-    });
-  }
   if (hub.endereco?.trim()) {
     itens.push({
       id: "localizacao",
@@ -152,6 +146,17 @@ export function buildHubItens(hub: HubDados, slug: string): HubItem[] {
       tipo: "localizacao",
       destaque: false,
       icone: "localizacao",
+    });
+  }
+  if (hub.instagram) {
+    itens.push({
+      id: "instagram",
+      rotulo: "Instagram",
+      href: instagramUrl(hub.instagram),
+      interno: false,
+      tipo: "instagram",
+      destaque: false,
+      icone: "instagram",
     });
   }
   const tel = hub.telefone ? hub.telefone.replace(/[^\d+]/g, "") : "";

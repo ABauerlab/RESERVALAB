@@ -386,6 +386,8 @@ export async function installMock(
             cardapio_publicado: perfil.cardapio_publicado,
             mostrar_cardapio: perfil.hub_mostrar_cardapio ?? true,
             descricao: perfil.hub_descricao ?? null,
+            selo: perfil.hub_selo ?? null,
+            mapa_url: perfil.hub_mapa_url ?? null,
             banner_url: perfil.hub_banner_ativo ? (perfil.hub_banner_url ?? null) : null,
             tipos_aceitos: tenant.tipos_aceitos,
             links: mock.state.hubLinks
