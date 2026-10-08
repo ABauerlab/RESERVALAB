@@ -182,3 +182,7 @@ Correções propostas, em ordem de risco:
 8. I e J: polimento e QA.
 
 Branches: o ambiente exige desenvolver em `claude/clever-mccarthy-d6snnr`; as fases entram como commits separados nessa branch em vez de branches `feat/*`.
+
+## 9. Status após a execução (2026-10-08)
+
+Ver `TEGGLY_EXECUTION_REPORT.md`. Resolvidos: 1 (Website), 2 e 3 em parte (copy publicada; estrutura aguarda decisão), 4 (ícones de marca), 5 (planos), 6 (onboarding), 7 (Dashboard), 8 (Link Hub), 9 (cardápio do Iracema importado, não publicado), 11 e 12 (peso 700 e `terracotta`). Em aberto: 10 (segredo do webhook e HTTP por IP), 3 (memória do agente), 13 (avisos de lint antigos).
