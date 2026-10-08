@@ -392,6 +392,7 @@ function CardapioAdminPage() {
               }
             >
               <TabsList
+                data-tour="cardapio-abas"
                 className="grid w-full grid-cols-3 sm:inline-grid sm:w-auto"
                 aria-label="Seções do cardápio"
               >

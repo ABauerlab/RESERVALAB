@@ -384,6 +384,7 @@ function AdminReservas() {
         <div
           role="group"
           aria-label="Período"
+          data-tour="reservas-periodo"
           className="-mx-4 mt-3 flex items-center gap-1.5 overflow-x-auto px-4 scrollbar-none md:mx-0 md:px-0"
         >
           {FILTROS_DATA.map((f) => (

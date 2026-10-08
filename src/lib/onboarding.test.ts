@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { deveMostrar, estadoDoUsuario, limitarPasso, passosDoTour } from "@/lib/onboarding";
+import {
+  caminhoDoPasso,
+  deveMostrar,
+  estadoDoUsuario,
+  limitarPasso,
+  mesmaPagina,
+  passosDoTour,
+} from "@/lib/onboarding";
 
 describe("onboarding: quem ve o tour", () => {
   it("usuario novo sem estado ve; sem data de criacao conta como novo", () => {
@@ -28,18 +35,37 @@ describe("onboarding: quem ve o tour", () => {
 describe("passos do tour", () => {
   const ids = (w: boolean, a = false) =>
     passosDoTour({ whatsapp: w, assistente: a }).map((p) => p.id);
-  it("cobre onde esta, hoje, reservas, agenda, clientes, cardapio, hub e ajustes, e fecha com conclusao", () => {
+  it("passeia pelas telas reais e volta ao Dashboard na conclusao", () => {
     expect(ids(false)).toEqual([
       "inicio",
       "hoje",
       "reservas",
       "agenda",
-      "clientes",
       "cardapio",
       "hub",
+      "eventos",
       "ajustes",
       "fim",
     ]);
+    const p = passosDoTour({ whatsapp: false, assistente: false });
+    expect(p.map((x) => x.rota)).toEqual([
+      "",
+      "",
+      "/reservas",
+      "/agenda",
+      "/cardapio",
+      "/links",
+      "/eventos",
+      "/configuracoes",
+      "",
+    ]);
+  });
+  it("caminho e comparacao de pagina", () => {
+    expect(caminhoDoPasso("iracema", { rota: "/reservas" })).toBe("/iracema/admin/reservas");
+    expect(caminhoDoPasso("iracema", { rota: "" })).toBe("/iracema/admin");
+    expect(caminhoDoPasso("iracema", {})).toBeNull();
+    expect(mesmaPagina("/iracema/admin/", "/iracema/admin")).toBe(true);
+    expect(mesmaPagina("/iracema/admin/agenda", "/iracema/admin")).toBe(false);
   });
   it("passo de WhatsApp so aparece quando o plano inclui", () => {
     expect(ids(true)).toContain("whatsapp");
