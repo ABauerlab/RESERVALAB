@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   PLANOS,
+  RECURSOS_ORDEM,
   descontoAnualPercentual,
   formatarReais,
   intervaloDoMes,
@@ -34,6 +35,11 @@ describe("planos", () => {
     expect(temRecurso(PLANOS.pro, "assistente_ia")).toBe(true);
     expect(planoMinimoPara("whatsapp_confirmacao").id).toBe("essencial");
     expect(planoMinimoPara("assistente_ia").id).toBe("pro");
+  });
+
+  it("todo recurso de todo plano esta na ordem de exibicao e tem rotulo", () => {
+    for (const p of Object.values(PLANOS))
+      for (const r of p.recursos) expect(RECURSOS_ORDEM).toContain(r);
   });
 
   it("limites crescem e o gratuito e mais generoso que 25 e 30 do mercado", () => {

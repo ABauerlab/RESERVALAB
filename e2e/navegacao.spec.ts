@@ -11,7 +11,7 @@ test.describe("Painel", () => {
     const erros: string[] = [];
     page.on("pageerror", (e) => erros.push(e.message));
     for (const [rota, texto] of [
-      ["/iracema/admin", /\d{2}\/\d{2}\/\d{4}/],
+      ["/iracema/admin", /\d{1,2} de [a-zç]+/],
       ["/iracema/admin/reservas", /Reservas/],
       ["/iracema/admin/contatos", "Clientes"],
       ["/iracema/admin/relatorios", "Relatórios"],

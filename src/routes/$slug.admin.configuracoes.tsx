@@ -1,4 +1,6 @@
+import { AjudaSecao } from "@/components/admin/AjudaSecao";
 import { MarcaOptIn } from "@/components/admin/MarcaOptIn";
+import { PlanoSecao } from "@/components/admin/PlanoSecao";
 import { pwaHeadLinks } from "@/lib/pwa-manifest";
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
@@ -143,7 +145,13 @@ function ConfiguracoesPage() {
         <section className="mt-6 space-y-4 animate-in-up">
           <Accordion
             type="multiple"
-            defaultValue={["identidade", "reservas"]}
+            defaultValue={[
+              "identidade",
+              "reservas",
+              ...(typeof window !== "undefined" && window.location.hash === "#plano"
+                ? ["plano"]
+                : []),
+            ]}
             className="space-y-3"
           >
             <AccordionItem
@@ -487,6 +495,42 @@ function ConfiguracoesPage() {
                 </div>
               </AccordionContent>
             </AccordionItem>
+            <AccordionItem
+              value="plano"
+              id="plano"
+              className="rounded-xl border border-border bg-card px-5"
+            >
+              <AccordionTrigger className="py-4 hover:no-underline">
+                <span>
+                  <span className="block text-base font-semibold text-foreground">Seu plano</span>
+                  <span className="mt-0.5 block text-sm font-normal text-muted-foreground">
+                    Plano atual, reservas do mês e comparação.
+                  </span>
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-5">
+                <PlanoSecao
+                  ready={admin.ready}
+                  tenantId={tenant?.id ?? null}
+                  tenantNome={tenant?.nome ?? ""}
+                />
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="ajuda" className="rounded-xl border border-border bg-card px-5">
+              <AccordionTrigger className="py-4 hover:no-underline">
+                <span>
+                  <span className="block text-base font-semibold text-foreground">Ajuda</span>
+                  <span className="mt-0.5 block text-sm font-normal text-muted-foreground">
+                    Refazer o passo a passo e falar com a gente.
+                  </span>
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-5">
+                <AjudaSecao />
+              </AccordionContent>
+            </AccordionItem>
+
             <AccordionItem
               value="seguranca"
               className="rounded-xl border border-border bg-card px-5"

@@ -15,8 +15,7 @@ export type Recurso =
   | "reconfirmacao"
   | "assistente_ia"
   | "relatorios_periodo"
-  | "relatorios_completos"
-  | "ocultar_powered_by";
+  | "relatorios_completos";
 
 export type Plano = {
   id: PlanoId;
@@ -86,7 +85,6 @@ export const PLANOS: Record<PlanoId, Plano> = {
       "assistente_ia",
       "relatorios_periodo",
       "relatorios_completos",
-      "ocultar_powered_by",
     ],
   },
 };
@@ -106,8 +104,20 @@ export const ROTULO_RECURSO: Record<Recurso, string> = {
   assistente_ia: "Assistente no WhatsApp",
   relatorios_periodo: "Relatórios por período",
   relatorios_completos: "Relatórios completos e exportação",
-  ocultar_powered_by: "Sem “powered by Teggly”",
 };
+
+/** Ordem de exibicao dos recursos nas tabelas de comparacao (site e Ajustes). */
+export const RECURSOS_ORDEM: readonly Recurso[] = [
+  "reserva_publica",
+  "cardapio",
+  "link_hub",
+  "marca_opt_in",
+  "whatsapp_confirmacao",
+  "reconfirmacao",
+  "assistente_ia",
+  "relatorios_periodo",
+  "relatorios_completos",
+];
 
 export function ehPlanoId(v: unknown): v is PlanoId {
   return v === "gratuito" || v === "essencial" || v === "pro";

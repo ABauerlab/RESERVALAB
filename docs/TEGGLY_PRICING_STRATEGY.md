@@ -20,7 +20,7 @@ Base: `TEGGLY_MARKET_PRICING_RESEARCH.md`. **Todos os preços e limites abaixo s
 | Clientes e histórico | Sim, até 200 clientes | Ilimitado | Ilimitado |
 | Relatórios | Resumo do dia | Período e tipo | Completos e exportação |
 | Marca do restaurante (logo e cor, opt-in) | Sim | Sim | Sim |
-| "powered by Teggly" | Sempre | Sempre | Pode ocultar (white-label) |
+| "powered by Teggly" | Sempre | Sempre | Sempre (white-label sem selo fica para a conversa de Rede) |
 | Usuários do painel | 1 | 3 | 10 |
 | Suporte | Central de ajuda | E-mail | Prioritário |
 | Rede (várias unidades) | n/a | n/a | Fale com a gente |

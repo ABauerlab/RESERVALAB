@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useShellMode } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 import { MobileNavigation } from "./MobileNavigation";
+import { Onboarding } from "./Onboarding";
 import { Sidebar } from "./Sidebar";
 import type { AdminTab } from "./nav-items";
 
@@ -64,6 +65,7 @@ export function AppShell({
       </div>
 
       {mode === "bottom" && <MobileNavigation slug={slug} active={active} onSignOut={signOut} />}
+      <Onboarding slug={slug} />
     </div>
   );
 }

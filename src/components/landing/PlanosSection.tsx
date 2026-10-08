@@ -4,13 +4,13 @@ import { Check, Minus } from "lucide-react";
 import {
   ORDEM_PLANOS,
   PLANOS,
+  RECURSOS_ORDEM,
   ROTULO_RECURSO,
   descontoAnualPercentual,
   formatarReais,
   mensalDoAnualCentavos,
   temRecurso,
   type PlanoId,
-  type Recurso,
 } from "@/lib/plans";
 import { mailtoContato } from "@/lib/site";
 import { cn } from "@/lib/utils";
@@ -23,18 +23,7 @@ const CTA: Record<PlanoId, string> = {
   pro: "Falar com especialista",
 };
 
-const LINHAS: Recurso[] = [
-  "reserva_publica",
-  "cardapio",
-  "link_hub",
-  "marca_opt_in",
-  "whatsapp_confirmacao",
-  "reconfirmacao",
-  "assistente_ia",
-  "relatorios_periodo",
-  "relatorios_completos",
-  "ocultar_powered_by",
-];
+const LINHAS = RECURSOS_ORDEM;
 
 export function PlanosSection() {
   const [anual, setAnual] = useState(false);

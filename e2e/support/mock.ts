@@ -188,7 +188,7 @@ function fixtures(): Fixtures {
   };
 }
 
-function sessionJson() {
+function sessionJson(novoUsuario = false) {
   const b = (o: unknown) => Buffer.from(JSON.stringify(o)).toString("base64url");
   const exp = Math.floor(Date.now() / 1000) + 86400 * 30;
   const jwt = `${b({ alg: "HS256", typ: "JWT" })}.${b({ sub: "u1", aud: "authenticated", role: "authenticated", exp })}.sig`;
@@ -203,7 +203,11 @@ function sessionJson() {
       aud: "authenticated",
       role: "authenticated",
       email: "admin@iracema.test",
-      user_metadata: {},
+      created_at: novoUsuario ? "2026-10-09T10:00:00Z" : "2026-08-01T10:00:00Z",
+      // Por padrao o usuario ja viu o passo a passo, para ele nao cobrir as telas dos outros testes.
+      user_metadata: novoUsuario
+        ? {}
+        : { teggly_onboarding: { versao: 1, concluido_em: "2026-08-02T10:00:00Z" } },
       app_metadata: {},
     },
   };
@@ -242,7 +246,11 @@ function applyFilters(rows: Row[], url: URL): Row[] {
   return out;
 }
 
-export async function installMock(context: BrowserContext, initial: Mode = "data"): Promise<Mock> {
+export async function installMock(
+  context: BrowserContext,
+  initial: Mode = "data",
+  opcoes: { novoUsuario?: boolean } = {},
+): Promise<Mock> {
   const mock: Mock = {
     state: fixtures(),
     mode: initial,
@@ -265,7 +273,7 @@ export async function installMock(context: BrowserContext, initial: Mode = "data
         /* sem storage */
       }
     },
-    [`sb-${REF}-auth-token`, JSON.stringify(sessionJson())],
+    [`sb-${REF}-auth-token`, JSON.stringify(sessionJson(opcoes.novoUsuario))],
   );
 
   const json = (
@@ -302,7 +310,18 @@ export async function installMock(context: BrowserContext, initial: Mode = "data
           },
         });
       }
-      if (p.startsWith("/auth/v1")) return json(route, sessionJson().user);
+      if (p.startsWith("/auth/v1")) {
+        if (method === "PUT") {
+          let body: unknown = null;
+          try {
+            body = req.postDataJSON();
+          } catch {
+            body = null;
+          }
+          mock.writes.push({ method, url: req.url(), body });
+        }
+        return json(route, sessionJson(opcoes.novoUsuario).user);
+      }
 
       // Storage: envio aceito; arquivos publicos devolvem um PNG 1x1 para a imagem carregar.
       if (p.startsWith("/storage/v1/object/public/")) {

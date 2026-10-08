@@ -1,14 +1,17 @@
 import { pwaHeadLinks } from "@/lib/pwa-manifest";
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { Bell, BellRing, ChevronLeft, ChevronRight, Download, Loader2 } from "lucide-react";
 
-import { formatData, type Reserva } from "@/lib/reservations";
-import { addDaysISO, todayISO, weekdayLabel } from "@/lib/admin-dates";
+import type { Reserva } from "@/lib/reservations";
+import { addDaysISO, formatDataLonga, localHHMM, todayISO } from "@/lib/admin-dates";
+import { clientesDeCasa, resumoDoDia } from "@/lib/dashboard";
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
 import { useDetailMode } from "@/hooks/use-media-query";
 import { useReservaActions, useReservasRealtime } from "@/hooks/use-reservas-admin";
 import { useHojeData } from "@/hooks/use-hoje";
+import { usePlano } from "@/hooks/use-plano";
 import { usePwaActions } from "@/hooks/use-pwa-actions";
 import { cn } from "@/lib/utils";
 
@@ -18,7 +21,10 @@ import { MensagemDoDiaButton } from "@/components/admin/MensagemDoDia";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { useRowAction } from "@/components/admin/RowAction";
 import { ReservaDetail } from "@/components/admin/ReservaDetail";
+import { ClientesDeCasa } from "@/components/admin/hoje/ClientesDeCasa";
+import { Kpis } from "@/components/admin/hoje/Kpis";
 import { NeedsYou } from "@/components/admin/hoje/NeedsYou";
+import { PlanoCard } from "@/components/admin/hoje/PlanoCard";
 import { ServiceLine } from "@/components/admin/hoje/ServiceLine";
 import { UpcomingDays, type DayInfo } from "@/components/admin/hoje/UpcomingDays";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -54,19 +60,19 @@ function AdminHoje() {
       setSelected((s) => (s && s.id === id ? ({ ...s, ...patch } as Reserva) : s)),
     onDeleted: () => setSelected(null),
   });
-  const { diaQ, pendentesQ, reconfirmarQ, proximosQ, bloqueiosQ, feriadosQ, eventosQ } =
+  const { diaQ, historicoQ, pendentesQ, reconfirmarQ, proximosQ, bloqueiosQ, feriadosQ, eventosQ } =
     useHojeData(ready, tenantId, dia);
+  const planoInfo = usePlano(ready, tenantId);
 
   const reservasDia = useMemo(() => diaQ.data ?? [], [diaQ.data]);
-  const resumo = useMemo(() => {
-    const ativas = reservasDia.filter((r) => r.status !== "cancelada");
-    return {
-      reservas: ativas.length,
-      pessoas: ativas.reduce((n, r) => n + (r.quantidade ?? 0), 0),
-      pendentes: ativas.filter((r) => r.status === "pendente").length,
-      canceladas: reservasDia.length - ativas.length,
-    };
-  }, [reservasDia]);
+  const resumo = useMemo(
+    () => resumoDoDia(reservasDia, dia, hoje, localHHMM()),
+    [reservasDia, dia, hoje],
+  );
+  const deCasa = useMemo(
+    () => clientesDeCasa(reservasDia, historicoQ.data ?? [], dia),
+    [reservasDia, historicoQ.data, dia],
+  );
 
   const proximos = useMemo(() => {
     const out: Record<string, DayInfo> = {};
@@ -119,11 +125,7 @@ function AdminHoje() {
       >
         <PageHeader
           eyebrow={isToday ? "Hoje" : undefined}
-          title={
-            <>
-              <span className="capitalize">{weekdayLabel(dia)}</span>, {formatData(dia)}
-            </>
-          }
+          title={formatDataLonga(dia)}
           description={`${isToday ? "Hoje: " : ""}${sentence}`}
           actions={<MensagemDoDiaButton tenantId={tenantId} />}
         />
@@ -155,20 +157,26 @@ function AdminHoje() {
           </button>
         </div>
 
-        {needsTotal > 0 && (
-          <button
-            type="button"
-            onClick={() => setNeedsOpen(true)}
-            className="mt-3 flex h-11 w-full items-center justify-between rounded-lg border border-warning-500/30 bg-warning-50 px-4 text-left text-[13px] font-semibold text-warning-700 xl:hidden"
-          >
-            <span>
-              Precisa de você · {pendentes.length}{" "}
-              {pendentes.length === 1 ? "pendente" : "pendentes"}
-              {reconfirmar.length > 0 ? `, ${reconfirmar.length} a reconfirmar` : ""}
-            </span>
-            <ChevronRight className="h-4 w-4" />
-          </button>
-        )}
+        <Kpis
+          slug={slug}
+          reservas={resumo.reservas}
+          pessoas={resumo.pessoas}
+          proxima={resumo.proxima}
+          restantes={resumo.restantes}
+          isToday={dia === hoje}
+          pendentes={pendentes.length}
+          reconfirmar={reconfirmar.length}
+          onAbrirProxima={setSelected}
+          onAbrirPrecisaDeVoce={() => {
+            if (window.matchMedia("(min-width: 1280px)").matches) {
+              document
+                .getElementById("precisa-de-voce")
+                ?.scrollIntoView({ behavior: "smooth", block: "start" });
+            } else {
+              setNeedsOpen(true);
+            }
+          }}
+        />
 
         <div
           className={cn(
@@ -177,9 +185,18 @@ function AdminHoje() {
           )}
         >
           <section aria-label="Linha do serviço" className="min-w-0">
-            <h2 className="mb-2 hidden text-xs font-extrabold uppercase tracking-[0.08em] text-muted-foreground xl:block">
-              Linha do serviço
-            </h2>
+            <div className="mb-2 flex items-center justify-between">
+              <h2 className="hidden text-xs font-extrabold uppercase tracking-[0.08em] text-muted-foreground xl:block">
+                Linha do serviço
+              </h2>
+              <Link
+                to="/$slug/admin/agenda"
+                params={{ slug }}
+                className="ml-auto inline-flex min-h-11 items-center text-xs font-semibold text-primary hover:underline xl:min-h-0"
+              >
+                Ver na Agenda
+              </Link>
+            </div>
             {diaQ.isLoading ? (
               <div className="space-y-2">
                 {Array.from({ length: 4 }).map((_, i) => (
@@ -212,9 +229,11 @@ function AdminHoje() {
                 {resumo.canceladas} {resumo.canceladas === 1 ? "cancelada" : "canceladas"} neste dia
               </p>
             )}
+            <ClientesDeCasa slug={slug} itens={deCasa} onOpen={(c) => setSelected(c.reserva)} />
           </section>
 
           <section
+            id="precisa-de-voce"
             aria-label="Precisa de você"
             className={cn("min-w-0", selected && dock ? "" : "hidden xl:block")}
           >
@@ -238,6 +257,10 @@ function AdminHoje() {
         <div className="mt-8">
           <UpcomingDays dia={dia} info={proximos} onPick={setDia} />
         </div>
+
+        {planoInfo.explicito && !planoInfo.loading && (
+          <PlanoCard slug={slug} plano={planoInfo.plano} uso={planoInfo.uso} />
+        )}
 
         {(pwa.showPushCTA || pwa.pushActive || pwa.showLegacyNotifCTA || pwa.showInstall) && (
           <div className="mt-8 flex flex-wrap gap-2 border-t border-border pt-4">
