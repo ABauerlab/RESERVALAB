@@ -152,7 +152,7 @@ function RelatoriosPage() {
                 <ul className="grid grid-cols-2 gap-3">
                   {STATUS_LIST.map((s) => (
                     <li key={s} className="rounded-lg bg-muted/50 p-3">
-                      <p className="text-2xl font-bold tabular-nums">{rel.porStatus[s]}</p>
+                      <p className="text-2xl font-extrabold tabular-nums">{rel.porStatus[s]}</p>
                       <p className="mt-0.5 text-xs text-muted-foreground">{STATUS_LABEL[s]}</p>
                     </li>
                   ))}

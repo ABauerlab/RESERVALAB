@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 export function PublicShell({
   nome,
   marca,
+  capa,
   subtitulo,
   children,
   rodape = true,
@@ -16,6 +17,8 @@ export function PublicShell({
 }: {
   nome: string;
   marca?: React.ReactNode;
+  /** Banner do restaurante, acima do nome (ex.: Link Hub). */
+  capa?: React.ReactNode;
   subtitulo?: string;
   children: React.ReactNode;
   rodape?: boolean;
@@ -30,7 +33,8 @@ export function PublicShell({
           className,
         )}
       >
-        <header className="text-center">
+        {capa}
+        <header className={cn("text-center", capa ? "mt-6" : "")}>
           {marca ??
             (logo && (
               <img
@@ -72,7 +76,7 @@ export function EstadoPublico({
   acao?: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center">
+    <div className="rounded-lg border border-dashed border-border bg-card p-8 text-center">
       <p className="text-lg font-semibold text-foreground">{titulo}</p>
       <p className="mt-1.5 text-sm text-muted-foreground">{texto}</p>
       {acao && <div className="mt-5 flex justify-center">{acao}</div>}

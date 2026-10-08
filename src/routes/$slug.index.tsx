@@ -1,3 +1,4 @@
+import { IconeWhatsApp } from "@/components/brand/BrandIcons";
 import { useMarcaLogo } from "@/components/public/MarcaScope";
 import { comMarca } from "@/components/public/MarcaScope";
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
@@ -12,7 +13,6 @@ import {
   Loader2,
   PartyPopper,
   BookOpen,
-  MessageCircle,
   MapPin,
   Phone,
 } from "lucide-react";
@@ -117,7 +117,7 @@ function TenantHome() {
               className="mb-4 h-14 w-auto object-contain"
             />
           )}
-          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">
+          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-brand">
             {tenant.nome}
           </p>
           <h1 className="mt-6 font-serif text-[44px] leading-[1.05] tracking-tight text-foreground sm:text-6xl">
@@ -130,7 +130,7 @@ function TenantHome() {
         </header>
 
         {eventoQ.data && (
-          <div className="mt-8 overflow-hidden rounded-lg border border-terracotta/25 bg-terracotta/5 animate-in-up">
+          <div className="mt-8 overflow-hidden rounded-lg border border-brand/25 bg-brand/5 animate-in-up">
             {eventoQ.data.imagem_url && (
               <img
                 src={eventoQ.data.imagem_url}
@@ -139,13 +139,13 @@ function TenantHome() {
               />
             )}
             <div className="p-5">
-              <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">
+              <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-brand">
                 <PartyPopper className="h-3.5 w-3.5" /> Evento em destaque
               </p>
               <p className="mt-2 font-serif font-semibold text-2xl leading-snug text-foreground">
                 {eventoQ.data.titulo}
               </p>
-              <p className="mt-1 text-sm font-medium text-terracotta">
+              <p className="mt-1 text-sm font-medium text-brand">
                 {formatData(eventoQ.data.data)}
                 {eventoQ.data.horario ? ` às ${formatHorario(eventoQ.data.horario)}` : ""}
               </p>
@@ -169,10 +169,10 @@ function TenantHome() {
                 onClick={() =>
                   trackFacebookCustomEvent(tenant.pixel_facebook_id, CLICK_RESERVA_EVENT[card.tipo])
                 }
-                className="group relative flex items-center gap-4 rounded-lg border border-border bg-card px-5 py-4 shadow-[var(--shadow-sm)] transition-all duration-200 hover:-translate-y-0.5 hover:border-terracotta/40 hover:shadow-[var(--shadow-md)] active:scale-[0.99] animate-in-up"
+                className="group relative flex items-center gap-4 rounded-lg border border-border bg-card px-5 py-4 shadow-[var(--shadow-sm)] transition-all duration-200 hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-[var(--shadow-md)] active:scale-[0.99] animate-in-up"
                 style={{ animationDelay: `${60 + i * 50}ms` }}
               >
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-cream text-terracotta transition-colors group-hover:bg-terracotta group-hover:text-terracotta-foreground">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-cream text-brand transition-colors group-hover:bg-brand group-hover:text-brand-foreground">
                   <Icon className="h-5 w-5" strokeWidth={1.75} />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -181,7 +181,7 @@ function TenantHome() {
                     {card.descricao}
                   </p>
                 </div>
-                <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-terracotta" />
+                <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-brand" />
               </Link>
             );
           })}
@@ -236,7 +236,7 @@ function ContatoRapido({
   const tel = telefone ? telefone.replace(/[^\d+]/g, "") : "";
   const itens = [
     cardapioHref && { href: cardapioHref, rotulo: "Cardápio", Icone: BookOpen, externo: false },
-    wa && { href: `https://wa.me/${wa}`, rotulo: "WhatsApp", Icone: MessageCircle, externo: true },
+    wa && { href: `https://wa.me/${wa}`, rotulo: "WhatsApp", Icone: IconeWhatsApp, externo: true },
     tel && { href: `tel:${tel}`, rotulo: "Ligar", Icone: Phone, externo: false },
     endereco && {
       href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endereco)}`,

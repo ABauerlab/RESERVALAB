@@ -66,6 +66,7 @@ export function MobileNavigation({
                 key={item.id}
                 to={item.to}
                 params={{ slug }}
+                data-tour={`nav-${item.id}`}
                 aria-current={on ? "page" : undefined}
                 className={itemCls(on)}
               >

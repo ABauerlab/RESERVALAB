@@ -2,7 +2,9 @@ import { pwaHeadLinks } from "@/lib/pwa-manifest";
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Download, Loader2, MessageCircle, Search, Users } from "lucide-react";
+import { Download, Loader2, Search, Users } from "lucide-react";
+
+import { IconeWhatsApp } from "@/components/brand/BrandIcons";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
@@ -173,7 +175,7 @@ function ContatosPage() {
 
         <div className="mt-4 flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-4">
           <div className="flex min-w-0 items-center gap-2.5">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-cream text-terracotta">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-cream text-brand">
               <Users className="h-4 w-4" />
             </span>
             <div>
@@ -306,7 +308,7 @@ function WhatsLink({ c }: { c: Contato }) {
       aria-label={`Conversar com ${c.nome} no WhatsApp`}
       className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground xl:h-9 xl:w-9"
     >
-      <MessageCircle className="h-4 w-4" />
+      <IconeWhatsApp className="h-4 w-4" />
     </a>
   );
 }

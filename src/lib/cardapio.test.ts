@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   categoriasVisiveis,
+  filtrarCardapio,
   formatPreco,
   parsePreco,
   precoParaCampo,
@@ -68,5 +69,48 @@ describe("categoriasVisiveis", () => {
     };
     expect(categoriasVisiveis(c).map((x) => x.nome)).toEqual(["Pratos"]);
     expect(categoriasVisiveis(null)).toEqual([]);
+  });
+});
+
+describe("filtrarCardapio", () => {
+  const cats = [
+    {
+      id: "1",
+      nome: "Petiscos",
+      descricao: null,
+      itens: [
+        {
+          id: "a",
+          nome: "Pão de queijo",
+          descricao: "Mineiro",
+          preco_centavos: 1000,
+          imagem_url: null,
+        },
+        {
+          id: "b",
+          nome: "Fritas",
+          descricao: "Serve 2 pessoas.",
+          preco_centavos: 3990,
+          imagem_url: null,
+        },
+      ],
+    },
+    {
+      id: "2",
+      nome: "Bebidas",
+      descricao: null,
+      itens: [
+        { id: "c", nome: "Água tônica", descricao: null, preco_centavos: 900, imagem_url: null },
+      ],
+    },
+  ];
+  it("ignora acento e caixa e procura tambem na descricao", () => {
+    expect(filtrarCardapio(cats, "PAO").map((c) => c.itens.length)).toEqual([1]);
+    expect(filtrarCardapio(cats, "agua")[0]?.itens[0]?.id).toBe("c");
+    expect(filtrarCardapio(cats, "pessoas")[0]?.itens[0]?.id).toBe("b");
+  });
+  it("sem termo devolve tudo e sem resultado devolve vazio", () => {
+    expect(filtrarCardapio(cats, "  ")).toHaveLength(2);
+    expect(filtrarCardapio(cats, "sushi")).toEqual([]);
   });
 });

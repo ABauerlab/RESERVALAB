@@ -53,9 +53,7 @@ function AcompanharPage() {
         </Link>
 
         <header className="mt-6 animate-fade">
-          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">
-            Acompanhar
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-brand">Acompanhar</p>
           <h1 className="mt-3 font-serif text-4xl leading-tight tracking-tight">Sua reserva</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Informe o código recebido após enviar a solicitação.

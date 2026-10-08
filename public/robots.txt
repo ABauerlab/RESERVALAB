@@ -6,4 +6,4 @@ Disallow: /*/reservar
 Disallow: /*/obrigado
 Disallow: /*/acompanhar
 
-Sitemap: https://reserva.bauerlab.com.br/sitemap.xml
+Sitemap: https://teggly.com.br/sitemap.xml

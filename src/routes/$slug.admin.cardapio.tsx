@@ -1,6 +1,6 @@
 import { pwaHeadLinks } from "@/lib/pwa-manifest";
 import { createFileRoute, useParams } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowDown,
@@ -14,6 +14,8 @@ import {
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
+
+import { enviarImagemDaEmpresa } from "@/lib/assets";
 
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
 import { AdminShell } from "@/components/admin/AdminShell";
@@ -82,6 +84,22 @@ function CardapioAdminPage() {
 
   const [catForm, setCatForm] = useState<CategoriaForm | null>(null);
   const [itemForm, setItemForm] = useState<ItemForm | null>(null);
+  const [enviandoFoto, setEnviandoFoto] = useState(false);
+  const arquivoFoto = useRef<HTMLInputElement>(null);
+
+  async function enviarFoto(file: File | undefined) {
+    if (!file || !tenantId) return;
+    setEnviandoFoto(true);
+    try {
+      const url = await enviarImagemDaEmpresa(tenantId, "produto", file);
+      setItemForm((f) => (f ? { ...f, imagem_url: url } : f));
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Não foi possível enviar a foto.");
+    } finally {
+      setEnviandoFoto(false);
+      if (arquivoFoto.current) arquivoFoto.current.value = "";
+    }
+  }
   const [excluir, setExcluir] = useState<
     { tipo: "categoria"; row: CategoriaRow } | { tipo: "item"; row: ItemRow } | null
   >(null);
@@ -370,7 +388,7 @@ function CardapioAdminPage() {
                 >
                   <div className="flex flex-wrap items-start justify-between gap-2 p-4">
                     <div className="min-w-0">
-                      <h3 className="break-words text-base font-bold">{c.nome}</h3>
+                      <h3 className="break-words text-base font-semibold">{c.nome}</h3>
                       {c.descricao && (
                         <p className="mt-0.5 text-sm text-muted-foreground">{c.descricao}</p>
                       )}
@@ -647,11 +665,53 @@ function CardapioAdminPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="item-img">URL da foto (opcional)</Label>
+                <Label htmlFor="item-img">Foto (opcional)</Label>
+                <div className="flex items-center gap-3">
+                  {itemForm.imagem_url ? (
+                    <img
+                      src={itemForm.imagem_url}
+                      alt="Prévia da foto"
+                      className="h-16 w-20 shrink-0 rounded-lg border border-border object-cover"
+                    />
+                  ) : (
+                    <span className="grid h-16 w-20 shrink-0 place-items-center rounded-lg border border-dashed border-border text-xs text-muted-foreground">
+                      Sem foto
+                    </span>
+                  )}
+                  <input
+                    ref={arquivoFoto}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    className="sr-only"
+                    aria-label="Enviar foto do item"
+                    onChange={(e) => void enviarFoto(e.target.files?.[0])}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={enviandoFoto}
+                    onClick={() => arquivoFoto.current?.click()}
+                    className="h-11 rounded-md"
+                  >
+                    {enviandoFoto && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {itemForm.imagem_url ? "Trocar foto" : "Enviar foto"}
+                  </Button>
+                  {itemForm.imagem_url && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => setItemForm({ ...itemForm, imagem_url: "" })}
+                      className="h-11 rounded-md"
+                    >
+                      Remover
+                    </Button>
+                  )}
+                </div>
                 <Input
                   id="item-img"
                   value={itemForm.imagem_url}
-                  placeholder="https://..."
+                  placeholder="ou cole o endereço da imagem (https://...)"
+                  aria-label="Endereço da foto"
                   onChange={(e) => setItemForm({ ...itemForm, imagem_url: e.target.value })}
                   className="h-11 rounded-md"
                 />

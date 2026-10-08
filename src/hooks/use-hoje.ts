@@ -134,5 +134,35 @@ export function useHojeData(ready: boolean, tenantId: string | null, dia: string
     },
   });
 
-  return { diaQ, pendentesQ, reconfirmarQ, proximosQ, bloqueiosQ, feriadosQ, eventosQ, ini, fim };
+  // Historico leve (so telefone, data e status) para reconhecer quem ja e cliente da casa.
+  const historicoQ = useQuery({
+    enabled,
+    queryKey: ["reservas", tenantId, "historico-clientes", dia],
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("reservas")
+        .select("telefone,data,status")
+        .eq("tenant_id", tenantId!)
+        .lt("data", dia)
+        .neq("status", "cancelada")
+        .order("data", { ascending: false })
+        .limit(1000);
+      if (error) throw error;
+      return data as Array<Pick<Reserva, "telefone" | "data" | "status">>;
+    },
+  });
+
+  return {
+    diaQ,
+    historicoQ,
+    pendentesQ,
+    reconfirmarQ,
+    proximosQ,
+    bloqueiosQ,
+    feriadosQ,
+    eventosQ,
+    ini,
+    fim,
+  };
 }

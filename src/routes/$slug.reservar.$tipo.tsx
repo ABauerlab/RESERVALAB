@@ -253,7 +253,7 @@ function ReservarPage() {
         </Link>
 
         <header className="mt-6 animate-fade">
-          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">
+          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-brand">
             {tenantQ.data?.nome ?? "Reserva"}
           </p>
           <h1 className="mt-3 font-serif text-4xl leading-tight tracking-tight sm:text-5xl">
@@ -275,24 +275,24 @@ function ReservarPage() {
         </header>
 
         {isAniv && (
-          <section className="mt-6 rounded-lg border border-terracotta/25 bg-terracotta/5 p-5 animate-in-up">
+          <section className="mt-6 rounded-lg border border-brand/25 bg-brand/5 p-5 animate-in-up">
             <p className="font-serif font-semibold text-xl leading-snug sm:text-2xl">
               Vai ser um prazer comemorar seu aniversário no {tenantQ.data?.nome ?? "Iracema"}!
             </p>
             <ul className="mt-4 space-y-3 text-sm leading-relaxed text-muted-foreground">
               <li className="flex gap-2.5">
-                <Gift className="mt-0.5 h-4 w-4 shrink-0 text-terracotta" />
+                <Gift className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
                 <span>
                   O aniversariante da semana ganha um drink ou uma sobremesa e também 10% do valor
                   gasto na própria comanda em cashback para uma próxima visita.
                 </span>
               </li>
               <li className="flex gap-2.5">
-                <Receipt className="mt-0.5 h-4 w-4 shrink-0 text-terracotta" />
+                <Receipt className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
                 <span>A partir de 15 convidados, disponibilizamos comandas individuais.</span>
               </li>
               <li className="flex gap-2.5">
-                <Cake className="mt-0.5 h-4 w-4 shrink-0 text-terracotta" />
+                <Cake className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
                 <span>
                   Pode trazer seu bolo! Nós guardamos e disponibilizamos pratos e talheres.
                 </span>
@@ -301,7 +301,7 @@ function ReservarPage() {
           </section>
         )}
         {isEvento && (
-          <section className="mt-6 space-y-4 rounded-lg border border-terracotta/25 bg-terracotta/5 p-5 animate-in-up">
+          <section className="mt-6 space-y-4 rounded-lg border border-brand/25 bg-brand/5 p-5 animate-in-up">
             <div>
               <p className="font-serif font-semibold text-xl leading-snug sm:text-2xl">
                 Orçamento — eventos particulares
@@ -313,7 +313,7 @@ function ReservarPage() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="rounded-lg bg-card p-4">
-                <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">
+                <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-brand">
                   <UtensilsCrossed className="h-3.5 w-3.5" /> Petiscos
                 </p>
                 <ul className="mt-2.5 space-y-1 text-sm text-muted-foreground">
@@ -327,7 +327,7 @@ function ReservarPage() {
               </div>
 
               <div className="rounded-lg bg-card p-4">
-                <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">
+                <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-brand">
                   <Beer className="h-3.5 w-3.5" /> Bebidas
                 </p>
                 <ul className="mt-2.5 space-y-1 text-sm text-muted-foreground">
@@ -340,7 +340,7 @@ function ReservarPage() {
             </div>
 
             <div className="rounded-lg bg-card p-4">
-              <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-terracotta">
+              <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-brand">
                 <Receipt className="h-3.5 w-3.5" /> Valores (5 horas de evento)
               </p>
               <ul className="mt-2.5 space-y-1.5 text-sm">
@@ -367,7 +367,7 @@ function ReservarPage() {
             </div>
 
             <p className="flex gap-2.5 text-sm leading-relaxed text-muted-foreground">
-              <Wallet className="mt-0.5 h-4 w-4 shrink-0 text-terracotta" />
+              <Wallet className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
               <span>Pagamento: 50% de sinal no ato da reserva e 50% restante no dia.</span>
             </p>
           </section>
@@ -434,7 +434,7 @@ function ReservarPage() {
           </div>
 
           {precisaHorario && ehFeriado && (
-            <p className="-mt-2 text-xs text-terracotta">
+            <p className="-mt-2 text-xs text-brand">
               {data && new Date(data + "T00:00:00").toLocaleDateString("pt-BR")} é feriado —
               horários de fim de semana.
             </p>
@@ -546,7 +546,7 @@ function ReservarPage() {
           <Button
             type="submit"
             disabled={!podeEnviar || enviando}
-            className="mt-2 w-full rounded-lg bg-terracotta text-terracotta-foreground hover:bg-blue-700 disabled:opacity-50"
+            className="mt-2 w-full rounded-lg bg-brand text-brand-foreground hover:bg-blue-700 disabled:opacity-50"
             style={{ height: 52 }}
           >
             {enviando ? (

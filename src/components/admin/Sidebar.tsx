@@ -21,6 +21,7 @@ function SidebarLink({
     <Link
       to={item.to}
       params={{ slug }}
+      data-tour={`nav-${item.id}`}
       aria-current={active ? "page" : undefined}
       aria-label={rail ? item.label : undefined}
       title={rail ? item.label : undefined}

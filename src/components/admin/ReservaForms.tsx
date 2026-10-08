@@ -164,9 +164,9 @@ export function CancelFields({
     <div className="space-y-4 text-sm">
       <button
         onClick={onRemarcar}
-        className="w-full rounded-lg border border-terracotta/30 bg-terracotta/5 p-4 text-left transition-colors hover:bg-terracotta/10"
+        className="w-full rounded-lg border border-brand/30 bg-brand/5 p-4 text-left transition-colors hover:bg-brand/10"
       >
-        <p className="font-medium text-terracotta">Remarcar em vez de cancelar</p>
+        <p className="font-medium text-brand">Remarcar em vez de cancelar</p>
         <p className="mt-1 text-xs text-muted-foreground">
           Altere a data ou o horário e mantenha a reserva — o cliente não precisa fazer tudo de
           novo.

@@ -49,6 +49,10 @@ export type PerfilRow = {
   cardapio_publicado: boolean;
   hub_publicado: boolean;
   marca_ativa?: boolean;
+  hub_descricao?: string | null;
+  hub_banner_url?: string | null;
+  hub_banner_ativo?: boolean;
+  hub_mostrar_cardapio?: boolean;
 };
 
 // As tabelas novas ainda nao estao em `types.ts` (arquivo gerado). Cliente sem tipos de tabela,
@@ -143,4 +147,27 @@ export function reordenar<T extends { id: string; ordem: number }>(
 /** Categorias sem itens ativos nao aparecem na pagina publica. */
 export function categoriasVisiveis(c: CardapioPublico | null): CategoriaCardapio[] {
   return (c?.categorias ?? []).filter((cat) => cat.itens.length > 0);
+}
+
+function normalizar(t: string): string {
+  return t
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+/** Busca por nome ou descricao, sem acento e sem diferenciar maiuscula. Categoria sem item some. */
+export function filtrarCardapio(
+  categorias: CategoriaCardapio[],
+  termo: string,
+): CategoriaCardapio[] {
+  const t = normalizar(termo);
+  if (!t) return categorias;
+  return categorias
+    .map((c) => ({
+      ...c,
+      itens: c.itens.filter((i) => normalizar(`${i.nome} ${i.descricao ?? ""}`).includes(t)),
+    }))
+    .filter((c) => c.itens.length > 0);
 }

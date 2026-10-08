@@ -12,12 +12,13 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
+import { SITE_URL } from "@/lib/site";
 
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-6">
       <div className="max-w-md text-center animate-in-up">
-        <p className="font-serif text-7xl text-terracotta">404</p>
+        <p className="font-serif text-7xl text-brand">404</p>
         <h2 className="mt-4 text-xl font-semibold">Página não encontrada</h2>
         <p className="mt-2 text-sm text-muted-foreground">
           O que você procura não existe ou foi movido.
@@ -88,7 +89,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
       { name: "apple-mobile-web-app-title", content: "Teggly" },
       { name: "mobile-web-app-capable", content: "yes" },
-      { name: "author", content: "BauerLab" },
+      { name: "author", content: "Teggly" },
       { property: "og:site_name", content: "Teggly" },
       { property: "og:title", content: "Teggly | Mais reservas. Menos trabalho." },
       {
@@ -96,7 +97,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content: "Reservas e atendimento inteligente para restaurantes, direto no WhatsApp.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: "https://reserva.bauerlab.com.br/og-image.png" },
+      { property: "og:image", content: `${SITE_URL}/og-image.png` },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
       { property: "og:locale", content: "pt_BR" },
@@ -106,7 +107,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         name: "twitter:description",
         content: "Reservas e atendimento inteligente para restaurantes, direto no WhatsApp.",
       },
-      { name: "twitter:image", content: "https://reserva.bauerlab.com.br/og-image.png" },
+      { name: "twitter:image", content: `${SITE_URL}/og-image.png` },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
