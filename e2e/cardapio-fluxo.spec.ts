@@ -51,7 +51,12 @@ test.describe("Cardápio: do painel à página pública", () => {
     expect(mock.state.itens[0]).toMatchObject({ nome: "Pão de queijo", preco_centavos: 1800 });
     expect(String(mock.state.itens[0]!.imagem_url)).toContain("/tenant-assets/");
 
+    // Publicar é uma decisão: aba Publicação, chave e confirmação.
+    await page.getByRole("tab", { name: "Publicação" }).click();
+    await expect(page.getByText("Rascunho, não publicado").first()).toBeVisible();
     await page.getByRole("switch", { name: "Publicar cardápio" }).click();
+    expect(mock.state.perfil[0]!.cardapio_publicado).toBe(false);
+    await page.getByRole("button", { name: "Publicar", exact: true }).click();
     await expect.poll(() => mock.state.perfil[0]!.cardapio_publicado).toBe(true);
 
     await page.goto("/iracema/cardapio");
@@ -98,6 +103,7 @@ test.describe("Cardápio: do painel à página pública", () => {
     await expect(page.getByText("Cardápio indisponível por enquanto")).toBeVisible();
 
     await page.goto("/iracema/admin/cardapio");
+    await page.getByRole("tab", { name: "Publicação" }).click();
     const previa = page.getByRole("link", { name: "Pré-visualizar" });
     await expect(previa).toHaveAttribute("href", "/iracema/cardapio?previa=1");
 

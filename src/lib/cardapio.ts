@@ -12,6 +12,8 @@ export type ItemCardapio = {
   descricao: string | null;
   preco_centavos: number | null;
   imagem_url: string | null;
+  /** Item em evidencia (prato da casa). Ausente em respostas antigas. */
+  destaque?: boolean;
 };
 
 export type CategoriaCardapio = {
@@ -21,7 +23,12 @@ export type CategoriaCardapio = {
   itens: ItemCardapio[];
 };
 
-export type CardapioPublico = { nome: string; categorias: CategoriaCardapio[] };
+export type CardapioPublico = {
+  nome: string;
+  /** Layout escolhido (lista, cards, galeria, compacto). Ausente/nulo: o sistema sugere. */
+  layout?: string | null;
+  categorias: CategoriaCardapio[];
+};
 
 /** Linhas das tabelas, como o admin as le. */
 export type CategoriaRow = {
@@ -42,6 +49,7 @@ export type ItemRow = {
   imagem_url: string | null;
   ordem: number;
   ativo: boolean;
+  destaque?: boolean;
 };
 export type PerfilRow = {
   tenant_id: string;
@@ -94,7 +102,11 @@ export async function fetchCardapioPrevia(
   tenantId: string,
   nome: string,
 ): Promise<CardapioPublico | null> {
-  const [cats, itens] = await Promise.all([fetchCategorias(tenantId), fetchItens(tenantId)]);
+  const [cats, itens, perfil] = await Promise.all([
+    fetchCategorias(tenantId),
+    fetchItens(tenantId),
+    fetchPerfil(tenantId),
+  ]);
   if (cats.error || itens.error) throw new Error((cats.error ?? itens.error)!.message);
   const categorias = (cats.data ?? [])
     .filter((c) => c.ativo)
@@ -110,9 +122,12 @@ export async function fetchCardapioPrevia(
           descricao: i.descricao,
           preco_centavos: i.preco_centavos,
           imagem_url: i.imagem_url,
+          destaque: i.destaque === true,
         })),
     }));
-  return categorias.length > 0 ? { nome, categorias } : null;
+  return categorias.length > 0
+    ? { nome, layout: perfil.data?.cardapio_layout ?? null, categorias }
+    : null;
 }
 
 export function fetchCategorias(tenantId: string) {
