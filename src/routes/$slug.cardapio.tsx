@@ -79,6 +79,16 @@ function CardapioPublicoPage() {
 
   const [busca, setBusca] = useState("");
   const [ativa, setAtiva] = useState<string | null>(null);
+  // A previa e so do admin: nunca deve ser indexada.
+  useEffect(() => {
+    if (!previa) return;
+    const meta = document.createElement("meta");
+    meta.name = "robots";
+    meta.content = "noindex";
+    document.head.appendChild(meta);
+    return () => meta.remove();
+  }, [previa]);
+
   const todas = useMemo(() => categoriasVisiveis(cardapioQ.data ?? null), [cardapioQ.data]);
   const visiveis = useMemo(() => filtrarCardapio(todas, busca), [todas, busca]);
   // No modo previa o admin pode testar um layout pela URL sem salvar.
