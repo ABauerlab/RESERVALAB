@@ -173,7 +173,11 @@ test.describe("Cardápio: reordenar arrastando", () => {
   test("alça de arrastar funciona pelo teclado e grava a nova ordem da categoria", async ({
     page,
     context,
+    isMobile,
   }) => {
+    // No celular o arrastar é por toque (segurar e arrastar), que o teste não simula; o teclado
+    // depende da próxima categoria estar visível na tela, o que no celular nem sempre acontece.
+    test.skip(isMobile, "arrastar por teclado é validado no desktop");
     const mock = await installMock(context);
     await page.goto("/iracema/admin/cardapio");
     await expect(page.getByRole("heading", { name: "Pratos" })).toBeVisible();
