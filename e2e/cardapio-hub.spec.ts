@@ -113,6 +113,7 @@ test.describe("Cardápio e Link Hub (painel)", () => {
     const item = mock.writes.find((w) => w.url.includes("cardapio_itens") && w.method === "POST");
     expect(item!.body).toMatchObject({ nome: "Moqueca", preco_centavos: 5250, categoria_id: "c1" });
 
+    await page.getByRole("tab", { name: "Publicação" }).click();
     await page.getByRole("switch", { name: "Publicar cardápio" }).click();
     await expect.poll(() => mock.state.perfil[0]!.cardapio_publicado).toBe(false);
   });

@@ -370,9 +370,14 @@ export async function installMock(
                   descricao: i.descricao,
                   preco_centavos: i.preco_centavos,
                   imagem_url: i.imagem_url,
+                  destaque: i.destaque === true,
                 })),
             }));
-          return json(route, { nome: "Iracema", categorias });
+          return json(route, {
+            nome: "Iracema",
+            layout: perfil.cardapio_layout ?? null,
+            categorias,
+          });
         }
         if (name === "hub_do_tenant") {
           const perfil = mock.state.perfil[0];
