@@ -7,6 +7,7 @@ export function mensagemErroReserva(erro: unknown, padrao: string): string {
     typeof erro === "object" && erro !== null && "message" in erro
       ? String((erro as { message: unknown }).message)
       : "";
+  if (msg.includes("Capacidade")) return "Esse dia ou horário está lotado. Escolha outro.";
   if (msg.includes("indisponivel"))
     return "Essa data ou horário não está disponível. Escolha outro.";
   if (msg.includes("nao pode ser")) return "Esta reserva não pode mais ser alterada.";

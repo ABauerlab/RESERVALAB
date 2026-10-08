@@ -19,6 +19,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { parseCapacidade } from "@/lib/capacidade";
 import { clearTenantCache } from "@/lib/tenant";
 import {
   DEFAULT_MENSAGEM_CANCELAMENTO,
@@ -63,6 +64,8 @@ function ConfiguracoesPage() {
   const [mensagemReconfirmacao, setMensagemReconfirmacao] = useState("");
   const [limiteSemana, setLimiteSemana] = useState("");
   const [limiteFimDeSemana, setLimiteFimDeSemana] = useState("");
+  const [capacidadeDia, setCapacidadeDia] = useState("");
+  const [capacidadeHorario, setCapacidadeHorario] = useState("");
   const [pixelFacebook, setPixelFacebook] = useState("");
   const [observacaoArea, setObservacaoArea] = useState("");
 
@@ -81,6 +84,14 @@ function ConfiguracoesPage() {
     setMensagemReconfirmacao(tenant.mensagem_reconfirmacao ?? DEFAULT_MENSAGEM_RECONFIRMACAO);
     setLimiteSemana(tenant.horario_limite_semana?.slice(0, 5) ?? "");
     setLimiteFimDeSemana(tenant.horario_limite_fim_semana?.slice(0, 5) ?? "");
+    const cap = tenant as unknown as {
+      capacidade_pessoas_dia?: number | null;
+      capacidade_pessoas_horario?: number | null;
+    };
+    setCapacidadeDia(cap.capacidade_pessoas_dia ? String(cap.capacidade_pessoas_dia) : "");
+    setCapacidadeHorario(
+      cap.capacidade_pessoas_horario ? String(cap.capacidade_pessoas_horario) : "",
+    );
     setPixelFacebook(tenant.pixel_facebook_id ?? "");
     setObservacaoArea(tenant.observacao_area ?? "");
   }, [tenant]);
@@ -105,7 +116,9 @@ function ConfiguracoesPage() {
           horario_limite_fim_semana: limiteFimDeSemana || null,
           pixel_facebook_id: pixelFacebook.trim() || null,
           observacao_area: observacaoArea.trim() || null,
-        })
+          capacidade_pessoas_dia: parseCapacidade(capacidadeDia),
+          capacidade_pessoas_horario: parseCapacidade(capacidadeHorario),
+        } as never)
         .eq("id", tenant!.id);
       if (error) throw error;
     },
@@ -310,6 +323,45 @@ function ConfiguracoesPage() {
                     placeholder="Ex: Trabalhamos com as áreas Salão, Fundos, Corredor e Varanda. Não garantimos o local de preferência — isso depende da quantidade de reservas na data escolhida."
                     className="min-h-24 rounded-md text-sm leading-relaxed"
                   />
+                </div>
+
+                <div className="space-y-4 border-t border-border/60 pt-5 first:border-t-0 first:pt-0">
+                  <div>
+                    <h3 className="font-semibold">Capacidade da casa</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Quando o limite é atingido, o site de reservas deixa de aceitar novas reservas
+                      naquele dia ou horário (reservas feitas por você no painel não são
+                      bloqueadas). Deixe em branco para não limitar.
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="cap-dia" className="text-[13px]">
+                        Pessoas por dia
+                      </Label>
+                      <Input
+                        id="cap-dia"
+                        inputMode="numeric"
+                        value={capacidadeDia}
+                        onChange={(e) => setCapacidadeDia(e.target.value.replace(/\D/g, ""))}
+                        placeholder="Ex.: 120"
+                        className="h-11 rounded-md"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="cap-horario" className="text-[13px]">
+                        Pessoas por horário
+                      </Label>
+                      <Input
+                        id="cap-horario"
+                        inputMode="numeric"
+                        value={capacidadeHorario}
+                        onChange={(e) => setCapacidadeHorario(e.target.value.replace(/\D/g, ""))}
+                        placeholder="Ex.: 40"
+                        className="h-11 rounded-md"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="space-y-4 border-t border-border/60 pt-5 first:border-t-0 first:pt-0">

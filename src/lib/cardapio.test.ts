@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   categoriasVisiveis,
+  moverPara,
   filtrarCardapio,
   formatPreco,
   parsePreco,
@@ -112,5 +113,39 @@ describe("filtrarCardapio", () => {
   it("sem termo devolve tudo e sem resultado devolve vazio", () => {
     expect(filtrarCardapio(cats, "  ")).toHaveLength(2);
     expect(filtrarCardapio(cats, "sushi")).toEqual([]);
+  });
+});
+
+describe("moverPara (arrastar)", () => {
+  const l = [
+    { id: "a", ordem: 0 },
+    { id: "b", ordem: 1 },
+    { id: "c", ordem: 2 },
+    { id: "d", ordem: 3 },
+  ];
+  it("move para baixo e para cima renumerando so o que mudou", () => {
+    expect(moverPara(l, "a", "c")).toEqual([
+      { id: "b", ordem: 0 },
+      { id: "c", ordem: 1 },
+      { id: "a", ordem: 2 },
+    ]);
+    expect(moverPara(l, "d", "b")).toEqual([
+      { id: "d", ordem: 1 },
+      { id: "b", ordem: 2 },
+      { id: "c", ordem: 3 },
+    ]);
+  });
+  it("sem mudanca para o mesmo item ou id desconhecido", () => {
+    expect(moverPara(l, "b", "b")).toEqual([]);
+    expect(moverPara(l, "x", "b")).toEqual([]);
+  });
+  it("funciona mesmo com todas as ordens iguais", () => {
+    const iguais = ["a", "b", "c"].map((id) => ({ id, ordem: 0 }));
+    const r = moverPara(iguais, "c", "a");
+    // c fica em 0 (igual ao que ja era); a e b ganham 1 e 2.
+    expect(r).toEqual([
+      { id: "a", ordem: 1 },
+      { id: "b", ordem: 2 },
+    ]);
   });
 });

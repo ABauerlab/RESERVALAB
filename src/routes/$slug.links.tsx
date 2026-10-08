@@ -8,6 +8,7 @@ import { MapaIncorporado, MapaRecolhivel } from "@/components/hub/HubMapa";
 import { EstadoPublico, PublicShell } from "@/components/public/PublicShell";
 import { buildHubItens, fetchHub, type HubItem } from "@/lib/hub";
 import { iconeUrlSegura } from "@/lib/hub-icons";
+import { fetchOgRestaurante, montarOg } from "@/lib/og";
 import { fetchProximoEvento } from "@/lib/eventos";
 import { formatData } from "@/lib/reservations";
 import { urlDeMapaValida } from "@/lib/mapa";
@@ -15,19 +16,23 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/$slug/links")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `Reservas, cardápio e contato | ${params.slug}` },
-      { name: "description", content: "Reserve sua mesa, veja o cardápio e fale com a casa." },
-      { property: "og:type", content: "website" },
-      { property: "og:title", content: `Reservas, cardápio e contato | ${params.slug}` },
-      {
-        property: "og:description",
-        content: "Reserve sua mesa, veja o cardápio e fale com a casa.",
-      },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
+  loader: ({ params }) => fetchOgRestaurante(params.slug),
+  head: ({ params, loaderData }) => {
+    const og = montarOg(params.slug, "links", loaderData ?? null);
+    return {
+      meta: loaderData
+        ? og.meta
+        : [
+            { title: `Reservas, cardápio e contato | ${params.slug}` },
+            {
+              name: "description",
+              content: "Reserve sua mesa, veja o cardápio e fale com a casa.",
+            },
+            ...og.meta,
+          ],
+      links: og.links,
+    };
+  },
   component: comMarca(HubPublicoPage),
 });
 

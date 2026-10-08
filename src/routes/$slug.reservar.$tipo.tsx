@@ -1,3 +1,4 @@
+import { cabeNaCasa, fetchCapacidadeDoDia } from "@/lib/capacidade";
 import { comMarca } from "@/components/public/MarcaScope";
 import { createFileRoute, Link, useNavigate, useParams, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
@@ -130,6 +131,16 @@ function ReservarPage() {
 
   const hoje = useMemo(() => todayISO(), []);
 
+  // Capacidade da casa (so existe se o restaurante definiu limites): avisa antes de enviar.
+  const capQ = useQuery({
+    enabled: !!data,
+    queryKey: ["capacidade-do-dia", slug, data],
+    staleTime: 15_000,
+    retry: false,
+    queryFn: () => fetchCapacidadeDoDia(slug, data),
+  });
+  const capacidade = capQ.data ?? null;
+
   const ehFeriado = useMemo(
     () => (feriadosQ.data ?? []).some((f: { data: string }) => f.data === data),
     [feriadosQ.data, data],
@@ -146,10 +157,11 @@ function ReservarPage() {
               fimDeSemana: tenantQ.data?.horario_limite_fim_semana,
             },
             ehFeriado,
-          )
+          ).filter((h) => cabeNaCasa(capacidade, h, quantidade).ok)
         : [],
     [
       precisaHorario,
+      capacidade,
       data,
       quantidade,
       tenantQ.data?.horario_limite_semana,
@@ -183,9 +195,19 @@ function ReservarPage() {
     return faixa ? { motivo: faixa.motivo, diaTodo: false as const } : null;
   }, [bloqueiosQ.data, data, horario]);
 
+  const lotado = useMemo(() => {
+    const v = cabeNaCasa(capacidade, precisaHorario && horario ? horario : null, quantidade);
+    if (!v.ok) return v.motivo;
+    // Todos os horarios do dia estouram para este grupo.
+    if (precisaHorario && data && capacidade && horariosOpcoes.length === 0)
+      return "horario" as const;
+    return null;
+  }, [capacidade, precisaHorario, horario, quantidade, data, horariosOpcoes.length]);
+
   const podeEnviar =
     !!tenantQ.data &&
     !bloqueio &&
+    !lotado &&
     nome.trim().length >= 2 &&
     telefone.replace(/\D/g, "").length >= 10 &&
     quantidade > 0 &&
@@ -451,6 +473,25 @@ function ReservarPage() {
                 </p>
                 <p className="mt-0.5 text-muted-foreground">
                   {bloqueio.motivo?.trim() || "Escolha outra opção para continuar."}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {lotado && (
+            <div
+              role="alert"
+              className="flex items-start gap-3 rounded-lg border border-destructive/25 bg-destructive/5 p-4"
+            >
+              <CalendarX2 className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+              <div className="text-sm">
+                <p className="font-medium text-destructive">
+                  {lotado === "dia"
+                    ? "Este dia está lotado para um grupo desse tamanho"
+                    : "Não há mais lugares nesse horário para um grupo desse tamanho"}
+                </p>
+                <p className="mt-0.5 text-muted-foreground">
+                  Escolha outro dia ou horário, ou reduza o número de pessoas.
                 </p>
               </div>
             </div>

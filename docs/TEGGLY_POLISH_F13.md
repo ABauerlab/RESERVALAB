@@ -31,3 +31,10 @@ Resumo do que foi entregue e do que fica para depois. Detalhes por PR no GitHub.
 - Ocupação/capacidade no Dashboard: só quando existir capacidade cadastrada.
 - Reordenar cardápio por arrastar e soltar.
 - Cutover do domínio teggly.com.br na Hostinger: manual, pelo proprietário (`docs/TEGGLY_DOMAIN_CUTOVER.md`).
+
+## F14: capacidade, Open Graph por restaurante, arrastar no cardápio e fotos do Iracema
+
+- **Capacidade** (Ajustes > Reservas): limite de pessoas por dia e por horário, opcional. A reserva pública (`criar_reserva`) e a alteração pelo código (`update_reserva_by_codigo`) recusam o que passar do limite ("lotado"); reservas feitas pelo painel nunca são bloqueadas. A página de reserva avisa antes de enviar e esconde horários que não comportam o grupo (`capacidade_do_dia`, só números agregados). SQL em `docs/database/applied/f14_capacidade.sql`. Atenção: o agente de WhatsApp que chama `criar_reserva` passa a receber o erro "Capacidade do dia/horario esgotada" quando a casa define limite.
+- **Open Graph por restaurante** (`src/lib/og.ts`): o preview de `/{slug}`, `/{slug}/links` e `/{slug}/cardapio` usa o nome, o selo, a frase e a imagem da casa (banner do Link Hub, senão foto de um prato do cardápio publicado, senão a imagem padrão). Gerado no servidor a partir de conteúdo já público; sem dados, cai no preview genérico. Uma arte de compartilhamento desenhada automaticamente (texto sobre a foto) exigiria uma biblioteca de rasterização no servidor; fica como evolução.
+- **Arrastar no cardápio**: categorias e itens se reordenam arrastando (mouse, toque segurando um instante, teclado: espaço, setas, espaço). As setas continuam como alternativa. Usa `@dnd-kit` (só no painel).
+- **Fotos do Iracema**: 60 itens receberam as fotos do novo ensaio (`produto-<id>-ensaio.webp`, até 900 px, WebP). Ficaram sem foto: Acréscimo de molho, Soda italiana e o item inativo da categoria "Comida di Buteco".

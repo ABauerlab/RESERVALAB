@@ -22,6 +22,7 @@ import { useTenantAdmin } from "@/hooks/use-tenant-admin";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { AparenciaPainel } from "@/components/cardapio/AparenciaPainel";
+import { ListaOrdenavel, Ordenavel } from "@/components/cardapio/Ordenavel";
 import { PreviaCliente } from "@/components/cardapio/PreviaCliente";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ehLayout, type LayoutCardapio } from "@/lib/cardapio-layout";
@@ -55,6 +56,7 @@ import {
   formatPreco,
   parsePreco,
   precoParaCampo,
+  moverPara,
   reordenar,
   tabela,
   type CategoriaCardapio,
@@ -436,220 +438,262 @@ function CardapioAdminPage() {
                   </div>
                 ) : (
                   <div className="mt-6 space-y-5">
-                    {categorias.map((c, idx) => {
-                      const itens = itensPorCategoria.get(c.id) ?? [];
-                      return (
-                        <section
-                          key={c.id}
-                          aria-label={`Categoria ${c.nome}`}
-                          className={cn(
-                            "rounded-xl border border-border bg-card",
-                            !c.ativo && "opacity-70",
-                          )}
-                        >
-                          <div className="flex flex-wrap items-start justify-between gap-2 p-4">
-                            <div className="min-w-0">
-                              <h3 className="break-words text-base font-semibold">{c.nome}</h3>
-                              {c.descricao && (
-                                <p className="mt-0.5 text-sm text-muted-foreground">
-                                  {c.descricao}
-                                </p>
-                              )}
-                              {!c.ativo && (
-                                <p className="mt-1 text-xs font-semibold text-muted-foreground">
-                                  Oculta
-                                </p>
-                              )}
-                            </div>
-                            <div className="flex shrink-0 items-center gap-1">
-                              <IconBtn
-                                label="Subir categoria"
-                                disabled={idx === 0}
-                                onClick={() =>
-                                  mover.mutate({
-                                    tabela: "cardapio_categorias",
-                                    mudancas: reordenar(categorias, c.id, -1),
-                                  })
-                                }
-                              >
-                                <ArrowUp className="h-4 w-4" />
-                              </IconBtn>
-                              <IconBtn
-                                label="Descer categoria"
-                                disabled={idx === categorias.length - 1}
-                                onClick={() =>
-                                  mover.mutate({
-                                    tabela: "cardapio_categorias",
-                                    mudancas: reordenar(categorias, c.id, 1),
-                                  })
-                                }
-                              >
-                                <ArrowDown className="h-4 w-4" />
-                              </IconBtn>
-                              <IconBtn
-                                label={c.ativo ? "Ocultar categoria" : "Mostrar categoria"}
-                                onClick={() =>
-                                  alternarAtivo.mutate({
-                                    tipo: "categoria",
-                                    id: c.id,
-                                    ativo: !c.ativo,
-                                  })
-                                }
-                              >
-                                {c.ativo ? (
-                                  <Eye className="h-4 w-4" />
-                                ) : (
-                                  <EyeOff className="h-4 w-4" />
-                                )}
-                              </IconBtn>
-                              <IconBtn
-                                label="Editar categoria"
-                                onClick={() =>
-                                  setCatForm({
-                                    id: c.id,
-                                    nome: c.nome,
-                                    descricao: c.descricao ?? "",
-                                  })
-                                }
-                              >
-                                <Pencil className="h-4 w-4" />
-                              </IconBtn>
-                              <IconBtn
-                                label="Excluir categoria"
-                                onClick={() => setExcluir({ tipo: "categoria", row: c })}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </IconBtn>
-                            </div>
-                          </div>
-
-                          <ul className="divide-y divide-border/70 border-t border-border/70">
-                            {itens.length === 0 && (
-                              <li className="px-4 py-4 text-sm text-muted-foreground">
-                                Nenhum item nesta categoria.
-                              </li>
-                            )}
-                            {itens.map((i, j) => (
-                              <li
-                                key={i.id}
+                    <ListaOrdenavel
+                      ids={categorias.map((c) => c.id)}
+                      onReordenar={(a, b) =>
+                        mover.mutate({
+                          tabela: "cardapio_categorias",
+                          mudancas: moverPara(categorias, a, b),
+                        })
+                      }
+                    >
+                      {categorias.map((c, idx) => {
+                        const itens = itensPorCategoria.get(c.id) ?? [];
+                        return (
+                          <Ordenavel key={c.id} id={c.id} rotulo={c.nome}>
+                            {(alcaCategoria) => (
+                              <section
+                                aria-label={`Categoria ${c.nome}`}
                                 className={cn(
-                                  "flex flex-wrap items-center gap-3 px-4 py-3",
-                                  !i.ativo && "opacity-60",
+                                  "rounded-xl border border-border bg-card",
+                                  !c.ativo && "opacity-70",
                                 )}
                               >
-                                <div className="min-w-0 flex-1">
-                                  <p className="break-words text-sm font-semibold">{i.nome}</p>
-                                  <p className="text-xs text-muted-foreground">
-                                    {formatPreco(i.preco_centavos) ?? "Sem preço"}
-                                    {i.destaque && " · Destaque"}
-                                    {!i.ativo && " · Oculto"}
-                                  </p>
-                                </div>
-                                <div className="flex shrink-0 items-center gap-1">
-                                  <IconBtn
-                                    label={`Subir ${i.nome}`}
-                                    disabled={j === 0}
-                                    onClick={() =>
-                                      mover.mutate({
-                                        tabela: "cardapio_itens",
-                                        mudancas: reordenar(itens, i.id, -1),
-                                      })
-                                    }
-                                  >
-                                    <ArrowUp className="h-4 w-4" />
-                                  </IconBtn>
-                                  <IconBtn
-                                    label={`Descer ${i.nome}`}
-                                    disabled={j === itens.length - 1}
-                                    onClick={() =>
-                                      mover.mutate({
-                                        tabela: "cardapio_itens",
-                                        mudancas: reordenar(itens, i.id, 1),
-                                      })
-                                    }
-                                  >
-                                    <ArrowDown className="h-4 w-4" />
-                                  </IconBtn>
-                                  <IconBtn
-                                    label={
-                                      i.destaque
-                                        ? `Tirar destaque de ${i.nome}`
-                                        : `Destacar ${i.nome}`
-                                    }
-                                    onClick={() =>
-                                      destacar.mutate({ id: i.id, destaque: !i.destaque })
-                                    }
-                                  >
-                                    <Star
-                                      className={cn(
-                                        "h-4 w-4",
-                                        i.destaque && "fill-warning-500 text-warning-500",
+                                <div className="flex flex-wrap items-start justify-between gap-2 p-4">
+                                  <div className="flex min-w-0 items-start gap-1">
+                                    {alcaCategoria}
+                                    <div className="min-w-0">
+                                      <h3 className="break-words text-base font-semibold">
+                                        {c.nome}
+                                      </h3>
+                                      {c.descricao && (
+                                        <p className="mt-0.5 text-sm text-muted-foreground">
+                                          {c.descricao}
+                                        </p>
                                       )}
-                                    />
-                                  </IconBtn>
-                                  <IconBtn
-                                    label={i.ativo ? `Ocultar ${i.nome}` : `Mostrar ${i.nome}`}
-                                    onClick={() =>
-                                      alternarAtivo.mutate({
-                                        tipo: "item",
-                                        id: i.id,
-                                        ativo: !i.ativo,
-                                      })
-                                    }
-                                  >
-                                    {i.ativo ? (
-                                      <Eye className="h-4 w-4" />
-                                    ) : (
-                                      <EyeOff className="h-4 w-4" />
+                                      {!c.ativo && (
+                                        <p className="mt-1 text-xs font-semibold text-muted-foreground">
+                                          Oculta
+                                        </p>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className="flex shrink-0 items-center gap-1">
+                                    <IconBtn
+                                      label="Subir categoria"
+                                      disabled={idx === 0}
+                                      onClick={() =>
+                                        mover.mutate({
+                                          tabela: "cardapio_categorias",
+                                          mudancas: reordenar(categorias, c.id, -1),
+                                        })
+                                      }
+                                    >
+                                      <ArrowUp className="h-4 w-4" />
+                                    </IconBtn>
+                                    <IconBtn
+                                      label="Descer categoria"
+                                      disabled={idx === categorias.length - 1}
+                                      onClick={() =>
+                                        mover.mutate({
+                                          tabela: "cardapio_categorias",
+                                          mudancas: reordenar(categorias, c.id, 1),
+                                        })
+                                      }
+                                    >
+                                      <ArrowDown className="h-4 w-4" />
+                                    </IconBtn>
+                                    <IconBtn
+                                      label={c.ativo ? "Ocultar categoria" : "Mostrar categoria"}
+                                      onClick={() =>
+                                        alternarAtivo.mutate({
+                                          tipo: "categoria",
+                                          id: c.id,
+                                          ativo: !c.ativo,
+                                        })
+                                      }
+                                    >
+                                      {c.ativo ? (
+                                        <Eye className="h-4 w-4" />
+                                      ) : (
+                                        <EyeOff className="h-4 w-4" />
+                                      )}
+                                    </IconBtn>
+                                    <IconBtn
+                                      label="Editar categoria"
+                                      onClick={() =>
+                                        setCatForm({
+                                          id: c.id,
+                                          nome: c.nome,
+                                          descricao: c.descricao ?? "",
+                                        })
+                                      }
+                                    >
+                                      <Pencil className="h-4 w-4" />
+                                    </IconBtn>
+                                    <IconBtn
+                                      label="Excluir categoria"
+                                      onClick={() => setExcluir({ tipo: "categoria", row: c })}
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </IconBtn>
+                                  </div>
+                                </div>
+
+                                <ListaOrdenavel
+                                  ids={itens.map((x) => x.id)}
+                                  onReordenar={(a, b) =>
+                                    mover.mutate({
+                                      tabela: "cardapio_itens",
+                                      mudancas: moverPara(itens, a, b),
+                                    })
+                                  }
+                                >
+                                  <ul className="divide-y divide-border/70 border-t border-border/70">
+                                    {itens.length === 0 && (
+                                      <li className="px-4 py-4 text-sm text-muted-foreground">
+                                        Nenhum item nesta categoria.
+                                      </li>
                                     )}
-                                  </IconBtn>
-                                  <IconBtn
-                                    label={`Editar ${i.nome}`}
+                                    {itens.map((i, j) => (
+                                      <Ordenavel key={i.id} id={i.id} rotulo={i.nome} as="li">
+                                        {(alcaItem) => (
+                                          <div
+                                            className={cn(
+                                              "flex flex-wrap items-center gap-3 px-4 py-3",
+                                              !i.ativo && "opacity-60",
+                                            )}
+                                          >
+                                            {alcaItem}
+                                            <div className="min-w-0 flex-1">
+                                              <p className="break-words text-sm font-semibold">
+                                                {i.nome}
+                                              </p>
+                                              <p className="text-xs text-muted-foreground">
+                                                {formatPreco(i.preco_centavos) ?? "Sem preço"}
+                                                {i.destaque && " · Destaque"}
+                                                {!i.ativo && " · Oculto"}
+                                              </p>
+                                            </div>
+                                            <div className="flex shrink-0 items-center gap-1">
+                                              <IconBtn
+                                                label={`Subir ${i.nome}`}
+                                                disabled={j === 0}
+                                                onClick={() =>
+                                                  mover.mutate({
+                                                    tabela: "cardapio_itens",
+                                                    mudancas: reordenar(itens, i.id, -1),
+                                                  })
+                                                }
+                                              >
+                                                <ArrowUp className="h-4 w-4" />
+                                              </IconBtn>
+                                              <IconBtn
+                                                label={`Descer ${i.nome}`}
+                                                disabled={j === itens.length - 1}
+                                                onClick={() =>
+                                                  mover.mutate({
+                                                    tabela: "cardapio_itens",
+                                                    mudancas: reordenar(itens, i.id, 1),
+                                                  })
+                                                }
+                                              >
+                                                <ArrowDown className="h-4 w-4" />
+                                              </IconBtn>
+                                              <IconBtn
+                                                label={
+                                                  i.destaque
+                                                    ? `Tirar destaque de ${i.nome}`
+                                                    : `Destacar ${i.nome}`
+                                                }
+                                                onClick={() =>
+                                                  destacar.mutate({
+                                                    id: i.id,
+                                                    destaque: !i.destaque,
+                                                  })
+                                                }
+                                              >
+                                                <Star
+                                                  className={cn(
+                                                    "h-4 w-4",
+                                                    i.destaque &&
+                                                      "fill-warning-500 text-warning-500",
+                                                  )}
+                                                />
+                                              </IconBtn>
+                                              <IconBtn
+                                                label={
+                                                  i.ativo
+                                                    ? `Ocultar ${i.nome}`
+                                                    : `Mostrar ${i.nome}`
+                                                }
+                                                onClick={() =>
+                                                  alternarAtivo.mutate({
+                                                    tipo: "item",
+                                                    id: i.id,
+                                                    ativo: !i.ativo,
+                                                  })
+                                                }
+                                              >
+                                                {i.ativo ? (
+                                                  <Eye className="h-4 w-4" />
+                                                ) : (
+                                                  <EyeOff className="h-4 w-4" />
+                                                )}
+                                              </IconBtn>
+                                              <IconBtn
+                                                label={`Editar ${i.nome}`}
+                                                onClick={() =>
+                                                  setItemForm({
+                                                    id: i.id,
+                                                    categoria_id: i.categoria_id,
+                                                    nome: i.nome,
+                                                    descricao: i.descricao ?? "",
+                                                    preco: precoParaCampo(i.preco_centavos),
+                                                    imagem_url: i.imagem_url ?? "",
+                                                    destaque: i.destaque === true,
+                                                  })
+                                                }
+                                              >
+                                                <Pencil className="h-4 w-4" />
+                                              </IconBtn>
+                                              <IconBtn
+                                                label={`Excluir ${i.nome}`}
+                                                onClick={() => setExcluir({ tipo: "item", row: i })}
+                                              >
+                                                <Trash2 className="h-4 w-4" />
+                                              </IconBtn>
+                                            </div>
+                                          </div>
+                                        )}
+                                      </Ordenavel>
+                                    ))}
+                                  </ul>
+                                </ListaOrdenavel>
+                                <div className="border-t border-border/70 p-3">
+                                  <Button
+                                    variant="outline"
                                     onClick={() =>
                                       setItemForm({
-                                        id: i.id,
-                                        categoria_id: i.categoria_id,
-                                        nome: i.nome,
-                                        descricao: i.descricao ?? "",
-                                        preco: precoParaCampo(i.preco_centavos),
-                                        imagem_url: i.imagem_url ?? "",
-                                        destaque: i.destaque === true,
+                                        categoria_id: c.id,
+                                        nome: "",
+                                        descricao: "",
+                                        preco: "",
+                                        imagem_url: "",
+                                        destaque: false,
                                       })
                                     }
+                                    className="h-11 w-full rounded-md xl:h-9 xl:w-auto"
                                   >
-                                    <Pencil className="h-4 w-4" />
-                                  </IconBtn>
-                                  <IconBtn
-                                    label={`Excluir ${i.nome}`}
-                                    onClick={() => setExcluir({ tipo: "item", row: i })}
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </IconBtn>
+                                    <Plus className="mr-1.5 h-4 w-4" /> Item em {c.nome}
+                                  </Button>
                                 </div>
-                              </li>
-                            ))}
-                          </ul>
-                          <div className="border-t border-border/70 p-3">
-                            <Button
-                              variant="outline"
-                              onClick={() =>
-                                setItemForm({
-                                  categoria_id: c.id,
-                                  nome: "",
-                                  descricao: "",
-                                  preco: "",
-                                  imagem_url: "",
-                                  destaque: false,
-                                })
-                              }
-                              className="h-11 w-full rounded-md xl:h-9 xl:w-auto"
-                            >
-                              <Plus className="mr-1.5 h-4 w-4" /> Item em {c.nome}
-                            </Button>
-                          </div>
-                        </section>
-                      );
-                    })}
+                              </section>
+                            )}
+                          </Ordenavel>
+                        );
+                      })}
+                    </ListaOrdenavel>
                   </div>
                 )}
               </TabsContent>

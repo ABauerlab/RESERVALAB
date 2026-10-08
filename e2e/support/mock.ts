@@ -97,6 +97,8 @@ type Fixtures = {
   perfil: Row[];
   marca: { cor: string | null; logo_url: string | null } | null;
   hubLinks: Row[];
+  /** Capacidade da casa (null = sem limite). `porHorario` = restante por horario. */
+  tenantCap: { dia?: number; horario?: number; porHorario?: Record<string, number> } | null;
 };
 
 function fixtures(): Fixtures {
@@ -138,6 +140,7 @@ function fixtures(): Fixtures {
         hub_publicado: true,
       },
     ],
+    tenantCap: null,
     hubLinks: [
       {
         id: "h1",
@@ -412,6 +415,15 @@ export async function installMock(
         if (name === "bloqueios_do_tenant") return json(route, []);
         if (name === "feriados_do_tenant") return json(route, []);
         if (name === "proximo_evento_do_tenant") return json(route, []);
+        if (name === "capacidade_do_dia") {
+          const t = mock.state.tenantCap;
+          if (!t) return json(route, null);
+          return json(route, {
+            dia_restante: t.dia ?? null,
+            horario_maximo: t.horario ?? null,
+            por_horario: t.porHorario ?? {},
+          });
+        }
         if (name === "evento_destaque_do_tenant") {
           const hoje = todayISO();
           const prox = [...mock.state.eventos]

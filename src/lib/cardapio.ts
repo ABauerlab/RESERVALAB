@@ -191,6 +191,27 @@ export function reordenar<T extends { id: string; ordem: number }>(
     .map(({ id: xid, ordem }) => ({ id: xid, ordem }));
 }
 
+/**
+ * Arrastar: move `ativoId` para a posicao de `alvoId` e devolve so as linhas cuja `ordem` mudou
+ * (renumera de 0 a n-1). Id desconhecido ou o mesmo id: nada muda.
+ */
+export function moverPara<T extends { id: string; ordem: number }>(
+  lista: T[],
+  ativoId: string,
+  alvoId: string,
+): Array<{ id: string; ordem: number }> {
+  const ordenada = [...lista].sort((a, b) => a.ordem - b.ordem);
+  const de = ordenada.findIndex((x) => x.id === ativoId);
+  const para = ordenada.findIndex((x) => x.id === alvoId);
+  if (de < 0 || para < 0 || de === para) return [];
+  const [item] = ordenada.splice(de, 1);
+  ordenada.splice(para, 0, item!);
+  return ordenada
+    .map((x, idx) => ({ id: x.id, ordem: idx, antes: x.ordem }))
+    .filter((x) => x.ordem !== x.antes)
+    .map(({ id, ordem }) => ({ id, ordem }));
+}
+
 /** Categorias sem itens ativos nao aparecem na pagina publica. */
 export function categoriasVisiveis(c: CardapioPublico | null): CategoriaCardapio[] {
   return (c?.categorias ?? []).filter((cat) => cat.itens.length > 0);
