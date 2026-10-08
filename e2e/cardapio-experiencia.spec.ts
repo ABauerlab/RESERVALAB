@@ -201,9 +201,13 @@ test.describe("Cardápio: reordenar arrastando", () => {
     await expect(page.getByRole("heading", { name: "Pratos" })).toBeVisible();
 
     const alca = page.getByRole("button", { name: "Arrastar para reordenar: Pratos" });
+    await expect(alca).toBeVisible();
     await alca.focus();
+    // O dnd-kit precisa de um quadro entre cada tecla; em máquina carregada, sem a pausa a soltura se perde.
     await page.keyboard.press("Space");
+    await page.waitForTimeout(150);
     await page.keyboard.press("ArrowDown");
+    await page.waitForTimeout(150);
     await page.keyboard.press("Space");
 
     await expect
