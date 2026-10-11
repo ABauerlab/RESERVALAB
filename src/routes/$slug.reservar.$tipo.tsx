@@ -20,12 +20,9 @@ import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import {
-  AREA_DESCRICAO,
-  AREA_LABEL,
   TIPO_LABEL,
   formatTelefone,
   horariosDisponiveis,
-  type ReservaArea,
   type ReservaTipo,
 } from "@/lib/reservations";
 import { fetchHub } from "@/lib/hub";
@@ -115,7 +112,6 @@ function ReservarPage() {
   const [horario, setHorario] = useState("");
   const [observacoes, setObservacoes] = useState("");
 
-  const [area, setArea] = useState<ReservaArea>("sem_preferencia");
   const [levaBolo, setLevaBolo] = useState<"sim" | "nao">("sim");
   const [comandas, setComandas] = useState<"sim" | "nao">("nao");
   const [tipoEvento, setTipoEvento] = useState("");
@@ -235,7 +231,7 @@ function ReservarPage() {
       _quantidade: quantidade,
       _data: data,
       _horario: precisaHorario && horario ? horario : undefined,
-      _area: isMesa ? area : undefined,
+      _area: undefined,
       _leva_bolo: isAniv ? levaBolo === "sim" : undefined,
       _comandas: isAniv ? comandas === "sim" : undefined,
       _tipo_evento: isEvento ? tipoEvento.trim() : undefined,
@@ -498,33 +494,10 @@ function ReservarPage() {
           )}
 
           {isMesa && (
-            <Field label="Área desejada">
-              <Select value={area} onValueChange={(v) => setArea(v as ReservaArea)}>
-                <SelectTrigger className="h-12 rounded-md">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="salao">
-                    {AREA_LABEL.salao} ({AREA_DESCRICAO.salao})
-                  </SelectItem>
-                  <SelectItem value="fundos">
-                    {AREA_LABEL.fundos} ({AREA_DESCRICAO.fundos})
-                  </SelectItem>
-                  <SelectItem value="corredor">
-                    {AREA_LABEL.corredor} ({AREA_DESCRICAO.corredor})
-                  </SelectItem>
-                  <SelectItem value="varanda">
-                    {AREA_LABEL.varanda} ({AREA_DESCRICAO.varanda})
-                  </SelectItem>
-                  <SelectItem value="sem_preferencia">{AREA_LABEL.sem_preferencia}</SelectItem>
-                </SelectContent>
-              </Select>
-              {tenantQ.data?.observacao_area && (
-                <p className="text-[12px] leading-relaxed text-muted-foreground">
-                  {tenantQ.data.observacao_area}
-                </p>
-              )}
-            </Field>
+            <p className="rounded-md border border-border bg-muted/40 px-3 py-2.5 text-[12px] leading-relaxed text-muted-foreground">
+              Não garantimos localização de mesa. Faremos o possível para acomodar você bem, mas a
+              disposição pode mudar no dia conforme a operação da casa.
+            </p>
           )}
 
           {isAniv && (

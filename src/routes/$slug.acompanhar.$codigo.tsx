@@ -8,27 +8,17 @@ import { mensagemErroReserva } from "@/lib/reserva-erros";
 
 import { supabase } from "@/integrations/supabase/client";
 import {
-  AREA_DESCRICAO,
-  AREA_LABEL,
   STATUS_LABEL,
   TIPO_LABEL,
   formatData,
   formatHorario,
   type Reserva,
-  type ReservaArea,
   type ReservaStatus,
 } from "@/lib/reservations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -112,14 +102,12 @@ function ReservaEdit({
   const [data, setData] = useState(reserva.data ?? "");
   const [horario, setHorario] = useState(reserva.horario ?? "");
   const [quantidade, setQuantidade] = useState<string>(String(reserva.quantidade ?? ""));
-  const [area, setArea] = useState<ReservaArea | "">(reserva.area ?? "");
   const [observacoes, setObservacoes] = useState(reserva.observacoes ?? "");
 
   useEffect(() => {
     setData(reserva.data ?? "");
     setHorario(reserva.horario ?? "");
     setQuantidade(String(reserva.quantidade ?? ""));
-    setArea(reserva.area ?? "");
     setObservacoes(reserva.observacoes ?? "");
   }, [reserva]);
 
@@ -130,7 +118,7 @@ function ReservaEdit({
         _data: data || null,
         _horario: horario || null,
         _quantidade: quantidade ? parseInt(quantidade, 10) : null,
-        _area: area || null,
+        _area: reserva.area ?? null,
         _observacoes: observacoes || null,
       };
       const { data: updated, error } = await (
@@ -190,11 +178,6 @@ function ReservaEdit({
               Horário: <span className="text-foreground">{formatHorario(reserva.horario)}</span>
             </p>
           )}
-          {reserva.area && (
-            <p>
-              Área: <span className="text-foreground">{AREA_LABEL[reserva.area]}</span>
-            </p>
-          )}
         </div>
       </div>
 
@@ -239,34 +222,6 @@ function ReservaEdit({
                   className="h-11 rounded-md"
                 />
               </div>
-              {reserva.tipo === "mesa" && (
-                <div className="space-y-2">
-                  <Label className="text-[13px]">Área</Label>
-                  <Select
-                    value={area || undefined}
-                    onValueChange={(v) => setArea(v as ReservaArea)}
-                  >
-                    <SelectTrigger className="h-11 rounded-md">
-                      <SelectValue placeholder="Sem preferência" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="salao">
-                        {AREA_LABEL.salao} ({AREA_DESCRICAO.salao})
-                      </SelectItem>
-                      <SelectItem value="fundos">
-                        {AREA_LABEL.fundos} ({AREA_DESCRICAO.fundos})
-                      </SelectItem>
-                      <SelectItem value="corredor">
-                        {AREA_LABEL.corredor} ({AREA_DESCRICAO.corredor})
-                      </SelectItem>
-                      <SelectItem value="varanda">
-                        {AREA_LABEL.varanda} ({AREA_DESCRICAO.varanda})
-                      </SelectItem>
-                      <SelectItem value="sem_preferencia">{AREA_LABEL.sem_preferencia}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
             </div>
             <div className="space-y-2">
               <Label className="text-[13px]">Observações</Label>
