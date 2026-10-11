@@ -310,17 +310,19 @@ function ConfiguracoesPage() {
 
                 <div className="space-y-4 border-t border-border/60 pt-5 first:border-t-0 first:pt-0">
                   <div>
-                    <h3 className="font-semibold">Observação sobre áreas (reserva de mesa)</h3>
+                    <h3 className="font-semibold">
+                      Aviso extra sobre localização (reserva de mesa)
+                    </h3>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      Aparece na tela de reserva de mesa, junto ao campo "Área desejada". Use para
-                      listar as áreas da casa e avisar que a escolhida não é garantida. Deixe em
-                      branco para não mostrar nada.
+                      O cliente não escolhe mais a área. A tela de reserva de mesa já avisa que a
+                      localização não é garantida; este texto é opcional e aparece logo abaixo do
+                      aviso. A área final continua sendo definida por você no painel.
                     </p>
                   </div>
                   <Textarea
                     value={observacaoArea}
                     onChange={(e) => setObservacaoArea(e.target.value)}
-                    placeholder="Ex: Trabalhamos com as áreas Salão, Fundos, Corredor e Varanda. Não garantimos o local de preferência — isso depende da quantidade de reservas na data escolhida."
+                    placeholder="Ex: Pedidos de local são avaliados conforme a lotação do dia."
                     className="min-h-24 rounded-md text-sm leading-relaxed"
                   />
                 </div>

@@ -98,7 +98,19 @@ describe("buildMensagemConfirmacao", () => {
       "Area: {area} | {codigo} | {link_acompanhar}",
       makeContexto({ reserva: makeReserva({ area: "externa" }) }),
     );
-    expect(msg).toBe("Area: Externa | ABC123 | https://exemplo.com/acompanhar/ABC123");
+    expect(msg.startsWith("Area: Externa | ABC123 | https://exemplo.com/acompanhar/ABC123")).toBe(
+      true,
+    );
+  });
+
+  it("avisa que não garantimos localização apenas em reservas de mesa", () => {
+    const mesa = buildMensagemConfirmacao(null, makeContexto());
+    expect(mesa).toContain("não garantimos localização de mesa");
+    const evento = buildMensagemConfirmacao(
+      null,
+      makeContexto({ reserva: makeReserva({ tipo: "evento" }) }),
+    );
+    expect(evento).not.toContain("não garantimos localização");
   });
 
   it("colapsa múltiplas linhas em branco resultantes da limpeza", () => {

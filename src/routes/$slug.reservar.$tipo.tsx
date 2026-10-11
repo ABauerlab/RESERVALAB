@@ -497,6 +497,9 @@ function ReservarPage() {
             <p className="rounded-md border border-border bg-muted/40 px-3 py-2.5 text-[12px] leading-relaxed text-muted-foreground">
               Não garantimos localização de mesa. Faremos o possível para acomodar você bem, mas a
               disposição pode mudar no dia conforme a operação da casa.
+              {tenantQ.data?.observacao_area && (
+                <span className="mt-1.5 block">{tenantQ.data.observacao_area}</span>
+              )}
             </p>
           )}
 
@@ -551,7 +554,11 @@ function ReservarPage() {
               <Textarea
                 value={observacoes}
                 onChange={(e) => setObservacoes(e.target.value)}
-                placeholder="Alguma preferência ou informação adicional?"
+                placeholder={
+                  isMesa
+                    ? "Algum pedido ou informação adicional? (local de mesa é apenas um pedido, sem garantia)"
+                    : "Alguma preferência ou informação adicional?"
+                }
                 className="min-h-24 rounded-md"
               />
             </Field>
