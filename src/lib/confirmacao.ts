@@ -163,12 +163,22 @@ function renderComFallback(
   return out;
 }
 
+const AVISO_LOCALIZACAO = "Obs: não garantimos localização de mesa.";
+
+function comAvisoLocalizacao(msg: string, ctx: ConfirmacaoContexto): string {
+  if (ctx.reserva.tipo !== "mesa" || msg.includes(AVISO_LOCALIZACAO)) return msg;
+  return `${msg}\n\n${AVISO_LOCALIZACAO}`;
+}
+
 export function buildMensagemConfirmacao(
   template: string | null | undefined,
   ctx: ConfirmacaoContexto,
 ): string {
   const tpl = template && template.trim().length > 0 ? template : DEFAULT_MENSAGEM_CONFIRMACAO;
-  return renderComFallback(tpl, valoresDeContexto(ctx), ctx.linkAcompanhar);
+  return comAvisoLocalizacao(
+    renderComFallback(tpl, valoresDeContexto(ctx), ctx.linkAcompanhar),
+    ctx,
+  );
 }
 
 /**
@@ -181,7 +191,10 @@ export function buildMensagemReconfirmacao(
   ctx: ConfirmacaoContexto,
 ): string {
   const tpl = template && template.trim().length > 0 ? template : DEFAULT_MENSAGEM_RECONFIRMACAO;
-  return renderComFallback(tpl, valoresDeContexto(ctx), ctx.linkAcompanhar);
+  return comAvisoLocalizacao(
+    renderComFallback(tpl, valoresDeContexto(ctx), ctx.linkAcompanhar),
+    ctx,
+  );
 }
 
 export type CancelamentoContexto = {
