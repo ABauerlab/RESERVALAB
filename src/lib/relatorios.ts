@@ -19,7 +19,14 @@ export type Relatorio = {
   semHorario: number;
   /** Motivos de cancelamento informados, mais frequentes primeiro. */
   motivos: Array<{ motivo: string; total: number }>;
+  /** Reservas canceladas com o motivo "Cliente não compareceu". */
+  noShow: number;
+  /** No-show sobre as reservas que já chegaram ao dia (finalizadas + no-show), em %. */
+  taxaNoShow: number;
 };
+
+/** Mesmo texto da opção de cancelamento usada no painel (MOTIVO_CANCELAMENTO_OPCOES). */
+export const MOTIVO_NO_SHOW = "Cliente não compareceu";
 
 export function buildRelatorio(reservas: Reserva[]): Relatorio {
   const porStatus = Object.fromEntries(STATUS_LIST.map((s) => [s, 0])) as Record<
@@ -35,6 +42,7 @@ export function buildRelatorio(reservas: Reserva[]): Relatorio {
   const motivos = new Map<string, { motivo: string; total: number }>();
   let pessoasAtendidas = 0;
   let semHorario = 0;
+  let noShow = 0;
 
   for (const r of reservas) {
     porStatus[r.status] += 1;
@@ -44,6 +52,7 @@ export function buildRelatorio(reservas: Reserva[]): Relatorio {
     }
     if (r.status === "cancelada") {
       const m = r.motivo_cancelamento?.trim();
+      if (m && m.toLowerCase() === MOTIVO_NO_SHOW.toLowerCase()) noShow += 1;
       if (m) {
         const k = m.toLowerCase();
         const atual = motivos.get(k);
@@ -65,6 +74,9 @@ export function buildRelatorio(reservas: Reserva[]): Relatorio {
   const taxaConfirmacao =
     total > 0 ? Math.round(((porStatus.confirmada + porStatus.finalizada) / total) * 100) : 0;
 
+  const chegaramAoDia = porStatus.finalizada + noShow;
+  const taxaNoShow = chegaramAoDia > 0 ? Math.round((noShow / chegaramAoDia) * 100) : 0;
+
   return {
     total,
     porStatus,
@@ -79,5 +91,7 @@ export function buildRelatorio(reservas: Reserva[]): Relatorio {
     motivos: Array.from(motivos.values())
       .sort((a, b) => b.total - a.total || a.motivo.localeCompare(b.motivo))
       .slice(0, 5),
+    noShow,
+    taxaNoShow,
   };
 }

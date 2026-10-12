@@ -69,4 +69,23 @@ describe("buildRelatorio", () => {
     expect(x.taxaConfirmacao).toBe(0);
     expect(x.porHora).toEqual([]);
   });
+  it("no-show conta so cancelamentos com o motivo de nao comparecimento", () => {
+    const x = buildRelatorio([
+      r({ status: "finalizada" }),
+      r({ status: "finalizada" }),
+      r({ status: "finalizada" }),
+      r({ status: "cancelada", motivo_cancelamento: "Cliente não compareceu" }),
+      r({ status: "cancelada", motivo_cancelamento: "cliente não compareceu " }),
+      r({ status: "cancelada", motivo_cancelamento: "Cliente desistiu" }),
+      r({ status: "confirmada" }),
+    ]);
+    expect(x.noShow).toBe(2);
+    expect(x.taxaNoShow).toBe(40);
+  });
+
+  it("taxa de no-show e zero sem reservas concluidas", () => {
+    const x = buildRelatorio([r({ status: "pendente" }), r({ status: "cancelada" })]);
+    expect(x.noShow).toBe(0);
+    expect(x.taxaNoShow).toBe(0);
+  });
 });

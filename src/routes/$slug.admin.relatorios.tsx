@@ -129,12 +129,13 @@ function RelatoriosPage() {
               </p>
             )}
 
-            <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-5">
+            <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
               <Metric label="Solicitações" value={rel.total} />
               <Metric label="Confirmadas" value={confirmadas} />
               <Metric label="Canceladas" value={rel.porStatus.cancelada} />
               <Metric label="Pessoas atendidas" value={rel.pessoasAtendidas} />
               <Metric label="Taxa de confirmação" value={`${rel.taxaConfirmacao}%`} />
+              <Metric label="No-show" value={`${rel.noShow} (${rel.taxaNoShow}%)`} />
             </div>
 
             <div className="mt-6 grid gap-4 md:grid-cols-2">
