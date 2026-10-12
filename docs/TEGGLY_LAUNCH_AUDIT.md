@@ -29,6 +29,12 @@ Fontes: código do repositório, `docs/`, pasta Drive `14_PENDENCIAS_PARA_CLAUDE
 7. Prova social do Iracema no site sem autorização documentada (PROD-03).
 8. E-mail oficial atual é da BauerLab (PROD-02); domínio teggly.com.br sem e-mail definido.
 
+## 2b. Decisão do dono (2026-10-12)
+
+Gratuito mantém: 40 reservas/mês, página pública de reserva, Cardápio Digital e Link Hub. Os demais recursos seguem os planos pagos (matriz em `src/lib/plans.ts`).
+
+Verificação somente leitura do banco de produção (`wkvyhpfuezzinlaxsaap`): 14 tabelas, inclui `tenant_planos` (0 linhas, logo todas as empresas valem Pro de lançamento), `tenant_perfil`, cardápio e `hub_links`; 2 empresas. Nada foi alterado.
+
 ## 3. Feito nesta etapa
 
 - `/planos` com comparativo responsivo, canonical, JSON-LD e sitemap.
@@ -57,3 +63,11 @@ Fontes: código do repositório, `docs/`, pasta Drive `14_PENDENCIAS_PARA_CLAUDE
 | Contact | clique no WhatsApp | privacidade |
 | InitiateCheckout | clique em contratar | checkout |
 | Purchase | **somente** via webhook confirmado | InfinitePay |
+
+## 6. Etapa 2 (2026-10-12)
+
+- `/ebook`: formulário com validação cliente e servidor, honeypot, tempo mínimo, limite por IP, Turnstile opcional, consentimento. O PDF só sai com link assinado (30 min) depois que o Apps Script confirma o registro. PDF fica no código do servidor, não em `/public`. Script em `docs/ebook/apps-script.gs`. A página está `noindex` até a Política de Privacidade existir.
+- `/$slug` inexistente responde HTTP 404; slugs institucionais reservados (`src/lib/slugs.ts`, também na função `create-company`, que precisa de deploy).
+- `src/lib/pagamentos.ts`: decisão idempotente de eventos (duplicado, fora de ordem, valor/moeda divergente, estorno), sem liberar plano em modo de teste. Falta o adaptador InfinitePay.
+- `docs/database/proposed/pagamentos_e_limites.sql`: pedidos, eventos únicos e `tenant_tem_recurso`, com rollback. **Não aplicado.**
+- `/privacidade`: página provisória `noindex`, sem texto jurídico.
