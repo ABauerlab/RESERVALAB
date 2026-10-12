@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as PlanosRouteImport } from './routes/planos'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MasterIndexRouteImport } from './routes/master.index'
 import { Route as SlugIndexRouteImport } from './routes/$slug.index'
@@ -39,6 +40,11 @@ import { Route as ApiPublicHooksSendPushRouteImport } from './routes/api/public/
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlanosRoute = PlanosRouteImport.update({
+  id: '/planos',
+  path: '/planos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -170,6 +176,7 @@ const ApiPublicHooksSendPushRoute = ApiPublicHooksSendPushRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/planos': typeof PlanosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$slug/cardapio': typeof SlugCardapioRoute
   '/$slug/links': typeof SlugLinksRoute
@@ -198,6 +205,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/planos': typeof PlanosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$slug/cardapio': typeof SlugCardapioRoute
   '/$slug/links': typeof SlugLinksRoute
@@ -227,6 +235,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/planos': typeof PlanosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$slug/cardapio': typeof SlugCardapioRoute
   '/$slug/links': typeof SlugLinksRoute
@@ -257,6 +266,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/planos'
     | '/sitemap.xml'
     | '/$slug/cardapio'
     | '/$slug/links'
@@ -285,6 +295,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/planos'
     | '/sitemap.xml'
     | '/$slug/cardapio'
     | '/$slug/links'
@@ -313,6 +324,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/planos'
     | '/sitemap.xml'
     | '/$slug/cardapio'
     | '/$slug/links'
@@ -342,6 +354,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PlanosRoute: typeof PlanosRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SlugCardapioRoute: typeof SlugCardapioRoute
   SlugLinksRoute: typeof SlugLinksRoute
@@ -376,6 +389,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/planos': {
+      id: '/planos'
+      path: '/planos'
+      fullPath: '/planos'
+      preLoaderRoute: typeof PlanosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -558,6 +578,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PlanosRoute: PlanosRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SlugCardapioRoute: SlugCardapioRoute,
   SlugLinksRoute: SlugLinksRoute,

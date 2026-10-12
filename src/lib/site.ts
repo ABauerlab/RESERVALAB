@@ -5,11 +5,10 @@ export const SITE_URL = "https://teggly.com.br";
 export const EMAIL_CONTATO = "contato.bauerlab@gmail.com";
 export const INSTAGRAM_TEGGLY = "teggly";
 
-// Texto mantido como estava: chega ao WhatsApp da equipe e pode ser lido por automacoes fora deste
-// repositorio. Revisar junto com o atendimento.
+// Conferido em 2026-10-12: nenhum workflow n8n depende deste texto.
 export const WHATSAPP_TEGGLY =
   "https://wa.me/5531998021169?text=" +
-  encodeURIComponent("Ola! Quero usar o ReservaLab na minha empresa.");
+  encodeURIComponent("Olá! Quero conhecer o Teggly para o meu restaurante.");
 
 export function mailtoContato(assunto: string, corpo?: string): string {
   const q = [`subject=${encodeURIComponent(assunto)}`];

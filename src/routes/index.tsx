@@ -21,13 +21,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { PLANOS, ORDEM_PLANOS } from "@/lib/plans";
-import {
-  EMAIL_CONTATO,
-  INSTAGRAM_TEGGLY,
-  SITE_URL,
-  WHATSAPP_TEGGLY,
-  mailtoContato,
-} from "@/lib/site";
+import { EMAIL_CONTATO, INSTAGRAM_TEGGLY, SITE_URL, WHATSAPP_TEGGLY } from "@/lib/site";
 
 const DESCRICAO =
   "Plataforma de reservas e atendimento inteligente para restaurantes: reservas, WhatsApp, clientes, cardápio e Link Hub em um só lugar.";
@@ -78,22 +72,19 @@ function Reveal({ children }: { children: React.ReactNode; delay?: number }) {
   return <>{children}</>;
 }
 
-const CTA_ASSUNTO = "Quero começar com o Teggly";
-const CTA_CORPO = "Nome do restaurante:\nCidade:\nWhatsApp para contato:";
-
 function CTAPrimary({ onDark = false }: { onDark?: boolean }) {
   return (
-    <a
-      href={mailtoContato(CTA_ASSUNTO, CTA_CORPO)}
+    <Link
+      to="/planos"
       className={`group inline-flex h-[52px] items-center justify-center gap-2 rounded-[10px] px-6 text-base font-semibold transition duration-200 ease-teggly focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/30 ${
         onDark
           ? "bg-white text-slate-900 hover:bg-slate-100"
           : "bg-primary text-primary-foreground shadow-blue hover:bg-blue-700"
       }`}
     >
-      Começar agora
+      Ver planos e começar
       <ArrowRight className="h-5 w-5 transition-transform motion-safe:group-hover:translate-x-0.5" />
-    </a>
+    </Link>
   );
 }
 
@@ -189,7 +180,7 @@ const faq = [
   },
   {
     q: "Como começo?",
-    a: "Fale com a gente. Cadastramos o seu restaurante, liberamos o acesso e o painel leva você pelos primeiros passos.",
+    a: "Escolha o plano em teggly.com.br/planos. Hoje a ativação é feita pelo nosso time, que cadastra o seu restaurante e libera o acesso. O painel leva você pelos primeiros passos.",
   },
 ];
 
@@ -234,12 +225,12 @@ function Landing() {
               </a>
             ))}
           </nav>
-          <a
-            href={mailtoContato(CTA_ASSUNTO, CTA_CORPO)}
+          <Link
+            to="/planos"
             className="ml-auto inline-flex h-11 shrink-0 items-center rounded-[10px] bg-primary px-4 text-[15px] font-semibold text-primary-foreground shadow-blue transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/30"
           >
-            Começar agora
-          </a>
+            Ver planos
+          </Link>
         </div>
       </header>
 
@@ -584,7 +575,7 @@ function Landing() {
                 automação do WhatsApp.
               </p>
             </Reveal>
-            <PlanosSection />
+            <PlanosSection resumo />
           </div>
         </section>
 
