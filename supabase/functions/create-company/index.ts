@@ -15,6 +15,40 @@ function json(body: unknown, status = 200) {
   });
 }
 
+// Manter em sincronia com src/lib/slugs.ts.
+const SLUGS_RESERVADOS = [
+  "admin",
+  "ajuda",
+  "api",
+  "app",
+  "blog",
+  "cadastro",
+  "checkout",
+  "contato",
+  "cookies",
+  "demo",
+  "demonstracao",
+  "ebook",
+  "entrar",
+  "login",
+  "marca",
+  "master",
+  "obrigado",
+  "pagamento",
+  "planos",
+  "politica-de-privacidade",
+  "privacidade",
+  "robots-txt",
+  "sitemap-xml",
+  "sobre",
+  "suporte",
+  "teggly",
+  "termos",
+  "termos-de-uso",
+  "vsl",
+  "www",
+];
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "Método não permitido" }, 405);
@@ -62,6 +96,7 @@ Deno.serve(async (req) => {
     const senha_admin = String(body.senha_admin ?? "");
 
     if (!/^[a-z0-9][a-z0-9-]{1,40}$/.test(slug)) return json({ error: "Slug inválido" }, 400);
+    if (SLUGS_RESERVADOS.includes(slug)) return json({ error: "Esse endereço é reservado" }, 400);
     if (nome.length < 2) return json({ error: "Nome inválido" }, 400);
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email_admin))
       return json({ error: "E-mail inválido" }, 400);

@@ -3,7 +3,7 @@ import { FlyerEvento } from "@/components/public/FlyerEvento";
 import { IconeWhatsApp } from "@/components/brand/BrandIcons";
 import { useMarcaLogo } from "@/components/public/MarcaScope";
 import { comMarca } from "@/components/public/MarcaScope";
-import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import {
@@ -28,13 +28,20 @@ import {
 } from "@/lib/reservations";
 import { fetchHub } from "@/lib/hub";
 import { carregarOg, montarOg } from "@/lib/og";
-import { getTenantBySlug } from "@/lib/tenant";
+import { getTenantBySlug, tenantExiste } from "@/lib/tenant";
+import { isSlugReservado } from "@/lib/slugs";
 import { CLICK_RESERVA_EVENT, initFacebookPixel, trackFacebookCustomEvent } from "@/lib/fbpixel";
 import { TegglyLogo } from "@/components/brand/TegglyLogo";
 
 export const Route = createFileRoute("/$slug/")({
   // Preview ao compartilhar: nome, frase e imagem da propria casa (ver src/lib/og.ts).
-  loader: ({ params, context }) => carregarOg(params.slug, context.queryClient),
+  loader: async ({ params, context }) => {
+    // 404 de verdade para endereco inexistente (so no servidor; no navegador a pagina ja mostra o aviso).
+    if (typeof window === "undefined") {
+      if (isSlugReservado(params.slug) || !(await tenantExiste(params.slug))) throw notFound();
+    }
+    return carregarOg(params.slug, context.queryClient);
+  },
   head: ({ params, loaderData }) => {
     const og = montarOg(params.slug, "", loaderData ?? null);
     return {
