@@ -23,6 +23,7 @@ import {
   TIPO_LABEL,
   formatTelefone,
   horariosDisponiveis,
+  telefoneValido,
   type ReservaTipo,
 } from "@/lib/reservations";
 import { fetchHub } from "@/lib/hub";
@@ -107,6 +108,7 @@ function ReservarPage() {
 
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
+  const [telefoneTocado, setTelefoneTocado] = useState(false);
   const [quantidade, setQuantidade] = useState<number>(2);
   const [data, setData] = useState("");
   const [horario, setHorario] = useState("");
@@ -205,7 +207,7 @@ function ReservarPage() {
     !bloqueio &&
     !lotado &&
     nome.trim().length >= 2 &&
-    telefone.replace(/\D/g, "").length >= 10 &&
+    telefoneValido(telefone) &&
     quantidade > 0 &&
     !!data &&
     (!precisaHorario || !!horario) &&
@@ -405,11 +407,17 @@ function ReservarPage() {
 
           <Field
             label="Telefone / WhatsApp"
-            hint="Se for do exterior, comece com + e o código do país"
+            hint={
+              telefoneTocado && telefone.trim() !== "" && !telefoneValido(telefone)
+                ? "Confira o número: use DDD + celular com 9 dígitos, ex: (31) 99999-9999. Enviaremos a confirmação por WhatsApp."
+                : "Enviaremos a confirmação por WhatsApp. Se for do exterior, comece com + e o código do país"
+            }
           >
             <Input
               value={telefone}
               onChange={(e) => setTelefone(formatTelefone(e.target.value))}
+              onBlur={() => setTelefoneTocado(true)}
+              aria-invalid={telefoneTocado && telefone.trim() !== "" && !telefoneValido(telefone)}
               placeholder="(11) 91234-5678 ou +1 555 1234"
               inputMode="tel"
               autoComplete="tel"

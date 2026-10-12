@@ -101,6 +101,20 @@ export function formatTelefone(v: string): string {
   return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
 }
 
+/**
+ * Valida telefone para contato por WhatsApp.
+ * - Internacional (começa com "+"): 8 a 15 dígitos (E.164).
+ * - BR: DDD válido (11 a 99) + celular de 9 dígitos começando em 9 (11 dígitos no total).
+ * Rejeita sequências repetidas (ex: 99999999999). Não garante que o número tenha WhatsApp.
+ */
+export function telefoneValido(v: string): boolean {
+  const trimmed = v.trim();
+  const d = trimmed.replace(/\D/g, "");
+  if (/^(\d)\1+$/.test(d)) return false;
+  if (trimmed.startsWith("+")) return d.length >= 8 && d.length <= 15;
+  return /^[1-9][1-9]9\d{8}$/.test(d);
+}
+
 /** Retorna telefone somente-dígitos incluindo DDI (default 55 se não informado). */
 export function telefoneToWhatsApp(v: string): string {
   const trimmed = v.trim();
