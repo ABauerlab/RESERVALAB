@@ -6,9 +6,13 @@ test.describe("Website", () => {
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Mais reservas.");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Menos trabalho.");
 
-    // Um CTA primario com o mesmo texto, indo para o e-mail oficial.
-    const cta = page.getByRole("link", { name: "Começar agora" }).first();
-    await expect(cta).toHaveAttribute("href", /^mailto:contato\.bauerlab@gmail\.com/);
+    // Todo CTA de comecar leva a pagina de planos.
+    const cta = page.getByRole("link", { name: /Ver planos e começar/ }).first();
+    await expect(cta).toHaveAttribute("href", "/planos");
+    await expect(page.getByRole("link", { name: "Ver planos" }).first()).toHaveAttribute(
+      "href",
+      "/planos",
+    );
 
     // Planos: gratuito com limite explicito, cardapio em todos, melhor custo-beneficio destacado.
     const planos = page.locator("#planos");

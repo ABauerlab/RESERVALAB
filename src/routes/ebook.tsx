@@ -1,8 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { validarLead, type ErrosLead } from "@/lib/ebook";
-import { SITE_URL } from "@/lib/site";
+import { EMAIL_CONTATO, SITE_URL } from "@/lib/site";
+
+const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined;
+
+type TurnstileApi = {
+  render: (el: HTMLElement, o: Record<string, unknown>) => string;
+  reset: (id?: string) => void;
+};
 
 export const Route = createFileRoute("/ebook")({
   head: () => ({
@@ -46,6 +53,31 @@ function PaginaEbook() {
   const [erroGeral, setErroGeral] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [token, setToken] = useState<string | null>(null);
+  const [duplicado, setDuplicado] = useState(false);
+  const [captcha, setCaptcha] = useState<string | null>(null);
+  const captchaEl = useRef<HTMLDivElement>(null);
+  const captchaId = useRef<string | null>(null);
+
+  // Cloudflare Turnstile so aparece quando VITE_TURNSTILE_SITE_KEY existe (o servidor verifica o token).
+  useEffect(() => {
+    if (!TURNSTILE_SITE_KEY || !captchaEl.current) return;
+    const montar = () => {
+      const api = (window as unknown as { turnstile?: TurnstileApi }).turnstile;
+      if (!api || !captchaEl.current || captchaId.current) return;
+      captchaId.current = api.render(captchaEl.current, {
+        sitekey: TURNSTILE_SITE_KEY,
+        callback: (t: string) => setCaptcha(t),
+        "expired-callback": () => setCaptcha(null),
+        "error-callback": () => setCaptcha(null),
+      });
+    };
+    if ((window as unknown as { turnstile?: TurnstileApi }).turnstile) return montar();
+    const sc = document.createElement("script");
+    sc.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    sc.async = true;
+    sc.onload = montar;
+    document.head.appendChild(sc);
+  }, []);
 
   async function enviar(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -56,10 +88,15 @@ function PaginaEbook() {
       consentimento,
       site: (new FormData(e.currentTarget).get("site") as string) ?? "",
       t: aberto.current,
+      captcha,
     };
     const v = validarLead(corpo);
     if (!v.ok) {
       setErros(v.erros);
+      return;
+    }
+    if (TURNSTILE_SITE_KEY && !captcha) {
+      setErroGeral("Conclua a verificação de segurança antes de enviar.");
       return;
     }
     setErros({});
@@ -206,6 +243,7 @@ function PaginaEbook() {
                   )}
                 </div>
               </div>
+              {TURNSTILE_SITE_KEY && <div ref={captchaEl} className="mt-4" />}
               {erroGeral && (
                 <p
                   role="alert"
@@ -221,6 +259,14 @@ function PaginaEbook() {
               >
                 {enviando ? "Enviando..." : "Quero o guia grátis"}
               </button>
+              <p className="mt-4 text-xs text-slate-600">
+                Usamos seus dados só para entregar o guia e falar sobre ele. Para pedir a exclusão,
+                escreva para{" "}
+                <a className="underline" href={`mailto:${EMAIL_CONTATO}`}>
+                  {EMAIL_CONTATO}
+                </a>
+                .
+              </p>
             </form>
           )}
         </section>

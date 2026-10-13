@@ -71,3 +71,8 @@ Verificação somente leitura do banco de produção (`wkvyhpfuezzinlaxsaap`): 1
 - `src/lib/pagamentos.ts`: decisão idempotente de eventos (duplicado, fora de ordem, valor/moeda divergente, estorno), sem liberar plano em modo de teste. Falta o adaptador InfinitePay.
 - `docs/database/proposed/pagamentos_e_limites.sql`: pedidos, eventos únicos e `tenant_tem_recurso`, com rollback. **Não aplicado.**
 - `/privacidade`: página provisória `noindex`, sem texto jurídico.
+
+## 7. Etapa 3 (2026-10-13)
+
+- E-mail oficial do site: `contato@teggly.com.br` (`src/lib/site.ts`; e2e atualizados). Pendente: e-mail transacional e caixa de entrada reais no domínio.
+- Captura do e-book pronta localmente: Apps Script completo e testado com o código real em simulação de planilha (`src/lib/ebook-apps-script.test.ts`), README em `docs/ebook/README.md`, URL `/exec` validada no servidor, duplicado tratado, falha nunca libera o PDF. **Integração real NÃO concluída**: falta a planilha, o script publicado e as variáveis `EBOOK_*` no servidor.

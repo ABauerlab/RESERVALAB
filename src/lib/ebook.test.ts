@@ -6,6 +6,8 @@ import {
   normalizarInstagram,
   normalizarWhatsapp,
   processarLeadEbook,
+  responderDownload,
+  urlAppsScriptValida,
   validarLead,
   verificarLink,
   type ConfigEbook,
@@ -23,7 +25,7 @@ const valido = {
   t: AGORA - 10_000,
 };
 const config: ConfigEbook = {
-  appsScriptUrl: "https://script.example/exec",
+  appsScriptUrl: "https://script.google.com/macros/s/AKfycbTESTE123/exec",
   appsScriptSecret: "s1",
   tokenSecret: "tok",
   turnstileSecret: undefined,
@@ -155,5 +157,58 @@ describe("link de download", () => {
     expect(await verificarLink("tok", `${c}x.${s}`, AGORA + 1000)).toBe(false);
     expect(await verificarLink("tok", null, AGORA)).toBe(false);
     expect(await verificarLink("tok", "lixo", AGORA)).toBe(false);
+  });
+});
+
+describe("integracao com o Apps Script: casos extras", () => {
+  it("resposta de limite do script vira 429 e nao libera", async () => {
+    const f = vi.fn().mockResolvedValue(resp({ ok: false, erro: "limite" }));
+    const r = await processarLeadEbook(valido, ctx({ doFetch: f }));
+    expect(r.status).toBe(429);
+  });
+  it("so aceita a URL /exec do Apps Script", async () => {
+    expect(urlAppsScriptValida("https://script.google.com/macros/s/AKfy-1_x/exec")).toBe(true);
+    for (const u of [
+      undefined,
+      "",
+      "http://script.google.com/macros/s/A/exec",
+      "https://evil.example/exec",
+      "https://script.google.com/macros/s/A/dev",
+    ])
+      expect(urlAppsScriptValida(u)).toBe(false);
+    const f = vi.fn();
+    const r = await processarLeadEbook(
+      valido,
+      ctx({ doFetch: f, config: { ...config, appsScriptUrl: "https://evil.example/exec" } }),
+    );
+    expect(r.status).toBe(503);
+    expect(f).not.toHaveBeenCalled();
+  });
+});
+
+describe("download protegido", () => {
+  const pdf = async () => new Uint8Array([37, 80, 68, 70]);
+  it("sem token, token invalido, expirado ou sem segredo: 403 e nunca le o arquivo", async () => {
+    const obter = vi.fn(pdf);
+    const t = await assinarLink("tok", AGORA);
+    for (const [token, segredo, agora] of [
+      [null, "tok", AGORA],
+      ["lixo", "tok", AGORA],
+      [t, "outro", AGORA + 1000],
+      [t, "tok", AGORA + 31 * 60_000],
+      [t, undefined, AGORA + 1000],
+    ] as const) {
+      const r = await responderDownload(token, segredo, agora, obter);
+      expect(r.status).toBe(403);
+    }
+    expect(obter).not.toHaveBeenCalled();
+  });
+  it("com link valido entrega o PDF sem cache", async () => {
+    const t = await assinarLink("tok", AGORA);
+    const r = await responderDownload(t, "tok", AGORA + 1000, pdf);
+    expect(r.status).toBe(200);
+    expect(r.headers.get("content-type")).toBe("application/pdf");
+    expect(r.headers.get("cache-control")).toContain("no-store");
+    expect(new Uint8Array(await r.arrayBuffer())).toEqual(new Uint8Array([37, 80, 68, 70]));
   });
 });

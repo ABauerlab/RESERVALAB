@@ -123,6 +123,35 @@ export async function verificarLink(
   }
 }
 
+/** So aceita a URL de implantacao do Apps Script, para uma variavel errada nao virar um destino qualquer. */
+export function urlAppsScriptValida(url: string | undefined): url is string {
+  return (
+    !!url && /^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(url.trim())
+  );
+}
+
+/** Resposta do download: so entrega o arquivo com link assinado valido. */
+export async function responderDownload(
+  token: string | null,
+  secret: string | undefined,
+  agora: number,
+  obterPdf: () => Promise<Uint8Array>,
+): Promise<Response> {
+  if (!secret || !(await verificarLink(secret, token, agora)))
+    return new Response("Link inválido ou expirado. Peça o guia de novo em /ebook.", {
+      status: 403,
+      headers: { "Cache-Control": "no-store" },
+    });
+  return new Response((await obterPdf()) as unknown as BodyInit, {
+    headers: {
+      "Content-Type": "application/pdf",
+      "Content-Disposition": 'attachment; filename="Teggly_Guia_Reservas_Organizadas.pdf"',
+      "Cache-Control": "private, no-store",
+      "X-Robots-Tag": "noindex",
+    },
+  });
+}
+
 /* ------------------------------ limite de tentativas ------------------------------ */
 
 export type LimitadorTentativas = (chave: string, agora: number) => boolean;
@@ -187,7 +216,7 @@ export async function processarLeadEbook(
   const v = validarLead(entrada);
   if (!v.ok) return { status: 422, body: { ok: false, codigo: "dados_invalidos", erros: v.erros } };
 
-  if (!config.appsScriptUrl || !config.appsScriptSecret || !config.tokenSecret)
+  if (!urlAppsScriptValida(config.appsScriptUrl) || !config.appsScriptSecret || !config.tokenSecret)
     return { status: 503, body: { ok: false, codigo: "indisponivel" } };
 
   if (config.turnstileSecret) {
@@ -201,7 +230,7 @@ export async function processarLeadEbook(
     if (c === "indisponivel") return { status: 503, body: { ok: false, codigo: "indisponivel" } };
   }
 
-  let resultado: { ok?: boolean; status?: string } | null = null;
+  let resultado: { ok?: boolean; status?: string; erro?: string } | null = null;
   try {
     const r = await doFetch(config.appsScriptUrl, {
       method: "POST",
@@ -217,11 +246,13 @@ export async function processarLeadEbook(
       signal: AbortSignal.timeout(10000),
     });
     if (!r.ok) return { status: 502, body: { ok: false, codigo: "registro_falhou" } };
-    resultado = (await r.json()) as { ok?: boolean; status?: string };
+    resultado = (await r.json()) as { ok?: boolean; status?: string; erro?: string };
   } catch {
     return { status: 502, body: { ok: false, codigo: "registro_falhou" } };
   }
 
+  if (resultado?.ok === false && resultado.erro === "limite")
+    return { status: 429, body: { ok: false, codigo: "muitas_tentativas" } };
   // Sem confirmacao explicita do registro, nao libera o arquivo.
   if (
     !resultado ||
