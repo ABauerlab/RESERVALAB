@@ -3,8 +3,9 @@
  * o registro do lead. Tudo aqui e puro e recebe dependencias por parametro para ser testavel.
  */
 import { verificarTurnstile } from "@/lib/captcha";
+import { VERSAO_TEXTOS } from "@/lib/legal";
 
-export const VERSAO_AVISO_EBOOK = "2026-10-12";
+export const VERSAO_AVISO_EBOOK = VERSAO_TEXTOS;
 const TEMPO_MINIMO_MS = 3000;
 const TEMPO_MAXIMO_MS = 1000 * 60 * 60 * 6;
 export const VALIDADE_LINK_MS = 1000 * 60 * 30;

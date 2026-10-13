@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermosRouteImport } from './routes/termos'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as PlanosRouteImport } from './routes/planos'
@@ -41,6 +42,11 @@ import { Route as SlugAdminAgendaRouteImport } from './routes/$slug.admin.agenda
 import { Route as SlugAcompanharCodigoRouteImport } from './routes/$slug.acompanhar.$codigo'
 import { Route as ApiPublicHooksSendPushRouteImport } from './routes/api/public/hooks.send-push'
 
+const TermosRoute = TermosRouteImport.update({
+  id: '/termos',
+  path: '/termos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -204,6 +210,7 @@ export interface FileRoutesByFullPath {
   '/planos': typeof PlanosRoute
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/termos': typeof TermosRoute
   '/$slug/cardapio': typeof SlugCardapioRoute
   '/$slug/links': typeof SlugLinksRoute
   '/$slug/obrigado': typeof SlugObrigadoRoute
@@ -237,6 +244,7 @@ export interface FileRoutesByTo {
   '/planos': typeof PlanosRoute
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/termos': typeof TermosRoute
   '/$slug/cardapio': typeof SlugCardapioRoute
   '/$slug/links': typeof SlugLinksRoute
   '/$slug/obrigado': typeof SlugObrigadoRoute
@@ -271,6 +279,7 @@ export interface FileRoutesById {
   '/planos': typeof PlanosRoute
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/termos': typeof TermosRoute
   '/$slug/cardapio': typeof SlugCardapioRoute
   '/$slug/links': typeof SlugLinksRoute
   '/$slug/obrigado': typeof SlugObrigadoRoute
@@ -306,6 +315,7 @@ export interface FileRouteTypes {
     | '/planos'
     | '/privacidade'
     | '/sitemap.xml'
+    | '/termos'
     | '/$slug/cardapio'
     | '/$slug/links'
     | '/$slug/obrigado'
@@ -339,6 +349,7 @@ export interface FileRouteTypes {
     | '/planos'
     | '/privacidade'
     | '/sitemap.xml'
+    | '/termos'
     | '/$slug/cardapio'
     | '/$slug/links'
     | '/$slug/obrigado'
@@ -372,6 +383,7 @@ export interface FileRouteTypes {
     | '/planos'
     | '/privacidade'
     | '/sitemap.xml'
+    | '/termos'
     | '/$slug/cardapio'
     | '/$slug/links'
     | '/$slug/obrigado'
@@ -406,6 +418,7 @@ export interface RootRouteChildren {
   PlanosRoute: typeof PlanosRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TermosRoute: typeof TermosRoute
   SlugCardapioRoute: typeof SlugCardapioRoute
   SlugLinksRoute: typeof SlugLinksRoute
   SlugObrigadoRoute: typeof SlugObrigadoRoute
@@ -436,6 +449,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/termos': {
+      id: '/termos'
+      path: '/termos'
+      fullPath: '/termos'
+      preLoaderRoute: typeof TermosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -662,6 +682,7 @@ const rootRouteChildren: RootRouteChildren = {
   PlanosRoute: PlanosRoute,
   PrivacidadeRoute: PrivacidadeRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TermosRoute: TermosRoute,
   SlugCardapioRoute: SlugCardapioRoute,
   SlugLinksRoute: SlugLinksRoute,
   SlugObrigadoRoute: SlugObrigadoRoute,

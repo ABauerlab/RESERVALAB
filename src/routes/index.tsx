@@ -687,6 +687,23 @@ function Landing() {
                 Área administrativa
               </Link>
             </nav>
+            <nav aria-label="Legal" className="space-y-1">
+              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-600">
+                Legal
+              </p>
+              <Link
+                to="/privacidade"
+                className="flex min-h-11 items-center text-slate-600 transition hover:text-foreground"
+              >
+                Privacidade
+              </Link>
+              <Link
+                to="/termos"
+                className="flex min-h-11 items-center text-slate-600 transition hover:text-foreground"
+              >
+                Termos de Uso
+              </Link>
+            </nav>
           </div>
         </div>
         <div className="border-t border-border">

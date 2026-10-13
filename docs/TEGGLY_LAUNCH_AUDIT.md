@@ -76,3 +76,9 @@ Verificação somente leitura do banco de produção (`wkvyhpfuezzinlaxsaap`): 1
 
 - E-mail oficial do site: `contato@teggly.com.br` (`src/lib/site.ts`; e2e atualizados). Pendente: e-mail transacional e caixa de entrada reais no domínio.
 - Captura do e-book pronta localmente: Apps Script completo e testado com o código real em simulação de planilha (`src/lib/ebook-apps-script.test.ts`), README em `docs/ebook/README.md`, URL `/exec` validada no servidor, duplicado tratado, falha nunca libera o PDF. **Integração real NÃO concluída**: falta a planilha, o script publicado e as variáveis `EBOOK_*` no servidor.
+
+## 8. Etapa 4 (2026-10-13)
+
+- Apps Script publicado pelo dono respondeu à verificação (`GET /exec` retorna `{"ok":true,"servico":"teggly-ebook"}`). Nenhum lead de teste foi enviado.
+- `/privacidade` e `/termos` publicados (rascunho redigido a partir do que o produto faz, versão `2026-10-13` em `src/lib/legal.ts`, gravada junto do aceite do e-book). Links no rodapé da home, em `/planos` e no formulário do e-book. **Rascunho: recomenda-se revisão jurídica.** Lacunas: razão social/CNPJ, endereço e foro.
+- Variáveis `EBOOK_*` ainda precisam ser definidas na hospedagem de produção (sem acesso a ela nesta sessão).

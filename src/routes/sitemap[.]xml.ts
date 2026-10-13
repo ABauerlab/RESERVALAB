@@ -12,6 +12,8 @@ export const Route = createFileRoute("/sitemap.xml")({
         const urls = [
           `  <url><loc>${BASE_URL}/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>`,
           `  <url><loc>${BASE_URL}/planos</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>`,
+          `  <url><loc>${BASE_URL}/privacidade</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>`,
+          `  <url><loc>${BASE_URL}/termos</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>`,
         ].join("\n");
         const xml = [
           `<?xml version="1.0" encoding="UTF-8"?>`,

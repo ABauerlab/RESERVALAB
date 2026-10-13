@@ -88,6 +88,15 @@ function PaginaPlanos() {
           </a>
           .
         </p>
+        <p className="mt-4 text-sm text-slate-600">
+          <Link to="/termos" className="underline">
+            Termos de Uso
+          </Link>{" "}
+          ·{" "}
+          <Link to="/privacidade" className="underline">
+            Privacidade
+          </Link>
+        </p>
       </main>
     </div>
   );

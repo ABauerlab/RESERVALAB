@@ -233,7 +233,11 @@ function PaginaEbook() {
                     <span>
                       Li o{" "}
                       <Link to="/privacidade" className="font-semibold text-blue-700 underline">
-                        aviso de privacidade
+                        Aviso de Privacidade
+                      </Link>{" "}
+                      e os{" "}
+                      <Link to="/termos" className="font-semibold text-blue-700 underline">
+                        Termos de Uso
                       </Link>{" "}
                       e aceito receber o guia e contato da Teggly sobre ele.
                     </span>
