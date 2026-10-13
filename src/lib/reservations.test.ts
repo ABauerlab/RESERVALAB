@@ -5,7 +5,33 @@ import {
   formatTelefone,
   horariosDisponiveis,
   telefoneToWhatsApp,
+  telefoneValido,
 } from "@/lib/reservations";
+
+describe("telefoneValido", () => {
+  it("aceita celular BR com DDD e 9 dígitos", () => {
+    expect(telefoneValido("(31) 99763-6610")).toBe(true);
+    expect(telefoneValido("11912345678")).toBe(true);
+  });
+
+  it("rejeita número BR incompleto, sem o 9 ou com DDD inválido", () => {
+    expect(telefoneValido("(31) 9763-6610")).toBe(false);
+    expect(telefoneValido("(31) 89763-6610")).toBe(false);
+    expect(telefoneValido("(01) 99763-6610")).toBe(false);
+    expect(telefoneValido("")).toBe(false);
+  });
+
+  it("rejeita sequências repetidas", () => {
+    expect(telefoneValido("(99) 99999-9999")).toBe(false);
+    expect(telefoneValido("+1111111111")).toBe(false);
+  });
+
+  it("aceita internacional com + entre 8 e 15 dígitos", () => {
+    expect(telefoneValido("+1 415 555 0132")).toBe(true);
+    expect(telefoneValido("+55 11 91234-5678")).toBe(true);
+    expect(telefoneValido("+123456")).toBe(false);
+  });
+});
 
 describe("formatTelefone", () => {
   it("formata número BR incompleto conforme o usuário digita", () => {
