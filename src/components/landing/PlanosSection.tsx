@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Check, Minus } from "lucide-react";
 
@@ -25,7 +26,11 @@ const CTA: Record<PlanoId, string> = {
 
 const LINHAS = RECURSOS_ORDEM;
 
-export function PlanosSection() {
+/**
+ * `resumo`: uso na home, onde todo CTA leva a /planos. Em /planos o CTA abre o contato por e-mail
+ * enquanto o checkout (InfinitePay) nao esta ligado; nenhum plano pago e liberado por este botao.
+ */
+export function PlanosSection({ resumo = false }: { resumo?: boolean }) {
   const [anual, setAnual] = useState(false);
   return (
     <div>
@@ -103,20 +108,34 @@ export function PlanosSection() {
                   </li>
                 ))}
               </ul>
-              <a
-                href={mailtoContato(
-                  `Quero começar com o Teggly (plano ${p.nome})`,
-                  "Nome do restaurante:\nCidade:\nWhatsApp para contato:",
-                )}
-                className={cn(
-                  "inline-flex h-11 items-center justify-center rounded-[10px] px-5 text-[15px] font-semibold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/30",
-                  destaque
-                    ? "mt-auto bg-primary text-primary-foreground shadow-blue hover:bg-blue-700"
-                    : "mt-auto border border-border bg-card hover:bg-slate-50",
-                )}
-              >
-                {CTA[id]}
-              </a>
+              {resumo ? (
+                <Link
+                  to="/planos"
+                  className={cn(
+                    "inline-flex h-11 items-center justify-center rounded-[10px] px-5 text-[15px] font-semibold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/30",
+                    destaque
+                      ? "mt-auto bg-primary text-primary-foreground shadow-blue hover:bg-blue-700"
+                      : "mt-auto border border-border bg-card hover:bg-slate-50",
+                  )}
+                >
+                  Ver o plano {p.nome}
+                </Link>
+              ) : (
+                <a
+                  href={mailtoContato(
+                    `Quero começar com o Teggly (plano ${p.nome})`,
+                    "Nome do restaurante:\nCidade:\nWhatsApp para contato:",
+                  )}
+                  className={cn(
+                    "inline-flex h-11 items-center justify-center rounded-[10px] px-5 text-[15px] font-semibold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/30",
+                    destaque
+                      ? "mt-auto bg-primary text-primary-foreground shadow-blue hover:bg-blue-700"
+                      : "mt-auto border border-border bg-card hover:bg-slate-50",
+                  )}
+                >
+                  {CTA[id]}
+                </a>
+              )}
             </li>
           );
         })}

@@ -28,3 +28,19 @@ export function clearTenantCache(slug?: string) {
   if (slug) _cache.delete(slug.toLowerCase());
   else _cache.clear();
 }
+
+/**
+ * Usada so no servidor para decidir o status HTTP 404: `false` apenas quando a consulta funcionou e
+ * nao existe empresa ativa com o slug. Falha de consulta devolve `true` (nao derruba pagina valida).
+ */
+export async function tenantExiste(slug: string): Promise<boolean> {
+  const key = slug.toLowerCase();
+  const { data, error } = await supabase
+    .from("tenants")
+    .select("id")
+    .eq("slug", key)
+    .eq("ativo", true)
+    .maybeSingle();
+  if (error) return true;
+  return !!data;
+}

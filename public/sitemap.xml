@@ -5,4 +5,13 @@
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
+  <url>
+    <loc>https://teggly.com.br/planos</loc>
+  </url>
+  <url>
+    <loc>https://teggly.com.br/privacidade</loc>
+  </url>
+  <url>
+    <loc>https://teggly.com.br/termos</loc>
+  </url>
 </urlset>

@@ -9,7 +9,11 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermosRouteImport } from './routes/termos'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
+import { Route as PlanosRouteImport } from './routes/planos'
+import { Route as EbookRouteImport } from './routes/ebook'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MasterIndexRouteImport } from './routes/master.index'
 import { Route as SlugIndexRouteImport } from './routes/$slug.index'
@@ -21,6 +25,8 @@ import { Route as SlugAdminIndexRouteImport } from './routes/$slug.admin.index'
 import { Route as SlugAcompanharIndexRouteImport } from './routes/$slug.acompanhar.index'
 import { Route as ApiPublicVapidPublicKeyRouteImport } from './routes/api/public/vapid-public-key'
 import { Route as ApiPublicManifestDotwebmanifestRouteImport } from './routes/api/public/manifest[.]webmanifest'
+import { Route as ApiPublicEbookDownloadRouteImport } from './routes/api/public/ebook-download'
+import { Route as ApiPublicEbookRouteImport } from './routes/api/public/ebook'
 import { Route as SlugReservarTipoRouteImport } from './routes/$slug.reservar.$tipo'
 import { Route as SlugAdminTrocarSenhaRouteImport } from './routes/$slug.admin.trocar-senha'
 import { Route as SlugAdminSugestoesRouteImport } from './routes/$slug.admin.sugestoes'
@@ -36,9 +42,29 @@ import { Route as SlugAdminAgendaRouteImport } from './routes/$slug.admin.agenda
 import { Route as SlugAcompanharCodigoRouteImport } from './routes/$slug.acompanhar.$codigo'
 import { Route as ApiPublicHooksSendPushRouteImport } from './routes/api/public/hooks.send-push'
 
+const TermosRoute = TermosRouteImport.update({
+  id: '/termos',
+  path: '/termos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlanosRoute = PlanosRouteImport.update({
+  id: '/planos',
+  path: '/planos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EbookRoute = EbookRouteImport.update({
+  id: '/ebook',
+  path: '/ebook',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -97,6 +123,16 @@ const ApiPublicManifestDotwebmanifestRoute =
     path: '/api/public/manifest.webmanifest',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicEbookDownloadRoute = ApiPublicEbookDownloadRouteImport.update({
+  id: '/api/public/ebook-download',
+  path: '/api/public/ebook-download',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicEbookRoute = ApiPublicEbookRouteImport.update({
+  id: '/api/public/ebook',
+  path: '/api/public/ebook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SlugReservarTipoRoute = SlugReservarTipoRouteImport.update({
   id: '/$slug/reservar/$tipo',
   path: '/$slug/reservar/$tipo',
@@ -170,7 +206,11 @@ const ApiPublicHooksSendPushRoute = ApiPublicHooksSendPushRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ebook': typeof EbookRoute
+  '/planos': typeof PlanosRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/termos': typeof TermosRoute
   '/$slug/cardapio': typeof SlugCardapioRoute
   '/$slug/links': typeof SlugLinksRoute
   '/$slug/obrigado': typeof SlugObrigadoRoute
@@ -190,6 +230,8 @@ export interface FileRoutesByFullPath {
   '/$slug/admin/sugestoes': typeof SlugAdminSugestoesRoute
   '/$slug/admin/trocar-senha': typeof SlugAdminTrocarSenhaRoute
   '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
+  '/api/public/ebook': typeof ApiPublicEbookRoute
+  '/api/public/ebook-download': typeof ApiPublicEbookDownloadRoute
   '/api/public/manifest.webmanifest': typeof ApiPublicManifestDotwebmanifestRoute
   '/api/public/vapid-public-key': typeof ApiPublicVapidPublicKeyRoute
   '/$slug/acompanhar/': typeof SlugAcompanharIndexRoute
@@ -198,7 +240,11 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ebook': typeof EbookRoute
+  '/planos': typeof PlanosRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/termos': typeof TermosRoute
   '/$slug/cardapio': typeof SlugCardapioRoute
   '/$slug/links': typeof SlugLinksRoute
   '/$slug/obrigado': typeof SlugObrigadoRoute
@@ -218,6 +264,8 @@ export interface FileRoutesByTo {
   '/$slug/admin/sugestoes': typeof SlugAdminSugestoesRoute
   '/$slug/admin/trocar-senha': typeof SlugAdminTrocarSenhaRoute
   '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
+  '/api/public/ebook': typeof ApiPublicEbookRoute
+  '/api/public/ebook-download': typeof ApiPublicEbookDownloadRoute
   '/api/public/manifest.webmanifest': typeof ApiPublicManifestDotwebmanifestRoute
   '/api/public/vapid-public-key': typeof ApiPublicVapidPublicKeyRoute
   '/$slug/acompanhar': typeof SlugAcompanharIndexRoute
@@ -227,7 +275,11 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ebook': typeof EbookRoute
+  '/planos': typeof PlanosRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/termos': typeof TermosRoute
   '/$slug/cardapio': typeof SlugCardapioRoute
   '/$slug/links': typeof SlugLinksRoute
   '/$slug/obrigado': typeof SlugObrigadoRoute
@@ -247,6 +299,8 @@ export interface FileRoutesById {
   '/$slug/admin/sugestoes': typeof SlugAdminSugestoesRoute
   '/$slug/admin/trocar-senha': typeof SlugAdminTrocarSenhaRoute
   '/$slug/reservar/$tipo': typeof SlugReservarTipoRoute
+  '/api/public/ebook': typeof ApiPublicEbookRoute
+  '/api/public/ebook-download': typeof ApiPublicEbookDownloadRoute
   '/api/public/manifest.webmanifest': typeof ApiPublicManifestDotwebmanifestRoute
   '/api/public/vapid-public-key': typeof ApiPublicVapidPublicKeyRoute
   '/$slug/acompanhar/': typeof SlugAcompanharIndexRoute
@@ -257,7 +311,11 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/ebook'
+    | '/planos'
+    | '/privacidade'
     | '/sitemap.xml'
+    | '/termos'
     | '/$slug/cardapio'
     | '/$slug/links'
     | '/$slug/obrigado'
@@ -277,6 +335,8 @@ export interface FileRouteTypes {
     | '/$slug/admin/sugestoes'
     | '/$slug/admin/trocar-senha'
     | '/$slug/reservar/$tipo'
+    | '/api/public/ebook'
+    | '/api/public/ebook-download'
     | '/api/public/manifest.webmanifest'
     | '/api/public/vapid-public-key'
     | '/$slug/acompanhar/'
@@ -285,7 +345,11 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/ebook'
+    | '/planos'
+    | '/privacidade'
     | '/sitemap.xml'
+    | '/termos'
     | '/$slug/cardapio'
     | '/$slug/links'
     | '/$slug/obrigado'
@@ -305,6 +369,8 @@ export interface FileRouteTypes {
     | '/$slug/admin/sugestoes'
     | '/$slug/admin/trocar-senha'
     | '/$slug/reservar/$tipo'
+    | '/api/public/ebook'
+    | '/api/public/ebook-download'
     | '/api/public/manifest.webmanifest'
     | '/api/public/vapid-public-key'
     | '/$slug/acompanhar'
@@ -313,7 +379,11 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/ebook'
+    | '/planos'
+    | '/privacidade'
     | '/sitemap.xml'
+    | '/termos'
     | '/$slug/cardapio'
     | '/$slug/links'
     | '/$slug/obrigado'
@@ -333,6 +403,8 @@ export interface FileRouteTypes {
     | '/$slug/admin/sugestoes'
     | '/$slug/admin/trocar-senha'
     | '/$slug/reservar/$tipo'
+    | '/api/public/ebook'
+    | '/api/public/ebook-download'
     | '/api/public/manifest.webmanifest'
     | '/api/public/vapid-public-key'
     | '/$slug/acompanhar/'
@@ -342,7 +414,11 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  EbookRoute: typeof EbookRoute
+  PlanosRoute: typeof PlanosRoute
+  PrivacidadeRoute: typeof PrivacidadeRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TermosRoute: typeof TermosRoute
   SlugCardapioRoute: typeof SlugCardapioRoute
   SlugLinksRoute: typeof SlugLinksRoute
   SlugObrigadoRoute: typeof SlugObrigadoRoute
@@ -362,6 +438,8 @@ export interface RootRouteChildren {
   SlugAdminSugestoesRoute: typeof SlugAdminSugestoesRoute
   SlugAdminTrocarSenhaRoute: typeof SlugAdminTrocarSenhaRoute
   SlugReservarTipoRoute: typeof SlugReservarTipoRoute
+  ApiPublicEbookRoute: typeof ApiPublicEbookRoute
+  ApiPublicEbookDownloadRoute: typeof ApiPublicEbookDownloadRoute
   ApiPublicManifestDotwebmanifestRoute: typeof ApiPublicManifestDotwebmanifestRoute
   ApiPublicVapidPublicKeyRoute: typeof ApiPublicVapidPublicKeyRoute
   SlugAcompanharIndexRoute: typeof SlugAcompanharIndexRoute
@@ -371,11 +449,39 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/termos': {
+      id: '/termos'
+      path: '/termos'
+      fullPath: '/termos'
+      preLoaderRoute: typeof TermosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/planos': {
+      id: '/planos'
+      path: '/planos'
+      fullPath: '/planos'
+      preLoaderRoute: typeof PlanosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ebook': {
+      id: '/ebook'
+      path: '/ebook'
+      fullPath: '/ebook'
+      preLoaderRoute: typeof EbookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -453,6 +559,20 @@ declare module '@tanstack/react-router' {
       path: '/api/public/manifest.webmanifest'
       fullPath: '/api/public/manifest.webmanifest'
       preLoaderRoute: typeof ApiPublicManifestDotwebmanifestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/ebook-download': {
+      id: '/api/public/ebook-download'
+      path: '/api/public/ebook-download'
+      fullPath: '/api/public/ebook-download'
+      preLoaderRoute: typeof ApiPublicEbookDownloadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/ebook': {
+      id: '/api/public/ebook'
+      path: '/api/public/ebook'
+      fullPath: '/api/public/ebook'
+      preLoaderRoute: typeof ApiPublicEbookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$slug/reservar/$tipo': {
@@ -558,7 +678,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  EbookRoute: EbookRoute,
+  PlanosRoute: PlanosRoute,
+  PrivacidadeRoute: PrivacidadeRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TermosRoute: TermosRoute,
   SlugCardapioRoute: SlugCardapioRoute,
   SlugLinksRoute: SlugLinksRoute,
   SlugObrigadoRoute: SlugObrigadoRoute,
@@ -578,6 +702,8 @@ const rootRouteChildren: RootRouteChildren = {
   SlugAdminSugestoesRoute: SlugAdminSugestoesRoute,
   SlugAdminTrocarSenhaRoute: SlugAdminTrocarSenhaRoute,
   SlugReservarTipoRoute: SlugReservarTipoRoute,
+  ApiPublicEbookRoute: ApiPublicEbookRoute,
+  ApiPublicEbookDownloadRoute: ApiPublicEbookDownloadRoute,
   ApiPublicManifestDotwebmanifestRoute: ApiPublicManifestDotwebmanifestRoute,
   ApiPublicVapidPublicKeyRoute: ApiPublicVapidPublicKeyRoute,
   SlugAcompanharIndexRoute: SlugAcompanharIndexRoute,
