@@ -28,6 +28,11 @@ function atracao(over: Partial<Atracao> = {}): Atracao {
     contato: null,
     cache_valor: null,
     observacoes: null,
+    destaque: false,
+    descricao_publica: null,
+    imagem_url: null,
+    imagem_largura: null,
+    imagem_altura: null,
     updated_at: "2026-10-01T10:00:00Z",
     ...over,
   };

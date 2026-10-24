@@ -16,9 +16,14 @@ export type Database = {
           created_at: string;
           criado_por: string | null;
           data: string;
+          descricao_publica: string | null;
+          destaque: boolean;
           horario_fim: string | null;
           horario_inicio: string | null;
           id: string;
+          imagem_altura: number | null;
+          imagem_largura: number | null;
+          imagem_url: string | null;
           observacoes: string | null;
           status: string;
           tenant_id: string;
@@ -33,9 +38,14 @@ export type Database = {
           created_at?: string;
           criado_por?: string | null;
           data: string;
+          descricao_publica?: string | null;
+          destaque?: boolean;
           horario_fim?: string | null;
           horario_inicio?: string | null;
           id?: string;
+          imagem_altura?: number | null;
+          imagem_largura?: number | null;
+          imagem_url?: string | null;
           observacoes?: string | null;
           status?: string;
           tenant_id: string;
@@ -50,9 +60,14 @@ export type Database = {
           created_at?: string;
           criado_por?: string | null;
           data?: string;
+          descricao_publica?: string | null;
+          destaque?: boolean;
           horario_fim?: string | null;
           horario_inicio?: string | null;
           id?: string;
+          imagem_altura?: number | null;
+          imagem_largura?: number | null;
+          imagem_url?: string | null;
           observacoes?: string | null;
           status?: string;
           tenant_id?: string;
@@ -113,6 +128,7 @@ export type Database = {
       };
       eventos_destaque: {
         Row: {
+          atracao_id: string | null;
           created_at: string;
           data: string;
           descricao: string | null;
@@ -123,6 +139,7 @@ export type Database = {
           titulo: string;
         };
         Insert: {
+          atracao_id?: string | null;
           created_at?: string;
           data: string;
           descricao?: string | null;
@@ -133,6 +150,7 @@ export type Database = {
           titulo: string;
         };
         Update: {
+          atracao_id?: string | null;
           created_at?: string;
           data?: string;
           descricao?: string | null;
