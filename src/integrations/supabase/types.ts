@@ -8,6 +8,68 @@ export type Database = {
   };
   public: {
     Tables: {
+      atracoes: {
+        Row: {
+          atualizado_por: string | null;
+          cache_valor: number | null;
+          contato: string | null;
+          created_at: string;
+          criado_por: string | null;
+          data: string;
+          horario_fim: string | null;
+          horario_inicio: string | null;
+          id: string;
+          observacoes: string | null;
+          status: string;
+          tenant_id: string;
+          tipo: string;
+          titulo: string;
+          updated_at: string;
+        };
+        Insert: {
+          atualizado_por?: string | null;
+          cache_valor?: number | null;
+          contato?: string | null;
+          created_at?: string;
+          criado_por?: string | null;
+          data: string;
+          horario_fim?: string | null;
+          horario_inicio?: string | null;
+          id?: string;
+          observacoes?: string | null;
+          status?: string;
+          tenant_id: string;
+          tipo?: string;
+          titulo: string;
+          updated_at?: string;
+        };
+        Update: {
+          atualizado_por?: string | null;
+          cache_valor?: number | null;
+          contato?: string | null;
+          created_at?: string;
+          criado_por?: string | null;
+          data?: string;
+          horario_fim?: string | null;
+          horario_inicio?: string | null;
+          id?: string;
+          observacoes?: string | null;
+          status?: string;
+          tenant_id?: string;
+          tipo?: string;
+          titulo?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "atracoes_tenant_id_fkey";
+            columns: ["tenant_id"];
+            isOneToOne: false;
+            referencedRelation: "tenants";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       agenda_bloqueios: {
         Row: {
           created_at: string;
