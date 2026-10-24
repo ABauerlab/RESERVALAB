@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   Lightbulb,
   Link2,
+  Mic2,
   Music,
   Settings,
   UtensilsCrossed,
@@ -18,6 +19,7 @@ export type AdminTab =
   | "cardapio"
   | "links"
   | "eventos"
+  | "atracoes"
   | "relatorios"
   | "contatos"
   | "configuracoes"
@@ -54,6 +56,12 @@ export const NAV_EVENTOS: NavItem = {
   label: "Eventos",
   icon: Music,
   to: "/$slug/admin/eventos",
+};
+export const NAV_ATRACOES: NavItem = {
+  id: "atracoes",
+  label: "Atrações",
+  icon: Mic2,
+  to: "/$slug/admin/atracoes",
 };
 export const NAV_CARDAPIO: NavItem = {
   id: "cardapio",
@@ -94,7 +102,7 @@ export const NAV_AJUSTES: NavItem = {
 
 /** Desktop: todos os destinos, nada deixa de ser alcançável. */
 export const SIDEBAR_GROUPS: NavItem[][] = [
-  [NAV_HOJE, NAV_RESERVAS, NAV_AGENDA, NAV_EVENTOS],
+  [NAV_HOJE, NAV_RESERVAS, NAV_AGENDA, NAV_ATRACOES, NAV_EVENTOS],
   [NAV_CARDAPIO, NAV_LINKS],
   [NAV_CLIENTES, NAV_RELATORIOS],
 ];
@@ -103,6 +111,7 @@ export const SIDEBAR_FOOTER: NavItem[] = [NAV_SUGESTOES, NAV_AJUSTES];
 /** Mobile: barra inferior (Agenda aponta para a página atual até a F2) + "Mais". */
 export const BOTTOM_ITEMS: NavItem[] = [NAV_HOJE, NAV_RESERVAS, NAV_AGENDA];
 export const MORE_ITEMS: NavItem[] = [
+  NAV_ATRACOES,
   NAV_EVENTOS,
   NAV_CARDAPIO,
   NAV_LINKS,
