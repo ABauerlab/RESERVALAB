@@ -14,7 +14,8 @@ ALTER TABLE public.eventos_destaque
   ADD COLUMN atracao_id uuid UNIQUE REFERENCES public.atracoes(id) ON DELETE CASCADE;
 
 -- Só atração confirmada pode estar em destaque (cancelar ou voltar para negociação tira do site).
-CREATE OR REPLACE FUNCTION public.atracoes_before_write()
+-- Reaproveita a função e o gatilho de UPDATE existentes (sem DROP) e adiciona o de INSERT.
+CREATE OR REPLACE FUNCTION public.atracoes_before_update()
  RETURNS trigger
  LANGUAGE plpgsql
  SET search_path TO 'public'
@@ -31,14 +32,9 @@ BEGIN
 END;
 $function$;
 
-REVOKE ALL ON FUNCTION public.atracoes_before_write() FROM PUBLIC, anon, authenticated;
-
-DROP TRIGGER atracoes_before_update ON public.atracoes;
-DROP FUNCTION public.atracoes_before_update();
-
-CREATE TRIGGER atracoes_before_write
-  BEFORE INSERT OR UPDATE ON public.atracoes
-  FOR EACH ROW EXECUTE FUNCTION public.atracoes_before_write();
+CREATE TRIGGER atracoes_before_insert
+  BEFORE INSERT ON public.atracoes
+  FOR EACH ROW EXECUTE FUNCTION public.atracoes_before_update();
 
 -- Projeta a atração em destaque para eventos_destaque.
 CREATE OR REPLACE FUNCTION public.atracoes_sync_destaque()
