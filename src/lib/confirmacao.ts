@@ -8,13 +8,12 @@ import {
 
 /**
  * Template padrão da mensagem de confirmação enviada ao cliente no WhatsApp.
- * Sem emoji, apenas texto. O link fica sozinho na última linha para que o
+ * Sem emoji, apenas texto. Sem saudação ("Ola, tudo bem?"): a confirmação
+ * costuma chegar no meio de uma conversa. O link fica sozinho na última linha para que o
  * WhatsApp reconheça a URL inteira (links seguidos de texto na mesma linha
  * costumavam ser cortados na visualização).
  */
-export const DEFAULT_MENSAGEM_CONFIRMACAO = `Ola {nome}, tudo bem?
-
-Sua reserva no {empresa} esta CONFIRMADA.
+export const DEFAULT_MENSAGEM_CONFIRMACAO = `{nome}, sua reserva no {empresa} esta CONFIRMADA.
 
 Codigo: {codigo}
 Data: {data}
@@ -35,9 +34,7 @@ _*Essa é uma mensagem automática de confirmação de reserva*_`;
  * Sempre inclui o link para fazer uma nova reserva, reforçando que o cliente
  * continua no controle mesmo com o cancelamento.
  */
-export const DEFAULT_MENSAGEM_CANCELAMENTO = `Ola {nome}, tudo bem?
-
-Sua reserva no {empresa} (codigo {codigo}) foi CANCELADA.
+export const DEFAULT_MENSAGEM_CANCELAMENTO = `{nome}, sua reserva no {empresa} (codigo {codigo}) foi CANCELADA.
 
 Data: {data}
 Horario: {horario}

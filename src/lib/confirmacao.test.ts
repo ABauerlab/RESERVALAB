@@ -44,7 +44,8 @@ function makeContexto(overrides: Partial<ConfirmacaoContexto> = {}): Confirmacao
 describe("buildMensagemConfirmacao", () => {
   it("substitui todos os placeholders do template padrão", () => {
     const msg = buildMensagemConfirmacao(null, makeContexto());
-    expect(msg).toContain("Ola Maria, tudo bem?");
+    expect(msg).toContain("Maria, sua reserva no Restaurante Exemplo esta CONFIRMADA.");
+    expect(msg).not.toContain("tudo bem");
     expect(msg).toContain("Restaurante Exemplo");
     expect(msg).toContain("Codigo: ABC123");
     expect(msg).toContain("Data: 17/08/2026");
@@ -57,12 +58,12 @@ describe("buildMensagemConfirmacao", () => {
 
   it("usa o template padrão quando nenhum template customizado é passado", () => {
     const msg = buildMensagemConfirmacao(undefined, makeContexto());
-    expect(msg.startsWith("Ola Maria, tudo bem?")).toBe(true);
+    expect(msg.startsWith("Maria, sua reserva")).toBe(true);
   });
 
   it("usa o template padrão quando o template customizado é string vazia/em branco", () => {
     const msg = buildMensagemConfirmacao("   ", makeContexto());
-    expect(msg).toContain("Ola Maria, tudo bem?");
+    expect(msg).toContain("Maria, sua reserva no Restaurante Exemplo esta CONFIRMADA.");
   });
 
   it("remove linhas cujo valor ficou vazio após a substituição", () => {
@@ -186,7 +187,8 @@ function makeCancelamentoContexto(
 describe("buildMensagemCancelamento", () => {
   it("substitui todos os placeholders do template padrão", () => {
     const msg = buildMensagemCancelamento(null, makeCancelamentoContexto());
-    expect(msg).toContain("Ola Maria, tudo bem?");
+    expect(msg).toContain("Maria, sua reserva no Restaurante Exemplo (codigo ABC123) foi CANCELADA.");
+    expect(msg).not.toContain("tudo bem");
     expect(msg).toContain("codigo ABC123");
     expect(msg).toContain("Data: 17/08/2026");
     expect(msg).toContain("Horario: 19:30");
@@ -196,7 +198,7 @@ describe("buildMensagemCancelamento", () => {
 
   it("usa o template padrão quando nenhum template customizado é passado", () => {
     const msg = buildMensagemCancelamento(undefined, makeCancelamentoContexto());
-    expect(msg.startsWith("Ola Maria, tudo bem?")).toBe(true);
+    expect(msg.startsWith("Maria, sua reserva")).toBe(true);
   });
 
   it("remove a linha de motivo quando nenhum motivo é informado", () => {
