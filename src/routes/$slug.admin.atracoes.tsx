@@ -2,7 +2,7 @@ import { pwaHeadLinks } from "@/lib/pwa-manifest";
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight, Copy, Loader2, Mic2, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Copy, Loader2, Mic2, Plus, Star } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -243,6 +243,12 @@ function AtracoesPage() {
                                       ESTILO_STATUS[a.status],
                                     )}
                                   >
+                                    {a.destaque && (
+                                      <Star
+                                        className="mr-1 inline h-3 w-3 fill-current"
+                                        aria-label="Destaque no site"
+                                      />
+                                    )}
                                     {a.horario_inicio && (
                                       <span className="mr-1 opacity-70">
                                         {a.horario_inicio.slice(0, 5)}
@@ -291,6 +297,12 @@ function AtracoesPage() {
                                     a.status === "cancelada" && "line-through opacity-60",
                                   )}
                                 >
+                                  {a.destaque && (
+                                    <Star
+                                      className="mr-1 inline h-3.5 w-3.5 fill-current text-brand"
+                                      aria-label="Destaque no site"
+                                    />
+                                  )}
                                   {a.titulo}
                                 </p>
                                 {faixaHorario(a) && (

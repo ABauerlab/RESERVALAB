@@ -1,5 +1,5 @@
 import { pwaHeadLinks } from "@/lib/pwa-manifest";
-import { createFileRoute, useParams } from "@tanstack/react-router";
+import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ImagePlus, Loader2, Music, Plus, Trash2 } from "lucide-react";
@@ -20,6 +20,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 type EventoRow = {
   id: string;
+  atracao_id?: string | null;
   titulo: string;
   data: string;
   horario: string | null;
@@ -363,25 +364,37 @@ function EventosPage() {
                       {e.horario ? ` às ${formatHorario(e.horario)}` : ""}
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setTrocandoId(e.id);
-                      arquivoTroca.current?.click();
-                    }}
-                    disabled={trocarFlyer.isPending}
-                    className="flex h-11 w-11 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent xl:h-9 xl:w-9"
-                    aria-label={`${e.imagem_url ? "Trocar" : "Enviar"} flyer de ${e.titulo}`}
-                  >
-                    <ImagePlus className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => remover.mutate(e.id)}
-                    className="flex h-11 w-11 xl:h-9 xl:w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                    aria-label="Remover evento"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
+                  {e.atracao_id ? (
+                    <Link
+                      to="/$slug/admin/atracoes"
+                      params={{ slug }}
+                      className="shrink-0 rounded-md border border-border px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-accent"
+                    >
+                      Gerenciar em Atrações
+                    </Link>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTrocandoId(e.id);
+                          arquivoTroca.current?.click();
+                        }}
+                        disabled={trocarFlyer.isPending}
+                        className="flex h-11 w-11 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent xl:h-9 xl:w-9"
+                        aria-label={`${e.imagem_url ? "Trocar" : "Enviar"} flyer de ${e.titulo}`}
+                      >
+                        <ImagePlus className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => remover.mutate(e.id)}
+                        className="flex h-11 w-11 xl:h-9 xl:w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                        aria-label="Remover evento"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </>
+                  )}
                 </li>
               ))}
             </ul>

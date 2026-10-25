@@ -34,6 +34,11 @@ export type Atracao = {
   contato: string | null;
   cache_valor: number | null;
   observacoes: string | null;
+  destaque: boolean;
+  descricao_publica: string | null;
+  imagem_url: string | null;
+  imagem_largura: number | null;
+  imagem_altura: number | null;
   updated_at: string;
 };
 
