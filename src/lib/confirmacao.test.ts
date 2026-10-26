@@ -187,7 +187,9 @@ function makeCancelamentoContexto(
 describe("buildMensagemCancelamento", () => {
   it("substitui todos os placeholders do template padrão", () => {
     const msg = buildMensagemCancelamento(null, makeCancelamentoContexto());
-    expect(msg).toContain("Maria, sua reserva no Restaurante Exemplo (codigo ABC123) foi CANCELADA.");
+    expect(msg).toContain(
+      "Maria, sua reserva no Restaurante Exemplo (codigo ABC123) foi CANCELADA.",
+    );
     expect(msg).not.toContain("tudo bem");
     expect(msg).toContain("codigo ABC123");
     expect(msg).toContain("Data: 17/08/2026");
