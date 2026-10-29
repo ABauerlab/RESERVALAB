@@ -114,3 +114,10 @@ Feriado de 12/10/2026: a casa abre com horário de fim de semana, 12h às 17h (i
 para essa data). Eventos com data passada nunca são apresentados como futuros. Qualquer outro dado
 que mude (pratos especiais, promoções, condições comerciais) segue a informação mais recente da
 equipe; sem registro, não inventar.
+
+Sábado 14/11/2026 (adicionado em 29/10/2026): casamento às 16h, sem reservas (agenda já bloqueada
+no sistema). Almoço por ordem de chegada, sem reserva, das 12h às 15h; iFood e 99Food também das
+12h às 15h. Iracema não envia link de reserva para essa data, não diz que a casa está fechada o
+dia todo, não fala de detalhes do casamento e não afirma a música ao vivo habitual desse sábado
+(diz que precisa confirmar). A seção 20 e a seção "Atrações e eventos especiais" citam a exceção.
+Depois de 14/11/2026 esse bloco pode ser removido da base.
