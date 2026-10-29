@@ -29,7 +29,7 @@ repetir, para restaurar em minutos.
   Cancelar reserva (sistema), Consultar agenda (bloqueios e lotacao) e
   **Consultar eventos em destaque**.
 - Base de conhecimento, seção 20: todo sábado tem música ao vivo a partir das 13h30, casa abre
-  às 12h, e a escalação de cada sábado fica no Instagram `@iracemabh`.
+  às 12h e funciona até 19h (desde 29/10/2026), e a escalação de cada sábado fica no Instagram `@iracemabh`.
 - Base de conhecimento não contém evento com data fixa já vencida (ex.: Baticum de 11/10/2026).
   Eventos com data vêm da ferramenta, não do texto.
 - `REGRA DE SAUDACAO` no texto do agente (não repetir saudação na mesma conversa).
@@ -67,7 +67,7 @@ Conteúdo do nó **Base de conhecimento do Iracema** (`toolCode`, retorna o text
 - Iracema Bistrô Bar: restaurante, bar e espaço para eventos em um casarão dos anos 50, no
   coração de Santa Tereza. Conceito: comida, encontros e história no Santa Tereza.
 - Endereço: Rua Almandina, 56, Santa Tereza, Belo Horizonte - MG, CEP 31010-080.
-- Horário: segunda a sexta 11h às 15h; sábado 12h às 17h (com música ao vivo a partir das 13h30);
+- Horário: segunda a sexta 11h às 15h; sábado 12h às 19h (com música ao vivo a partir das 13h30);
   domingo 12h às 17h. Sujeito a alteração por eventos e feriados (seção 23).
 
 ### Pratos da semana
