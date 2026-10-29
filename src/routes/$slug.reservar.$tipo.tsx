@@ -153,6 +153,7 @@ function ReservarPage() {
             {
               semana: tenantQ.data?.horario_limite_semana,
               fimDeSemana: tenantQ.data?.horario_limite_fim_semana,
+              sabado: tenantQ.data?.horario_limite_sabado,
             },
             ehFeriado,
           ).filter((h) => cabeNaCasa(capacidade, h, quantidade).ok)
@@ -164,6 +165,7 @@ function ReservarPage() {
       quantidade,
       tenantQ.data?.horario_limite_semana,
       tenantQ.data?.horario_limite_fim_semana,
+      tenantQ.data?.horario_limite_sabado,
       ehFeriado,
     ],
   );

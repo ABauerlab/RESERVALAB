@@ -64,6 +64,7 @@ function ConfiguracoesPage() {
   const [mensagemReconfirmacao, setMensagemReconfirmacao] = useState("");
   const [limiteSemana, setLimiteSemana] = useState("");
   const [limiteFimDeSemana, setLimiteFimDeSemana] = useState("");
+  const [limiteSabado, setLimiteSabado] = useState("");
   const [capacidadeDia, setCapacidadeDia] = useState("");
   const [capacidadeHorario, setCapacidadeHorario] = useState("");
   const [pixelFacebook, setPixelFacebook] = useState("");
@@ -84,6 +85,7 @@ function ConfiguracoesPage() {
     setMensagemReconfirmacao(tenant.mensagem_reconfirmacao ?? DEFAULT_MENSAGEM_RECONFIRMACAO);
     setLimiteSemana(tenant.horario_limite_semana?.slice(0, 5) ?? "");
     setLimiteFimDeSemana(tenant.horario_limite_fim_semana?.slice(0, 5) ?? "");
+    setLimiteSabado(tenant.horario_limite_sabado?.slice(0, 5) ?? "");
     const cap = tenant as unknown as {
       capacidade_pessoas_dia?: number | null;
       capacidade_pessoas_horario?: number | null;
@@ -114,6 +116,7 @@ function ConfiguracoesPage() {
           mensagem_reconfirmacao: mensagemReconfirmacao.trim() || DEFAULT_MENSAGEM_RECONFIRMACAO,
           horario_limite_semana: limiteSemana || null,
           horario_limite_fim_semana: limiteFimDeSemana || null,
+          horario_limite_sabado: limiteSabado || null,
           pixel_facebook_id: pixelFacebook.trim() || null,
           observacao_area: observacaoArea.trim() || null,
           capacidade_pessoas_dia: parseCapacidade(capacidadeDia),
@@ -375,7 +378,7 @@ function ConfiguracoesPage() {
                       fechamento padrão.
                     </p>
                   </div>
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                     <div className="space-y-2">
                       <Label className="text-[13px]">Dias de semana (seg–sex)</Label>
                       <Input
@@ -393,6 +396,18 @@ function ConfiguracoesPage() {
                         onChange={(e) => setLimiteFimDeSemana(e.target.value)}
                         className="h-11 rounded-md"
                       />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[13px]">Só sábado</Label>
+                      <Input
+                        type="time"
+                        value={limiteSabado}
+                        onChange={(e) => setLimiteSabado(e.target.value)}
+                        className="h-11 rounded-md"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Se preenchido, vale no lugar do fim de semana aos sábados.
+                      </p>
                     </div>
                   </div>
                 </div>
