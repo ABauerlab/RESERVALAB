@@ -10,6 +10,19 @@ export const WHATSAPP_TEGGLY =
   "https://wa.me/5531998021169?text=" +
   encodeURIComponent("Olá! Quero conhecer o Teggly para o meu restaurante.");
 
+export const WHATSAPP_NUMERO = "5531998021169";
+
+/** Link do WhatsApp com mensagem pronta. Todo pedido de plano do site e do painel cai aqui. */
+export function whatsappMensagem(texto: string): string {
+  return `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(texto)}`;
+}
+
+export function whatsappPlano(plano: string, detalhes?: string): string {
+  const linhas = [`Olá! Quero contratar o plano ${plano} do Teggly.`];
+  if (detalhes) linhas.push("", detalhes);
+  return whatsappMensagem(linhas.join("\n"));
+}
+
 export function mailtoContato(assunto: string, corpo?: string): string {
   const q = [`subject=${encodeURIComponent(assunto)}`];
   if (corpo) q.push(`body=${encodeURIComponent(corpo)}`);

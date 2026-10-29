@@ -13,7 +13,7 @@ import {
   temRecurso,
   type PlanoId,
 } from "@/lib/plans";
-import { mailtoContato } from "@/lib/site";
+import { whatsappPlano } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 const DESTAQUE: PlanoId = "essencial";
@@ -27,8 +27,9 @@ const CTA: Record<PlanoId, string> = {
 const LINHAS = RECURSOS_ORDEM;
 
 /**
- * `resumo`: uso na home, onde todo CTA leva a /planos. Em /planos o CTA abre o contato por e-mail
- * enquanto o checkout (InfinitePay) nao esta ligado; nenhum plano pago e liberado por este botao.
+ * `resumo`: uso na home, onde todo CTA leva a /planos. Em /planos o CTA abre o WhatsApp do time com
+ * a mensagem do plano escolhido enquanto o checkout (InfinitePay) nao esta ligado; nenhum plano
+ * pago e liberado por este botao.
  */
 export function PlanosSection({ resumo = false }: { resumo?: boolean }) {
   const [anual, setAnual] = useState(false);
@@ -122,10 +123,12 @@ export function PlanosSection({ resumo = false }: { resumo?: boolean }) {
                 </Link>
               ) : (
                 <a
-                  href={mailtoContato(
-                    `Quero começar com o Teggly (plano ${p.nome})`,
-                    "Nome do restaurante:\nCidade:\nWhatsApp para contato:",
+                  href={whatsappPlano(
+                    p.nome + (anual ? " (cobrança anual)" : " (cobrança mensal)"),
+                    "Nome do restaurante:\nCidade:",
                   )}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className={cn(
                     "inline-flex h-11 items-center justify-center rounded-[10px] px-5 text-[15px] font-semibold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/30",
                     destaque
