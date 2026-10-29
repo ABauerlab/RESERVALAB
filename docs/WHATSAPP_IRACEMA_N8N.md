@@ -30,6 +30,8 @@ repetir, para restaurar em minutos.
   **Consultar eventos em destaque**.
 - Base de conhecimento, seção 20: todo sábado tem música ao vivo a partir das 13h30, casa abre
   às 12h e funciona até 19h (desde 29/10/2026), e a escalação de cada sábado fica no Instagram `@iracemabh`.
+- Base de conhecimento, seção 5: aos sábados as reservas são aceitas até 17h30 (coluna
+  `tenants.horario_limite_sabado`, desde 29/10/2026); a Iracema não cita limite de outros dias.
 - Base de conhecimento não contém evento com data fixa já vencida (ex.: Baticum de 11/10/2026).
   Eventos com data vêm da ferramenta, não do texto.
 - `REGRA DE SAUDACAO` no texto do agente (não repetir saudação na mesma conversa).
