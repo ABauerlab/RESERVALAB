@@ -177,6 +177,19 @@ describe("horariosDisponiveis", () => {
     expect(fds[fds.length - 1]).toBe("17:00");
   });
 
+  it("limite de sábado substitui o de fim de semana só aos sábados e pode passar das 17h", () => {
+    const limites = { fimDeSemana: "14:00", sabado: "17:30" };
+    const sabado = horariosDisponiveis("2026-08-15", 4, limites); // sábado
+    expect(sabado[sabado.length - 1]).toBe("17:30");
+    expect(sabado).toContain("17:00");
+
+    const domingo = horariosDisponiveis("2026-08-16", 4, limites);
+    expect(domingo[domingo.length - 1]).toBe("14:00");
+
+    const segunda = horariosDisponiveis("2026-08-17", 4, limites);
+    expect(segunda[segunda.length - 1]).toBe("15:00");
+  });
+
   it("aceita horário no formato HH:MM:SS (como vem do Postgres)", () => {
     const slots = horariosDisponiveis("2026-08-17", 4, { semana: "13:00:00" });
     expect(slots[slots.length - 1]).toBe("13:00");

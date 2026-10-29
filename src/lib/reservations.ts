@@ -147,10 +147,15 @@ function slots(inicio: string, fim: string, stepMin = 30): string[] {
   return out;
 }
 
-/** Corte configurável por empresa do último horário aceito (seg-sex / sáb-dom). */
+/**
+ * Corte configurável por empresa do último horário aceito (seg-sex / sáb-dom).
+ * `sabado`, quando preenchido, vale só para sábados e substitui `fimDeSemana` nesse dia, inclusive
+ * para estender a janela além das 17h.
+ */
 export type HorarioLimites = {
   semana?: string | null;
   fimDeSemana?: string | null;
+  sabado?: string | null;
 };
 
 /**
@@ -180,6 +185,8 @@ export function horariosDisponiveis(
   const fimPadrao = fimDeSemana ? "17:00" : "15:00";
 
   if (quantidade <= 30) {
+    const limiteSabado = dia === 6 ? limites?.sabado?.slice(0, 5) : undefined;
+    if (limiteSabado) return slots("12:00", limiteSabado);
     const limite = (fimDeSemana ? limites?.fimDeSemana : limites?.semana)?.slice(0, 5);
     const fim = limite || fimPadrao;
     return fimDeSemana ? slots("12:00", fim) : slots("11:00", fim);
