@@ -10,7 +10,7 @@ import {
   formatarReais,
   temRecurso,
 } from "@/lib/plans";
-import { mailtoContato } from "@/lib/site";
+import { whatsappMensagem } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 /**
@@ -144,10 +144,11 @@ export function PlanoSecao({
       </div>
 
       <a
-        href={mailtoContato(
-          `Plano do Teggly: ${tenantNome}`,
-          `Restaurante: ${tenantNome}\nPlano atual: ${plano.nome}\nQuero conversar sobre: `,
+        href={whatsappMensagem(
+          `Olá! Quero falar sobre o plano do Teggly.\n\nRestaurante: ${tenantNome}\nPlano atual: ${plano.nome}`,
         )}
+        target="_blank"
+        rel="noopener noreferrer"
         className="inline-flex h-11 items-center rounded-md border border-border px-4 text-sm font-medium transition-colors hover:bg-accent"
       >
         Falar sobre planos

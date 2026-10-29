@@ -131,7 +131,7 @@ test.describe("Onboarding", () => {
     await expect(page.getByText(/Nenhuma reserva fica escondida ou bloqueada/)).toBeVisible();
     await expect(page.getByRole("link", { name: "Falar sobre planos" })).toHaveAttribute(
       "href",
-      /^mailto:contato@teggly\.com\.br/,
+      /^https:\/\/wa\.me\/5531998021169\?text=/,
     );
   });
 });
