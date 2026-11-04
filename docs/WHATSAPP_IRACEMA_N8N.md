@@ -33,7 +33,10 @@ repetir, para restaurar em minutos.
 - Base de conhecimento, seção 5: aos sábados as reservas são aceitas até 17h30 (coluna
   `tenants.horario_limite_sabado`, desde 29/10/2026); a Iracema não cita limite de outros dias.
 - Base de conhecimento não contém evento com data fixa já vencida (ex.: Baticum de 11/10/2026).
-  Eventos com data vêm da ferramenta, não do texto.
+  Eventos com data vêm da ferramenta, não do texto. Exceção deliberada: a seção 23 traz datas
+  específicas (14/11/2026 e Roda da Boua em 20/11/2026) a pedido da equipe. Cada bloco tem a
+  data no título e deve ser removido depois do evento; o mesmo evento também precisa estar
+  cadastrado em "Destacar no site" (painel, Atrações) para a ferramenta trazer.
 - `REGRA DE SAUDACAO` no texto do agente (não repetir saudação na mesma conversa).
 - Nós que dependem do telefone usam `$('Extrair mensagem').first().json.telefone`.
 
@@ -123,3 +126,9 @@ no sistema) e sem almoço no salão: o almoço desse dia é somente por delivery
 gentileza, oferece o Linktree (perguntando antes), não envia link de reserva para essa data, não
 fala de detalhes do casamento nem de música ao vivo nesse dia. A seção 20 e a seção "Atrações e
 eventos especiais" citam a exceção. Depois de 14/11/2026 esse bloco pode ser removido da base.
+
+Sexta 20/11/2026 (feriado, atualizado em 04/11/2026): Roda da Boua. Condição especial de
+aniversariante: aniversariante off; +10 nomes na lista amiga, off até as 15:30h; +2 Xeque-Mates
+para o aniversariante; 20% de desconto na compra de ingresso para os demais convidados. A
+Iracema não inventa horário de início, atração, preço de ingresso nem line-up. Depois de
+20/11/2026 esse bloco sai da base.
