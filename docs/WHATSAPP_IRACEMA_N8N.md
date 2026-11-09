@@ -127,8 +127,22 @@ gentileza, oferece o Linktree (perguntando antes), não envia link de reserva pa
 fala de detalhes do casamento nem de música ao vivo nesse dia. A seção 20 e a seção "Atrações e
 eventos especiais" citam a exceção. Depois de 14/11/2026 esse bloco pode ser removido da base.
 
-Sexta 20/11/2026 (feriado, atualizado em 04/11/2026): Roda da Boua. Condição especial de
-aniversariante: aniversariante off; +10 nomes na lista amiga, off até as 15:30h; +2 Xeque-Mates
-para o aniversariante; 20% de desconto na compra de ingresso para os demais convidados. A
-Iracema não inventa horário de início, atração, preço de ingresso nem line-up. Depois de
-20/11/2026 esse bloco sai da base.
+Domingo 15/11/2026: Sergim Santhiago e Banda, 13h30, aceita reservas (link do Teggly).
+
+Sexta 20/11/2026 (feriado, atualizado em 09/11/2026): Roda da Boua, somente com ingresso e sem
+reservas. Ingressos: `https://shotgun.live/en/events/roda-da-boua-iracema-20-11-14-h`. Condição de
+aniversariante: aniversariante off; +10 nomes na lista amiga (formulário
+`https://forms.gle/H5uodKtE3ymWDj4B7`), off até as 15:30h; +2 Xeque-Mates; 20% de desconto no
+ingresso dos convidados. Depois de 20/11/2026 esse bloco sai da base.
+
+Sábado 21/11/2026 e domingo 29/11/2026: Sergim Santhiago e Banda, 13h30, com reservas.
+
+Sábado 28/11/2026: Pagode do Sonic, somente com ingresso e sem reservas. Ingressos:
+`https://shotgun.live/en/events/pagode-do-sonic-iracema-28-11`. Depois dessa data o bloco sai da base.
+
+## Memória da conversa
+
+`Memória da conversa (por telefone)` usa `contextWindowLength` 24 (era 8). Com 8, o corte da
+janela podia começar numa chamada de ferramenta sem a mensagem do cliente antes, e o Gemini
+respondia 400 ("function call turn comes immediately after a user turn", execução 49222 de
+09/11/2026).
