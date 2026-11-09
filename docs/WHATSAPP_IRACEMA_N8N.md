@@ -146,3 +146,19 @@ Sábado 28/11/2026: Pagode do Sonic, somente com ingresso e sem reservas. Ingres
 janela podia começar numa chamada de ferramenta sem a mensagem do cliente antes, e o Gemini
 respondia 400 ("function call turn comes immediately after a user turn", execução 49222 de
 09/11/2026).
+
+## Base de conhecimento única (desde 09/11/2026)
+
+A base mora na tabela `public.ia_base_conhecimento` (linha `tenant_slug = 'iracema'`), lida pela
+função `base_conhecimento_do_tenant('iracema')`. O nó **Base de conhecimento do Iracema** do
+WhatsApp e o do Instagram são `postgresTool` que chamam essa função. Para atualizar a base,
+faça `UPDATE` nessa linha (não edite mais texto dentro do n8n). A seção "Base de conhecimento"
+acima passa a ser só cópia de recuperação.
+
+## Instagram (Direct)
+
+Workflow **Iracema - Atendimento Instagram (Dona Iracema)**, id `JLGWamYc0j3tFuEb`. Webhook
+`https://n8n.bauerlab.com.br/webhook/instagram-iracema` (GET verifica, POST recebe), app Meta
+`1386317073371652`, conta `@iracemabh` (`17841421453124391`), credencial n8n `Instagram Iracema`.
+Ferramentas: base, eventos em destaque e agenda. Não consulta nem altera reservas (não há
+telefone); aponta para o site. Memória: `n8n_chat_histories_iracema_instagram`, janela 24.
