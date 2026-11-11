@@ -36,3 +36,14 @@ Data: 2026-10-08. Estado do cardápio: **NÃO PUBLICADO** (`tenant_perfil.cardap
 ## Atualização: fotos em melhor qualidade enviadas pelo dono
 
 O dono enviou um pacote com 19 fotos (cerca de 700 px de altura, 53 a 255 KB, JPEG). Elas substituíram as versões pequenas dos mesmos 19 itens (caminho `<tenant>/produto-<id>-hd.jpg`; o arquivo pequeno correspondente foi removido). Sobraram 6 itens com a versão pequena (Amstel 600 ml, Eisenbahn, Heineken, Amstel Lager, Geraldim, Quintal da Jabu). Resultado no banco: 19 em alta, 6 pequenas, 38 sem foto, 0 apontando para o Goomer. O cardápio segue **não publicado**; use "Pré-visualizar" no painel.
+
+## Atualização 11/11/2026: fotos originais do Goomer
+
+Pedido do dono: usar no cardápio do Teggly as fotos do cardápio do Goomer (`iracema.goomer.app/menu`) e deixar sem foto o que não tem.
+
+- Fonte: API pública do próprio menu (`www.goomer.app/webmenu/iracema/menu/...`), versão `large` (JPEG, 24 a 209 KB).
+- 22 itens do Teggly casados por nome com produto do Goomer que tem foto. Arquivos em `tenant-assets/<tenant>/produto-<id>-goomer.jpg`, `imagem_url` com `?v=goomer1`.
+- 42 itens ficaram **sem foto** (`imagem_url = null`): os que o Goomer não tem foto, os que só existiam como imagem "ensaio" e o Harumaki.
+- O Bolinho de Linguiça tem foto no Goomer mas não existe no cardápio do Teggly (cadastrar o item se quiser usar a foto).
+- Função temporária `tmp-fotos-goomer-iracema` substituída por stub 410 (pode ser apagada no painel).
+- Arquivos antigos (`-ensaio.webp`, `-hd.jpg`) continuam no bucket, sem referência. Limpeza opcional.

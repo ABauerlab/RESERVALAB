@@ -73,7 +73,8 @@ Conteúdo do nó **Base de conhecimento do Iracema** (`toolCode`, retorna o text
   coração de Santa Tereza. Conceito: comida, encontros e história no Santa Tereza.
 - Endereço: Rua Almandina, 56, Santa Tereza, Belo Horizonte - MG, CEP 31010-080.
 - Horário: segunda a sexta 11h às 15h; sábado 12h às 19h (com música ao vivo a partir das 13h30);
-  domingo 12h às 17h. Sujeito a alteração por eventos e feriados (seção 23).
+  domingo 12h às 17h. Almoço de sábado e domingo: 12h às 15h. Sujeito a alteração por eventos e feriados
+  (seção 23).
 
 ### Pratos da semana
 
@@ -129,6 +130,16 @@ eventos especiais" citam a exceção. Depois de 14/11/2026 esse bloco pode ser r
 
 Sexta 20/11/2026 (feriado, atualizado em 04/11/2026): Roda da Boua. Condição especial de
 aniversariante: aniversariante off; +10 nomes na lista amiga, off até as 15:30h; +2 Xeque-Mates
-para o aniversariante; 20% de desconto na compra de ingresso para os demais convidados. A
-Iracema não inventa horário de início, atração, preço de ingresso nem line-up. Depois de
+para o aniversariante; 20% de desconto na compra de ingresso para os demais convidados (cupom próprio pedido no
+Instagram do evento). A Iracema não inventa horário de início, atração, preço de ingresso nem line-up. Depois de
 20/11/2026 esse bloco sai da base.
+
+Sábado 28/11/2026: Pagode do Sonic, só com ingresso e sem reservas (início 16h). Condição especial
+de aniversariante: aniversariante off; +10 nomes na lista amiga, off até as 17:30h; +2 Xeque-Mates
+para o aniversariante; 20% de desconto na compra de ingresso para os demais convidados (cupom
+próprio pedido no Instagram do evento). Depois de 28/11/2026 esse bloco sai da base.
+
+Nota (11/11/2026): o texto da base não vive no n8n, e sim na tabela `ia_base_conhecimento`
+(`tenant_slug = 'iracema'`), lida pela função `base_conhecimento_do_tenant`. Alterações de conteúdo
+são `UPDATE` nessa tabela (ver `supabase/migrations/20261111120000_*.sql`); não exigem republicar
+o workflow.
