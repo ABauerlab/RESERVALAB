@@ -1,3 +1,4 @@
+import { separarLinks } from "@/lib/linkify";
 import { fetchProximoEvento } from "@/lib/eventos";
 import { FlyerEvento } from "@/components/public/FlyerEvento";
 import { IconeWhatsApp } from "@/components/brand/BrandIcons";
@@ -171,8 +172,22 @@ function TenantHome() {
                 {eventoQ.data.horario ? ` às ${formatHorario(eventoQ.data.horario)}` : ""}
               </p>
               {eventoQ.data.descricao && (
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {eventoQ.data.descricao}
+                <p className="mt-2 whitespace-pre-line break-words text-sm leading-relaxed text-muted-foreground">
+                  {separarLinks(eventoQ.data.descricao).map((t, i) =>
+                    t.href ? (
+                      <a
+                        key={i}
+                        href={t.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-medium text-brand underline underline-offset-2"
+                      >
+                        {t.texto}
+                      </a>
+                    ) : (
+                      <span key={i}>{t.texto}</span>
+                    ),
+                  )}
                 </p>
               )}
             </div>

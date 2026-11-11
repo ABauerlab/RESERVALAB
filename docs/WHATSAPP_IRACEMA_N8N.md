@@ -143,3 +143,14 @@ Nota (11/11/2026): o texto da base não vive no n8n, e sim na tabela `ia_base_co
 (`tenant_slug = 'iracema'`), lida pela função `base_conhecimento_do_tenant`. Alterações de conteúdo
 são `UPDATE` nessa tabela (ver `supabase/migrations/20261111120000_*.sql`); não exigem republicar
 o workflow.
+
+Limpeza automática (11/11/2026): a função `ia_base_limpar_blocos_vencidos()` roda todo dia às
+00:10 de Brasília (job pg_cron `ia-base-limpar-blocos-vencidos`; migration
+`supabase/migrations/20261111140000_*.sql`). Ela apaga da base todo bloco `## ...` cujo título
+traga uma data DD/MM/AAAA já passada e, depois de 14/11/2026, as menções soltas ao fechamento
+desse dia nas seções 20 e "Atrações". Para um bloco sair sozinho, **o título precisa ter a data
+completa** (ex.: `## Sábado 28/11/2026 - ...`). Não é preciso remover blocos de data à mão.
+
+Roda da Boua e Pagode do Sonic também estão em "Destacar no site" (`eventos_destaque`), com os
+links de ingresso e da lista amiga na descrição; a página de reservas transforma URLs da descrição
+em links clicáveis.

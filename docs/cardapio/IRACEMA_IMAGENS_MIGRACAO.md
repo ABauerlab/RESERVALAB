@@ -47,3 +47,5 @@ Pedido do dono: usar no cardápio do Teggly as fotos do cardápio do Goomer (`ir
 - O Bolinho de Linguiça tem foto no Goomer mas não existe no cardápio do Teggly (cadastrar o item se quiser usar a foto).
 - Função temporária `tmp-fotos-goomer-iracema` substituída por stub 410 (pode ser apagada no painel).
 - Arquivos antigos (`-ensaio.webp`, `-hd.jpg`) continuam no bucket, sem referência. Limpeza opcional.
+
+Pendente: 90 arquivos `produto-*` (`-ensaio.webp`, `-hd.jpg`, versões pequenas) seguem no bucket sem nenhuma referência em `cardapio_itens`. A exclusão em massa via função temporária foi bloqueada nesta sessão; apagar pelo painel do Supabase (Storage, `tenant-assets`, pasta do tenant) ou autorizar a limpeza.
