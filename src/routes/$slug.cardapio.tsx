@@ -228,8 +228,15 @@ function CardapioPublicoPage() {
       </a>
     ) : undefined;
 
-  const cartao = (i: ItemCardapio, n: number) => (
-    <ItemDoCardapio key={i.id} item={i} layout={layout} indice={n} onAbrir={abrirItem} />
+  const cartao = (i: ItemCardapio, n: number, reservarFoto = false) => (
+    <ItemDoCardapio
+      key={i.id}
+      item={i}
+      layout={layout}
+      indice={n}
+      onAbrir={abrirItem}
+      reservarFoto={reservarFoto}
+    />
   );
 
   return (
@@ -338,19 +345,23 @@ function CardapioPublicoPage() {
       )}
 
       <div className="space-y-10">
-        {visiveis.map((c, ci) => (
-          <section key={c.id} id={`cat-${c.id}`} className="scroll-mt-28">
-            <h2 className="text-xl font-extrabold tracking-tight text-foreground">{c.nome}</h2>
-            {c.descricao && <p className="mt-1 text-sm text-muted-foreground">{c.descricao}</p>}
-            <ul className={GRADE[layout]}>
-              {c.itens.map((i, n) => (
-                <li key={i.id} className={layout === "cards" ? "min-w-0" : undefined}>
-                  {cartao(i, ci === 0 ? n : 99)}
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))}
+        {visiveis.map((c, ci) => {
+          // Categoria que mistura itens com e sem foto: os sem foto ganham um espaco neutro.
+          const misto = c.itens.some((i) => !!i.imagem_url) && c.itens.some((i) => !i.imagem_url);
+          return (
+            <section key={c.id} id={`cat-${c.id}`} className="scroll-mt-28">
+              <h2 className="text-xl font-extrabold tracking-tight text-foreground">{c.nome}</h2>
+              {c.descricao && <p className="mt-1 text-sm text-muted-foreground">{c.descricao}</p>}
+              <ul className={GRADE[layout]}>
+                {c.itens.map((i, n) => (
+                  <li key={i.id} className={layout === "cards" ? "min-w-0" : undefined}>
+                    {cartao(i, ci === 0 ? n : 99, misto)}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          );
+        })}
       </div>
 
       <ItemDetalhe

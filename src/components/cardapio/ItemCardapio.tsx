@@ -1,4 +1,4 @@
-import { Star } from "lucide-react";
+import { Star, UtensilsCrossed } from "lucide-react";
 import { useState } from "react";
 
 import { formatPreco, type ItemCardapio } from "@/lib/cardapio";
@@ -40,6 +40,22 @@ export function Foto({
   );
 }
 
+/** Espaco neutro no lugar da foto, para itens sem foto numa categoria que mistura os dois. */
+export function SemFoto({ proporcao, className }: { proporcao?: string; className?: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      style={proporcao ? { aspectRatio: proporcao } : undefined}
+      className={cn(
+        "flex w-full items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100",
+        className,
+      )}
+    >
+      <UtensilsCrossed className="h-7 w-7 text-slate-300" />
+    </span>
+  );
+}
+
 export function SeloDestaque() {
   return (
     <span className="inline-flex items-center gap-1 rounded-full bg-warning-100 px-2 py-0.5 text-[11px] font-bold uppercase tracking-[0.06em] text-warning-700">
@@ -58,11 +74,14 @@ export function ItemDoCardapio({
   layout,
   indice,
   onAbrir,
+  reservarFoto,
 }: {
   item: ItemCardapio;
   layout: LayoutCardapio;
   indice: number;
   onAbrir: (id: string) => void;
+  /** A categoria mistura itens com e sem foto: mostra um espaco neutro para manter o alinhamento. */
+  reservarFoto?: boolean;
 }) {
   const preco = formatPreco(item.preco_centavos);
   const temFoto = !!item.imagem_url;
@@ -80,8 +99,10 @@ export function ItemDoCardapio({
           "flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card hover:border-slate-300",
         )}
       >
-        {temFoto && (
+        {temFoto ? (
           <Foto src={item.imagem_url!} alt="" prioridade={indice < 4} proporcao="4 / 3" />
+        ) : (
+          reservarFoto && <SemFoto proporcao="4 / 3" />
         )}
         <span className="flex flex-1 flex-col p-3">
           {item.destaque && (
@@ -96,7 +117,7 @@ export function ItemDoCardapio({
             <span
               className={cn(
                 "mt-1 text-[13px] leading-snug text-muted-foreground",
-                temFoto ? "line-clamp-2" : "line-clamp-4",
+                temFoto || reservarFoto ? "line-clamp-2" : "line-clamp-4",
               )}
             >
               {item.descricao}
@@ -123,8 +144,10 @@ export function ItemDoCardapio({
           "overflow-hidden rounded-2xl border border-border bg-card hover:border-slate-300",
         )}
       >
-        {temFoto && (
+        {temFoto ? (
           <Foto src={item.imagem_url!} alt="" prioridade={indice < 2} proporcao="16 / 10" />
+        ) : (
+          reservarFoto && <SemFoto proporcao="16 / 10" />
         )}
         <span className="block p-4">
           {item.destaque && (
@@ -211,9 +234,13 @@ export function ItemDoCardapio({
           </span>
         )}
       </span>
-      {temFoto && (
+      {(temFoto || reservarFoto) && (
         <span className="h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-border/60">
-          <Foto src={item.imagem_url!} alt="" prioridade={indice < 3} className="h-full w-full" />
+          {temFoto ? (
+            <Foto src={item.imagem_url!} alt="" prioridade={indice < 3} className="h-full w-full" />
+          ) : (
+            <SemFoto className="h-full" />
+          )}
         </span>
       )}
     </button>
