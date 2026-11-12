@@ -160,3 +160,7 @@ nesses dias não existe mesa garantida, reservada ou separada, nem para quem tem
 a Dona Iracema chegou a dizer a uma cliente que ela tinha mesa garantida em 20/11. Migration
 `supabase/migrations/20261112120000_*.sql`. A frase da seção 5 é genérica e permanece depois dos
 eventos.
+
+Aplicado em produção em 12/11/2026. Existem 2 reservas confirmadas de aniversário em 20/11 (criadas
+antes do bloqueio da agenda); por isso a regra manda o agente nem negar nem garantir mesa quando a
+consulta mostrar reserva nesses dias, e passar para a equipe.
