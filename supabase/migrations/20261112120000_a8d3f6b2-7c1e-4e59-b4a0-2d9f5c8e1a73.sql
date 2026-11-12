@@ -7,7 +7,7 @@ UPDATE public.ia_base_conhecimento
 SET conteudo = replace(
       conteudo,
       E'Nunca afirmar disponibilidade sem confirmação oficial.',
-      E'Em dia de evento SOMENTE com ingresso (blocos da seção 23 marcados "SEM RESERVAS"), não existe reserva de mesa por causa da lotação: NUNCA diga ou sugira que a pessoa tem mesa garantida, reservada, separada ou "sua mesa". O ingresso dá entrada no evento, não mesa. Se alguém disser que tem mesa nesses dias, não confirme: explique com gentileza que nesses dias não há reserva de mesas por causa da lotação e que vai encaminhar para a equipe conferir.\nNunca afirmar disponibilidade sem confirmação oficial.')
+      E'Em dia de evento SOMENTE com ingresso (blocos da seção 23 marcados "SEM RESERVAS"), não existe reserva de mesa por causa da lotação: NUNCA diga ou sugira que a pessoa tem mesa garantida, reservada, separada ou "sua mesa". O ingresso dá entrada no evento, não mesa. Se alguém disser que tem mesa nesses dias, não confirme: explique com gentileza que nesses dias não há reserva de mesas por causa da lotação e que vai encaminhar para a equipe conferir. Se a ferramenta Consultar reservas do cliente mostrar uma reserva dessa pessoa para um desses dias, não afirme que a mesa está garantida e também não diga que a reserva não existe: diga que a equipe vai entrar em contato para alinhar os detalhes daquele dia, sem prometer mesa, área ou horário.\nNunca afirmar disponibilidade sem confirmação oficial.')
 WHERE tenant_slug = 'iracema'
   AND conteudo NOT LIKE '%NUNCA diga ou sugira que a pessoa tem mesa garantida%';
 
