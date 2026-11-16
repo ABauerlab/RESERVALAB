@@ -1,5 +1,5 @@
 /** Dominio publico oficial. Canonical, Open Graph, sitemap e robots partem daqui. */
-export const SITE_URL = "https://teggly.com.br";
+export const SITE_URL = "https://teggly.bauerlab.com.br";
 
 /** Contatos oficiais do Teggly para o site e materiais publicos. Nao inventar outros. */
 export const EMAIL_CONTATO = "contato@teggly.com.br";

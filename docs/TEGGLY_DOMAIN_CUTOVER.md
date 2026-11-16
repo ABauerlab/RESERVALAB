@@ -1,5 +1,10 @@
 # Teggly: domínio teggly.com.br, auditoria e troca manual
 
+> **Atualização 16/11/2026: domínio provisório.** O `teggly.com.br` saiu do ar (pendência no Registro.br, prazo de 72 h). Enquanto isso o endereço oficial é **https://teggly.bauerlab.com.br** (site Hostinger `teggly.bauerlab.com.br`, deploy automático da branch `main`). Todos os caminhos continuam iguais (`/{slug}`, `/{slug}/admin`, `/{slug}/links`, `/{slug}/cardapio`, `/{slug}/acompanhar/{codigo}`, `/master`).
+> Trocados: `SITE_URL`, sitemap, robots, textos legais, AGENTS.md e doc do n8n; n8n (Atendimento WhatsApp, Atendimento Instagram, Confirmação de Reserva, Lembrete/Avisos de 7 e 2 dias); migration `20261116200000` para a base de conhecimento (`ia_base_conhecimento`).
+> Quando o `teggly.com.br` voltar: reverter `SITE_URL` e repetir a troca no sentido inverso (mesmos 4 workflows e a mesma migration, com os valores invertidos). O e-mail `contato@teggly.com.br` não foi alterado.
+
+
 Domínio oficial: **https://teggly.com.br**. O domínio antigo `reserva.bauerlab.com.br` **continua funcionando** até o dono fazer a troca. Nada foi alterado na Hostinger.
 
 ## 1. Auditoria do código

@@ -27,28 +27,28 @@ test.describe("Website", () => {
     await expect(page.locator("a[href*='bauerlab.com.br']")).toHaveCount(0);
   });
 
-  test("metadados publicos apontam para o dominio oficial teggly.com.br", async ({
+  test("metadados publicos apontam para o dominio oficial teggly.bauerlab.com.br", async ({
     page,
     request,
   }) => {
     await page.goto("/");
     await expect(page.locator("link[rel='canonical']")).toHaveAttribute(
       "href",
-      "https://teggly.com.br/",
+      "https://teggly.bauerlab.com.br/",
     );
     await expect(page.locator("meta[property='og:url']")).toHaveAttribute(
       "content",
-      "https://teggly.com.br/",
+      "https://teggly.bauerlab.com.br/",
     );
     await expect(page.locator("meta[property='og:image']")).toHaveAttribute(
       "content",
-      "https://teggly.com.br/og-image.png",
+      "https://teggly.bauerlab.com.br/og-image.png",
     );
     const robots = await (await request.get("/robots.txt")).text();
-    expect(robots).toContain("https://teggly.com.br/sitemap.xml");
+    expect(robots).toContain("https://teggly.bauerlab.com.br/sitemap.xml");
     expect(robots).not.toContain("bauerlab.com.br");
     const sitemap = await (await request.get("/sitemap.xml")).text();
-    expect(sitemap).toContain("https://teggly.com.br/");
+    expect(sitemap).toContain("https://teggly.bauerlab.com.br/");
     expect(sitemap).not.toContain("bauerlab.com.br");
   });
 

@@ -88,7 +88,7 @@ ou preço; em feriado com horário especial, não presumir o prato.
 
 ### Regras da casa
 
-- Cardápio: `https://teggly.com.br/iracema/cardapio`. Reservas: `https://teggly.com.br/iracema`.
+- Cardápio: `https://teggly.bauerlab.com.br/iracema/cardapio`. Reservas: `https://teggly.bauerlab.com.br/iracema`.
   Perguntar antes de enviar qualquer link. Nunca afirmar disponibilidade sem confirmação.
 - Espaços: Salão, Fundos, Corredor e Varanda; preferência não é garantia.
 - Grupos a partir de 15 pessoas: comanda individual; não confundir com evento particular.

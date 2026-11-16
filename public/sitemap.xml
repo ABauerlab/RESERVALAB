@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://teggly.com.br/</loc>
+    <loc>https://teggly.bauerlab.com.br/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://teggly.com.br/planos</loc>
+    <loc>https://teggly.bauerlab.com.br/planos</loc>
   </url>
   <url>
-    <loc>https://teggly.com.br/privacidade</loc>
+    <loc>https://teggly.bauerlab.com.br/privacidade</loc>
   </url>
   <url>
-    <loc>https://teggly.com.br/termos</loc>
+    <loc>https://teggly.bauerlab.com.br/termos</loc>
   </url>
 </urlset>

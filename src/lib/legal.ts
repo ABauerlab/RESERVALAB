@@ -14,7 +14,7 @@ export const PRIVACIDADE: Secao[] = [
   {
     titulo: "1. Quem somos e a quem este aviso se aplica",
     paragrafos: [
-      "O Teggly é uma plataforma de reservas e atendimento para restaurantes e bares, com página de reserva, cardápio digital, Link Hub, clientes e automações de WhatsApp. Este aviso explica como tratamos dados pessoais no site teggly.com.br, na página do guia gratuito e no painel do Teggly.",
+      "O Teggly é uma plataforma de reservas e atendimento para restaurantes e bares, com página de reserva, cardápio digital, Link Hub, clientes e automações de WhatsApp. Este aviso explica como tratamos dados pessoais no site teggly.bauerlab.com.br, na página do guia gratuito e no painel do Teggly.",
       `Contato para qualquer assunto de privacidade: ${EMAIL_CONTATO}.`,
     ],
   },
@@ -135,7 +135,7 @@ export const TERMOS: Secao[] = [
   {
     titulo: "4. Planos e recursos",
     paragrafos: [
-      "Os recursos, limites e preços de cada plano são os publicados em teggly.com.br/planos. O Cardápio Digital e o Link Hub estão em todos os planos, inclusive no Gratuito, que também inclui a página pública de reserva até o limite de reservas por mês informado. Recursos como confirmação e lembrete por WhatsApp, relatórios e assistente dependem do plano contratado. Os valores podem ser ajustados, e o ajuste não afeta o período já pago.",
+      "Os recursos, limites e preços de cada plano são os publicados em teggly.bauerlab.com.br/planos. O Cardápio Digital e o Link Hub estão em todos os planos, inclusive no Gratuito, que também inclui a página pública de reserva até o limite de reservas por mês informado. Recursos como confirmação e lembrete por WhatsApp, relatórios e assistente dependem do plano contratado. Os valores podem ser ajustados, e o ajuste não afeta o período já pago.",
     ],
   },
   {

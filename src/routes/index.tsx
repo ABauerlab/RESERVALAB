@@ -180,7 +180,7 @@ const faq = [
   },
   {
     q: "Como começo?",
-    a: "Escolha o plano em teggly.com.br/planos. Hoje a ativação é feita pelo nosso time, que cadastra o seu restaurante e libera o acesso. O painel leva você pelos primeiros passos.",
+    a: "Escolha o plano em teggly.bauerlab.com.br/planos. Hoje a ativação é feita pelo nosso time, que cadastra o seu restaurante e libera o acesso. O painel leva você pelos primeiros passos.",
   },
 ];
 

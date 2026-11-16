@@ -21,8 +21,8 @@ describe("montarOg", () => {
     );
     expect(get(m, "og:image")).toBe(og!.imagem);
     expect(get(m, "og:image:height")).toBe("400");
-    expect(get(m, "og:url")).toBe("https://teggly.com.br/iracema/links");
-    expect(m.links).toEqual([{ rel: "canonical", href: "https://teggly.com.br/iracema/links" }]);
+    expect(get(m, "og:url")).toBe("https://teggly.bauerlab.com.br/iracema/links");
+    expect(m.links).toEqual([{ rel: "canonical", href: "https://teggly.bauerlab.com.br/iracema/links" }]);
   });
   it("Cardapio e reserva tem titulo e frase proprios", () => {
     expect(get(montarOg("iracema", "cardapio", og), "og:title")).toBe("Cardápio | Iracema");
@@ -30,14 +30,14 @@ describe("montarOg", () => {
       "Veja o cardápio do Iracema e reserve sua mesa.",
     );
     expect(get(montarOg("iracema", "", og), "og:title")).toBe("Reservar mesa | Iracema");
-    expect(get(montarOg("iracema", "", og), "og:url")).toBe("https://teggly.com.br/iracema");
+    expect(get(montarOg("iracema", "", og), "og:url")).toBe("https://teggly.bauerlab.com.br/iracema");
   });
   it("sem imagem da casa, usa a imagem padrao; sem dados, so a URL", () => {
     expect(get(montarOg("a", "links", { ...og!, imagem: null }), "og:image")).toBe(
-      "https://teggly.com.br/og-image.png",
+      "https://teggly.bauerlab.com.br/og-image.png",
     );
     const vazio = montarOg("a", "links", null);
-    expect(vazio.meta).toEqual([{ property: "og:url", content: "https://teggly.com.br/a/links" }]);
+    expect(vazio.meta).toEqual([{ property: "og:url", content: "https://teggly.bauerlab.com.br/a/links" }]);
   });
   it("frase longa e cortada", () => {
     const m = montarOg("a", "links", { ...og!, selo: null, descricao: "x".repeat(400) });
