@@ -130,14 +130,21 @@ eventos especiais" citam a exceção. Depois de 14/11/2026 esse bloco pode ser r
 
 Sexta 20/11/2026 (feriado, atualizado em 04/11/2026): Roda da Boua. Condição especial de
 aniversariante: aniversariante off; +10 nomes na lista amiga, off até as 15:30h; +2 Xeque-Mates
-para o aniversariante; 20% de desconto na compra de ingresso para os demais convidados (cupom próprio pedido no
-Instagram do evento). A Iracema não inventa horário de início, atração, preço de ingresso nem line-up. Depois de
+para o aniversariante; 20% de desconto na compra de ingresso para os demais convidados (cupom próprio, pedido pelo
+WhatsApp: a Iracema avisa o dono e ele cria e envia o cupom). A Iracema não inventa horário de início, atração, preço de ingresso nem line-up. Depois de
 20/11/2026 esse bloco sai da base.
 
 Sábado 28/11/2026: Pagode do Sonic, só com ingresso e sem reservas (início 16h). Condição especial
 de aniversariante: aniversariante off; +10 nomes na lista amiga, off até as 17:30h; +2 Xeque-Mates
 para o aniversariante; 20% de desconto na compra de ingresso para os demais convidados (cupom
-próprio pedido no Instagram do evento). Depois de 28/11/2026 esse bloco sai da base.
+próprio pedido pelo WhatsApp: o dono cria e envia). Depois de 28/11/2026 esse bloco sai da base.
+
+Cupom de aniversariante (16/11/2026): os workflows de WhatsApp e Instagram têm a ferramenta
+`Avisar dono: cupom de aniversariante` (HTTP Request Tool, Evolution `sendText` para 5531998021169,
+credencial `Header Auth account`). A Iracema chama 1 vez por aniversariante da Roda da Boua (20/11) ou do
+Pagode do Sonic (28/11) que preencheu a lista amiga; o dono cria o cupom de 20% e envia à pessoa.
+A regra de quando chamar está nos blocos de evento da base. Links de formulário ficam sempre no fim da
+linha, sem `)` nem `.` colados (migration `20261116220000_*.sql`).
 
 Nota (11/11/2026): o texto da base não vive no n8n, e sim na tabela `ia_base_conhecimento`
 (`tenant_slug = 'iracema'`), lida pela função `base_conhecimento_do_tenant`. Alterações de conteúdo
