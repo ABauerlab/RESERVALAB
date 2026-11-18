@@ -37,6 +37,11 @@ reserva rodam no n8n e usam funções do banco (migrations em
   (Brasília). Cada aviso tem coluna própria (`aviso_confirmacao_7d_enviado`,
   `aviso_confirmacao_2d_enviado`). Colunas novas de controle entram como
   `true` nas reservas existentes para não disparar mensagens retroativas.
-- Links oficiais: reservas `https://teggly.com.br/{slug}`, cardápio
-  `https://teggly.com.br/{slug}/cardapio`, acompanhar
-  `https://teggly.com.br/{slug}/acompanhar/{codigo}`.
+- Links oficiais: reservas `{dominio}/{slug}`, cardápio `{dominio}/{slug}/cardapio`, acompanhar
+  `{dominio}/{slug}/acompanhar/{codigo}`, hub de links `{dominio}/{slug}/links` (o Linktree não é
+  mais usado). `{dominio}` é `ia_agente_config.dominio_publico`: hoje
+  `https://teggly.bauerlab.com.br`, voltará a `https://teggly.com.br`; trocar só lá.
+- Horário-limite de reserva vem do cadastro (`tenants`) pelo bloco "DADOS AO VIVO DO TEGGLY" da
+  base. Nunca escrever horário-limite como texto fixo na base.
+- Botão de pausa da IA (geral e por conversa) está no Teggly; qualquer nó novo que responda
+  cliente precisa passar pelo gate `ia_whatsapp_deve_responder`.

@@ -26,12 +26,29 @@ repetir, para restaurar em minutos.
 
 - O agente **Dona Iracema (Agente)** tem estas ferramentas ligadas (`ai_tool`):
   Base de conhecimento do Iracema, Consultar reservas do cliente, Confirmar reserva (sistema),
-  Cancelar reserva (sistema), Consultar agenda (bloqueios e lotacao) e
-  **Consultar eventos em destaque**.
+  Cancelar reserva (sistema), **Alterar reserva (sistema)**, Consultar agenda (bloqueios e
+  lotacao), **Consultar eventos em destaque**, Avisar dono: cupom de aniversariante e
+  **Avisar equipe (pedido que o sistema nao resolve)**.
+- Entre "É mensagem válida?" e "Pedido claro de cancelamento?" existe a cadeia do Teggly:
+  Registrar mensagem (buffer) → IA ligada e mensagem nova? → Aguarda agrupar mensagens (6 s) →
+  Coletar mensagens agrupadas → Sou a ultima mensagem? → Mensagem agrupada. Ela faz duas coisas:
+  respeita o botão de **ligar/desligar a IA** do painel (geral ou por conversa) e junta mensagens
+  seguidas da mesma pessoa em **uma** resposta (antes cada mensagem disparava uma execução e uma
+  resposta, e elas se repetiam). O texto do agente vem de `$('Mensagem agrupada')`.
 - Base de conhecimento, seção 20: todo sábado tem música ao vivo a partir das 13h30, casa abre
   às 12h e funciona até 19h (desde 29/10/2026), e a escalação de cada sábado fica no Instagram `@iracemabh`.
-- Base de conhecimento, seção 5: aos sábados as reservas são aceitas até 17h30 (coluna
-  `tenants.horario_limite_sabado`, desde 29/10/2026); a Iracema não cita limite de outros dias.
+- Horário-limite de reserva **não é mais texto fixo na base** (18/11/2026): a seção 5 manda usar o
+  bloco `DADOS AO VIVO DO TEGGLY`, que `base_conhecimento_final()` anexa ao fim da base lendo
+  `tenants.horario_limite_semana`, `horario_limite_sabado`, `horario_limite_fim_semana` e os
+  feriados. Mudou o horário no painel, a Iracema já responde certo. Nunca escrever horário-limite
+  na base.
+- Almoço de sábado e domingo: 12h às 15h, exceto em dias de evento ou com a casa fechada.
+- Linktree **não é mais usado**: delivery e links vão pelo link hub `/iracema/links`.
+- O nó "Carregar base de conhecimento" chama `base_conhecimento_final('iracema')` e devolve também
+  `dominio` (`ia_agente_config.dominio_publico`). Todos os links teggly da base e o link de
+  acompanhamento do prompt usam esse domínio. Hoje é `https://teggly.bauerlab.com.br`; para voltar
+  a `https://teggly.com.br` basta `UPDATE ia_agente_config SET dominio_publico = ... WHERE
+  tenant_slug = 'iracema'`, sem editar o workflow.
 - Base de conhecimento não contém evento com data fixa já vencida (ex.: Baticum de 11/10/2026).
   Eventos com data vêm da ferramenta, não do texto. Exceção deliberada: a seção 23 traz datas
   específicas (14/11/2026 e Roda da Boua em 20/11/2026) a pedido da equipe. Cada bloco tem a
@@ -73,7 +90,7 @@ Conteúdo do nó **Base de conhecimento do Iracema** (`toolCode`, retorna o text
   coração de Santa Tereza. Conceito: comida, encontros e história no Santa Tereza.
 - Endereço: Rua Almandina, 56, Santa Tereza, Belo Horizonte - MG, CEP 31010-080.
 - Horário: segunda a sexta 11h às 15h; sábado 12h às 19h (com música ao vivo a partir das 13h30);
-  domingo 12h às 17h. Almoço de sábado e domingo: 12h às 15h. Sujeito a alteração por eventos e feriados
+  domingo 12h às 17h. Almoço de sábado e domingo: 12h às 15h, exceto em dia de evento ou casa fechada. Sujeito a alteração por eventos e feriados
   (seção 23).
 
 ### Pratos da semana
@@ -103,7 +120,7 @@ ou preço; em feriado com horário especial, não presumir o prato.
 - Pagamento: VR, débito e crédito; comanda individual. Couvert R$ 10,00, opcional.
 - Vegetariano e vegano: há opções; proteína vegana informada é a linguiça de cogumelos defumada
   da Cogumelado.
-- Delivery: iFood e 99Food, reunidos em `https://linktr.ee/iracemabh`.
+- Delivery: iFood e 99Food, reunidos no link hub `/iracema/links` (Linktree aposentado em 18/11/2026).
 - Artistas: formulário `https://forms.gle/ZWDVHa6W7NeTx5Dr8`; a equipe responde se houver interesse.
 
 ### Seção 20: música e agenda
@@ -124,7 +141,7 @@ equipe; sem registro, não inventar.
 Sábado 14/11/2026 (atualizado em 29/10/2026): casamento às 16h, sem reservas (agenda já bloqueada
 no sistema) e sem almoço no salão: o almoço desse dia é somente por delivery (iFood e 99Food), das
 12h às 15h. A casa não recebe clientes para sentar, com ou sem reserva. Iracema explica isso com
-gentileza, oferece o Linktree (perguntando antes), não envia link de reserva para essa data, não
+gentileza, oferece o link hub (perguntando antes), não envia link de reserva para essa data, não
 fala de detalhes do casamento nem de música ao vivo nesse dia. A seção 20 e a seção "Atrações e
 eventos especiais" citam a exceção. Depois de 14/11/2026 esse bloco pode ser removido da base.
 
@@ -164,3 +181,27 @@ eventos.
 Aplicado em produção em 12/11/2026. Existem 2 reservas confirmadas de aniversário em 20/11 (criadas
 antes do bloqueio da agenda); por isso a regra manda o agente nem negar nem garantir mesa quando a
 consulta mostrar reserva nesses dias, e passar para a equipe.
+
+## Teggly manda na Iracema (18/11/2026)
+
+Migration `supabase/migrations/20261118200000_*.sql`.
+
+- **Liga/desliga a IA**: tabelas `ia_agente_config` (geral) e `ia_conversa_pausa` (por telefone,
+  chave = últimos 8 dígitos). Painel: Configurações > Atendente de WhatsApp e tela Clientes (chave
+  geral e botão por cliente). Desligada, ela não responde nada, nem confirmação ou cancelamento por
+  mensagem; avisos automáticos do sistema continuam. Funções: `ia_whatsapp_estado`,
+  `ia_whatsapp_definir_global`, `ia_whatsapp_definir_conversa` (painel) e
+  `ia_whatsapp_deve_responder` (n8n).
+- **Agrupar mensagens**: `ia_msg_buffer`, `ia_buffer_add` e `ia_buffer_coletar`. Só a execução da
+  mensagem mais recente do telefone responde, levando todas juntas. Webhook duplicado (mesmo
+  `key.id`) é descartado.
+- **Alterar reserva pela Iracema**: `agente_alterar_reserva(slug, telefone, codigo, data, horario,
+  quantidade, area, observacoes)`. O telefone vem do WhatsApp (só altera reserva do próprio
+  número), com as mesmas regras do site (limite de horário, agenda bloqueada, lotação). Evento,
+  casamento e grupo acima de 30 pessoas devolvem `PRECISA_EQUIPE`, e a Iracema chama "Avisar equipe".
+  Ao mudar a data, os avisos e lembretes automáticos da reserva são reiniciados. O gatilho
+  `notificar_mudanca_reserva` continua avisando o dono.
+- Repetição de resposta: causa era uma execução por mensagem em paralelo (5 mensagens em 33 s
+  geraram 5 respostas, todas com o contato da Simone e a mesma pergunta). Resolvida pelo buffer.
+- Não dá para detectar "um humano respondeu no WhatsApp" pelo webhook: mensagens enviadas pela API
+  também chegam com `fromMe` e `source: web`. Por isso a pausa é manual.

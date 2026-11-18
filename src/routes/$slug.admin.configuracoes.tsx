@@ -1,4 +1,5 @@
 import { AjudaSecao } from "@/components/admin/AjudaSecao";
+import { IaWhatsappCard } from "@/components/admin/IaWhatsapp";
 import { MarcaOptIn } from "@/components/admin/MarcaOptIn";
 import { PlanoSecao } from "@/components/admin/PlanoSecao";
 import { pwaHeadLinks } from "@/lib/pwa-manifest";
@@ -583,6 +584,26 @@ function ConfiguracoesPage() {
                   tenantId={tenant?.id ?? null}
                   tenantNome={tenant?.nome ?? ""}
                 />
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem
+              value="ia-whatsapp"
+              id="ia-whatsapp"
+              className="rounded-xl border border-border bg-card px-5"
+            >
+              <AccordionTrigger className="py-4 hover:no-underline">
+                <span>
+                  <span className="block text-base font-semibold text-foreground">
+                    Atendente de WhatsApp
+                  </span>
+                  <span className="mt-0.5 block text-sm font-normal text-muted-foreground">
+                    Ligar, desligar ou pausar uma conversa.
+                  </span>
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-5">
+                <IaWhatsappCard slug={slug} />
               </AccordionContent>
             </AccordionItem>
 
