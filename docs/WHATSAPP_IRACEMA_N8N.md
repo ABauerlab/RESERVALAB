@@ -50,6 +50,24 @@ repetir, para restaurar em minutos.
 - `REGRA DE SAUDACAO` no texto do agente (não repetir saudação na mesma conversa).
 - Nós que dependem do telefone usam `$('Extrair mensagem').first().json.telefone`.
 
+## Uso real de tokens (18/11/2026)
+
+O nó de modelo do Gemini no n8n não expõe `usageMetadata` dentro do fluxo (`$('Gemini ...')` falha
+com "No data found from main input") e o `tokenUsage` guardado na execução só traz tokens de
+entrada e saída, **sem tokens de cache**. Por isso o registro é feito por fora, pelo workflow
+**IA | Coletor de uso real de tokens (Iracema e Sony)** (id `JXg2DDyrfmC4m03j`):
+
+- Agenda a cada 20 min, lê as últimas 60 execuções de Iracema WhatsApp, Iracema Instagram e Sony
+  pela API do n8n (`includeData=true`, precisa da credencial `n8nApi`) e grava em n8n Data Table
+  `ia_uso_tokens` (id `9PHxDAoplRL4J2xR`), com upsert pela coluna `chave` (`execucao|modelo`).
+- Colunas: tokens de entrada e saída reais por modelo, `chamadas`, `audios_groq` e
+  `custo_brl_estimado` (preços em R$ por 1M de tokens, US$ x 5,5, os mesmos de
+  `agente_config.precos_modelo` do GBH).
+- `tokens_cache` só é preenchido nas chamadas HTTP diretas ao Gemini (mídia da Sony). Nas chamadas
+  do agente fica `null`: o n8n não entrega esse dado.
+- Se um nó de modelo ou de mídia for renomeado (`Analisar midia (Gemini)`, `Transcrever (Groq ...)`),
+  ajustar o código do nó `Extrair uso real`.
+
 ## Ferramenta "Consultar eventos em destaque"
 
 Nó `n8n-nodes-base.postgresTool` (typeVersion 2.7), credencial `Postgres account`
