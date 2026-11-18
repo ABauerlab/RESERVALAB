@@ -25,9 +25,19 @@ repetir, para restaurar em minutos.
 ## Invariantes (conferir após qualquer edição)
 
 - O agente **Dona Iracema (Agente)** tem estas ferramentas ligadas (`ai_tool`):
-  Base de conhecimento do Iracema, Consultar reservas do cliente, Confirmar reserva (sistema),
-  Cancelar reserva (sistema), Consultar agenda (bloqueios e lotacao) e
-  **Consultar eventos em destaque**.
+  Consultar reservas do cliente, Confirmar reserva (sistema), Cancelar reserva (sistema),
+  Consultar agenda (bloqueios e lotacao), **Consultar eventos em destaque** e Avisar dono: cupom
+  de aniversariante. **Não existe mais a tool "Base de conhecimento do Iracema"** (18/11/2026).
+- **Base de conhecimento no system prompt (18/11/2026):** o nó `Carregar base de conhecimento`
+  (`n8n-nodes-base.postgres` 2.7, `SELECT public.base_conhecimento_do_tenant('iracema') AS base`,
+  `executeOnce`, `onError: continueRegularOutput`, `alwaysOutputData`) fica entre
+  `Aguarda (natural)` e `Dona Iracema (Agente)`. O `systemMessage` do agente é uma expressão
+  (começa com `=`) e termina com a seção `# BASE DE CONHECIMENTO DO IRACEMA` seguida de
+  `{{ $('Carregar base de conhecimento').first().json.base || '...' }}`. Se esse nó for removido
+  ou renomeado, o agente fica sem dados da casa.
+- Modelo do agente WhatsApp: `models/gemini-3.5-flash-lite`; memória Postgres
+  (`n8n_chat_histories_iracema`) com `contextWindowLength` 10. Instagram:
+  `models/gemini-3.1-flash-lite`, memória 10. A família `gemini-2.5` retorna 404 na nossa chave.
 - Base de conhecimento, seção 20: todo sábado tem música ao vivo a partir das 13h30, casa abre
   às 12h e funciona até 19h (desde 29/10/2026), e a escalação de cada sábado fica no Instagram `@iracemabh`.
 - Base de conhecimento, seção 5: aos sábados as reservas são aceitas até 17h30 (coluna
@@ -65,7 +75,8 @@ A função `eventos_em_destaque_do_tenant` está em
 
 ## Base de conhecimento (cópia de referência em 26/10/2026)
 
-Conteúdo do nó **Base de conhecimento do Iracema** (`toolCode`, retorna o texto abaixo).
+Conteúdo da base de conhecimento (hoje lida do banco pelo nó `Carregar base de conhecimento` e
+embutida no system prompt; antes era a tool **Base de conhecimento do Iracema**).
 
 ### Identidade e dados permanentes
 
