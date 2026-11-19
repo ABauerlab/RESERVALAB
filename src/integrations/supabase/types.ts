@@ -573,6 +573,12 @@ export type Database = {
         };
         Returns: string;
       };
+      ia_whatsapp_estado: { Args: { _slug: string }; Returns: Json };
+      ia_whatsapp_definir_global: { Args: { _ativo: boolean; _slug: string }; Returns: Json };
+      ia_whatsapp_definir_conversa: {
+        Args: { _horas?: number; _pausado: boolean; _slug: string; _telefone: string };
+        Returns: Json;
+      };
       get_my_tenant_id: { Args: never; Returns: string };
       get_reserva_by_codigo: {
         Args: { _codigo: string };

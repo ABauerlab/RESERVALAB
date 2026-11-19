@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Download, Loader2, Search, Users } from "lucide-react";
 
 import { IconeWhatsApp } from "@/components/brand/BrandIcons";
+import { IaPausaBotao, IaWhatsappFaixa } from "@/components/admin/IaWhatsapp";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useTenantAdmin } from "@/hooks/use-tenant-admin";
@@ -173,6 +174,8 @@ function ContatosPage() {
           </div>
         </div>
 
+        <IaWhatsappFaixa slug={slug} />
+
         <div className="mt-4 flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-4">
           <div className="flex min-w-0 items-center gap-2.5">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-cream text-brand">
@@ -241,7 +244,10 @@ function ContatosPage() {
                         <p className="break-words font-medium">{c.nome}</p>
                         <p className="text-sm text-muted-foreground">{c.telefone}</p>
                       </div>
-                      <WhatsLink c={c} />
+                      <span className="flex shrink-0">
+                        <IaPausaBotao slug={slug} telefone={c.telefoneWhatsapp} nome={c.nome} />
+                        <WhatsLink c={c} />
+                      </span>
                     </div>
                     <p className="mt-1 text-xs text-muted-foreground">
                       {c.reservas} {c.reservas === 1 ? "reserva" : "reservas"} · última{" "}
@@ -284,7 +290,10 @@ function ContatosPage() {
                           {STATUS_LABEL[c.ultimoStatus]}
                         </td>
                         <td className="px-4 py-1.5 text-right">
-                          <WhatsLink c={c} />
+                          <span className="inline-flex">
+                            <IaPausaBotao slug={slug} telefone={c.telefoneWhatsapp} nome={c.nome} />
+                            <WhatsLink c={c} />
+                          </span>
                         </td>
                       </tr>
                     ))}
