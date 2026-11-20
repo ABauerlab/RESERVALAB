@@ -43,6 +43,11 @@ repetir, para restaurar em minutos.
   feriados. Mudou o horário no painel, a Iracema já responde certo. Nunca escrever horário-limite
   na base.
 - Almoço de sábado e domingo: 12h às 15h, exceto em dias de evento ou com a casa fechada.
+- **Sem almoço em 20/11/2026 (Roda da Boua) e 28/11/2026 (Pagode do Sonic)** (20/11/2026): a casa
+  abre só para o evento, sem almoço nem funcionamento comum, mesmo sendo sexta e sábado. A regra
+  está na seção 5 e nos blocos de 20/11 e 28/11 da seção 23 (migration
+  `20261120120000_b7e3a1c5-9d24-4f68-8a0e-3c5d7f9b1e26.sql`). Ao remover esses blocos depois dos
+  eventos, remover também a frase da seção 5.
 - Linktree **não é mais usado**: delivery e links vão pelo link hub `/iracema/links`.
 - O nó "Carregar base de conhecimento" chama `base_conhecimento_final('iracema')` e devolve também
   `dominio` (`ia_agente_config.dominio_publico`). Todos os links teggly da base e o link de
