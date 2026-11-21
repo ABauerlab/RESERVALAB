@@ -43,11 +43,16 @@ repetir, para restaurar em minutos.
   feriados. Mudou o horário no painel, a Iracema já responde certo. Nunca escrever horário-limite
   na base.
 - Almoço de sábado e domingo: 12h às 15h, exceto em dias de evento ou com a casa fechada.
+- **Sem almoço em 20/11/2026 (Roda da Boua) e 28/11/2026 (Pagode do Sonic)** (20/11/2026): a casa
+  abre só para o evento, sem almoço nem funcionamento comum, mesmo sendo sexta e sábado. A regra
+  está na seção 5 e nos blocos de 20/11 e 28/11 da seção 23 (migration
+  `20261120120000_b7e3a1c5-9d24-4f68-8a0e-3c5d7f9b1e26.sql`). Ao remover esses blocos depois dos
+  eventos, remover também a frase da seção 5.
 - Linktree **não é mais usado**: delivery e links vão pelo link hub `/iracema/links`.
 - O nó "Carregar base de conhecimento" chama `base_conhecimento_final('iracema')` e devolve também
   `dominio` (`ia_agente_config.dominio_publico`). Todos os links teggly da base e o link de
-  acompanhamento do prompt usam esse domínio. Hoje é `https://teggly.bauerlab.com.br`; para voltar
-  a `https://teggly.com.br` basta `UPDATE ia_agente_config SET dominio_publico = ... WHERE
+  acompanhamento do prompt usam esse domínio. Desde 21/11/2026 é `https://teggly.com.br`; para trocar de novo
+  basta `UPDATE ia_agente_config SET dominio_publico = ... WHERE
   tenant_slug = 'iracema'`, sem editar o workflow.
 - Base de conhecimento não contém evento com data fixa já vencida (ex.: Baticum de 11/10/2026).
   Eventos com data vêm da ferramenta, não do texto. Exceção deliberada: a seção 23 traz datas
@@ -205,3 +210,15 @@ Migration `supabase/migrations/20261118200000_*.sql`.
   geraram 5 respostas, todas com o contato da Simone e a mesma pergunta). Resolvida pelo buffer.
 - Não dá para detectar "um humano respondeu no WhatsApp" pelo webhook: mensagens enviadas pela API
   também chegam com `fromMe` e `source: web`. Por isso a pausa é manual.
+
+## Correções de 21/11/2026
+
+- **Lembrete de 24h dizia "amanhã" para reserva de hoje.** O texto tinha "amanhã" fixo e a consulta
+  traz reservas das próximas 24h (inclui hoje). Agora "Montar mensagem" e "Montar aviso 2 dias"
+  calculam hoje/amanhã/data por `$now.setZone('America/Sao_Paulo')`. Nunca escrever "amanhã" fixo.
+- O bloco `DADOS AO VIVO DO TEGGLY` traz `HOJE é dd/mm/aaaa e AMANHÃ é ...` (Brasília) e os feriados
+  usam a data de Brasília (antes `current_date` em UTC).
+- Domínio voltou para `https://teggly.com.br`: `ia_agente_config`, base, aviso de 7 dias,
+  confirmação (nó "Dominio oficial (teggly.com.br)") e prompt do Instagram.
+- Liga/desliga da IA testado no banco: desligada não grava nem responde; ao religar, a próxima
+  mensagem é gravada e coletada normalmente (`ia_buffer_add` + `ia_buffer_coletar`).
