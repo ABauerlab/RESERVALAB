@@ -51,8 +51,8 @@ repetir, para restaurar em minutos.
 - Linktree **não é mais usado**: delivery e links vão pelo link hub `/iracema/links`.
 - O nó "Carregar base de conhecimento" chama `base_conhecimento_final('iracema')` e devolve também
   `dominio` (`ia_agente_config.dominio_publico`). Todos os links teggly da base e o link de
-  acompanhamento do prompt usam esse domínio. Hoje é `https://teggly.bauerlab.com.br`; para voltar
-  a `https://teggly.com.br` basta `UPDATE ia_agente_config SET dominio_publico = ... WHERE
+  acompanhamento do prompt usam esse domínio. Desde 21/11/2026 é `https://teggly.com.br`; para trocar de novo
+  basta `UPDATE ia_agente_config SET dominio_publico = ... WHERE
   tenant_slug = 'iracema'`, sem editar o workflow.
 - Base de conhecimento não contém evento com data fixa já vencida (ex.: Baticum de 11/10/2026).
   Eventos com data vêm da ferramenta, não do texto. Exceção deliberada: a seção 23 traz datas
@@ -210,3 +210,15 @@ Migration `supabase/migrations/20261118200000_*.sql`.
   geraram 5 respostas, todas com o contato da Simone e a mesma pergunta). Resolvida pelo buffer.
 - Não dá para detectar "um humano respondeu no WhatsApp" pelo webhook: mensagens enviadas pela API
   também chegam com `fromMe` e `source: web`. Por isso a pausa é manual.
+
+## Correções de 21/11/2026
+
+- **Lembrete de 24h dizia "amanhã" para reserva de hoje.** O texto tinha "amanhã" fixo e a consulta
+  traz reservas das próximas 24h (inclui hoje). Agora "Montar mensagem" e "Montar aviso 2 dias"
+  calculam hoje/amanhã/data por `$now.setZone('America/Sao_Paulo')`. Nunca escrever "amanhã" fixo.
+- O bloco `DADOS AO VIVO DO TEGGLY` traz `HOJE é dd/mm/aaaa e AMANHÃ é ...` (Brasília) e os feriados
+  usam a data de Brasília (antes `current_date` em UTC).
+- Domínio voltou para `https://teggly.com.br`: `ia_agente_config`, base, aviso de 7 dias,
+  confirmação (nó "Dominio oficial (teggly.com.br)") e prompt do Instagram.
+- Liga/desliga da IA testado no banco: desligada não grava nem responde; ao religar, a próxima
+  mensagem é gravada e coletada normalmente (`ia_buffer_add` + `ia_buffer_coletar`).
