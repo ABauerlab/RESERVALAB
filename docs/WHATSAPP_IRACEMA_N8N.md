@@ -116,9 +116,13 @@ ou preço; em feriado com horário especial, não presumir o prato.
 - Grupos a partir de 15 pessoas: comanda individual; não confundir com evento particular.
 - Aniversário: aniversariante da semana ganha 1 drink ou 1 sobremesa; 10% da comanda vira
   cashback; pode levar bolo.
-- Eventos particulares: mínimo 50, máximo 180 pessoas, 5 horas; pacotes de R$ 110, 160, 180 e
-  200 por pessoa; couvert artístico de banda R$ 10/pessoa quando aplicável; pagamento 50% na
-  reserva e 50% no dia. Grandes eventos: Simone, +55 31 98801-0243 (não passar para reserva comum).
+- Eventos particulares: mínimo 50, máximo 180 pessoas, 5 horas; petiscos (carne de panela com
+  pãozinho, bolinho de linguiça, chips de jiló, batata frita, harumaki de carne de panela) e
+  bebidas (água mineral, água gasosa, Eisenbahn, Guaraná, Coca-Cola normal/zero); pacotes de
+  R$ 110, 160, 180 e 200 por pessoa; couvert artístico de banda R$ 10/pessoa quando aplicável;
+  pagamento 50% na reserva e 50% no dia. Mínimo de 50 pessoas não é negociável pela IA (atualizado
+  em 25/11/2026, removido o item "coxinha de moranga com rabada" dos petiscos). Grandes eventos:
+  Simone, +55 31 98801-0243 (não passar para reserva comum).
 - Pets: bem-vindos na varanda ou no fim do corredor (não garantir). Crianças: espaço na varanda.
   Casa acessível. Mesas externas existem (sem garantia). Wi-Fi disponível.
 - Estacionamento: sem próprio, vagas na rua em frente (não garantir).
@@ -210,6 +214,50 @@ Migration `supabase/migrations/20261118200000_*.sql`.
   geraram 5 respostas, todas com o contato da Simone e a mesma pergunta). Resolvida pelo buffer.
 - Não dá para detectar "um humano respondeu no WhatsApp" pelo webhook: mensagens enviadas pela API
   também chegam com `fromMe` e `source: web`. Por isso a pausa é manual.
+
+## Auditoria e correções de 25/11/2026
+
+- **Brecha fechada: reserva grande fora do horário sem revisão da equipe.** Um cliente
+  conseguiu reservar mesa (não evento) para 70 pessoas fora do horário de funcionamento e a
+  própria Dona Iracema confirmou pelo WhatsApp sem nenhuma revisão humana. A causa era
+  `criar_reserva`: o corte de horário só valia para `quantidade <= 30`. Agora qualquer reserva
+  (mesa, aniversário etc., não só evento) com **mais de 30 pessoas fora do horário normal do
+  dia** continua sendo aceita (para não perder o cliente), mas entra como `tipo_evento =
+  'Evento - A negociar'` e `reservas.confirmacao_manual_necessaria = true`.
+  `confirmar_reserva_por_codigo` (usada pelo cliente e pela IA) passa a rejeitar a confirmação
+  dessa reserva com o erro `RESERVA_PRECISA_CONFIRMACAO_MANUAL_DA_EQUIPE` — só a equipe confirma,
+  direto no Teggly (update de status ali não passa por essa função, continua liberado).
+  Migration `supabase/migrations/20261125120000_*.sql`.
+- **Horários especiais por data** (`public.horarios_especiais`): nova tabela reaproveitável
+  para substituir o horário-limite normal numa data específica. Primeiro uso: quarta-feira
+  23/12/2026, funcionamento estendido até as 18h (último dia antes da pausa entre Natal e
+  Réveillon). `criar_reserva`, `agente_alterar_reserva` e o bloco `DADOS AO VIVO DO TEGGLY`
+  (`ia_contexto_ao_vivo`) já leem essa tabela.
+- **Base de conhecimento (seção 9, eventos particulares):** removido o item "coxinha de
+  moranga com rabada" dos petiscos (lista oficial atual não o inclui) e reforçada a regra de
+  nunca aceitar evento particular com menos de 50 pessoas, com orientação de fechamento de
+  vendas. Seção 23 ganhou o bloco da quarta-feira 23/12/2026 (horário estendido + aviso de
+  pausa entre Natal e Réveillon, sem data de reabertura cadastrada).
+- **Agente mais autônomo, menos avisos à equipe.** O prompt (`systemMessage` do nó **Dona
+  Iracema (Agente)**) não documentava as ferramentas `Alterar reserva (sistema)`, `Consultar
+  eventos em destaque` e `Avisar equipe (pedido que o sistema nao resolve)` — o agente escalava
+  por precaução em vez de resolver sozinho. Agora o prompt cobre as 8 ferramentas ligadas ao
+  agente, deixa explícito que `Avisar equipe` é só para os casos que as outras ferramentas não
+  resolvem (evento/casamento/>30 pessoas, reclamação que precisa de decisão humana, reserva
+  "Evento - A negociar"), e adiciona uma seção de fechamento/vendas (conduzir até o fechamento,
+  nunca contradizer o mínimo/máximo de evento particular).
+- **Novo workflow separado: "Iracema - Grupo de reservas (WhatsApp)"**
+  (`https://n8n.bauerlab.com.br/workflow/eHpDcrwZnHeWs92I`, id `eHpDcrwZnHeWs92I`). A cada
+  minuto, lê `public.notificacoes_grupo_reservas` (fila alimentada pelo trigger
+  `trg_notificar_grupo_reservas` em `public.reservas`, migration
+  `supabase/migrations/20261125121000_*.sql`) e manda para o grupo
+  `120363042936295967@g.us` duas mensagens: o resumo da mudança (nova reserva confirmada,
+  cancelamento de reserva confirmada, ou alteração de reserva confirmada) e a lista completa de
+  reservas confirmadas atualizadas (`public.lista_reservas_confirmadas_grupo`). Reserva que
+  nunca foi confirmada não gera aviso. **Esse workflow está criado como rascunho, inativo** —
+  não foi publicado nem testado, porque o grupo tem os sócios e a regra do projeto proíbe teste
+  nesse grupo. Antes de publicar: revisar o texto das duas mensagens e confirmar a formatação da
+  lista com a equipe, depois usar `publish_workflow`.
 
 ## Correções de 21/11/2026
 
