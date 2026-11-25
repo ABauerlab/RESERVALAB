@@ -134,6 +134,32 @@ export function useReservaActions(
     await confirmarSemNotificar.mutateAsync(r.id);
   }
 
+  const solicitarConfirmacao = useMutation({
+    mutationFn: async (id: string) => {
+      const { data, error } = await supabase.rpc("solicitar_confirmacao_manual", {
+        _reserva_id: id,
+      });
+      if (error) throw error;
+      const resultado = data as { ok: boolean; erro?: string } | null;
+      if (!resultado?.ok) throw new Error(resultado?.erro ?? "ERRO_DESCONHECIDO");
+    },
+    onSuccess: () => {
+      toast.success("Solicitação enviada. O cliente recebe a mensagem de confirmação em breve.");
+    },
+    onError: (err: unknown) => {
+      const msg = err instanceof Error ? err.message : "";
+      if (msg === "EVENTO_EM_NEGOCIACAO")
+        toast.error("Essa reserva está em negociação com a equipe — não dá para pedir confirmação ao cliente ainda.");
+      else if (msg === "RESERVA_NAO_PENDENTE")
+        toast.error("Essa reserva não está mais pendente.");
+      else toast.error("Não foi possível solicitar a confirmação.");
+    },
+  });
+
+  async function handleSolicitarConfirmacao(r: Reserva) {
+    await solicitarConfirmacao.mutateAsync(r.id);
+  }
+
   async function handleReconfirm(r: Reserva) {
     await updateReserva.mutateAsync({
       id: r.id,
@@ -172,14 +198,19 @@ export function useReservaActions(
   }
 
   const pending =
-    updateReserva.isPending || deleteReserva.isPending || confirmarSemNotificar.isPending;
+    updateReserva.isPending ||
+    deleteReserva.isPending ||
+    confirmarSemNotificar.isPending ||
+    solicitarConfirmacao.isPending;
 
   return {
     updateReserva,
     deleteReserva,
     confirmarSemNotificar,
+    solicitarConfirmacao,
     handleConfirm,
     handleConfirmSemNotificar,
+    handleSolicitarConfirmacao,
     handleReconfirm,
     handleCancel,
     handleSetStatus,

@@ -204,6 +204,13 @@ function ReservarPage() {
     return null;
   }, [capacidade, precisaHorario, horario, quantidade, data, horariosOpcoes.length]);
 
+  // Evento particular tem faixa fixa de quantidade (mínimo 50, máximo 180);
+  // os demais tipos não têm limite de negócio aqui (o site só evita valores
+  // absurdos no próprio input).
+  const qtdMin = isEvento ? 50 : 1;
+  const qtdMax = isEvento ? 180 : 5000;
+  const quantidadeForaDoLimiteDeEvento = isEvento && (quantidade < qtdMin || quantidade > qtdMax);
+
   const podeEnviar =
     !!tenantQ.data &&
     !bloqueio &&
@@ -211,6 +218,7 @@ function ReservarPage() {
     nome.trim().length >= 2 &&
     telefoneValido(telefone) &&
     quantidade > 0 &&
+    !quantidadeForaDoLimiteDeEvento &&
     !!data &&
     (!precisaHorario || !!horario) &&
     (!isEvento || tipoEvento.trim().length > 0);
@@ -246,7 +254,9 @@ function ReservarPage() {
 
     if (error || !codigo) {
       const msg = error?.message ?? "";
-      if (msg.includes("indisponivel"))
+      if (msg.includes("minimo") || msg.includes("maximo"))
+        toast.error("Para evento particular, a quantidade deve ficar entre 50 e 180 pessoas.");
+      else if (msg.includes("indisponivel"))
         toast.error("Essa data ou horário não está disponível. Escolha outro.");
       else if (msg.includes("Telefone")) toast.error("Confira o telefone informado.");
       else if (msg.includes("nao esta disponivel"))
@@ -342,7 +352,6 @@ function ReservarPage() {
                   <li>Carne de panela com pãozinho</li>
                   <li>Bolinho de linguiça</li>
                   <li>Chips de jiló</li>
-                  <li>Coxinha de moranga com rabada</li>
                   <li>Batata frita</li>
                   <li>Harumaki de carne de panela</li>
                 </ul>
@@ -428,8 +437,17 @@ function ReservarPage() {
             />
           </Field>
 
-          <Field label={isEvento || isCasa ? "Quantidade prevista" : "Quantidade de pessoas"}>
-            <QuantityInput value={quantidade} onChange={setQuantidade} min={1} max={5000} />
+          <Field
+            label={isEvento || isCasa ? "Quantidade prevista" : "Quantidade de pessoas"}
+            hint={
+              isEvento
+                ? quantidadeForaDoLimiteDeEvento
+                  ? "Evento particular: mínimo de 50 e máximo de 180 pessoas."
+                  : "Mínimo de 50 • Máximo de 180 pessoas"
+                : undefined
+            }
+          >
+            <QuantityInput value={quantidade} onChange={setQuantidade} min={qtdMin} max={qtdMax} />
           </Field>
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
