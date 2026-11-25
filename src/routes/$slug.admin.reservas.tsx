@@ -557,6 +557,7 @@ function AdminReservas() {
         onClose={fechar}
         onConfirm={() => selected && actions.handleConfirm(selected)}
         onConfirmSemNotificar={() => selected && actions.handleConfirmSemNotificar(selected)}
+        onSolicitarConfirmacao={() => selected && actions.handleSolicitarConfirmacao(selected)}
         onReconfirm={() => selected && actions.handleReconfirm(selected)}
         onSetStatus={(status) => selected && actions.handleSetStatus(selected, status)}
         onSave={(patch) =>

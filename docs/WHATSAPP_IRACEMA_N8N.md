@@ -334,6 +334,41 @@ Esta etapa corrigiu o path e, junto, adicionou o tratamento pedido para a altera
   e chamaria ferramentas reais (inclusive `Avisar equipe`, que manda WhatsApp real), o que a
   tarefa pediu para evitar.
 
+## Etapa 5 de 25/11/2026: pendências finais (sem auditoria histórica)
+
+Fora de escopo nesta etapa, por pedido explícito: auditoria histórica completa do WhatsApp,
+métricas de conversão, análise de atendimentos antigos.
+
+- **Autonomia e anti-contradição no prompt**: nova seção "Autonomia (resolva, nao so encaminhe)"
+  — reforça que `Avisar equipe` só entra quando a própria ferramenta pedir ou for algo
+  genuinamente fora do que as ferramentas cobrem; estende a lógica de fechamento/vendas para
+  reserva comum (não só evento); reforça nunca contradizer preço/mínimo/condição já dada na
+  mesma conversa. Publicado e verificado lendo o `systemMessage` armazenado (não só o retorno de
+  sucesso) — as 8 ferramentas continuam intactas.
+- **Formulário do Teggly (evento particular)**: `QuantityInput` agora usa `min=50`/`max=180`
+  quando `tipo=evento` (antes aceitava 1-5000 pessoas mesmo em evento, sem checagem nenhuma),
+  com aviso visual e mensagem de erro específica ("Para evento particular, a quantidade deve
+  ficar entre 50 e 180 pessoas.") em vez do genérico. Removido "Coxinha de moranga com rabada"
+  da lista de petiscos do formulário (já tinha sido removido da base de conhecimento, mas não
+  do site — contradição real entre os dois canais, corrigida).
+- **23/12/2026 detalhado**: bloco da base de conhecimento passou a dizer "das 11h às 18h"
+  (explícito, não só "até as 18h") e inclui o prato do dia (filé de tilápia — mesmo prato de
+  quarta-feira comum) e o link do cardápio.
+- **Botão "Solicitar confirmação" no Teggly** (novo): `ReservaDetail` ganhou a ação
+  `solicitar_confirmacao`, disponível só para reserva `pendente` e **sem**
+  `confirmacao_manual_necessaria` (evento em negociação). Chama
+  `public.solicitar_confirmacao_manual(_reserva_id)`, que insere um pedido em
+  `public.solicitacoes_confirmacao_manual` sem tocar no status da reserva. Testado com usuário
+  simulado via `request.jwt.claims` (sem sessão real): pendente elegível cria o pedido; evento em
+  negociação e reserva já confirmada são bloqueados; status da reserva não muda.
+  Workflow novo **"Iracema - Solicitar confirmacao manual (WhatsApp)"**
+  (`https://n8n.bauerlab.com.br/workflow/XN2bTbvPO9B3o3FH`) lê essa fila (mesmo padrão de claim
+  com `FOR UPDATE SKIP LOCKED` do workflow do grupo), manda a mensagem personalizada e marca
+  `enviado`/`enviado_em`. Testado com `test_workflow` (dados simulados, nenhuma mensagem real).
+  **Criado como rascunho, inativo** — pendente de revisão do texto da mensagem antes de publicar.
+- Migrations: `supabase/migrations/20261125140000_iracema_botao_solicitar_confirmacao.sql` e
+  `supabase/migrations/20261125141000_iracema_base_detalhe_23_12.sql`.
+
 ## Correções de 21/11/2026
 
 - **Lembrete de 24h dizia "amanhã" para reserva de hoje.** O texto tinha "amanhã" fixo e a consulta

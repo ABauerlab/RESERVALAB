@@ -18,6 +18,7 @@ import {
   RotateCcw,
   Save,
   Loader2,
+  MessageCircleQuestion,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -51,6 +52,7 @@ import { SidePanel } from "./SidePanel";
 const LABEL: Record<DetailAction, string> = {
   confirmar: "Confirmar e avisar no WhatsApp",
   confirmar_sem_avisar: "Confirmar sem avisar",
+  solicitar_confirmacao: "Solicitar confirmação ao cliente",
   reconfirmar: "Reconfirmar no WhatsApp",
   finalizar: "Finalizar",
   editar: "Editar",
@@ -62,6 +64,7 @@ const LABEL: Record<DetailAction, string> = {
 const ICON: Record<DetailAction, React.ComponentType<{ className?: string }>> = {
   confirmar: IconeWhatsApp,
   confirmar_sem_avisar: CheckCircle2,
+  solicitar_confirmacao: MessageCircleQuestion,
   reconfirmar: BellRing,
   finalizar: CheckCircle2,
   editar: Pencil,
@@ -80,6 +83,7 @@ export function ReservaDetail({
   onClose,
   onConfirm,
   onConfirmSemNotificar,
+  onSolicitarConfirmacao,
   onReconfirm,
   onSetStatus,
   onSave,
@@ -91,6 +95,7 @@ export function ReservaDetail({
   onClose: () => void;
   onConfirm: () => unknown;
   onConfirmSemNotificar: () => unknown;
+  onSolicitarConfirmacao: () => unknown;
   onReconfirm: () => unknown;
   onSetStatus: (s: ReservaStatus) => void;
   onSave: (patch: ReservaUpdate) => Promise<void>;
@@ -163,6 +168,8 @@ export function ReservaDetail({
         return void onConfirm();
       case "confirmar_sem_avisar":
         return void onConfirmSemNotificar();
+      case "solicitar_confirmacao":
+        return void onSolicitarConfirmacao();
       case "reconfirmar":
         return void onReconfirm();
       case "finalizar":

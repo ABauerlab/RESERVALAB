@@ -24,6 +24,7 @@ export function rowMainAction(r: Reserva): MainAction {
 export type DetailAction =
   | "confirmar"
   | "confirmar_sem_avisar"
+  | "solicitar_confirmacao"
   | "reconfirmar"
   | "finalizar"
   | "editar"
@@ -38,7 +39,16 @@ export function detailActions(r: Reserva): { primary: DetailAction | null; more:
     case "pendente":
       return {
         primary: "confirmar",
-        more: ["confirmar_sem_avisar", "finalizar", "editar", "cancelar", "excluir"],
+        more: [
+          "confirmar_sem_avisar",
+          // "Evento - A negociar" ainda está em negociação com a equipe: o
+          // botão de pedir confirmação ao cliente não se aplica a esse caso.
+          ...(r.confirmacao_manual_necessaria ? [] : (["solicitar_confirmacao"] as const)),
+          "finalizar",
+          "editar",
+          "cancelar",
+          "excluir",
+        ],
       };
     case "confirmada":
       return r.reconfirmada_em
