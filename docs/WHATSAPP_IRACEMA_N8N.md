@@ -254,10 +254,9 @@ Migration `supabase/migrations/20261118200000_*.sql`.
   `120363042936295967@g.us` duas mensagens: o resumo da mudança (nova reserva confirmada,
   cancelamento de reserva confirmada, ou alteração de reserva confirmada) e a lista completa de
   reservas confirmadas atualizadas (`public.lista_reservas_confirmadas_grupo`). Reserva que
-  nunca foi confirmada não gera aviso. **Esse workflow está criado como rascunho, inativo** —
-  não foi publicado nem testado, porque o grupo tem os sócios e a regra do projeto proíbe teste
-  nesse grupo. Antes de publicar: revisar o texto das duas mensagens e confirmar a formatação da
-  lista com a equipe, depois usar `publish_workflow`.
+  nunca foi confirmada não gera aviso. Título da lista é `DD/MM/AAAA HH:MM` (sem segundos).
+  **Ativado em produção em 25/11/2026**, após a equipe revisar e aprovar o texto das duas
+  mensagens.
 
 ## Correções de 21/11/2026
 
