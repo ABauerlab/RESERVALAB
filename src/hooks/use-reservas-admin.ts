@@ -140,11 +140,16 @@ export function useReservaActions(
         _reserva_id: id,
       });
       if (error) throw error;
-      const resultado = data as { ok: boolean; erro?: string } | null;
+      const resultado = data as { ok: boolean; erro?: string; ja_pendente?: boolean } | null;
       if (!resultado?.ok) throw new Error(resultado?.erro ?? "ERRO_DESCONHECIDO");
+      return resultado;
     },
-    onSuccess: () => {
-      toast.success("Solicitação enviada. O cliente recebe a mensagem de confirmação em breve.");
+    onSuccess: (resultado) => {
+      if (resultado?.ja_pendente) {
+        toast.info("Já existe uma solicitação aguardando envio para essa reserva.");
+      } else {
+        toast.success("Solicitação enviada. O cliente recebe a mensagem de confirmação em breve.");
+      }
     },
     onError: (err: unknown) => {
       const msg = err instanceof Error ? err.message : "";
