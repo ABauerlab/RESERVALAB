@@ -369,6 +369,48 @@ métricas de conversão, análise de atendimentos antigos.
 - Migrations: `supabase/migrations/20261125140000_iracema_botao_solicitar_confirmacao.sql` e
   `supabase/migrations/20261125141000_iracema_base_detalhe_23_12.sql`.
 
+## Etapa 6 de 25/11/2026: publicação do botão "Solicitar confirmação"
+
+- **Texto final da mensagem** (aprovado pelo usuário) aplicado no nó "Montar mensagem":
+  ```
+  Oi, {nome}! Tudo bem? 💛
+  Estamos entrando em contato para confirmar sua reserva no Iracema:
+  📅 Data: {DD/MM}
+  🕒 Horário: {HH:MM}
+  👥 Pessoas: {quantidade}
+  Podemos confirmar sua presença?
+  Se precisar alterar alguma informação ou não puder mais comparecer, é só nos avisar por aqui!
+  Você também pode confirmar diretamente pelo link:
+  {link de acompanhamento}
+  Será um prazer receber vocês no Iracema! 💛
+  ```
+- **Tratamento de erro de envio**: nó HTTP "EvolutionAPI - Enviar solicitacao de confirmacao" com
+  `onError: continueErrorOutput`; saída de erro vai para o novo nó "Marcar erro de envio"
+  (`UPDATE ... SET enviado = true, enviado_em = now(), erro = $2`), que registra a falha e evita
+  retentativa infinita; o pedido não fica preso. A falha fica visível em
+  `solicitacoes_confirmacao_manual.erro` para a equipe consultar.
+- **Falha de duplicação encontrada e corrigida antes de publicar**: testes isolados mostraram que
+  2 cliques na mesma reserva ainda pendente criavam 2 linhas na fila (2 mensagens ao cliente).
+  Corrigido com índice único parcial
+  `solicitacoes_confirmacao_manual_uma_pendente_idx ON solicitacoes_confirmacao_manual(reserva_id)
+  WHERE NOT enviado` e nova checagem em `solicitar_confirmacao_manual`: clique repetido numa
+  reserva com pedido ainda não enviado retorna `{"ok": true, "ja_pendente": true}` sem inserir
+  linha nova; depois que o pedido anterior é marcado `enviado`, um novo clique volta a criar
+  pedido normalmente. Frontend (`use-reservas-admin.ts`) mostra toast informativo diferente
+  para esse caso. Migration:
+  `supabase/migrations/20261125150000_iracema_confirmacao_manual_evita_duplicados.sql`.
+- **Testes finais (isolados, `BEGIN...ROLLBACK`, sem reserva real nem envio real)**: pendente
+  elegível cria pedido; clique repetido não duplica (fila permanece com 1 linha); evento em
+  negociação bloqueado (`EVENTO_EM_NEGOCIACAO`); reserva já confirmada bloqueada
+  (`RESERVA_NAO_PENDENTE`); status da reserva nunca muda em nenhum cenário; chamada sem permissão
+  bloqueada (`SEM_PERMISSAO`). `test_workflow` com `pinData` confirmou o texto final da mensagem
+  renderizado corretamente no caminho de sucesso (o caminho de erro do HTTP não pode ser simulado
+  por `pinData` — validado por revisão do node, não por execução).
+- **Publicado**: workflow `XN2bTbvPO9B3o3FH` ativado; `activeVersionId` confirmado igual ao
+  `versionId` após publicar. Releitura confirmou: agente Dona Iracema (`nAlZi521cF2d41xs`) e
+  workflow do grupo de reservas (`eHpDcrwZnHeWs92I`) permanecem inalterados (mesmo `versionId`/
+  `activeVersionId` e `updatedAt` de antes desta etapa).
+
 ## Correções de 21/11/2026
 
 - **Lembrete de 24h dizia "amanhã" para reserva de hoje.** O texto tinha "amanhã" fixo e a consulta
