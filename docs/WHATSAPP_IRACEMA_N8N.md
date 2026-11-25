@@ -238,10 +238,17 @@ Migration `supabase/migrations/20261118200000_*.sql`.
   nunca aceitar evento particular com menos de 50 pessoas, com orientação de fechamento de
   vendas. Seção 23 ganhou o bloco da quarta-feira 23/12/2026 (horário estendido + aviso de
   pausa entre Natal e Réveillon, sem data de reabertura cadastrada).
-- **Agente mais autônomo, menos avisos à equipe.** O prompt (`systemMessage` do nó **Dona
-  Iracema (Agente)**) não documentava as ferramentas `Alterar reserva (sistema)`, `Consultar
-  eventos em destaque` e `Avisar equipe (pedido que o sistema nao resolve)` — o agente escalava
-  por precaução em vez de resolver sozinho. Agora o prompt cobre as 8 ferramentas ligadas ao
+- **Agente mais autônomo, menos avisos à equipe.** ⚠️ *Correção de 25/11/2026 (etapa 3): esta
+  edição foi descrita aqui como publicada em 25/11/2026, mas **nunca aplicou de fato** — o
+  `setNodeParameter` usou o path `/parameters/systemMessage` (errado; deveria ser
+  `/systemMessage`) e o prompt em produção ficou byte-a-byte idêntico ao original até ser
+  corrigido na etapa 3, quando a publicação foi verificada lendo o texto realmente armazenado,
+  não só o retorno de sucesso da chamada. Lição: depois de qualquer `setNodeParameter` em
+  `systemMessage`, reler o valor armazenado antes de considerar aplicado.* O prompt
+  (`systemMessage` do nó **Dona Iracema (Agente)**) não documentava as ferramentas `Alterar
+  reserva (sistema)`, `Consultar eventos em destaque` e `Avisar equipe (pedido que o sistema nao
+  resolve)` — o agente escalava por precaução em vez de resolver sozinho. Agora o prompt cobre as
+  8 ferramentas ligadas ao
   agente, deixa explícito que `Avisar equipe` é só para os casos que as outras ferramentas não
   resolvem (evento/casamento/>30 pessoas, reclamação que precisa de decisão humana, reserva
   "Evento - A negociar"), e adiciona uma seção de fechamento/vendas (conduzir até o fechamento,
@@ -298,9 +305,34 @@ foi usada.
   de rejeição — a reserva original fica **intacta e confirmada**, e o pedido de mudança entra em
   `public.alteracoes_pendentes` (nova tabela, uma linha pendente por reserva) aguardando a equipe
   aplicar manualmente no Teggly. Retorno passou a ser `ALTERACAO_PRECISA_CONFIRMACAO_MANUAL_DA_EQUIPE`.
-  O prompt da Dona Iracema ainda não foi atualizado para esse código de erro específico (fica
-  pendente; por ora cai no tratamento genérico de erro que já existia).
 - Migration: `supabase/migrations/20261125130000_iracema_grupo_concorrencia_e_regras.sql`.
+
+## Etapa 3 de 25/11/2026: prompt trata `ALTERACAO_PRECISA_CONFIRMACAO_MANUAL_DA_EQUIPE`
+
+Ao preparar esse ajuste, descobri que a edição da etapa 1 (ver nota acima) nunca tinha aplicado —
+o prompt em produção estava idêntico ao original, sem nenhuma das 8 ferramentas documentadas.
+Esta etapa corrigiu o path e, junto, adicionou o tratamento pedido para a alteração de reserva:
+
+- Nova seção **"Alteracao de reserva que precisa de confirmacao manual da equipe"**: quando
+  `Alterar reserva (sistema)` devolve `ALTERACAO_PRECISA_CONFIRMACAO_MANUAL_DA_EQUIPE`, o prompt
+  manda a Dona Iracema (a) nunca dizer que a alteração ou a reserva foram confirmadas, (b) nunca
+  dizer que a equipe já aprovou, (c) explicar que a reserva atual continua válida enquanto a
+  equipe avalia, (d) chamar `Avisar equipe` uma única vez por pedido (nunca duplicar o aviso na
+  mesma conversa), (e) nunca tentar contornar chamando `Alterar reserva` de novo com outros
+  dados, nunca cancelar a reserva original, nunca criar uma reserva nova no lugar, (f) nunca
+  prometer prazo de retorno não definido nas regras da casa, (g) nunca confundir isso com uma
+  reserva nova de evento particular (o mínimo/máximo de 50/180 é só para evento novo).
+- A busca por um mecanismo automático que já encaminhasse esse caso para a equipe não achou
+  nenhum: `alteracoes_pendentes` não tem trigger, e nenhum trigger de `reservas` dispara nesse
+  ramo da função (ela retorna antes de qualquer `UPDATE` em `reservas`). `Avisar equipe` (chamada
+  pelo agente) é a única notificação possível hoje — sem risco de duplicidade pelo lado do banco.
+- Publicado e verificado lendo o `systemMessage` realmente armazenado na versão ativa (não só o
+  retorno de sucesso), confirmando que o texto publicado é idêntico ao pretendido e que as 8
+  ferramentas continuam ligadas ao agente.
+- Teste dos cenários A-E foi uma revisão lógica do texto do prompt contra cada caso pedido, não
+  uma execução real do modelo: executar o agente de verdade exigiria rodar o webhook de produção
+  e chamaria ferramentas reais (inclusive `Avisar equipe`, que manda WhatsApp real), o que a
+  tarefa pediu para evitar.
 
 ## Correções de 21/11/2026
 
