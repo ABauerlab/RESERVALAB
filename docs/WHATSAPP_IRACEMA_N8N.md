@@ -258,6 +258,50 @@ Migration `supabase/migrations/20261118200000_*.sql`.
   **Ativado em produção em 25/11/2026**, após a equipe revisar e aprovar o texto das duas
   mensagens.
 
+## Correções de 25/11/2026 (etapa 2: concorrência, formato e regras)
+
+Tudo validado antes em transações com `ROLLBACK` e, no caso do workflow, com `test_workflow`
+(dados simulados) — nenhuma mensagem de teste foi enviada ao grupo real, nenhuma reserva real
+foi usada.
+
+- **Trava de concorrência**: "Buscar notificacoes pendentes" deixou de ser um `SELECT` simples e
+  passou a ser um `UPDATE ... RETURNING` com `FOR UPDATE SKIP LOCKED`, marcando `processando_em`
+  nas linhas escolhidas. Uma segunda execução nunca pega as mesmas linhas (testado com claim
+  duplo numa tabela de rascunho isolada: split exato, zero sobreposição). Trava expira em 3
+  minutos para recuperar execuções que falharam no meio do processamento.
+- **Controle de envio por mensagem**: `enviado`/`enviado_em` saíram de uso (mantidas na tabela só
+  por compatibilidade, nunca removidas) em favor de `resumo_enviado` e `lista_enviada`,
+  independentes. Uma notificação só é dada como concluída quando as duas são `true`. Risco
+  residual conhecido e não eliminado: se o envio HTTP de uma mensagem tiver sucesso mas a
+  execução cair antes do `UPDATE` que marca a flag, um reenvio é possível depois que a trava
+  expira — janela mínima, mas existe.
+- **Agrupamento de alterações**: o trigger `ia_notificar_grupo_reservas` agora faz `UPDATE` numa
+  notificação `'alterada'` ainda pendente (nenhuma das duas mensagens enviada) da mesma reserva,
+  em vez de inserir uma nova linha a cada `UPDATE` de `reservas`. Guarda o estado de antes da
+  primeira alteração (`estado_antes_texto`) e sempre recalcula o resumo contra o estado mais
+  recente. Se a notificação já tiver sido totalmente enviada, a próxima alteração cria uma nova.
+- **Formato da mensagem da lista**: reescrito para o padrão da equipe — cabeçalho
+  `*RESERVAS <DIA DA SEMANA> <DD/MM>*` + `*<LOCAL ou "SEM LOCAL DEFINIDO">*`, agrupado por
+  (data, área), com Nome/Data/Quantidade de pessoas/Horário/Telefone/Observação por reserva.
+- **Reserva fora do horário, qualquer quantidade**: `criar_reserva` não bloqueia mais nenhuma
+  reserva fora do horário normal (antes só bloqueava até 30 pessoas) — toda reserva fora do
+  horário vira `"Evento - A negociar"` (`confirmacao_manual_necessaria = true`), sem exceção de
+  tamanho.
+- **Mínimo/máximo de evento particular no banco**: `criar_reserva` agora rejeita `_tipo = 'evento'`
+  com menos de 50 ou mais de 180 pessoas, direto na função (antes só existia como texto na base
+  de conhecimento e na UI, sem validação real). **Pendência registrada, não implementada**: o
+  formulário do site (`$slug.reservar.$tipo.tsx`) ainda mostra a mensagem genérica "Não foi
+  possível enviar sua reserva. Tente novamente." para esse erro, e o campo de quantidade não tem
+  limite visual — melhorar isso é uma etapa futura, por decisão da equipe.
+- **`agente_alterar_reserva` alinhada com `criar_reserva`**: alterar uma reserva confirmada para
+  fora do horário (qualquer quantidade) não aplica mais a mudança direto nem devolve só um erro
+  de rejeição — a reserva original fica **intacta e confirmada**, e o pedido de mudança entra em
+  `public.alteracoes_pendentes` (nova tabela, uma linha pendente por reserva) aguardando a equipe
+  aplicar manualmente no Teggly. Retorno passou a ser `ALTERACAO_PRECISA_CONFIRMACAO_MANUAL_DA_EQUIPE`.
+  O prompt da Dona Iracema ainda não foi atualizado para esse código de erro específico (fica
+  pendente; por ora cai no tratamento genérico de erro que já existia).
+- Migration: `supabase/migrations/20261125130000_iracema_grupo_concorrencia_e_regras.sql`.
+
 ## Correções de 21/11/2026
 
 - **Lembrete de 24h dizia "amanhã" para reserva de hoje.** O texto tinha "amanhã" fixo e a consulta
